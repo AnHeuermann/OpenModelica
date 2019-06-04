@@ -1719,7 +1719,7 @@ try
   end if;
   // Get Wights
   (_,_,sortedEqs) := getMarkedNodes(eindex, eqArray, varArray, aMatrix, aMatrixT, nE, nV);
-  print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(nE),intString),",") + "\n\n");
+  //print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(nE),intString),",") + "\n\n");
   //print("\nDiscrete Vars:\n" + stringDelimitList(arrayList(nE),",") + "\n\n");
 
   if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
@@ -1745,7 +1745,7 @@ try
   for i in sortedEqs loop
     if(loopSize) > 0 then
       (tearingvars, residualequations, helpInnerEquations) :=
-      getTearingSetFromEq(i, tearingvars, residualequations, helpInnerEquations, aMatrix, aMatrixT, me, meT, varArray, eqArray, nE, nV,loopSize);
+      getTearingSetFromEq(i, isyst, ishared ,tearingvars, residualequations, helpInnerEquations, aMatrix, aMatrixT, me, meT, varArray, eqArray, nE, nV,loopSize);
     else
       residualequations := i::residualequations;
     end if;
@@ -1761,6 +1761,8 @@ end fastTearing;
 
 function getTearingSetFromEq
   input Integer equationIndex;
+  input BackendDAE.EqSystem isyst;
+  input BackendDAE.Shared ishared;
   input output list<Integer>  tearingvars;
   input output list<Integer>  residualequations;
   input output BackendDAE.InnerEquations InnerEquations;
@@ -1780,7 +1782,7 @@ protected
   BackendDAE.InnerEquation innerEquation;
   Integer idx, innerVarIdx;
   BackendDAE.Solvability s;
-  Boolean Marker = false "to know is the equation casual now";
+  Boolean b, Marker = false "to know is the equation casual now";
 algorithm
   try
   arrayUpdate(eqArray,equationIndex,false) "remove the edges from the equation equationIndex to Variables";
@@ -1797,6 +1799,8 @@ algorithm
       loopSize := loopSize - 1;
       if not Marker then
         if solvable(s) then
+          b := BackendDAEUtil.findSolvabelVarInEquation(idx, equationIndex, varArray, isyst, ishared);
+          //print("\n solvability: " + boolString(b) + " \n");
           innerEquation := BackendDAE.INNEREQUATION(equationIndex, {idx});
           Marker := true;
           innerVarIdx := idx;

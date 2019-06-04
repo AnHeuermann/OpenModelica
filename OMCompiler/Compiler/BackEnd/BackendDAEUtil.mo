@@ -3989,11 +3989,17 @@ protected
   BackendDAE.EquationArray eqns;
   BackendDAE.Equation eq;
   DAE.ComponentRef cr;
+  constant Boolean debug = true;
 algorithm
   BackendDAE.EQSYSTEM(orderedVars = vars,orderedEqs = eqns) := isyst;
   BackendDAE.SHARED(globalKnownVars=globalKnownVars) := ishared;
   eq := BackendEquation.get(eqns, inEquation);
   BackendDAE.VAR(varName = cr) := BackendVariable.getVarAt(vars, inVariable);
+
+  if debug then
+  print("\n Equation Check: " + BackendDump.equationString(eq) + "\n");
+  end if;
+
   _ := matchcontinue (eq,globalKnownVars)
     local
       Integer size;
@@ -4009,33 +4015,32 @@ algorithm
       list<DAE.ComponentRef> algoutCrefs;
       DAE.Expand crefExpand;
       DAE.ElementSource source;
-
     // EQUATION
     case (BackendDAE.EQUATION(exp = e1,scalar = e2),_)
       equation
-        solvability = fastTearingRowEnhanced(e1, e2, cr, varArray, vars, globalKnownVars);
+        solvability = fastTearingRowEnhanced(e1, e2, cr, varArray, vars, globalKnownVars, debug);
       then true;
     // COMPLEX_EQUATION
     case (BackendDAE.COMPLEX_EQUATION(size=size,left=e1,right=e2),_)
       equation
-        solvability = fastTearingRowEnhanced(e1, e2, cr, varArray, vars, globalKnownVars);
+        solvability = fastTearingRowEnhanced(e1, e2, cr, varArray, vars, globalKnownVars, debug);
       then true;
     // ARRAY_EQUATION
     case (BackendDAE.ARRAY_EQUATION(dimSize=ds,left=e1,right=e2),_)
       equation
-        solvability = fastTearingRowEnhanced(e1, e2, cr, varArray, vars, globalKnownVars);
+        solvability = fastTearingRowEnhanced(e1, e2, cr, varArray, vars, globalKnownVars, debug);
       then  true;
 
     // SOLVED_EQUATION
     case (BackendDAE.SOLVED_EQUATION(componentRef = cr,exp = e),_)
       equation
         expCref = Expression.crefExp(cr);
-        solvability = fastTearingRowEnhanced(expCref, e, cr, varArray, vars, globalKnownVars);
+        solvability = fastTearingRowEnhanced(expCref, e, cr, varArray, vars, globalKnownVars, debug);
       then   true;
     // RESIDUAL_EQUATION
     case (BackendDAE.RESIDUAL_EQUATION(exp = e),_)
       equation
-          solvability = fastTearingRowEnhanced(e, DAE.RCONST(0.0), cr, varArray, vars, globalKnownVars);
+          solvability = fastTearingRowEnhanced(e, DAE.RCONST(0.0), cr, varArray, vars, globalKnownVars, debug);
       then  true;
 
    /* // WHEN_EQUATION
@@ -4101,7 +4106,9 @@ algorithm
       then
         fail();
   end matchcontinue;
-
+  if debug then
+    print("\n solvability: " + boolString(solvability) + " \n");
+  end if;
 end findSolvabelVarInEquation;
 
 protected function fastTearingRowEnhanced
@@ -4111,6 +4118,7 @@ protected function fastTearingRowEnhanced
   input array<Boolean> varArray;
   input BackendDAE.Variables inVariables;
   input BackendDAE.Variables globalKnownVars;
+  input  Boolean debug;
   output Boolean solvability;
 algorithm
   solvability := matchcontinue(e1,e2,inCref,globalKnownVars)
@@ -4123,7 +4131,7 @@ algorithm
       list<DAE.ComponentRef> crlst;
       Absyn.Path path,path1;
       list<DAE.Exp> explst,crexplst, explst2;
-      Boolean b,solved,derived, b1, b2, b_1;
+      Boolean b,solved,constOneorMOne, b1, b2, b_1;
       BackendDAE.Constraints cons;
    // case({},_,_,_,_,_,_,_) then inRow;
 /*    case(r::rest,_,_,_,_,_,_,_)
@@ -4141,34 +4149,87 @@ algorithm
         true;
      case(_,_,_,_)
       equation
+        //print("\n Equation Check: " + BackendDump.expString(eq) + "\n");
         cr1 = ComponentReference.crefPrefixDer(inCref);
         e = Expression.crefExp(cr1);
         ((e,_)) = Expression.replaceExp(Expression.expSub(e1,e2), DAE.CALL(Absyn.IDENT("der"),{e},DAE.callAttrBuiltinReal), Expression.crefExp(cr1));
         e_derAlias = Expression.traverseExpDummy(e, replaceDerCall);
-        (de,derived) = fastTearingTestSolvability(e_derAlias, cr1, inVariables,NONE());
+        (de,constOneorMOne) = fastTearingTestSolvability(e_derAlias, cr1, inVariables,NONE());
         //if derived then
           (de,_) = ExpressionSimplify.simplify(de);
+          if debug then
+          print("\n Expression after Derive: " + ExpressionDump.printExpStr(de) + "\n");
+          end if;
           (_,crlst) = Expression.traverseExpBottomUp(de, Expression.traversingComponentRefFinder, {});
        //????
        //    else
        //    solvab = BackendDAE.SOLVABILITY_SOLVABLE();
        //end if;varArray;
+       if not constOneorMOne then
        b1 = fastTearingContainAnyVar(crlst, varArray, inVariables);
        b2 = containAnyVar(crlst, globalKnownVars);
-      then  matchcontinue(b1,b2)
-        case(true,_)
+       if debug then
+         print("\n Are the Variables that left after derive in algebraic Loop?: " + boolString(b1) + "\n" );
+         print("\n Are the Variables that left after derive a Parameter or Constant?: " + boolString(b2) + "\n" );
+       end if;
+       end if;
+      then  matchcontinue(b1,b2,not stringEqual(Flags.getConfigString(Flags.TEARING_STRICTNESS), "veryStrict"))
+        case(true,_,_)
           then false;
-        case(false,true)
+        case(false,true,true)
         equation
           (nominal,_) = Expression.traverseExpBottomUp(de, replaceVarWithNominal, globalKnownVars);
           (nominal,_) = ExpressionSimplify.simplify(nominal);
           (e3,_) = Expression.traverseExpBottomUp(de, replaceVarWithValue, globalKnownVars);
           (e3,_) = ExpressionSimplify.simplify(e3);
-          true = not Expression.isZeroOrAlmostZero(e1, nominal);
-          b_1 = Expression.isConst(e1);
+          true = not Expression.isZeroOrAlmostZero(e3, nominal);
+          b_1 = Expression.isConst(e3);
           then b_1;
+        case(false,false,_)
+          then true;
+        else then
+          false;
         end matchcontinue;
-      else
+        case(_,_,_,_)
+          equation
+           e = Expression.expSub(e1,e2);
+           e_derAlias = Expression.traverseExpDummy(e, replaceDerCall);
+           (de,constOneorMOne) = fastTearingTestSolvability(e_derAlias, inCref, inVariables,NONE());
+           //if derived then
+          (de,_) = ExpressionSimplify.simplify(de);
+          if debug then
+          print("\n Expression after Derive: " + ExpressionDump.printExpStr(de) + "\n");
+          end if;
+          (_,crlst) = Expression.traverseExpBottomUp(de, Expression.traversingComponentRefFinder, {});
+          //????
+          //    else
+          //    solvab = BackendDAE.SOLVABILITY_SOLVABLE();
+          //end if;varArray;
+          if not constOneorMOne then
+          b1 = fastTearingContainAnyVar(crlst, varArray, inVariables);
+          b2 = containAnyVar(crlst, globalKnownVars);
+            if debug then
+              print("\n Are the Variables that left after derive in algebraic Loop?: " + boolString(b1) + "\n" );
+              print("\n Are the Variables that left after derive a Parameter or Constant?: " + boolString(b2) + "\n" );
+            end if;
+         end if;
+      then  matchcontinue(b1,b2, not stringEqual(Flags.getConfigString(Flags.TEARING_STRICTNESS), "veryStrict"))
+        case(true,_,_)
+          then false;
+        case(false,false,_)
+          then true;
+        case(false,true,true)
+        equation
+          (nominal,_) = Expression.traverseExpBottomUp(de, replaceVarWithNominal, globalKnownVars);
+          (nominal,_) = ExpressionSimplify.simplify(nominal);
+          (e3,_) = Expression.traverseExpBottomUp(de, replaceVarWithValue, globalKnownVars);
+          (e3,_) = ExpressionSimplify.simplify(e3);
+          true = not Expression.isZeroOrAlmostZero(e3, nominal);
+          b_1 = Expression.isConst(e3);
+          then b_1;
+        else false;
+        end matchcontinue;
+       else
         then false;
       end matchcontinue;
 
@@ -4403,7 +4464,7 @@ function fastTearingTestSolvability
   input BackendDAE.Variables vars;
   input Option<DAE.FunctionTree> functions;
   output DAE.Exp f;
-  output Boolean derived;
+  output Boolean constOneorMOne;
 protected
   DAE.Type tp = Expression.typeof(e);
   Boolean trytosolve2 = stringEqual(Flags.getConfigString(Flags.TEARING_STRICTNESS), "casual");
@@ -4416,23 +4477,22 @@ protected
 algorithm
   try
   f := Differentiate.differentiateExpSolve(e, cr, functions);
-  f := match(f)
+  (f,constOneorMOne) := match(f)
         /* der(f(x)) = c/y => c*x = y*lhs */
         case DAE.BINARY(one,DAE.DIV(), DAE.CREF()) /*Note: 1/x => ln(x) => Expression.solve will solve it */
           guard Expression.isConst(one) and not Expression.isZero(one)
-        then one;
-        else f;
+        then (one,true);
+        else (f,false);
       end match;
-   derived := true;
    else
       f := Expression.makeConstOne(tp);
+      constOneorMOne:=true;
    end try;
    if Expression.isZero(f) then
     // see https://trac.openmodelica.org/OpenModelica/ticket/3742#comment:12
     // ExpressionSolve will fail for f == 0 --> internal loops inside tearing
     fail();
    end if;
-   true := derived;
    if debug then
      print("tryToSolveOrDerive" + ExpressionDump.printExpStr(e) + " -> " +  ExpressionDump.printExpStr(f) + " == " + ExpressionDump.printExpStr(Expression.crefExp(cr)) + "\n");
    end if;
