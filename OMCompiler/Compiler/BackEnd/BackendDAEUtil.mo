@@ -3989,7 +3989,7 @@ protected
   BackendDAE.EquationArray eqns;
   BackendDAE.Equation eq;
   DAE.ComponentRef cr;
-  constant Boolean debug = true;
+  constant Boolean debug = false;
 algorithm
   BackendDAE.EQSYSTEM(orderedVars = vars,orderedEqs = eqns) := isyst;
   BackendDAE.SHARED(globalKnownVars=globalKnownVars) := ishared;
@@ -4014,10 +4014,10 @@ protected
 algorithm
 
   if debug then
-  print("\n Equation Check: " + BackendDump.equationString(eq) + "\n");
+  print("\n Equation Check: " + BackendDump.equationString(inEq) + "\n");
   end if;
 
-  _ := match (inEq,globalKnownVars)
+  _ := matchcontinue (inEq,globalKnownVars)
     local
       Integer size;
       list<Integer> lst,ds, lstall, varsSolvedInWhenEqns;
@@ -4031,7 +4031,8 @@ algorithm
       list<BackendDAE.Equation> eqnselse;
       list<DAE.ComponentRef> algoutCrefs;
       DAE.Expand crefExpand;
-	  Boolean try_b;
+      DAE.ComponentRef cr;
+      Boolean try_b;
       DAE.ElementSource source;
     // EQUATION
     case (BackendDAE.EQUATION(exp = e1,scalar = e2),_)
@@ -4050,9 +4051,9 @@ algorithm
       then  true;
 
     // SOLVED_EQUATION
-    case (BackendDAE.SOLVED_EQUATION(componentRef = inCref,exp = e),_)
+    case (BackendDAE.SOLVED_EQUATION(componentRef = cr,exp = e),_)
       equation
-        expCref = Expression.crefExp(inCref);
+        expCref = Expression.crefExp(cr);
         solvability = fastTearingRowEnhanced(expCref, e, inCref, varArray, inVariables, globalKnownVars, debug);
       then   true;
     // RESIDUAL_EQUATION
@@ -4067,16 +4068,18 @@ algorithm
     // 2. vars occur in all branches: check how they are occur
     // 3. vars occur not in all branches: then unsolvable
     case(BackendDAE.IF_EQUATION(conditions=expl,eqnstrue=eqnslst,eqnsfalse=eqnselse),_)
-      equation
+      algorithm
         try
           //check condition?
-          try_b = tryToFindSolvableEqInBranch(inCref, eqnslst, varArray, inVariables, globalKnownVars, debug);
-		  true = try_b;            
-		  try_b = tryToFindSolvableEqInBranch(inCref, eqnslst, varArray, inVariables, globalKnownVars, debug);
-		  true = try_b;
-		  solvability = true;
+	  try_b := tryToFindSolvableEqInBranch(inCref, eqnselse, varArray, inVariables, globalKnownVars, debug);
+          true := try_b;
+          for eqns in eqnslst loop
+            try_b := tryToFindSolvableEqInBranch(inCref, eqns, varArray, inVariables, globalKnownVars, debug);
+            true := try_b;
+          end for;
+          solvability := true;
         else
-		  solvability = false;
+          solvability := false;
         end try;		
       then 
         true;
@@ -4088,7 +4091,7 @@ algorithm
         Error.addMessage(Error.INTERNAL_ERROR,{eqnstr});
       then
         fail();
-  end match;
+  end matchcontinue;
 
 end testSolvabilityForEquation;
 
@@ -4096,8 +4099,7 @@ end testSolvabilityForEquation;
 protected function tryToFindSolvableEqInBranch
   input DAE.ComponentRef inCref;
   input list<BackendDAE.Equation> iEqns;
-  input array<Boolean> varArray;  
-  input BackendDAE.EquationArray eqns;
+  input array<Boolean> varArray;
   input BackendDAE.Variables inVariables;
   input BackendDAE.Variables globalKnownVars;
   input Boolean debug;
@@ -4109,13 +4111,13 @@ algorithm
     try_b := match (eq,try_b)
     local
      Boolean b;  
-     case (_,false);
+     case (_,false)
        equation
-         b = testSolvabilityForEquation(cr, eq, varArray, vars, globalKnownVars, debug);
+         b = testSolvabilityForEquation(inCref, eq, varArray, inVariables, globalKnownVars, debug);
        then b;
      case (BackendDAE.IF_EQUATION(),true)
 	   equation 
-	     b = testSolvabilityForEquation(cr, eq, varArray, vars, globalKnownVars, debug);
+	     b = testSolvabilityForEquation(inCref, eq, varArray, inVariables, globalKnownVars, debug);
 		then false;
     end match; 
 	
@@ -4162,17 +4164,17 @@ algorithm
           end if;
           (_,crlst) = Expression.traverseExpBottomUp(de, Expression.traversingComponentRefFinder, {});
        if not constOneorMOne then
-       b1 = fastTearingContainAnyVar(crlst, varArray, inVariables);
+          b1 = Expression.isConst(de);
        b2 = containAnyVar(crlst, globalKnownVars);
        if debug then
          print("\n Are the Variables that left after derive in algebraic Loop?: " + boolString(b1) + "\n" );
          print("\n Are the Variables that left after derive a Parameter or Constant?: " + boolString(b2) + "\n" );
        end if;
        end if;
-      then  matchcontinue(b1,b2,not stringEqual(Flags.getConfigString(Flags.TEARING_STRICTNESS), "veryStrict"))
-        case(true,_,_)
+      then  matchcontinue(b1,b2, false)//not stringEqual(Flags.getConfigString(Flags.TEARING_STRICTNESS), "veryStrict"))
+         case(false,_,_)
           then false;
-        case(false,true,true)
+         case(true,true,true)
         equation
           (nominal,_) = Expression.traverseExpBottomUp(de, replaceVarWithNominal, globalKnownVars);
           (nominal,_) = ExpressionSimplify.simplify(nominal);
@@ -4181,7 +4183,7 @@ algorithm
           true = not Expression.isZeroOrAlmostZero(e3, nominal);
           b_1 = Expression.isConst(e3);
           then b_1;
-        case(false,false,_)
+        case(true,false,_)
           then true;
         else then
           false;
@@ -4198,17 +4200,17 @@ algorithm
           end if;
           (_,crlst) = Expression.traverseExpBottomUp(de, Expression.traversingComponentRefFinder, {});
           if not constOneorMOne then
-          b1 = fastTearingContainAnyVar(crlst, varArray, inVariables);
+          b1 = Expression.isConst(de);
           b2 = containAnyVar(crlst, globalKnownVars);
             if debug then
               print("\n Are the Variables that left after derive in algebraic Loop?: " + boolString(b1) + "\n" );
               print("\n Are the Variables that left after derive a Parameter or Constant?: " + boolString(b2) + "\n" );
             end if;
          end if;
-         then  matchcontinue(b1,b2, not stringEqual(Flags.getConfigString(Flags.TEARING_STRICTNESS), "veryStrict"))
-             case(true,_,_)
+         then  matchcontinue(b1,b2, false)//not stringEqual(Flags.getConfigString(Flags.TEARING_STRICTNESS), "veryStrict"))
+             case(false,_,_)
                then false;
-             case(false,false,_)
+             case(true,false,_)
                then true;
              case(false,true,true)
               equation
