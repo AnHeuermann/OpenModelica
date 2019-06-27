@@ -4242,7 +4242,12 @@ protected
   BackendDAE.Constraints cons;
 algorithm
   try
-     e := Expression.expSub(e1,e2);
+     try
+       e := Expression.expSub(e1,e2);
+     else
+       solvability := true;
+       return;
+     end try;
      e_derAlias := Expression.traverseExpDummy(e, replaceDerCall);
      (de,constOneorMOne) := fastTearingTestSolvability(e_derAlias, inCref, inVariables,NONE());
      (de,_) := ExpressionSimplify.simplify(de);
