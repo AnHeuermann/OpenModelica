@@ -4059,7 +4059,7 @@ algorithm
     case (BackendDAE.EQUATION(exp = e1,scalar = e2),_)
       equation
         //print("\nEQUATION \n");
-        solvability = true;//fastTearingRowEnhanced(e1, e2, inCref, varArray, inVariables, globalKnownVars, debug);
+       solvability = fastTearingRowEnhanced(e1, e2, inCref, varArray, inVariables, globalKnownVars, debug);
       then true;
     // COMPLEX_EQUATION
     case (BackendDAE.COMPLEX_EQUATION(size=size,left=e1,right=e2),_)
@@ -4095,9 +4095,8 @@ algorithm
     // WHEN_EQUATION
     case (BackendDAE.WHEN_EQUATION(whenEquation = elsewe),_)
       equation
-        //print("\nWhen_EQUATION \n");
-        solvability = true;
-        //solvability = tryToFindSolvableInWhenEq(elsewe, mark, rowmark, vars, globalKnownVars, {}, {});
+        print("\nWHEN_EQUATION are not supported now!\n");
+        fail();
       then true;
 
     // IF_EQUATION

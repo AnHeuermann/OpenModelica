@@ -1678,15 +1678,14 @@ protected
 algorithm
 try
 
- print("\n\n NEW LOOP \n\n");
   linear := BackendDAEUtil.getLinearfromJacType(jacType);
   BackendDAE.SHARED(backendDAEType=DAEtype, info=BackendDAE.EXTRA_INFO(fileNamePrefix=modelName)) := ishared;
   DAEtypeStr := BackendDump.printBackendDAEType2String(DAEtype);
 
-  //if debug then
+  if debug then
   print("\nStrongComponent EQ's "+ stringDelimitList(List.map(eindex,intString),",") + "\n\n");
   print("\nStrongComponent Var's "+ stringDelimitList(List.map(vindx,intString),",") + "\n\n");
-  //end if;
+  end if;
 
   // marker array for current compontSel_alwaysent
   varArray := arrayCreate(size,false);
@@ -1708,16 +1707,8 @@ try
   end for;
   (_,aMatrix,aMatrixT,_,_) := BackendDAEUtil.getIncidenceMatrixScalar(isyst,BackendDAE.SOLVABLE(), SOME(ishared.functionTree));
 
-  // Get advanced adjacency matrix (determine hotSel_neverw the variables occur in the equations)
-  //(me,meT,_,_) := BackendDAEUtil.getAdjacencyMatrixEnhancedScalar(isyst,ishared,false);
-
-   // print("\nnV Array: " + stringDelimitList(List.map(arrayList(varArray),boolString),",") + "\n\n");
-   // print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(eqArray),boolString),",") + "\n\n");
-  // Determine discrete vars
-  print("\nDiscrete Vars:\n" + stringDelimitList(List.map(discreteVars,intString),",") + "\n\n");
    try
     {} := discreteVars;
-    print("\nnot fail()!\n");
    else
     matchDiscreteVars(discreteVars, isyst, ishared, aMatrix, aMatrixT, varArray, eqArray, nE, nV);
        if debug then
@@ -1728,39 +1719,18 @@ try
        //Tearing of the assign
     (tearingvars, residualequations, helpInnerEquations,loopSize) := getTearingSetfromAssign(discreteVars,nE,nV,tearingvars, residualequations, helpInnerEquations, aMatrix, aMatrixT, varArray, eqArray,loopSize);
 
-    print("\n loopSize after getTearingSetfromAssign:" + intString(loopSize) + "\n");
-    end try;
-     //print("\neqMarker Array " + ":\n" + stringDelimitList(List.map(arrayList(eqArray),boolString),",") + "\n\n");
+  end try;
+
  if debug then
     print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(eqArray),boolString),",") + "\n\n");
     print("\nnV Array: " + stringDelimitList(List.map(arrayList(varArray),boolString),",") + "\n\n");
   end if;
-  // Get Wights
-  //(_,_,sortedEqs) := getMarkedNodes(eindex, eqArray, varArray, aMatrix, aMatrixT, nE, nV);
-  //print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(nE),intString),",") + "\n\n");
-  //print("\nDiscrete Vars:\n" + stringDelimitList(arrayList(nE),",") + "\n\n");
 
   if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
     //print("\n\nUNSOLVABLES:\n" + stringDelimitList(List.map(unsolvables,intString),",") + "\n\n");
 //    print("\nDiscrete Vars:\n" + stringDelimitList(List.map(discreteVars,intString),",") + "\n\n");
   end if;
 
-  // Collect variables with annotation attribute 'tearingSelect=always', 'tearingSelect=prefer', 'tearingSelect=avoid' and 'tearingSelect=never'
-  //(tSel_always,tSel_prefer,tSel_avoid,tSel_never) := tearingSelect(var_lst, tearingSelect_always, DAEtypeStr);
-
-  /*
-  print("\nAlways Vars:\n" + stringDelimitList(List.map(tSel_always,intString),",") + "\n\n");
-  print("\nPrefer Vars:\n" + stringDelimitList(List.map(tSel_prefer,intString),",") + "\n\n");
-  print("\nAvoid Vars:\n" + stringDelimitList(List.map(tSel_avoid,intString),",") + "\n\n");
-  print("\nNever Vars:\n" + stringDelimitList(List.map(tSel_never,intString),",") + "\n\n");
-  */
-
-  //Add the descrete, tearingSelect=always ,and unsolvable variables to the tearing set and delete them from varArray.
-  //tearingvars := listAppend(unsolvables, discreteVars);
-  //tearingvars = listAppend(tearingvars, tSel_always);
-
-  //print("\n Number of Residual Equaions:" + intString(listLength(residualequations)) + "\n");
-  //The Fast Tearing algorithm.
   for i in eindex loop
     if eqArray[i] then
        arrayUpdate(eqArray,i,false) "remove the edges from the equation equationIndex to Variables";
@@ -1775,11 +1745,14 @@ try
          end for;
       end if;
     end for;
-  true := listLength(residualequations) < listLength(eindex);
-
+  try
+    true := listLength(residualequations) < listLength(eindex);
+  else
+    print("\n\nWarning: The loop size is equal to tearing set.\n\n");
+  end try;
   ocomp := BackendDAE.TORNSYSTEM(BackendDAE.TEARINGSET(tearingvars, residualequations, listReverse(helpInnerEquations), BackendDAE.EMPTY_JACOBIAN()), NONE(), linear, mixedSystem);
 else
-  Error.addInternalError("function fastTearing failed", sourceInfo());
+  Error.addInternalError("function minimalTearing failed", sourceInfo());
   fail();
 end try;
 end minimalTearing;
@@ -1812,7 +1785,6 @@ protected
 algorithm
 try
 
- print("\n\n NEW LOOP \n\n");
   linear := BackendDAEUtil.getLinearfromJacType(jacType);
   BackendDAE.SHARED(backendDAEType=DAEtype, info=BackendDAE.EXTRA_INFO(fileNamePrefix=modelName)) := ishared;
   DAEtypeStr := BackendDump.printBackendDAEType2String(DAEtype);
@@ -1842,7 +1814,6 @@ try
   end for;
   (_,aMatrix,aMatrixT,_,_) := BackendDAEUtil.getIncidenceMatrixScalar(isyst,BackendDAE.SOLVABLE(), SOME(ishared.functionTree));
 
-  print("\nDiscrete Vars:\n" + stringDelimitList(List.map(discreteVars,intString),",") + "\n\n");
    try
     {} := discreteVars;
     print("\nnot fail()!\n");
@@ -1856,7 +1827,6 @@ try
        //Tearing of the assign
     (tearingvars, residualequations, helpInnerEquations,loopSize) := getTearingSetfromAssign(discreteVars,nE,nV,tearingvars, residualequations, helpInnerEquations, aMatrix, aMatrixT, varArray, eqArray,loopSize);
 
-    print("\n loopSize after getTearingSetfromAssign:" + intString(loopSize) + "\n");
     end try;
      //print("\neqMarker Array " + ":\n" + stringDelimitList(List.map(arrayList(eqArray),boolString),",") + "\n\n");
  if debug then
@@ -2032,7 +2002,7 @@ algorithm
  // print("\nVar occure in Equations:\n" + stringDelimitList(List.map(meT[varIdx],intString),",") + "\n\n");
   for eqIdx in meT[varIdx] loop
     if eqIdx > 0 then
-        print("\n For Discrete: Is equation "+intString(eqIdx) +" still marked"  + boolString(eqArray[eqIdx]) + " \n");
+        //print("\n For Discrete: Is equation "+intString(eqIdx) +" still marked"  + boolString(eqArray[eqIdx]) + " \n");
         if eqArray[eqIdx] then
       b := BackendDAEUtil.findSolvabelVarInEquation(varIdx, eqIdx, varArray, isyst, ishared);
         //  print("\n Is the equation solvable?"  + boolString(b) + " \n");
