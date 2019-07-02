@@ -1638,7 +1638,8 @@ end omcTearing4_1;
 //
 // =============================================================================
 protected function minimalTearing
-  "Describe me :-) "
+  "A tearing algorithm with liniar runtime in the normal case. Simple prevent discrete variable to land in loop.
+   All other variables get set to tearing vars. "
   input BackendDAE.EqSystem isyst;
   input BackendDAE.Shared ishared;
   input list<Integer> eindex;
@@ -1650,8 +1651,7 @@ protected function minimalTearing
   input Integer strongComponentIndex;
   output BackendDAE.StrongComponent ocomp;
 protected
-  // ToDo Clean up
-  Integer size = BackendDAEUtil.systemSize(isyst), loopSize =  0;
+  Integer size = BackendDAEUtil.systemSize(isyst);
   array<Integer> nE, nV;
   list<Integer> tSel_always, tSel_prefer, tSel_avoid, tSel_never,  discreteVars={}, sortedEqs;
   array<Boolean> varArray, eqArray;
@@ -1697,9 +1697,13 @@ try
   (_,aMatrix,aMatrixT,_,_) := BackendDAEUtil.getIncidenceMatrixScalar(isyst,BackendDAE.SOLVABLE(), SOME(ishared.functionTree));
 
 
-   try    // ToDo: Match me
-    {} := discreteVars;
-   else
+    _:= match(discreteVars)
+    local
+      Integer idx;
+    case({})
+    then ();
+    else
+    algorithm
     matchDiscreteVars(discreteVars, isyst, ishared, aMatrix, aMatrixT, varArray, eqArray, nE, nV);
        if debug then
          print("\nDiscrete Vars:\n" + stringDelimitList(List.map(discreteVars,intString),",") + "\n\n");
@@ -1707,17 +1711,13 @@ try
          print("\nnV Array: " + stringDelimitList(List.map(arrayList(nV),intString),",") + "\n\n");
        end if;
        //Tearing of the assign
-      (varArray, eqArray, helpInnerEquations) := getTearingSetfromAssign(discreteVars, nV, varArray, eqArray, helpInnerEquations);  // ToDo or nE??
-  end try;
+      (varArray, eqArray, helpInnerEquations) := getTearingSetfromAssign(discreteVars, nE, varArray, eqArray, helpInnerEquations);
+    then ();
+  end match;
 
  if debug then
     print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(eqArray),boolString),",") + "\n\n");
     print("\nnV Array: " + stringDelimitList(List.map(arrayList(varArray),boolString),",") + "\n\n");
-  end if;
-
-  if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
-    //print("\n\nUNSOLVABLES:\n" + stringDelimitList(List.map(unsolvables,intString),",") + "\n\n");
-    //print("\nDiscrete Vars:\n" + stringDelimitList(List.map(discreteVars,intString),",") + "\n\n");
   end if;
 
   for i in eindex loop
@@ -1736,12 +1736,11 @@ try
     end for;
   end for;
   
-  // ToDo: Verbose dump and if
-  try
-    true := listLength(residualequations) < listLength(eindex);
-  else
-    print("\n\nWarning: The loop size is equal to tearing set.\n\n");
-  end try;
+
+  if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+    print("\nNumber of residual equations: "+ intString(listLength(residualequations)) +"\n");
+  end if;
+
   ocomp := BackendDAE.TORNSYSTEM(BackendDAE.TEARINGSET(tearingvars, residualequations, listReverse(helpInnerEquations), BackendDAE.EMPTY_JACOBIAN()), NONE(), linear, mixedSystem);
 else
   Error.addInternalError("function minimalTearing failed", sourceInfo());
@@ -1796,7 +1795,7 @@ protected
   BackendDAE.Solvability s;
 algorithm
   try
-  // ToDo describe me
+  // This part based on Steward matching algorithm.
   for eqIdx in meT[varIdx] loop
     if eqIdx > 0 then
       if eqArray[eqIdx] then
