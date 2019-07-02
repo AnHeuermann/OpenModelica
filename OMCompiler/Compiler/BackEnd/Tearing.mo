@@ -79,6 +79,8 @@ protected constant String BORDER    = "****************************************"
 protected constant String UNDERLINE = "========================================";
 
 uniontype TearingMethod
+  record MINIMAL_TEARING "Only tear discrete variables from loops"
+    end MINIMAL_TEARING;
   record OMC_TEARING end OMC_TEARING;
   record CELLIER_TEARING end CELLIER_TEARING;
   record TOTAL_TEARING end TOTAL_TEARING;
@@ -140,8 +142,8 @@ protected function getTearingMethod
   output TearingMethod outTearingMethod;
 algorithm
   outTearingMethod := match(inTearingMethod)
+    case ("minimalTearing") then MINIMAL_TEARING();
     case ("omcTearing") then OMC_TEARING();
-
     case ("cellier") then CELLIER_TEARING();
 
     else equation
@@ -214,6 +216,15 @@ algorithm
           (ocomp,outRunMatching) := totalTearing(isyst, ishared, eindex, vindx, ojac, jacType, mixedSystem);
           if debug then execStat("Tearing.totalTearing"); end if;
         then (ocomp,outRunMatching);
+
+      case MINIMAL_TEARING()
+          algorithm
+           if Flags.isSet(Flags.TEARING_DUMP) or Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+             print("\nTearing type: total\n");
+           end if;
+           ocomp := minimalTearing(isyst, ishared, eindex, vindx, {}, ojac, jacType, mixedSystem, strongComponentIndex);
+           if debug then execStat("Tearing.minimalTearing"); end if;
+         then (ocomp, true);
 
       case USER_DEFINED_TEARING()
         algorithm
@@ -1623,6 +1634,236 @@ end omcTearing4_1;
 
 // =============================================================================
 //
+// Minimal Tearing
+//
+// =============================================================================
+protected function minimalTearing
+  "Describe me :-) "
+  input BackendDAE.EqSystem isyst;
+  input BackendDAE.Shared ishared;
+  input list<Integer> eindex;
+  input list<Integer> vindx;
+  input list<Integer> tearingSelect_always;
+  input Option<list<tuple<Integer, Integer, BackendDAE.Equation>>> ojac;
+  input BackendDAE.JacobianType jacType;
+  input Boolean mixedSystem;
+  input Integer strongComponentIndex;
+  output BackendDAE.StrongComponent ocomp;
+protected
+  // ToDo Clean up
+  Integer size = BackendDAEUtil.systemSize(isyst), loopSize =  0;
+  array<Integer> nE, nV;
+  list<Integer> tSel_always, tSel_prefer, tSel_avoid, tSel_never,  discreteVars={}, sortedEqs;
+  array<Boolean> varArray, eqArray;
+  BackendDAE.AdjacencyMatrixEnhanced me;
+  BackendDAE.AdjacencyMatrixTEnhanced meT;
+  list<Integer>  varSet, eqSet, unsolvables, tearingvars = {}, residualequations = {};
+  BackendDAE.InnerEquations helpInnerEquations = {};
+  BackendDAE.AdjacencyMatrix aMatrix, aMatrixT;
+  BackendDAE.BackendDAEType DAEtype;
+  String modelName, DAEtypeStr;
+  BackendDAE.Var var;
+  Boolean linear;
+  constant Boolean debug = false;
+algorithm
+try
+
+  linear := BackendDAEUtil.getLinearfromJacType(jacType);
+  BackendDAE.SHARED(backendDAEType=DAEtype, info=BackendDAE.EXTRA_INFO(fileNamePrefix=modelName)) := ishared;
+  DAEtypeStr := BackendDump.printBackendDAEType2String(DAEtype);
+
+  if debug then
+    print("\nStrongComponent EQ's "+ stringDelimitList(List.map(eindex,intString),",") + "\n\n");
+    print("\nStrongComponent Var's "+ stringDelimitList(List.map(vindx,intString),",") + "\n\n");
+  end if;
+
+  // marker array for current compontSel_alwaysent
+  varArray := arrayCreate(size,false);
+  eqArray := arrayCreate(size,false);
+  nE := arrayCreate(size,-1);
+  nV := arrayCreate(size,-1);
+
+  // Get discrete variables and adjacency matrix from strong component
+  for i in vindx loop
+    varArray[i] := true;
+    var := BackendVariable.getVarAt(BackendVariable.daeVars(isyst), i);
+    if BackendVariable.isVarDiscrete(var)  then
+      discreteVars:=i::discreteVars;
+    end if;
+  end for;
+  for i in eindex loop
+    eqArray[i] := true;
+  end for;
+  (_,aMatrix,aMatrixT,_,_) := BackendDAEUtil.getIncidenceMatrixScalar(isyst,BackendDAE.SOLVABLE(), SOME(ishared.functionTree));
+
+
+   try    // ToDo: Match me
+    {} := discreteVars;
+   else
+    matchDiscreteVars(discreteVars, isyst, ishared, aMatrix, aMatrixT, varArray, eqArray, nE, nV);
+       if debug then
+         print("\nDiscrete Vars:\n" + stringDelimitList(List.map(discreteVars,intString),",") + "\n\n");
+         print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(nE),intString),",") + "\n\n");
+         print("\nnV Array: " + stringDelimitList(List.map(arrayList(nV),intString),",") + "\n\n");
+       end if;
+       //Tearing of the assign
+      (varArray, eqArray, helpInnerEquations) := getTearingSetfromAssign(discreteVars, nV, varArray, eqArray, helpInnerEquations);  // ToDo or nE??
+  end try;
+
+ if debug then
+    print("\nnE Array " + ":\n" + stringDelimitList(List.map(arrayList(eqArray),boolString),",") + "\n\n");
+    print("\nnV Array: " + stringDelimitList(List.map(arrayList(varArray),boolString),",") + "\n\n");
+  end if;
+
+  if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+    //print("\n\nUNSOLVABLES:\n" + stringDelimitList(List.map(unsolvables,intString),",") + "\n\n");
+    //print("\nDiscrete Vars:\n" + stringDelimitList(List.map(discreteVars,intString),",") + "\n\n");
+  end if;
+
+  for i in eindex loop
+    if eqArray[i] then
+      arrayUpdate(eqArray,i,false) "remove the edges from the equation equationIndex to Variables";
+      residualequations := i::residualequations;
+    end if;
+
+    for elem in aMatrix[i] loop
+      if elem > 0 then
+        if varArray[elem] then
+          arrayUpdate(varArray,elem,false);
+          tearingvars := elem::tearingvars;
+        end if;
+      end if;
+    end for;
+  end for;
+  
+  // ToDo: Verbose dump and if
+  try
+    true := listLength(residualequations) < listLength(eindex);
+  else
+    print("\n\nWarning: The loop size is equal to tearing set.\n\n");
+  end try;
+  ocomp := BackendDAE.TORNSYSTEM(BackendDAE.TEARINGSET(tearingvars, residualequations, listReverse(helpInnerEquations), BackendDAE.EMPTY_JACOBIAN()), NONE(), linear, mixedSystem);
+else
+  Error.addInternalError("function minimalTearing failed", sourceInfo());
+  fail();
+end try;
+end minimalTearing;
+
+
+protected function matchDiscreteVars
+  "Helper function for minimalTearing.
+   Matches all discrete vars given by inDiscreteVars."
+  input list<Integer> inDiscreteVars;
+  input BackendDAE.EqSystem isyst;
+  input BackendDAE.Shared ishared;
+  input BackendDAE.AdjacencyMatrix me;
+  input BackendDAE.AdjacencyMatrix meT;
+  input array<Boolean> varArray;
+  input array<Boolean> eqArray;
+  input output array<Integer> assign1;
+  input output array<Integer> assign2;
+protected
+  array<Boolean> eqMarker;
+algorithm
+  try
+  for varIdx in inDiscreteVars loop
+    eqMarker := arrayCopy(eqArray);
+    (eqMarker, assign1, assign2, true) := pathFound(varIdx, isyst, ishared, me, meT, varArray, eqArray, eqMarker, assign1, assign2);
+  end for;
+  else
+    Error.addInternalError("function matchDiscreteVars failed", sourceInfo());
+    fail();
+  end try;
+end matchDiscreteVars;
+
+protected function pathFound
+  "Helper function for matchDiscreteVars.
+   Simple match for given variable given by varIdx with respect to solvability."
+  input Integer varIdx;
+  input BackendDAE.EqSystem isyst;
+  input BackendDAE.Shared ishared;
+  input BackendDAE.AdjacencyMatrix me;
+  input BackendDAE.AdjacencyMatrix meT;
+  input array<Boolean> varArray;
+  input array<Boolean> eqArray;
+  input output array<Boolean> eqMarker;
+  input output array<Integer> assign1;
+  input output array<Integer> assign2;
+  output Boolean success = false;
+protected
+  Boolean b;
+  Integer eqIdx;
+  BackendDAE.Solvability s;
+algorithm
+  try
+  // ToDo describe me
+  for eqIdx in meT[varIdx] loop
+    if eqIdx > 0 then
+      if eqArray[eqIdx] then
+        b := BackendDAEUtil.findSolvabelVarInEquation(varIdx, eqIdx, varArray, isyst, ishared);
+      else
+        b:= false;
+      end if;
+      if assign2[eqIdx] == -1 and b then
+        success := true;
+        assign2[eqIdx] := varIdx;
+        assign1[varIdx] := eqIdx;
+        return;
+      end if;
+    end if;
+  end for;
+  for eqIdx in meT[varIdx] loop
+    if eqIdx > 0 then
+      if eqMarker[eqIdx] then
+         eqMarker[eqIdx] := false;
+         (eqMarker, assign1, assign2 , success) := pathFound(assign2[eqIdx], isyst, ishared, me, meT , varArray, eqArray, eqMarker, assign1, assign2);
+      end if;
+    end if;
+    if success then
+      assign2[eqIdx] := varIdx;
+      assign1[varIdx] := eqIdx;
+      return;
+    end if;
+  end for;
+  else
+     Error.addInternalError("function pathFound failed", sourceInfo());
+     fail();
+  end try;
+end pathFound;
+
+
+protected function getTearingSetfromAssign
+  "Helper function for minimalTearing.
+   Set unmatched vars as tearing variables"
+  input list<Integer> inDiscreteVars;
+  input array<Integer> assign1;
+  input output array<Boolean> varArray;
+  input output array<Boolean> equationArray;
+  input output BackendDAE.InnerEquations innerEquations;
+protected
+  Integer eqIdx;
+  BackendDAE.InnerEquation innerEquation_tmp;
+algorithm
+  try
+  // Add matched discrete equation to inner equations
+  for varIdx in inDiscreteVars loop
+    arrayUpdate(varArray,varIdx,false);
+    eqIdx := assign1[varIdx];
+    arrayUpdate(equationArray,eqIdx,false);
+    innerEquation_tmp := BackendDAE.INNEREQUATION(eqIdx, {varIdx});
+    innerEquations := innerEquation_tmp::innerEquations;
+  end for;
+
+  else
+     Error.addInternalError("function getTearingSetfromAssign failed", sourceInfo());
+    fail();
+  end try;
+    //  print("\n loopSize after D:" + intString(loopSize) + "\n");
+end getTearingSetfromAssign;
+
+
+// =============================================================================
+//
 // Tearing from Book of Cellier
 //
 // =============================================================================
@@ -1779,7 +2020,6 @@ algorithm
   if debug then execStat("Tearing.CellierTearing -> 3.4"); end if;
   residual_coll := List.unique(residual_coll);
   if debug then execStat("Tearing.CellierTearing -> 3.5"); end if;
-
   // dump results with local indexes
   if Flags.isSet(Flags.TEARING_DUMP) or Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
     dumpTearingSetLocalIndexes(OutTVars,residual_coll,order,ass2,size,mapEqnIncRow,vars,eqns," - STRICT SET");
