@@ -1,0 +1,30 @@
+// name:              minimalTearing
+// keywords:          minimal tearing, discrete variables, loops
+// status:            correct
+// teardown_command:  rm -f Modelica.Electrical.Analog.Examples.Rectifier*
+//
+// Solve example with discrete variables inside loops.
+// Will fail with tearingMethod=noTearing
+
+loadModel(Modelica); getErrorString();
+
+setTearingMethod("minimalTearing"); getErrorString();
+
+simulate(Modelica.Electrical.Analog.Examples.Rectifier); getErrorString();
+
+
+// Result:
+// true
+// ""
+// true
+// ""
+// record SimulationResult
+//     resultFile = "Modelica.Electrical.Analog.Examples.Rectifier_res.mat",
+//     simulationOptions = "startTime = 0.0, stopTime = 0.1, numberOfIntervals = 10000, tolerance = 1e-006, method = 'dassl', fileNamePrefix = 'Modelica.Electrical.Analog.Examples.Rectifier', options = '', outputFormat = 'mat', variableFilter = '.*', cflags = '', simflags = ''",
+//     messages = "LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.
+// LOG_SUCCESS       | info    | The simulation finished successfully.
+// "
+// end SimulationResult;
+// "Warning: There are iteration variables with default zero start attribute. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->OMCFlags, in OMNotebook call setCommandLineOptions("-d=initialization").
+// "
+// endResult
