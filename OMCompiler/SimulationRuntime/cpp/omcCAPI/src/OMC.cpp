@@ -57,9 +57,9 @@ extern "C" {
       omc_Main_readSettings(threadData, mmc_mk_nil());
       CP_TD();
     MMC_CATCH_TOP(return -1)
-   
 
-   
+
+
     std::string options = "+d=execstat --simCodeTarget=Cpp --target=" + std::string(compiler);
     std::cout << "options " << options << "\n";
     if (SetCommandLineOptions(omcData, options.c_str()) == -1)
