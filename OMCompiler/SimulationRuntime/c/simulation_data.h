@@ -339,6 +339,7 @@ typedef struct LINEAR_SYSTEM_DATA
   modelica_integer equationIndex;       /* index for EQUATION_INFO */
 
   void *solverData[2]; /* [1] is the totalPivot solver; [0] holds other solvers ; both are used for the default solver */
+  void** parSolverData;
   modelica_real *x;                     /* solution vector x */
   modelica_real *A;                     /* matrix A */
   modelica_real *b;                     /* vector b */
@@ -348,7 +349,11 @@ typedef struct LINEAR_SYSTEM_DATA
   modelica_boolean solved;              /* 1: solved in current step - else not */
   modelica_boolean failed;              /* 1: failed while last try with lapack - else not */
   modelica_boolean useSparseSolver;     /* 1: use sparse solver, - else any solver */
+#ifdef USE_PARJAC
+  ANALYTIC_JACOBIAN** parentJacobian;    /* if != NULL then it's the parent jacobian matrix */
+#else
   ANALYTIC_JACOBIAN* parentJacobian;    /* if != NULL then it's the parent jacobian matrix */
+#endif
 
   /* statistics */
   unsigned long numberOfCall;           /* number of solving calls of this system */
