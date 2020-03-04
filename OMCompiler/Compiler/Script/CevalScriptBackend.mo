@@ -91,8 +91,10 @@ import FindZeroCrossings;
 import FInst;
 import Flags;
 import FlagsUtil;
+import FlatModel = NFFlatModel;
 import FMI;
 import FMIExt;
+import FunctionTree = NFFlatten.FunctionTree;
 import GC;
 import Graph;
 import HashSetString;
@@ -3209,6 +3211,9 @@ algorithm
   end match;
 end getAdjacencyMatrix;
 
+/* -------------------------------------------------------------------
+                         RUN OLD FRONTEND
+   ------------------------------------------------------------------- */
 public function runFrontEnd
   input output FCore.Cache cache;
   input output FCore.Graph env;
@@ -3284,11 +3289,10 @@ algorithm
   (cache,env,dae) := matchcontinue (inCache,inEnv,className)
     local
       Absyn.Restriction restriction;
-      Absyn.Class absynClass;
       String str,re;
       Option<SCode.Program> fp;
-      SCode.Program scodeP, scodePNew, scode_builtin, graphicProgramSCode;
-      Absyn.Program p,ptot,p_builtin, placementProgram;
+      SCode.Program scodeP, scode_builtin, graphicProgramSCode;
+      Absyn.Program p, placementProgram;
       DAE.FunctionTree funcs;
 
    case (cache,env,_)
@@ -3386,6 +3390,161 @@ algorithm
       then fail();
   end matchcontinue;
 end runFrontEndWork;
+
+
+/* -------------------------------------------------------------------
+                         RUN NEW FRONTEND
+   ------------------------------------------------------------------- */
+public function runNewFrontEnd
+  "author: kabdelhak 2020-03
+   Only run the new frontend pipeline and return the flat model instead of
+   DAE representation. Used for new backend and should replace runFrontEnd
+   at some point."
+  input FCore.Cache cache;
+  input FCore.Graph env;
+  input Absyn.Path className;
+  output Option<FlatModel> optFlatModel = NONE();
+  output Option<FunctionTree> optFuncs = NONE();
+  input Boolean relaxedFrontEnd "Do not check for illegal simulation models, so we allow instantation of packages, etc";
+protected
+  FlatModel flatModel;
+  FunctionTree funcs;
+  Boolean b;
+algorithm
+  // add program to the cache so it can be used to lookup modelica://
+  // URIs in external functions IncludeDirectory/LibraryDirectory
+  FlagsUtil.setConfigBool(Flags.BUILDING_MODEL, true);
+  try
+    b := runFrontEndLoadProgram(className);
+    true := b;
+    if Flags.isSet(Flags.GC_PROF) then
+      print(GC.profStatsStr(GC.getProfStats(), head="GC stats before front-end:") + "\n");
+    end if;
+    ExecStat.execStat("FrontEnd - loaded program");
+    (flatModel, funcs) := runNewFrontEndWork(cache,env,className,relaxedFrontEnd,Error.getNumErrorMessages());
+    if Flags.isSet(Flags.GC_PROF) then
+      print(GC.profStatsStr(GC.getProfStats(), head="GC stats after front-end:") + "\n");
+    end if;
+    ExecStat.execStat("FrontEnd - DAE generated");
+    optFlatModel := SOME(flatModel);
+    optFuncs := SOME(funcs);
+  else
+    // Return optFlatModel=NONE(); and optFuncs=NONE();
+  end try;
+  FlagsUtil.setConfigBool(Flags.BUILDING_MODEL, false);
+end runNewFrontEnd;
+
+protected function runNewFrontEndWork
+  input FCore.Cache inCache;
+  input FCore.Graph inEnv;
+  input Absyn.Path className;
+  input Boolean relaxedFrontEnd "Do not check for illegal simulation models, so we allow instantation of packages, etc";
+  input Integer numError;
+  output FlatModel flatModel;
+  output FunctionTree funcs;
+algorithm
+  (flatModel, funcs) := matchcontinue (inCache,inEnv,className)
+    local
+      Absyn.Restriction restriction;
+      String str, re;
+      Option<SCode.Program> fp;
+      SCode.Program scodeP, scode_builtin, graphicProgramSCode;
+      Absyn.Program placementProgram;
+
+      case (_, _, _)
+        algorithm
+          (_,scode_builtin) := FBuiltin.getInitialFunctions();
+          scodeP := listAppend(scode_builtin, SymbolTable.getSCode());
+          ExecStat.execStat("FrontEnd - Absyn->SCode");
+
+          // add also the graphics annotations if we are using the NF_API
+          if Flags.isSet(Flags.NF_API) then
+            placementProgram := Interactive.modelicaAnnotationProgram(Config.getAnnotationVersion());
+            graphicProgramSCode := AbsynToSCode.translateAbsyn2SCode(placementProgram);
+            scodeP := listAppend(scode_builtin, SymbolTable.getSCode());
+            scodeP := listAppend(scodeP, graphicProgramSCode);
+          end if;
+
+      then NFInst.instClassInProgramNewFrontend(className, scodeP);
+
+/* kabdelhak: i guess this case should be guard(Flags.isSet(Flags.GRAPH_INST) and not Flags.isSet(Flags.SCODE_INST))
+   disregard for now
+
+   case (cache,env,_)
+      equation
+        true = Flags.isSet(Flags.GRAPH_INST);
+        false = Flags.isSet(Flags.SCODE_INST);
+
+        System.realtimeTick(ClockIndexes.RT_CLOCK_FINST);
+        str = AbsynUtil.pathString(className);
+        (Absyn.CLASS(restriction = restriction)) = Interactive.getPathedClassInProgram(className, SymbolTable.getAbsyn(), true);
+        re = AbsynUtil.restrString(restriction);
+        Error.assertionOrAddSourceMessage(relaxedFrontEnd or not (AbsynUtil.isFunctionRestriction(restriction) or AbsynUtil.isPackageRestriction(restriction)),
+          Error.INST_INVALID_RESTRICTION,{str,re},AbsynUtil.dummyInfo);
+
+        System.realtimeTick(ClockIndexes.RT_CLOCK_FINST);
+
+        dae = FInst.instPath(className, SymbolTable.getSCode());
+      then (cache,env,dae);
+*/
+
+/* kabdelhak: once again, don't need that for now
+
+    case (cache,env,_)
+      equation
+        false = Flags.isSet(Flags.GRAPH_INST);
+        false = Flags.isSet(Flags.SCODE_INST);
+        str = AbsynUtil.pathString(className);
+        p = SymbolTable.getAbsyn();
+        (Absyn.CLASS(restriction = restriction)) = Interactive.getPathedClassInProgram(className, p, true);
+        re = AbsynUtil.restrString(restriction);
+        Error.assertionOrAddSourceMessage(relaxedFrontEnd or not (AbsynUtil.isFunctionRestriction(restriction) or AbsynUtil.isPackageRestriction(restriction)),
+          Error.INST_INVALID_RESTRICTION,{str,re},AbsynUtil.dummyInfo);
+
+        //System.stopTimer();
+        //print("\nExists+Dependency: " + realString(System.getTimerIntervalTime()));
+
+        //System.startTimer();
+        //print("\nAbsyn->SCode");
+        scodeP = SymbolTable.getSCode();
+
+        ExecStat.execStat("FrontEnd - Absyn->SCode");
+
+        //System.stopTimer();
+        //print("\nAbsyn->SCode: " + realString(System.getTimerIntervalTime()));
+
+        //System.startTimer();
+        //print("\nInst.instantiateClass");
+        (cache,env,_,dae) = Inst.instantiateClass(cache,InnerOuter.emptyInstHierarchy,scodeP,className);
+
+        dae = DAEUtil.mergeAlgorithmSections(dae);
+
+        //FGraphDump.dumpGraph(env, "F:\\dev\\" + AbsynUtil.pathString(className) + ".graph.graphml");
+
+        //System.stopTimer();
+        //print("\nInst.instantiateClass: " + realString(System.getTimerIntervalTime()));
+
+        // adrpo: do not add it to the instantiated classes, it just consumes memory for nothing.
+        DAEUtil.getFunctionList(FCore.getFunctionTree(cache),failOnError=true); // Make sure that the functions are valid before returning success
+      then (cache,env,dae);
+*/
+
+    case (_,_,_)
+      equation
+        failure(Interactive.getPathedClassInProgram(className, SymbolTable.getAbsyn()));
+        Error.addMessage(Error.LOOKUP_ERROR, {AbsynUtil.pathString(className),"<TOP>"});
+      then fail();
+
+    else
+      equation
+        str = AbsynUtil.pathString(className);
+        true = Error.getNumErrorMessages() == numError;
+        str = "Instantiation of " + str + " failed with no error message.";
+        Error.addMessage(Error.INTERNAL_ERROR, {str});
+      then fail();
+  end matchcontinue;
+
+end runNewFrontEndWork;
 
 protected function translateModel " author: x02lucpo
  translates a model into cpp code and writes also a makefile"
