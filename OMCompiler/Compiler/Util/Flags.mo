@@ -1341,15 +1341,19 @@ constant ConfigFlag ZEROMQ_SUB_PORT = CONFIG_FLAG(136, "zeroMQSubPort",
 constant ConfigFlag ZEROMQ_JOB_ID = CONFIG_FLAG(137, "zeroMQJOBID",
   NONE(), EXTERNAL(), STRING_FLAG("empty"), NONE(),
   Gettext.gettext("Configures the ID with which the omc api call is labelled for zeroMQ communication."));
+
 constant ConfigFlag ZEROMQ_SERVER_ID = CONFIG_FLAG(138, "zeroMQServerID",
   NONE(), EXTERNAL(), STRING_FLAG("empty"), NONE(),
   Gettext.gettext("Configures the ID with which server application is labelled for zeroMQ communication."));
+
 constant ConfigFlag ZEROMQ_CLIENT_ID = CONFIG_FLAG(139, "zeroMQClientID",
   NONE(), EXTERNAL(), STRING_FLAG("empty"), NONE(),
   Gettext.gettext("Configures the ID with which the client application is labelled for zeroMQ communication."));
+
 constant ConfigFlag FMI_VERSION = CONFIG_FLAG(140,
   "", NONE(), INTERNAL(), STRING_FLAG(""), NONE(),
   Gettext.gettext("returns the FMI Version either 1.0 or 2.0."));
+
 constant ConfigFlag FLAT_MODELICA = CONFIG_FLAG(141, "flatModelica",
   SOME("f"), EXTERNAL(), BOOL_FLAG(false), NONE(),
   Gettext.gettext("Outputs experimental flat Modelica."));
@@ -1365,6 +1369,10 @@ constant ConfigFlag FMI_FILTER = CONFIG_FLAG(142, "fmiFilter", NONE(), EXTERNAL(
 constant ConfigFlag FMI_SOURCES = CONFIG_FLAG(143, "fmiSources", NONE(), EXTERNAL(),
   BOOL_FLAG(true), NONE(),
   Gettext.gettext("Defines if FMUs will be exported with sources or not. --fmiFilter=blackBox might override this, because black box FMUs do never contain their source code."));
+
+constant ConfigFlag NEW_BACKEND = CONFIG_FLAG(142, "newBackend",
+  NONE(), EXTERNAL(), BOOL_FLAG(false), NONE(),
+  Gettext.gettext("Activates experimental new backend for better array handling. This also activates the new frontend. [WIP]"));
 
 function getFlags
   "Loads the flags with getGlobalRoot. Assumes flags have been loaded."
