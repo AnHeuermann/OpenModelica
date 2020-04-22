@@ -57,7 +57,7 @@ import Autoconf;
 import AvlSetString;
 import BackendDAECreate;
 import BackendDump;
-import BackendStructure = NBackendDAE.BackendStructure;
+import NBackendDAE;
 import BackendVariable;
 import Builtin;
 import ClockIndexes;
@@ -97,7 +97,6 @@ import HashTableCrIListArray;
 import HashTableCrILst;
 import HpcOmSimCodeMain;
 import HpcOmTaskGraph;
-import NBackendDAECreate;
 import RuntimeSources;
 import SerializeModelInfo;
 import TaskSystemDump;
@@ -924,7 +923,7 @@ algorithm
       FlatModel flatModel;
       FunctionTree funcTree;
 
-      BackendStructure bdae;
+      NBackendDAE bdae;
 
     /* new backend - also activates new frontend by default */
     case (graph, filenameprefix) guard(Flags.getConfigBool(Flags.NEW_BACKEND))
@@ -944,7 +943,7 @@ algorithm
            ================================ */
 
         /*  BackendStuff can now be added here. */
-        bdae := NBackendDAECreate.lower(flatModel, funcTree);
+        bdae := NBackendDAE.lower(flatModel, funcTree);
 
         /* Dummy output for now */
         libs := {"DUMMY"};
