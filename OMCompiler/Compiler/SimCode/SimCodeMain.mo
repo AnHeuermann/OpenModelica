@@ -944,6 +944,7 @@ algorithm
 
         /*  BackendStuff can now be added here. */
         bdae := NBackendDAE.lower(flatModel, funcTree);
+        print(NBackendDAE.toString(bdae, "(After Lowering)"));
 
         /* Dummy output for now */
         libs := {"DUMMY"};
