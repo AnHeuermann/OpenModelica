@@ -1177,6 +1177,9 @@ public
       else cref;
     end match;
   end mapFoldExpShallow;
+  /* ========================================
+      Backend Extension functions
+  ========================================= */
 
   function listHasDiscrete
     "kabdelhak: Returns true if any component reference in the list has a
