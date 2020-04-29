@@ -513,6 +513,7 @@ uniontype InstNode
       case IMPLICIT_SCOPE() then "$IMPLICIT";
       case EXP_NODE() then "$EXP(" + Expression.toString(node.exp) + ")";
       case EMPTY_NODE() then "$EMPTY";
+      case VAR_NODE() then "$VAR";
     end match;
   end name;
 
@@ -543,6 +544,7 @@ uniontype InstNode
       case NAME_NODE() then "name node";
       case IMPLICIT_SCOPE() then "implicit scope";
       case EMPTY_NODE() then "empty node";
+      case VAR_NODE() then "var node";
     end match;
   end typeName;
 
