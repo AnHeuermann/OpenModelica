@@ -1357,6 +1357,7 @@ constant ConfigFlag FMI_VERSION = CONFIG_FLAG(140,
 constant ConfigFlag FLAT_MODELICA = CONFIG_FLAG(141, "flatModelica",
   SOME("f"), EXTERNAL(), BOOL_FLAG(false), NONE(),
   Gettext.gettext("Outputs experimental flat Modelica."));
+
 constant ConfigFlag FMI_FILTER = CONFIG_FLAG(142, "fmiFilter", NONE(), EXTERNAL(),
   ENUM_FLAG(FMI_INTERNAL, {("none", FMI_NONE), ("internal", FMI_INTERNAL), ("protected", FMI_PROTECTED), ("blackBox", FMI_BLACKBOX)}),
   SOME(STRING_DESC_OPTION({
@@ -1366,11 +1367,12 @@ constant ConfigFlag FMI_FILTER = CONFIG_FLAG(142, "fmiFilter", NONE(), EXTERNAL(
     ("blackBox", Gettext.gettext("This option is used to hide everything except for inputs and outputs. Additional variables that need to be present in the modelDescription file for structrial reasons will have concealed names."))
     })),
   Gettext.gettext("Specifies which model variables get exposed by the modelDescription.xml"));
+
 constant ConfigFlag FMI_SOURCES = CONFIG_FLAG(143, "fmiSources", NONE(), EXTERNAL(),
   BOOL_FLAG(true), NONE(),
   Gettext.gettext("Defines if FMUs will be exported with sources or not. --fmiFilter=blackBox might override this, because black box FMUs do never contain their source code."));
 
-constant ConfigFlag NEW_BACKEND = CONFIG_FLAG(142, "newBackend",
+constant ConfigFlag NEW_BACKEND = CONFIG_FLAG(144, "newBackend",
   NONE(), EXTERNAL(), BOOL_FLAG(false), NONE(),
   Gettext.gettext("Activates experimental new backend for better array handling. This also activates the new frontend. [WIP]"));
 
