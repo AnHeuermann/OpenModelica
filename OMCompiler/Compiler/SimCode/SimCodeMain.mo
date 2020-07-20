@@ -1013,7 +1013,7 @@ algorithm
       algorithm
 
         // set daeMode to true for now - only allow daeMode!
-        FlagsUtil.setConfigBool(Flags.DAE_MODE, false);
+        FlagsUtil.setConfigBool(Flags.DAE_MODE, true);
 
         // calculate stuff that we need to create SimCode data structure
         /* ================================
