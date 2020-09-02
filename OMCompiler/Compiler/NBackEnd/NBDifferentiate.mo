@@ -287,8 +287,8 @@ public
     case Expression.INTEGER()   then (Expression.INTEGER(0), diffArguments);
     case Expression.REAL()      then (Expression.REAL(0.0), diffArguments);
     // leave boolean and string expressions as is
-    case Expression.BOOLEAN()   then (exp, diffArguments);
     case Expression.STRING()    then (exp, diffArguments);
+    case Expression.BOOLEAN()   then (exp, diffArguments);
 
     // differentiate cref
     case Expression.CREF() then differentiateComponentRef(exp, diffArguments);
@@ -330,6 +330,8 @@ public
         new_elements := element :: new_elements;
       end for;
     then (Expression.RECORD(exp.path, exp.ty, listReverse(new_elements)), diffArguments);
+
+    case Expression.CALL() then differentiateCall(exp, diffArguments);
 
     // (if c then a else b)' = if c then a' else b'
     case Expression.IF() algorithm
@@ -399,10 +401,6 @@ public
   end match;
 
 /* ToDo:
-
-  record CALL
-    Call call;
-  end CALL;
 
   record PARTIAL_FUNCTION_APPLICATION
     ComponentRef fn;
@@ -515,6 +513,34 @@ public
 
     end match;
   end differentiateComponentRef;
+
+  function differentiateCall
+    input output Expression exp "Has to be Expression.CALL()";
+    input output DifferentiationArguments diffArguments;
+  algorithm
+    (exp, diffArguments) := match exp
+      local
+        Call call;
+      case Expression.CALL(call=call) algorithm
+        exp.call := match call
+          local
+            String name;
+          case Call.TYPED_CALL() algorithm
+            print(Call.toString(call) + "\n");
+            name := AbsynUtil.pathString(Function.nameConsiderBuiltin(call.fn));
+            then(call);
+          else algorithm
+            Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed for: " + Call.toString(call)});
+            then fail();
+        end match;
+
+        then (exp, diffArguments);
+      else algorithm
+        // Add failtrace here
+        Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed for: " + Expression.toString(exp)});
+        then fail();
+    end match;
+  end differentiateCall;
 
   function differentiateBinary
     input output Expression exp "Has to be Expression.BINARY()";
