@@ -514,21 +514,36 @@ public
     end match;
   end differentiateComponentRef;
 
+
+  // TODO: Copy Differentiate.mo function differentiateCalls
   function differentiateCall
+  "Differentiate builtin function calls"
     input output Expression exp "Has to be Expression.CALL()";
     input output DifferentiationArguments diffArguments;
+  protected
+    constant Boolean debug = true;
   algorithm
+    if debug then
+      print("\nDifferentiate Exp-Call: "+ Expression.toString(exp)
+            + " w.r.t. " + ComponentRef.toString(diffArguments.diffCref) +"\n");
+      //print(DifferentiationArguments.toString(diffArguments));
+    end if;
+
     (exp, diffArguments) := match exp
       local
         Call call;
       case Expression.CALL(call=call) algorithm
-        exp.call := match call
+        _ := match call
           local
             String name;
+            ComponentRef inDiffwrtCref;
           case Call.TYPED_CALL() algorithm
-            print(Call.toString(call) + "\n");
+            //print("In function differentiateCall\n");
+            //print(Call.toString(call) + "\n");
             name := AbsynUtil.pathString(Function.nameConsiderBuiltin(call.fn));
-            then(call);
+            inDiffwrtCref := diffArguments.diffCref;
+            exp := differentiateCallExp1Arg(name, exp, diffArguments);
+            then();
           else algorithm
             Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed for: " + Call.toString(call)});
             then fail();
@@ -540,7 +555,51 @@ public
         Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed for: " + Expression.toString(exp)});
         then fail();
     end match;
+
+    if debug then
+      print("Differentiate-ExpCall-result: " + Expression.toString(exp) + "\n");
+    end if;
+
   end differentiateCall;
+
+  protected function differentiateCallExp1Arg
+    "This function differentiates built-in call expressions with 1 argument
+    with respect to a given variable,given as third argument."
+    input String name;
+    input output Expression exp;
+    input output DifferentiationArguments diffArguments;
+  algorithm
+    exp := match (name , exp)
+      local
+        Call call;
+        Expression exp1, exp2, diffExp1, diffExp2, cosExp, out;
+        list<Expression> arguments;
+        Operator operator, addOp, subOp, mulOp;
+        Operator.SizeClassification sizeClass;
+      // diff(sin(exp1)) = cos(exp1)*der(exp1)
+      case ("sin", Expression.CALL(call=call)) algorithm
+        arguments := Call.arguments(call);
+        if not listLength(arguments) == 1 then
+          Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed for: " + Expression.toString(exp) + "To many arguments!"});
+          fail();
+        end if;
+        exp1 := List.first(arguments);
+        print("exp1: " + Expression.toString(exp1) + "\n");
+        diffExp1 := differentiateExpression(exp1, diffArguments);
+        print("diffExp1: " + Expression.toString(diffExp1) + "\n");
+        cosExp := Expression.CALL(Call.makeTypedCall(NFBuiltinFuncs.COS_REAL, {exp1}, Expression.variability(exp1)));
+        print("cosExp: " + Expression.toString(diffExp1) + "\n");
+        sizeClass := NFOperator.SizeClassification.SCALAR;
+        mulOp := Operator.fromClassification((NFOperator.MathClassification.MULTIPLICATION, sizeClass), Type.REAL());
+        out := Expression.BINARY(cosExp, mulOp, diffExp2);
+        print("out: " + Expression.toString(out) + "\n");
+        then(out);
+
+      else algorithm
+        Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed for: " + Expression.toString(exp)});
+        then fail();
+    end match;
+  end differentiateCallExp1Arg;
 
   function differentiateBinary
     input output Expression exp "Has to be Expression.BINARY()";
