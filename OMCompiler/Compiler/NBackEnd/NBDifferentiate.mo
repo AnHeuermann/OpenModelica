@@ -524,9 +524,7 @@ public
     constant Boolean debug = true;
   algorithm
     if debug then
-      print("\nDifferentiate Exp-Call: "+ Expression.toString(exp)
-            + " w.r.t. " + ComponentRef.toString(diffArguments.diffCref) +"\n");
-      //print(DifferentiationArguments.toString(diffArguments));
+      print("\nDifferentiate Exp-Call: "+ Expression.toString(exp) + "\n");
     end if;
 
     (exp, diffArguments) := match exp
@@ -538,8 +536,6 @@ public
             String name;
             ComponentRef inDiffwrtCref;
           case Call.TYPED_CALL() algorithm
-            //print("In function differentiateCall\n");
-            //print(Call.toString(call) + "\n");
             name := AbsynUtil.pathString(Function.nameConsiderBuiltin(call.fn));
             inDiffwrtCref := diffArguments.diffCref;
             exp := differentiateCallExp1Arg(name, exp, diffArguments);
@@ -572,27 +568,25 @@ public
     exp := match (name , exp)
       local
         Call call;
-        Expression exp1, exp2, diffExp1, diffExp2, cosExp, out;
+        Expression exp1, exp2, diffExp1, diffExp2, out;
         list<Expression> arguments;
         Operator operator, addOp, subOp, mulOp;
         Operator.SizeClassification sizeClass;
-      // diff(sin(exp1)) = cos(exp1)*der(exp1)
+
+      // diff(sin(exp2)) = cos(exp2)*der(exp2)
       case ("sin", Expression.CALL(call=call)) algorithm
         arguments := Call.arguments(call);
         if not listLength(arguments) == 1 then
           Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed for: " + Expression.toString(exp) + "To many arguments!"});
           fail();
         end if;
-        exp1 := List.first(arguments);
-        print("exp1: " + Expression.toString(exp1) + "\n");
-        diffExp1 := differentiateExpression(exp1, diffArguments);
-        print("diffExp1: " + Expression.toString(diffExp1) + "\n");
-        cosExp := Expression.CALL(Call.makeTypedCall(NFBuiltinFuncs.COS_REAL, {exp1}, Expression.variability(exp1)));
-        print("cosExp: " + Expression.toString(diffExp1) + "\n");
+        exp2 := List.first(arguments);
+        diffExp2 := differentiateExpression(exp2, diffArguments);
+        exp1 := Expression.CALL(Call.makeTypedCall(NFBuiltinFuncs.COS_REAL, {exp2}, Expression.variability(exp2)));
+        // TODO: Check sizeClass for array-equations
         sizeClass := NFOperator.SizeClassification.SCALAR;
         mulOp := Operator.fromClassification((NFOperator.MathClassification.MULTIPLICATION, sizeClass), Type.REAL());
-        out := Expression.BINARY(cosExp, mulOp, diffExp2);
-        print("out: " + Expression.toString(out) + "\n");
+        out := Expression.BINARY(exp1, mulOp, diffExp2);
         then(out);
 
       else algorithm
