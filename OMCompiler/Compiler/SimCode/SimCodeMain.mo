@@ -765,11 +765,8 @@ algorithm
         SerializeModelInfo.serialize(simCode, Flags.isSet(Flags.INFO_XML_OPERATIONS));
         str := fmutmp + "/sources/" + simCode.fileNamePrefix;
         if FMUVersion == "1.0" then
-          b := System.covertTextFileToCLiteral(simCode.fileNamePrefix+"_info.json", str+"_info.c", Flags.getConfigString(Flags.TARGET));
-          if not b then
-            Error.addMessage(Error.INTERNAL_ERROR, {"System.covertTextFileToCLiteral failed. Could not write "+str+"_info.c\n"});
-            fail();
-          end if;
+          Error.addMessage(Error.INTERNAL_ERROR, {"System.covertTextFileToCLiteral failed. FMI 1.0 not supported any more.\n"});
+          fail();
         else
           // check for _info.json file in resource directory  when --fmiFilter=blackBox is not set
           if Flags.getConfigEnum(Flags.FMI_FILTER) <> Flags.FMI_BLACKBOX then
@@ -782,7 +779,7 @@ algorithm
         varInfo := simCode.modelInfo.varInfo;
         allFiles := {};
         allFiles := listAppend(RuntimeSources.commonHeaders, listAppend(RuntimeSources.commonFiles, allFiles));
-        allFiles := listAppend(if FMUVersion=="1.0" then RuntimeSources.fmi1Files else RuntimeSources.fmi2Files, allFiles);
+        allFiles := listAppend(RuntimeSources.fmi2Files, allFiles);
         if isSome(simCode.fmiSimulationFlags) then
           allFiles := listAppend(RuntimeSources.external3rdPartyFiles, allFiles);
           sundialsFiles := RuntimeSources.cvodeRuntimeFiles;
@@ -800,7 +797,7 @@ algorithm
           allFiles := listAppend(RuntimeSources.mixedFiles, allFiles);
         end if;
 
-        System.writeFile(fmutmp+"/sources/isfmi" + (if FMUVersion=="1.0" then "1" else "2"), "");
+        System.writeFile(fmutmp+"/sources/isfmi2", "");
 
         dgesvFiles :=  if varInfo.numLinearSystems > 0 or varInfo.numNonLinearSystems > 0 then RuntimeSources.dgesvFiles else {};
         defaultFiles := list(simCode.fileNamePrefix + f for f in RuntimeSources.defaultFileSuffixes);

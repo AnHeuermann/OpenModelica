@@ -122,13 +122,6 @@ void ShapeObject::dumpVisAttributes() const
 
 }
 
-/*
-double getShapeAttrFMU(const char* attr, rapidxml::xml_node<>* node, double time, fmi1_import_t* fmu)
-{
-    rapidxml::xml_node<>* expNode = node->first_node(attr)->first_node();
-    return evaluateExpressionFMU(expNode, time, fmu);
-}
-*/
 ShapeObjectAttribute getObjectAttributeForNode(const rapidxml::xml_node<>* node)
 {
     ShapeObjectAttribute oa;

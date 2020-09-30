@@ -1,7 +1,6 @@
 encapsulated package RuntimeSources
   constant list<String> commonFiles={COMMON_FILES};
   constant list<String> commonHeaders={COMMON_HEADERS};
-  constant list<String> fmi1Files={"fmi-export/fmu1_model_interface.c.inc","fmi-export/fmu1_model_interface.h"};
   constant list<String> fmi2Files={"fmi-export/fmu2_model_interface.c.inc","fmi-export/fmu2_model_interface.h", "fmi-export/fmu_read_flags.c.inc", "fmi-export/fmu_read_flags.h"};
   constant list<String> defaultFileSuffixes={".c", "_functions.c", "_records.c", "_01exo.c", "_02nls.c", "_03lsy.c", "_04set.c", "_05evt.c", "_06inz.c", "_07dly.c", "_08bnd.c", "_09alg.c", "_10asr.c", "_11mix.c", "_12jac.c", "_13opt.c", "_14lnz.c", "_15syn.c", "_16dae.c", "_17inl.c", "_init_fmu.c", "_FMU.c"};
   constant list<String> cvodeFiles={"sundials/cvode/cvode.h", "sundials/cvode/cvode_band.h", "sundials/cvode/cvode_bandpre.h", "sundials/cvode/cvode_bbdpre.h", "sundials/cvode/cvode_dense.h", "sundials/cvode/cvode_diag.h", "sundials/cvode/cvode_direct.h", "sundials/cvode/cvode_impl.h", "sundials/cvode/cvode_klu.h", "sundials/cvode/cvode_lapack.h", "sundials/cvode/cvode_sparse.h", "sundials/cvode/cvode_spbcgs.h", "sundials/cvode/cvode_spgmr.h", "sundials/cvode/cvode_spils.h", "sundials/cvode/cvode_sptfqmr.h"};

@@ -125,7 +125,6 @@ struct Directions
 };
 
 ShapeObjectAttribute getObjectAttributeForNode(const rapidxml::xml_node<>* node);
-//double getShapeAttrFMU(const char* attr, rapidxml::xml_node<>* node, double time/*, fmi1_import_t* fmu*/);
 unsigned int numShapes(rapidxml::xml_node<>* rootNode);
 
 

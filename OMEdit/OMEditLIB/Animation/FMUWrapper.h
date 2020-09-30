@@ -56,9 +56,7 @@ typedef struct
   std::vector<std::string> _stateNames;
   size_t _nStates;
   size_t _nEventIndicators;
-  fmi1_status_t _fmiStatus;
   fmi2_status_t fmiStatus2;
-  fmi1_event_info_t _eventInfo;
   fmi2_event_info_t eventInfo2;
   double _tcur;
   double _hcur;
@@ -79,13 +77,13 @@ class SimSettingsFMU
   ~SimSettingsFMU() = default;
   SimSettingsFMU(const SimSettingsFMU& ss) = delete;
   SimSettingsFMU& operator=(const SimSettingsFMU& ss) = delete;
-  void setTend(const fmi1_real_t t);
+  void setTend(const fmi2_real_t t);
   double getTend() const;
-  void setTstart(const fmi1_real_t t);
+  void setTstart(const fmi2_real_t t);
   double getTstart() const;
-  void setHdef(const fmi1_real_t h);
+  void setHdef(const fmi2_real_t h);
   double getHdef();
-  void setRelativeTolerance(const fmi1_real_t t);
+  void setRelativeTolerance(const fmi2_real_t t);
   double getRelativeTolerance();
   int getToleranceControlled() const;
   void setSolver(const Solver& solver);
@@ -154,13 +152,13 @@ class FMUWrapper_ME_1 : public FMUWrapperAbstract
   void completedIntegratorStep(int* callEventUpdate);
 
   const FMUData* getFMUData();
-  fmi1_import_t* getFMU();
+  fmi2_import_t* getFMU();
   void fmi_get_real(unsigned int* valueRef, double* res);
   unsigned int fmi_get_variable_by_name(const char* name);
 
  private:
-  fmi1_import_t* mpFMU;
-  fmi1_callback_functions_t mCallBackFunctions;
+  fmi2_import_t* mpFMU;
+  fmi2_callback_functions_t mCallBackFunctions;
   FMUData mFMUdata;
 };
 

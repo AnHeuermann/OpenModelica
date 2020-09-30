@@ -218,14 +218,6 @@ double VisualizerFMU::simulateStep(const double time)
   // Solve system
   mpFMU->solveSystem();
 
-  //print out some values for debugging:
-  //std::cout<<"DO EULER at "<< mpFMU->getFMUData()->_tcur<<std::endl;
-  //fmi1_import_variable_t* var = fmi1_import_get_variable_by_name(mpFMUl.mpFMU, "prismatic.s");
-  //const fmi1_value_reference_t vr  = fmi1_import_get_variable_vr(var);
-  //double value = -1.0;
-  //fmi1_import_get_real(mpFMUl.mpFMU, &vr, 1, &value);
-  //std::cout<<"value "<<value<<std::endl;
-
   // integrate a step with euler
   mpFMU->doEulerStep();
 
