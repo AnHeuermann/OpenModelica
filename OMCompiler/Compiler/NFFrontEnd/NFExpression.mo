@@ -396,7 +396,7 @@ public
         Boolean b;
         ComponentRef cr;
         Type ty;
-        list<Expression> expl;
+        list<Expression> expl, inv_expl;
         Expression e1, e2, e3;
         Option<Expression> oe;
         Path p;
@@ -513,6 +513,19 @@ public
           if comp == 0 then compare(exp1.exp, e1) else comp;
 
       case END() then 0;
+
+      case MULTARY()
+        algorithm
+          MULTARY(arguments = expl, inv_arguments = inv_expl, operator = op) := exp2;
+          comp := Operator.compare(exp1.operator, op);
+          if comp == 0 then
+            comp := compareList(exp1.arguments, expl);
+          end if;
+          if comp == 0 then
+            comp := compareList(exp1.inv_arguments, inv_expl);
+          end if;
+        then
+          comp;
 
       case BINARY()
         algorithm
@@ -1637,7 +1650,7 @@ public
       case MULTARY() guard(listEmpty(exp.arguments)) then "1/" + multaryString(exp.inv_arguments, exp, exp.operator);
 
       case MULTARY() then multaryString(exp.arguments, exp, exp.operator) +
-                          Operator.symbol(Operator.inverse(exp.operator)) +
+                          Operator.symbol(Operator.invert(exp.operator)) +
                           multaryString(exp.inv_arguments, exp, exp.operator);
 
       case BINARY() then operandString(exp.exp1, exp, true) +
@@ -1733,7 +1746,7 @@ public
       case MULTARY() guard(listEmpty(exp.arguments)) then "1/" + multaryString(exp.inv_arguments, exp, exp.operator);
 
       case MULTARY() then multaryString(exp.arguments, exp, exp.operator) +
-                          Operator.symbol(Operator.inverse(exp.operator)) +
+                          Operator.symbol(Operator.invert(exp.operator)) +
                           multaryString(exp.inv_arguments, exp, exp.operator);
 
       case BINARY() then operandFlatString(exp.exp1, exp, true) +
@@ -2082,7 +2095,7 @@ public
     else
       daeExp := DAE.BINARY(
         exp1      = toDAEMultaryArgs(arguments, operator),
-        operator  = Operator.toDAE(Operator.inverse(operator)),
+        operator  = Operator.toDAE(Operator.invert(operator)),
         exp2      = toDAEMultaryArgs(inv_arguments, operator)
        );
      end if;
@@ -3031,7 +3044,7 @@ public
   function mapFold<ArgT>
     input Expression exp;
     input MapFunc func;
-          output Expression outExp;
+    output Expression outExp;
     input output ArgT arg;
 
     partial function MapFunc
@@ -3802,6 +3815,7 @@ public
   end isMinusOne;
 
   function isNegative
+    "this requires proper simplification to be correct"
     input Expression exp;
     output Boolean negative;
   algorithm
@@ -3986,6 +4000,7 @@ public
     zeroExp := match ty
       case Type.REAL() then REAL(0.0);
       case Type.INTEGER() then INTEGER(0);
+      case Type.BOOLEAN() then BOOLEAN(false);
       case Type.ARRAY()
         then ARRAY(ty,
                    List.fill(makeZero(Type.unliftArray(ty)),
