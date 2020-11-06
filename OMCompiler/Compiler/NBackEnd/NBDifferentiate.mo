@@ -673,10 +673,10 @@ public
   algorithm
     derFuncCall := match (name)
       local
-        Expression exp1, exp2;
+        //Expression exp1, exp2;
       // acos -> - 1 / sqrt(1-innerExp^2)
-      case("acos") algorithm
-        exp1 :=
+      //case("acos") algorithm
+      //  exp1 :=
 
       // cos -> -sin
       case("cos") algorithm
