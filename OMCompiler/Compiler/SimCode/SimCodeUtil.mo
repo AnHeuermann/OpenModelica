@@ -1807,6 +1807,13 @@ algorithm
         (uniqueEqIndex1, odeEquations, algebraicEquations, allEquations, equationsforZeroCrossings, tempvars,
          eqSccMapping, eqBackendSimCodeMapping,backendMapping, sccIndex + 1);
 
+    // TORNSYSTEM (not hadnled yet)
+    case BackendDAE.TORNSYSTEM() algorithm
+        // Use createTornSystem here!
+        message := "Function createEquationsForSystem1 failed for component " + BackendDump.strongComponentString(comp) + "\nNot implemented yet!!!";
+        Error.addInternalError(message, sourceInfo());
+      then fail();
+
     // a system of equations
     case _
       equation
