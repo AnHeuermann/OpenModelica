@@ -310,8 +310,7 @@ algorithm
     // initialization stuff
     // ********************
 
-    if not ((Config.simCodeTarget() == "omsic") /*or (Config.simCodeTarget() ==  "omsicpp")*/)
-    then
+    if not (Config.simCodeTarget() == "omsic") then
       // generate equations for initDAE
       (initialEquations, uniqueEqIndex, tempvars) := createInitialEquations(inInitDAE, uniqueEqIndex, {});
 
@@ -365,10 +364,8 @@ algorithm
       FlagsUtil.setConfigEnum(Flags.SYM_SOLVER, 0);
     end if;
 
-
-    if not ((Config.simCodeTarget() == "omsic")/*or (Config.simCodeTarget() ==  "omsicpp")*/)
-    then
-     (uniqueEqIndex, odeEquations, algebraicEquations, localKnownVars, allEquations, equationsForZeroCrossings, tempvars,
+    if not (Config.simCodeTarget() == "omsic") then
+      (uniqueEqIndex, odeEquations, algebraicEquations, localKnownVars, allEquations, equationsForZeroCrossings, tempvars,
         equationSccMapping, eqBackendSimCodeMapping, backendMapping, sccOffset) :=
            createEquationsForSystems(contSysts, shared, uniqueEqIndex, zeroCrossings, tempvars, 1, backendMapping, true);
       omsiOptData := NONE();
@@ -645,12 +642,9 @@ algorithm
 
     execStat("simCode: some other stuff during SimCode phase");
 
-
-
-     if ((Config.simCodeTarget() <> "Cpp"))then
+    if ((Config.simCodeTarget() <> "Cpp"))then
       reasonableSize := Util.nextPrime(10+integer(1.4*(BackendDAEUtil.equationArraySizeBDAE(inBackendDAE)+BackendDAEUtil.equationArraySizeBDAE(inInitDAE)+listLength(parameterEquations))));
       eqCache := HashTableSimCodeEqCache.emptyHashTableSized(reasonableSize);
-
 
       // Alias equations to other equations.
       // The C++ codegen does things differently and will not handle this
@@ -858,10 +852,18 @@ algorithm
     zceqnsmarks := arrayCreate(BackendDAEUtil.equationArraySizeDAE(syst), 0);
 
     //FIXME: Add continuous clocked systems support
+    // AHeu: Fix me now?
+    //print("AHeu: comps before:\n");
+    //BackendDump.dumpComponents(comps);
+    //print("-------------------\n");
     (_, _, equations, _, ouniqueEqIndex, clockedVars, oeqSccMapping, oeqBackendSimCodeMapping, oBackendMapping) :=
         createEquationsForSystem(stateeqnsmark, zceqnsmarks, syst, inShared, comps, ouniqueEqIndex, {},
                                  sccOffset, oeqSccMapping, oeqBackendSimCodeMapping, oBackendMapping, true);
     sccOffset := listLength(comps) + sccOffset;
+    //print("AHeu: After createEquationsForSystem\n");
+    //dumpSimEqSystemLst(equations, "\n");
+    //print("-------------------\n");
+
     //otempvars := listAppend(clockedVars, otempvars);
     GC.free(stateeqnsmark);
     GC.free(zceqnsmarks);
@@ -1507,35 +1509,38 @@ algorithm
       BackendDAE.Shared shared;
       Boolean createAlgebraicEquations;
     case BackendDAE.MATCHING(ass1=ass1, comps=comps)
-      equation
+      algorithm
         if Flags.isSet(Flags.BLT_MATRIX_DUMP) then
           BackendDump.dumpEqSystemBLTmatrixHTML(inSyst);
         end if;
 
-        (shared, zeroCrossings, createAlgebraicEquations) = inArg;
+        //print("AHeu1:\n");
+        //BackendDump.dumpEqSystem(inSyst, "In system Backend");
+
+        (shared, zeroCrossings, createAlgebraicEquations) := inArg;
         (uniqueEqIndex, odeEquations, algebraicEquations, allEquations, equationsForZeroCrossings, tempvars,
-         eqSccMapping, eqBackendSimCodeMapping, backendMapping, sccOffset) = inFold;
+         eqSccMapping, eqBackendSimCodeMapping, backendMapping, sccOffset) := inFold;
 
-        funcs = BackendDAEUtil.getFunctions(shared);
-        (syst, _, _) = BackendDAEUtil.getAdjacencyMatrixfromOption(inSyst, BackendDAE.ABSOLUTE(), SOME(funcs), BackendDAEUtil.isInitializationDAE(shared));
+        funcs := BackendDAEUtil.getFunctions(shared);
+        (syst, _, _) := BackendDAEUtil.getAdjacencyMatrixfromOption(inSyst, BackendDAE.ABSOLUTE(), SOME(funcs), BackendDAEUtil.isInitializationDAE(shared));
 
-        stateeqnsmark = arrayCreate(BackendDAEUtil.equationArraySizeDAE(syst), 0);
-        zceqnsmarks = arrayCreate(BackendDAEUtil.equationArraySizeDAE(syst), 0);
-        stateeqnsmark = BackendDAEUtil.markStateEquations(syst, stateeqnsmark, ass1);
-        zceqnsmarks = BackendDAEUtil.markZeroCrossingEquations(syst, zeroCrossings, zceqnsmarks, ass1);
+        stateeqnsmark := arrayCreate(BackendDAEUtil.equationArraySizeDAE(syst), 0);
+        zceqnsmarks := arrayCreate(BackendDAEUtil.equationArraySizeDAE(syst), 0);
+        stateeqnsmark := BackendDAEUtil.markStateEquations(syst, stateeqnsmark, ass1);
+        zceqnsmarks := BackendDAEUtil.markZeroCrossingEquations(syst, zeroCrossings, zceqnsmarks, ass1);
 
         (odeEquations1, algebraicEquations1, allEquations1, equationsForZeroCrossings1, uniqueEqIndex,
-         tempvars, eqSccMapping, eqBackendSimCodeMapping, backendMapping) =
+         tempvars, eqSccMapping, eqBackendSimCodeMapping, backendMapping) :=
             createEquationsForSystem(
                 stateeqnsmark, zceqnsmarks, syst, shared, comps, uniqueEqIndex, tempvars,
                 sccOffset, eqSccMapping, eqBackendSimCodeMapping, backendMapping,createAlgebraicEquations);
         GC.free(stateeqnsmark);
         GC.free(zceqnsmarks);
 
-        odeEquations = List.consOnTrue(not listEmpty(odeEquations1), odeEquations1, odeEquations);
-        algebraicEquations = List.consOnTrue(not listEmpty(algebraicEquations1), algebraicEquations1, algebraicEquations);
-        allEquations = List.append_reverse(allEquations1, allEquations);
-        equationsForZeroCrossings = List.append_reverse(equationsForZeroCrossings1, equationsForZeroCrossings);
+        odeEquations := List.consOnTrue(not listEmpty(odeEquations1), odeEquations1, odeEquations);
+        algebraicEquations := List.consOnTrue(not listEmpty(algebraicEquations1), algebraicEquations1, algebraicEquations);
+        allEquations := List.append_reverse(allEquations1, allEquations);
+        equationsForZeroCrossings := List.append_reverse(equationsForZeroCrossings1, equationsForZeroCrossings);
 
       then ( uniqueEqIndex, odeEquations, algebraicEquations, allEquations, equationsForZeroCrossings, tempvars,
              eqSccMapping, eqBackendSimCodeMapping, backendMapping, listLength(comps) + sccOffset );
@@ -1668,6 +1673,9 @@ algorithm
       BackendDAE.Var v;
       BackendDAE.Equation eqn;
       SimCode.SimEqSystem firstSES;
+      BackendDAE.TearingSet strictTearingSet;
+      Option<BackendDAE.TearingSet> casualTearingSet;
+      Boolean isLinear, isMixedSystem, skipDiscInAlgorithm, genDiscrete;
 
       list<Integer> eqnslst;
       list<SimCode.SimEqSystem> equations1, noDiscEquations1;
@@ -1807,12 +1815,45 @@ algorithm
         (uniqueEqIndex1, odeEquations, algebraicEquations, allEquations, equationsforZeroCrossings, tempvars,
          eqSccMapping, eqBackendSimCodeMapping,backendMapping, sccIndex + 1);
 
-    // TORNSYSTEM (not hadnled yet)
-    case BackendDAE.TORNSYSTEM() algorithm
-        // Use createTornSystem here!
-        message := "Function createEquationsForSystem1 failed for component " + BackendDump.strongComponentString(comp) + "\nNot implemented yet!!!";
-        Error.addInternalError(message, sourceInfo());
-      then fail();
+   // // TORNSYSTEM
+   // case BackendDAE.TORNSYSTEM(strictTearingSet=strictTearingSet, casualTearingSet=casualTearingSet, linear=isLinear, mixedSystem=isMixedSystem)
+   //   algorithm
+   //     print("AHeu: Case BackendDAE.TORNSYSTEM start\n");
+   //     skipDiscInAlgorithm := false; // TODO: What is the menaing of this?
+   //     genDiscrete := false;
+   //     (equations1, uniqueEqIndex1, tempvars) := createTornSystem(isLinear, skipDiscInAlgorithm, genDiscrete, strictTearingSet, casualTearingSet, syst, shared, uniqueEqIndex, isMixedSystem, tempvars);
+//
+   //     //index := {}
+   //     //vindex := {}
+   //     //(equations1, uniqueEqIndex1, tempvars) = createEquation(index, vindex, syst, shared, false, uniqueEqIndex, tempvars, {});
+//
+   //     dumpSimEqSystemLst(equations1, "\n");
+//
+   //     eqnslst := strictTearingSet.residualequations;
+   //     if not listEmpty(equations1) then
+   //       firstSES := listHead(equations1);  // check if the all equations occur with this index in the c file
+   //       firstEqIndex := if isSimEqSys(firstSES) then uniqueEqIndex1-1 else uniqueEqIndex;
+   //       eqSccMapping := appendSccIdxRange(firstEqIndex, uniqueEqIndex1 - 1, sccIndex, eqSccMapping);
+   //       if not listLength(eqnslst) == 1 then
+   //         Error.addInternalError("I didn't thought this case was possible", sourceInfo());
+   //         fail();
+   //       end if;
+   //       eqBackendSimCodeMapping := appendSccIdxRange(firstEqIndex, uniqueEqIndex1 - 1, List.first(eqnslst), eqBackendSimCodeMapping);
+   //       backendMapping := setEqMapping(List.intRange2(firstEqIndex, uniqueEqIndex1 - 1), eqnslst, backendMapping);
+   //     end if;
+   //     if BackendEquation.isWhenEquation(BackendEquation.get(syst.orderedEqs, index)) then
+   //       //allEquations = equations1::allEquations;
+   //       Error.addInternalError("I didn't thought this case was possible", sourceInfo());
+   //       fail();
+   //     else
+   //       (odeEquations, algebraicEquations, allEquations, equationsforZeroCrossings) :=
+   //           addEquationsToLists(equations1, stateeqnsmark, zceqnsmark, eqnslst, odeEquations,
+   //                          algebraicEquations, allEquations, equationsforZeroCrossings);
+   //     end if;
+   //     print("AHeu: Case BackendDAE.TORNSYSTEM end\n");
+   //   then
+   //     (uniqueEqIndex1, odeEquations, algebraicEquations, allEquations, equationsforZeroCrossings, tempvars,
+   //      eqSccMapping, eqBackendSimCodeMapping,backendMapping, sccIndex + 1);
 
     // a system of equations
     case _
@@ -1915,7 +1956,7 @@ algorithm
       list<SimCodeVar.SimVar> tempvars;
       BackendDAE.ExtraInfo ei;
 
-      // ignore when equations if we should not generate them
+    // ignore when equations if we should not generate them
     case (false, _, _, BackendDAE.EQSYSTEM(orderedEqs=eqns), _, BackendDAE.SINGLEEQUATION(eqn=index))
       guard(BackendEquation.isWhenEquation(BackendEquation.get(eqns, index)))
      then ({}, {}, iuniqueEqIndex, itempvars);
@@ -1923,7 +1964,7 @@ algorithm
     case (false, _, _, BackendDAE.EQSYSTEM(), _, BackendDAE.SINGLEWHENEQUATION())
       then ({}, {}, iuniqueEqIndex, itempvars);
 
-        // ignore discrete if we should not generate them
+    // ignore discrete if we should not generate them
     case (_, _, false, BackendDAE.EQSYSTEM(orderedVars=vars), _, BackendDAE.SINGLEEQUATION(var=index))
       guard(BackendVariable.isVarDiscrete(BackendVariable.getVarAt(vars, index)))
      then ({}, {}, iuniqueEqIndex, itempvars);
@@ -1931,12 +1972,12 @@ algorithm
     case (_, _, false, BackendDAE.EQSYSTEM(), _, BackendDAE.SINGLEWHENEQUATION())
       then ({}, {}, iuniqueEqIndex, itempvars);
 
-        // ignore discrete in zero crossing if we should not generate them
+    // ignore discrete in zero crossing if we should not generate them
     case (_, true, _, BackendDAE.EQSYSTEM(orderedVars=vars), _, BackendDAE.SINGLEEQUATION(eqn=index, var=vindex))
       guard(BackendVariable.isVarDiscrete(BackendVariable.getVarAt(vars, vindex)) and listMember(index, zeroCrossingsEquations(syst, shared)))
      then ({}, {}, iuniqueEqIndex, itempvars);
 
-        // single equation
+    // single equation
     case (_, _, _, _, _, BackendDAE.SINGLEEQUATION(eqn=index, var=vindex))
       equation
         if (Flags.isSet(Flags.TEARING_DUMP) or Flags.isSet(Flags.TEARING_DUMPVERBOSE)) and not listEmpty(cons) then
@@ -1946,7 +1987,7 @@ algorithm
         (equations1, uniqueEqIndex, tempvars) = createEquation(index, vindex, syst, shared, skipDiscInAlgorithm, iuniqueEqIndex, itempvars, cons);
       then (equations1, equations1, uniqueEqIndex, tempvars);
 
-      // A single array equation
+    // A single array equation
     case (_, _, _, BackendDAE.EQSYSTEM(orderedVars=vars, orderedEqs=eqns), _, BackendDAE.SINGLEARRAY())
       equation
         (eqnlst, varlst,_) = BackendDAETransform.getEquationAndSolvedVar(comp, eqns, vars);
@@ -1955,7 +1996,7 @@ algorithm
         (equations1, noDiscEquations1, uniqueEqIndex, tempvars) = createSingleArrayEqnCode(genDiscrete, eqnlst, varlst, iuniqueEqIndex, itempvars, shared);
       then (equations1, noDiscEquations1, uniqueEqIndex, tempvars);
 
-        // A single algorithm section for several variables.
+    // A single algorithm section for several variables.
     case (_, _, _, BackendDAE.EQSYSTEM(orderedVars=vars, orderedEqs=eqns), _, BackendDAE.SINGLEALGORITHM())
       equation
         (eqnlst, varlst, _) = BackendDAETransform.getEquationAndSolvedVar(comp, eqns, vars);
@@ -1963,7 +2004,7 @@ algorithm
         (equations1, uniqueEqIndex) = createSingleAlgorithmCode(eqnlst, varlst, skipDiscInAlgorithm, iuniqueEqIndex, partitionKindToClockIndex(syst.partitionKind));
       then (equations1, equations1, uniqueEqIndex, itempvars);
 
-      // A single complex equation
+    // A single complex equation
     case (_, _, _, BackendDAE.EQSYSTEM(orderedVars=vars, orderedEqs=eqns), BackendDAE.SHARED(info = ei), BackendDAE.SINGLECOMPLEXEQUATION())
       equation
         (eqnlst, varlst,_) = BackendDAETransform.getEquationAndSolvedVar(comp, eqns, vars);
@@ -2352,7 +2393,11 @@ algorithm
         end if;
       then
         ({SimCode.SES_ALGORITHM(iuniqueEqIndex, algStatements, eqAttr)}, iuniqueEqIndex+1, itempvars);
-
+    else
+      algorithm
+      message := "Function createEquation failed for equation " + BackendDump.equationString(eqn);
+      Error.addInternalError(message, sourceInfo());
+    then fail();
   end match;
 end createEquation;
 
@@ -3518,137 +3563,146 @@ protected function createTornSystem
   output Integer ouniqueEqIndex;
   output list<SimCodeVar.SimVar> otempvars;
 algorithm
-   (equations_, ouniqueEqIndex, otempvars) := match(linear, isyst, ishared)
-     local
-       list<BackendDAE.Var> tvars;
-       list<BackendDAE.Equation> reqns;
-       BackendDAE.Variables vars, globalKnownVars;
-       BackendDAE.EquationArray eqns;
-       list<SimCodeVar.SimVar> tempvars, tempvars2, simVars;
-       list<SimCode.SimEqSystem> simequations, resEqs, eqs;
-       Integer uniqueEqIndex, nInnerVars;
-       list<DAE.ComponentRef> tcrs;
-       Option<SimCode.JacobianMatrix> jacobianMatrix;
-       list<Integer> tearingVars, residualEqns;
-       Boolean homotopySupport;
-       BackendDAE.InnerEquations innerEquations;
-       BackendDAE.Jacobian inJacobian;
-       SimCode.LinearSystem lSystem;
-       SimCode.NonlinearSystem nlSystem;
-       Option<SimCode.LinearSystem> alternativeTearingL;
-       Option<SimCode.NonlinearSystem> alternativeTearingNl;
-       BackendDAE.BackendDAEType backendDAEType;
-       Boolean partOfJac;
-       Option<Integer> clockIndex;
+  (equations_, ouniqueEqIndex, otempvars) := match(linear, isyst, ishared)
+    local
+      list<BackendDAE.Var> tvars;
+      list<BackendDAE.Equation> reqns;
+      BackendDAE.Variables vars, globalKnownVars;
+      BackendDAE.EquationArray eqns;
+      list<SimCodeVar.SimVar> tempvars, tempvars2, simVars;
+      list<SimCode.SimEqSystem> simequations, resEqs, eqs;
+      Integer uniqueEqIndex, nInnerVars;
+      list<DAE.ComponentRef> tcrs;
+      Option<SimCode.JacobianMatrix> jacobianMatrix;
+      list<Integer> tearingVars, residualEqns;
+      Boolean homotopySupport;
+      BackendDAE.InnerEquations innerEquations;
+      BackendDAE.Jacobian inJacobian;
+      SimCode.LinearSystem lSystem;
+      SimCode.NonlinearSystem nlSystem;
+      Option<SimCode.LinearSystem> alternativeTearingL;
+      Option<SimCode.NonlinearSystem> alternativeTearingNl;
+      BackendDAE.BackendDAEType backendDAEType;
+      Boolean partOfJac;
+      Option<Integer> clockIndex;
 
-     // CASE: linear
-     case(true, BackendDAE.EQSYSTEM(orderedVars=vars, orderedEqs=eqns), BackendDAE.SHARED(globalKnownVars=globalKnownVars)) equation
-       BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian) = strictTearingSet;
+    // CASE: linear
+    case(true, BackendDAE.EQSYSTEM(orderedVars=vars, orderedEqs=eqns), BackendDAE.SHARED(globalKnownVars=globalKnownVars)) equation
+      BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian) = strictTearingSet;
 
-       if not SymbolicJacobian.isJacobianGeneric(inJacobian) then
-         Error.addMessage(Error.NO_JACONIAN_TORNLINEAR_SYSTEM, {});
-         fail();
-       end if;
+      if not SymbolicJacobian.isJacobianGeneric(inJacobian) then
+        Error.addMessage(Error.NO_JACONIAN_TORNLINEAR_SYSTEM, {});
+        fail();
+      end if;
 
-       // get tearing vars
-       tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
-       tvars = List.map(tvars, BackendVariable.transformXToXd);
-       ((simVars, _)) = List.fold(tvars, traversingdlowvarToSimvarFold, ({}, globalKnownVars));
-       simVars = listReverse(simVars);
+      // get tearing vars
+      tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
+      tvars = List.map(tvars, BackendVariable.transformXToXd);
+      ((simVars, _)) = List.fold(tvars, traversingdlowvarToSimvarFold, ({}, globalKnownVars));
+      simVars = listReverse(simVars);
 
-       // get residual eqns
-       reqns = BackendEquation.getList(residualEqns, eqns);
-       reqns = BackendEquation.replaceDerOpInEquationList(reqns);
-       // generate other equations
-       (simequations, uniqueEqIndex, tempvars, nInnerVars, _) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, iuniqueEqIndex, itempvars, {});
-       (resEqs, uniqueEqIndex, tempvars) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars, ishared.functionTree);
-       eqs = listAppend(simequations, resEqs);
+      //print("AHeu2: ---------------------\n");
+      //BackendDump.printVarList(tvars);
+      //dumpVarLst(simVars, "AHeu: Dumping simvars from torn linear system");
+      //print("AHeu3: ---------------------\n");
+      //BackendDump.printVariables(vars);
+      //print("AHeu4: ---------------------\n");
 
-       (jacobianMatrix, uniqueEqIndex, tempvars) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars);
-       partOfJac = BackendDAEUtil.isJacobianDAE(ishared);
-       lSystem = SimCode.LINEARSYSTEM(uniqueEqIndex, false, true, simVars, {}, {}, eqs, jacobianMatrix, {}, 0, listLength(tvars)+nInnerVars+listLength(tempvars)-listLength(itempvars), partOfJac);
-       tempvars2 = tempvars;
+      // get residual eqns
+      reqns = BackendEquation.getList(residualEqns, eqns);
+      reqns = BackendEquation.replaceDerOpInEquationList(reqns);
+      // generate other equations
+      (simequations, uniqueEqIndex, tempvars, nInnerVars, _) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, iuniqueEqIndex, itempvars, {});
+      (resEqs, uniqueEqIndex, tempvars) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars, ishared.functionTree);
+      eqs = listAppend(simequations, resEqs);
 
-       // Do if dynamic tearing is activated
-       if Util.isSome(casualTearingSet) then
-         SOME(BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian)) = casualTearingSet;
-         // get tearing vars
-         tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
-         tvars = List.map(tvars, BackendVariable.transformXToXd);
-         ((simVars, _)) = List.fold(tvars, traversingdlowvarToSimvarFold, ({}, globalKnownVars));
-         simVars = listReverse(simVars);
+      (jacobianMatrix, uniqueEqIndex, tempvars) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars);
+      partOfJac = BackendDAEUtil.isJacobianDAE(ishared);
+      lSystem = SimCode.LINEARSYSTEM(uniqueEqIndex, false, true, simVars, {}, {}, eqs, jacobianMatrix, {}, 0, listLength(tvars)+nInnerVars+listLength(tempvars)-listLength(itempvars), partOfJac);
+      tempvars2 = tempvars;
 
-         // get residual eqns
-         reqns = BackendEquation.getList(residualEqns, eqns);
-         reqns = BackendEquation.replaceDerOpInEquationList(reqns);
-         // generate other equations
-         (simequations, uniqueEqIndex, tempvars2, nInnerVars, _) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, uniqueEqIndex+1, tempvars, {});
-         (resEqs, uniqueEqIndex, tempvars2) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars2, ishared.functionTree);
-         eqs = listAppend(simequations, resEqs);
+      // Do if dynamic tearing is activated
+      if Util.isSome(casualTearingSet) then
+        SOME(BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian)) = casualTearingSet;
+        // get tearing vars
+        tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
+        tvars = List.map(tvars, BackendVariable.transformXToXd);
+        ((simVars, _)) = List.fold(tvars, traversingdlowvarToSimvarFold, ({}, globalKnownVars));
+        simVars = listReverse(simVars);
 
-         (jacobianMatrix, uniqueEqIndex, tempvars2) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars2);
-         alternativeTearingL = SOME(SimCode.LINEARSYSTEM(uniqueEqIndex, false, true, simVars, {}, {}, eqs, jacobianMatrix, {}, 0, listLength(tvars)+nInnerVars+listLength(tempvars2)-listLength(tempvars), partOfJac));
+        // get residual eqns
+        reqns = BackendEquation.getList(residualEqns, eqns);
+        reqns = BackendEquation.replaceDerOpInEquationList(reqns);
+        // generate other equations
+        (simequations, uniqueEqIndex, tempvars2, nInnerVars, _) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, uniqueEqIndex+1, tempvars, {});
+        (resEqs, uniqueEqIndex, tempvars2) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars2, ishared.functionTree);
+        eqs = listAppend(simequations, resEqs);
 
-       else
-         alternativeTearingL = NONE();
-       end if;
-     then ({SimCode.SES_LINEAR(lSystem, alternativeTearingL, BackendDAE.EQ_ATTR_DEFAULT_UNKNOWN)}, uniqueEqIndex+1, tempvars2);
+        (jacobianMatrix, uniqueEqIndex, tempvars2) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars2);
+        alternativeTearingL = SOME(SimCode.LINEARSYSTEM(uniqueEqIndex, false, true, simVars, {}, {}, eqs, jacobianMatrix, {}, 0, listLength(tvars)+nInnerVars+listLength(tempvars2)-listLength(tempvars), partOfJac));
+      else
+        alternativeTearingL = NONE();
+      end if;
+    then ({SimCode.SES_LINEAR(lSystem, alternativeTearingL, BackendDAE.EQ_ATTR_DEFAULT_UNKNOWN)}, uniqueEqIndex+1, tempvars2);
 
-     // CASE: nonlinear
-     case(false, BackendDAE.EQSYSTEM(orderedVars=vars, orderedEqs=eqns), _) equation
-       BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian) = strictTearingSet;
-       // get tearing vars
-       tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
-       tvars = List.map(tvars, BackendVariable.transformXToXd);
+    // CASE: nonlinear
+    case(false, BackendDAE.EQSYSTEM(orderedVars=vars, orderedEqs=eqns), _) equation
+      BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian) = strictTearingSet;
+      // get tearing vars
+      tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
+      tvars = List.map(tvars, BackendVariable.transformXToXd);
 
-       // get residual eqns
-       reqns = BackendEquation.getList(residualEqns, eqns);
-       reqns = BackendEquation.replaceDerOpInEquationList(reqns);
-       // generate residual replacements
-       tcrs = List.map(tvars, BackendVariable.varCref);
-       // generate other equations
-       (simequations, uniqueEqIndex, tempvars, nInnerVars, homotopySupport) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, iuniqueEqIndex, itempvars, {});
-       (resEqs, uniqueEqIndex, tempvars) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars, ishared.functionTree);
-       eqs = listAppend(simequations, resEqs);
+      // get residual eqns
+      reqns = BackendEquation.getList(residualEqns, eqns);
+      reqns = BackendEquation.replaceDerOpInEquationList(reqns);
+      // generate residual replacements
+      tcrs = List.map(tvars, BackendVariable.varCref);
+      // generate other equations
+      (simequations, uniqueEqIndex, tempvars, nInnerVars, homotopySupport) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, iuniqueEqIndex, itempvars, {});
+      (resEqs, uniqueEqIndex, tempvars) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars, ishared.functionTree);
+      eqs = listAppend(simequations, resEqs);
 
-       (jacobianMatrix, uniqueEqIndex, tempvars) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars);
-       if not homotopySupport then
-         (_, homotopySupport) = BackendEquation.traverseExpsOfEquationList(reqns, BackendDAEUtil.containsHomotopyCall, false);
-       end if;
+      (jacobianMatrix, uniqueEqIndex, tempvars) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars);
+      if not homotopySupport then
+        (_, homotopySupport) = BackendEquation.traverseExpsOfEquationList(reqns, BackendDAEUtil.containsHomotopyCall, false);
+      end if;
 
-       clockIndex = partitionKindToClockIndex(isyst.partitionKind);
+      clockIndex = partitionKindToClockIndex(isyst.partitionKind);
 
-       nlSystem = SimCode.NONLINEARSYSTEM(uniqueEqIndex, eqs, tcrs, 0, listLength(tvars)+nInnerVars+listLength(tempvars)-listLength(itempvars), jacobianMatrix, homotopySupport, mixedSystem, true, clockIndex);
-       tempvars2 = tempvars;
+      nlSystem = SimCode.NONLINEARSYSTEM(uniqueEqIndex, eqs, tcrs, 0, listLength(tvars)+nInnerVars+listLength(tempvars)-listLength(itempvars), jacobianMatrix, homotopySupport, mixedSystem, true, clockIndex);
+      tempvars2 = tempvars;
 
-       // Do if dynamic tearing is activated
-       if Util.isSome(casualTearingSet) then
-         SOME(BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian)) = casualTearingSet;
-         // get tearing vars
-         tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
-         tvars = List.map(tvars, BackendVariable.transformXToXd);
+      // Do if dynamic tearing is activated
+      if Util.isSome(casualTearingSet) then
+        SOME(BackendDAE.TEARINGSET(tearingvars=tearingVars, residualequations=residualEqns, innerEquations=innerEquations, jac=inJacobian)) = casualTearingSet;
+        // get tearing vars
+        tvars = List.map1r(tearingVars, BackendVariable.getVarAt, vars);
+        tvars = List.map(tvars, BackendVariable.transformXToXd);
 
-         // get residual eqns
-         reqns = BackendEquation.getList(residualEqns, eqns);
-         reqns = BackendEquation.replaceDerOpInEquationList(reqns);
-         // generate residual replacements
-         tcrs = List.map(tvars, BackendVariable.varCref);
-         // generate other equations
-         (simequations, uniqueEqIndex, tempvars2, nInnerVars, homotopySupport) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, uniqueEqIndex+1, tempvars, {});
-         (resEqs, uniqueEqIndex, tempvars2) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars2, ishared.functionTree);
-         eqs = listAppend(simequations, resEqs);
+        // get residual eqns
+        reqns = BackendEquation.getList(residualEqns, eqns);
+        reqns = BackendEquation.replaceDerOpInEquationList(reqns);
+        // generate residual replacements
+        tcrs = List.map(tvars, BackendVariable.varCref);
+        // generate other equations
+        (simequations, uniqueEqIndex, tempvars2, nInnerVars, homotopySupport) = createTornSystemInnerEqns(innerEquations, skipDiscInAlgorithm, genDiscrete, isyst, ishared, uniqueEqIndex+1, tempvars, {});
+        (resEqs, uniqueEqIndex, tempvars2) = createNonlinearResidualEquations(reqns, uniqueEqIndex, tempvars2, ishared.functionTree);
+        eqs = listAppend(simequations, resEqs);
 
-         (jacobianMatrix, uniqueEqIndex, tempvars2) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars2);
-         if not homotopySupport then
-           (_, homotopySupport) = BackendEquation.traverseExpsOfEquationList(reqns, BackendDAEUtil.containsHomotopyCall, false);
-         end if;
+        (jacobianMatrix, uniqueEqIndex, tempvars2) = createSymbolicSimulationJacobian(inJacobian, uniqueEqIndex, tempvars2);
+        if not homotopySupport then
+          (_, homotopySupport) = BackendEquation.traverseExpsOfEquationList(reqns, BackendDAEUtil.containsHomotopyCall, false);
+        end if;
 
-         alternativeTearingNl = SOME(SimCode.NONLINEARSYSTEM(uniqueEqIndex, eqs, tcrs, 0, listLength(tvars)+nInnerVars+listLength(tempvars2)-listLength(tempvars), jacobianMatrix, homotopySupport, mixedSystem, true, clockIndex));
-       else
-         alternativeTearingNl = NONE();
-       end if;
-     then ({SimCode.SES_NONLINEAR(nlSystem, alternativeTearingNl, BackendDAE.EQ_ATTR_DEFAULT_UNKNOWN)}, uniqueEqIndex+1, tempvars2);
-   end match;
+        alternativeTearingNl = SOME(SimCode.NONLINEARSYSTEM(uniqueEqIndex, eqs, tcrs, 0, listLength(tvars)+nInnerVars+listLength(tempvars2)-listLength(tempvars), jacobianMatrix, homotopySupport, mixedSystem, true, clockIndex));
+      else
+        alternativeTearingNl = NONE();
+      end if;
+    then ({SimCode.SES_NONLINEAR(nlSystem, alternativeTearingNl, BackendDAE.EQ_ATTR_DEFAULT_UNKNOWN)}, uniqueEqIndex+1, tempvars2);
+    else equation
+      Error.addInternalError("Function createTornSystem failed.", sourceInfo());
+    then fail();
+  end match;
 end createTornSystem;
 
 protected function solveInnerEquations "author: Frenkel TUD 2011-05
@@ -3731,6 +3785,9 @@ algorithm
         repl = solveInnerEquations1(explst1, explst2, varlst, inVars, ishared, inRepl);
       then
         solveInnerEquations(rest, inEqns, inVars, ishared, repl);
+      else equation
+        Error.addInternalError("Function solveInnerEquations failed.", sourceInfo());
+      then fail();
   end match;
 end solveInnerEquations;
 

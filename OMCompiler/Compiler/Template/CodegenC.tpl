@@ -2195,9 +2195,11 @@ template functionSetupLinearSystemsTemp(list<SimEqSystem> linearSystems, String 
        else
          let &varDecls = buffer "" /*BUFD*/
          let &auxFunction = buffer ""
+         let &myTemp = buffer ""
          let MatrixA = (ls.simJac |> (row, col, eq as SES_RESIDUAL(__)) hasindex i0 =>
+           let &myTemp += "We are in this loop"
            let &preExp = buffer "" /*BUFD*/
-           let expPart = daeExp(eq.exp, contextSimulationDiscrete, &preExp,  &varDecls, &auxFunction)
+           let expPart = daeExp(eq.exp, contextSimulationDiscrete, &preExp, &varDecls, &auxFunction)
              '<%preExp%>linearSystemData->setAElement(<%row%>, <%col%>, <%expPart%>, <%i0%>, linearSystemData, threadData);'
           ;separator="\n")
 
@@ -2219,12 +2221,15 @@ template functionSetupLinearSystemsTemp(list<SimEqSystem> linearSystems, String 
        OMC_DISABLE_OPT
        void setLinearMatrixA<%ls.index%>(void *inData, threadData_t *threadData, void *systemData)
        {
+         // AHeu case 1
+         <%myTemp%>
          const int equationIndexes[2] = {1,<%ls.index%>};
          DATA* data = (DATA*) inData;
          LINEAR_SYSTEM_DATA* linearSystemData = (LINEAR_SYSTEM_DATA*) systemData;
          <% if ls.partOfJac then 'ANALYTIC_JACOBIAN* parentJacobian = linearSystemData->parDynamicData[omc_get_thread_num()].parentJacobian;'%>
          <%varDecls%>
          <%MatrixA%>
+         // Do we reach this case?
        }
        OMC_DISABLE_OPT
        void setLinearVectorb<%ls.index%>(void *inData, threadData_t *threadData, void *systemData)
@@ -2414,6 +2419,7 @@ template functionSetupLinearSystemsTemp(list<SimEqSystem> linearSystems, String 
        OMC_DISABLE_OPT
        void setLinearMatrixA<%ls.index%>(void *inData, void *systemData)
        {
+         // AHeu case 2
          const int equationIndexes[2] = {1,<%ls.index%>};
          DATA* data = (DATA*) inData;
          LINEAR_SYSTEM_DATA* linearSystemData = (LINEAR_SYSTEM_DATA*) systemData;
@@ -2444,6 +2450,7 @@ template functionSetupLinearSystemsTemp(list<SimEqSystem> linearSystems, String 
        OMC_DISABLE_OPT
        void setLinearMatrixA<%at.index%>(void *inData, void *systemData)
        {
+         // AHeu case 3
          const int equationIndexes[2] = {1,<%at.index%>};
          DATA* data = (DATA*) inData;
          LINEAR_SYSTEM_DATA* linearSystemData = (LINEAR_SYSTEM_DATA*) systemData;
