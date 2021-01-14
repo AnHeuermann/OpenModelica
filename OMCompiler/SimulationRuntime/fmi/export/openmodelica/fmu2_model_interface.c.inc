@@ -1755,6 +1755,46 @@ fmi2Status fmi2GetStringStatus(fmi2Component c, const fmi2StatusKind s, fmi2Stri
   return unsupportedFunction(c, "fmi2GetStringStatus", ~0);
 }
 
+fmi2Status notfmi2GetChangedReals(fmi2Component c, fmi2Real x_old[], fmi2Real x_diff[], fmi2Boolean isChanged[], size_t nx, fmi2Real epsilon)
+{
+  unsigned int i;
+  fmi2Real newVal;
+  ModelInstance* comp = (ModelInstance *)c;
+
+  if (invalidState(comp, "notfmi2GetChangedReals", ~0, modelContinuousTimeMode))
+    return fmi2Error;
+  if (invalidNumber(comp, "notfmi2GetChangedReals", "nx", nx, NUMBER_OF_REALS))
+    return fmi2Error;
+  if (nullPointer(comp, "notfmi2GetChangedReals", "x_old[]", x_old))
+    return fmi2Error;
+  if (nullPointer(comp, "notfmi2GetChangedReals", "x_diff[]", x_diff))
+    return fmi2Error;
+  if (nullPointer(comp, "notfmi2GetChangedReals", "isChanged[]", isChanged))
+    return fmi2Error;
+  if (epsilon<0) {
+    comp->state = modelError;
+    FILTERED_LOG(comp, fmi2Error, LOG_STATUSERROR, "%s: Invalid argument epsilon = %d. Expected epsilon >= 0.", "notfmi2GetChangedReals", epsilon)
+    return fmi2Error;
+  }
+
+  for(i=0; i<nx; i++)
+  {
+    newVal = comp->fmuData->localData[0]->realVars[i];
+    x_diff[i] = x_old[i] - newVal;
+    x_old[i] = newVal;
+    if (fabs(x_diff[i]) > epsilon)
+    {
+      isChanged[i] = fmi2True;
+    }
+    else
+    {
+      isChanged[i] = fmi2False;
+    }
+  }
+
+  return fmi2OK;
+}
+
 // ---------------------------------------------------------------------------
 // FMI functions: set external functions
 // ---------------------------------------------------------------------------
