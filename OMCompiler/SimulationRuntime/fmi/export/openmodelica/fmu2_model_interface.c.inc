@@ -1588,6 +1588,9 @@ fmi2Status fmi2DoStep(fmi2Component c, fmi2Real currentCommunicationPoint, fmi2R
 
   tCommunication = currentCommunicationPoint;
 
+  /* Save old variables */
+  memcpy(comp->fmuData->backup->realVars, comp->fmuData->localData[0]->realVars, NUMBER_OF_REALS*sizeof(modelica_real));
+
   fmi2EnterEventMode(c);
   fmi2EventIteration(c, &eventInfo);
   fmi2EnterContinuousTimeMode(c);
@@ -1755,19 +1758,32 @@ fmi2Status fmi2GetStringStatus(fmi2Component c, const fmi2StatusKind s, fmi2Stri
   return unsupportedFunction(c, "fmi2GetStringStatus", ~0);
 }
 
-fmi2Status notfmi2GetChangedReals(fmi2Component c, fmi2Real x_old[], fmi2Real x_diff[], fmi2Boolean isChanged[], size_t nx, fmi2Real epsilon)
+
+/**
+ * @brief Check if values of reals have changed after last fmi2DoStepFunction
+ *
+ * @param c             FMI component
+ * @param vr            Constant array with value references of real variables to check for changes
+ * @param nvr           Size of vr and isChanged
+ * @param isChanged     Output array containing bool if value of real variables with associated value references has changed greater then epsilon
+ * @param epsilon       Epsilon for difference.
+ * @return fmi2Status   Return fmi2OK on success, otherwise fmi2Error
+ */
+fmi2Status notfmi2ChangedReals(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, fmi2Boolean isChanged[], fmi2Real epsilon)
 {
   unsigned int i;
-  fmi2Real newVal;
   ModelInstance* comp = (ModelInstance *)c;
+  fmi2ValueReference valRef;
+  fmi2Real oldVal, newVal;
 
   if (invalidState(comp, "notfmi2GetChangedReals", ~0, modelContinuousTimeMode))
     return fmi2Error;
-  if (invalidNumber(comp, "notfmi2GetChangedReals", "nx", nx, NUMBER_OF_REALS))
-    return fmi2Error;
-  if (nullPointer(comp, "notfmi2GetChangedReals", "x_old[]", x_old))
-    return fmi2Error;
-  if (nullPointer(comp, "notfmi2GetChangedReals", "x_diff[]", x_diff))
+  if (nvr > NUMBER_OF_REALS)
+  {
+    comp->state = modelError;
+    FILTERED_LOG(comp, fmi2Error, LOG_STATUSERROR, "%s: Invalid number nvr = %zu. Expected nvr <= %i.", "notfmi2GetChangedReals", nvr, NUMBER_OF_REALS)
+  }
+  if (nullPointer(comp, "notfmi2GetChangedReals", "vr[]", vr))
     return fmi2Error;
   if (nullPointer(comp, "notfmi2GetChangedReals", "isChanged[]", isChanged))
     return fmi2Error;
@@ -1777,12 +1793,13 @@ fmi2Status notfmi2GetChangedReals(fmi2Component c, fmi2Real x_old[], fmi2Real x_
     return fmi2Error;
   }
 
-  for(i=0; i<nx; i++)
+  for(i=0; i<nvr; i++)
   {
-    newVal = comp->fmuData->localData[0]->realVars[i];
-    x_diff[i] = x_old[i] - newVal;
-    x_old[i] = newVal;
-    if (fabs(x_diff[i]) > epsilon)
+    if (vrOutOfRange(comp, "notfmi2ChangedReals", vr[i], NUMBER_OF_REALS))
+      return fmi2Error;
+    oldVal = comp->fmuData->backup->realVars[vr[i]];
+    newVal = comp->fmuData->localData[0]->realVars[vr[i]];
+    if (fabs(oldVal-newVal) > epsilon)
     {
       isChanged[i] = fmi2True;
     }
