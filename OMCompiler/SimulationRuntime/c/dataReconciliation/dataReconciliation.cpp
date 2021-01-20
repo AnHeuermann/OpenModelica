@@ -555,12 +555,22 @@ void solveMatrixMultiplication(double *matrixA, double *matrixB, int rowsa, int 
  */
 void solveSystemFstar(int n, int nhrs, double *tmpMatrixD, double *tmpMatrixC, ofstream &logfile, DATA * data)
 {
-  int N = n; // number of rows of Matrix A
+  int N = n;        // number of rows of Matrix A
   int NRHS = nhrs;  // number of columns of Matrix B
   int LDA = N;
   int LDB = N;
   int ipiv[N];
   int info;
+
+  // Print A
+  printf("A=\n");
+  for(int i=0; i<N; i++) {
+    for(int j=0; j<LDA; j++) {
+      printf("%.5e\t", tmpMatrixD[i*N+j]);
+    }
+    printf("\n");
+  }
+
   // call the external function
   dgesv_(&N, &NRHS, tmpMatrixD, &LDA, ipiv, tmpMatrixC, &LDB, &info);
   if (info > 0)
@@ -572,6 +582,7 @@ void solveSystemFstar(int n, int nhrs, double *tmpMatrixD, double *tmpMatrixC, o
     createErrorHtmlReport(data);
     exit(1);
   }
+  exit(1);
 }
 
 /*
