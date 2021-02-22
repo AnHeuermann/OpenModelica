@@ -1713,6 +1713,10 @@ protected
 algorithm
   linear := BackendDAEUtil.getLinearfromJacType(jacType);
 
+  if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+     print("\n" + BORDER + "\nBEGINNING of minimalTearing\n\n");
+  end if;
+
 try
 
   // Create a local subsystem to simplify processing. This is not neccessary per-se but is helpful.
@@ -1725,8 +1729,11 @@ try
 
   (adjEnh,adjEnhT) := BackendDAEUtil.getAdjacencyMatrixEnhanced(subsyst, ishared, BackendDAEUtil.isInitializationDAE(ishared));
 
-  // print("Minimal Tearing subsystem: \n");
-  // BackendDump.printEqSystem(subsyst);
+  if Flags.isSet(Flags.TEARING_DUMP) or Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+    print("\n\n###BEGIN print Strong Component#####################\n(Function:minimalTearing)\n");
+    BackendDump.printEqSystem(subsyst);
+    print("\n###END print Strong Component#######################\n(Function:minimalTearing)\n\n\n");
+  end if;
 
   size := listLength(vindx);
   varArray := arrayCreate(size,true);
@@ -1736,7 +1743,11 @@ try
 
   // find discrete vars. Warn on tearing select always and prefer on discrete vars.
   unsolvedDiscreteVars := findDiscreteWarnTearingSelect(var_lst);
-  // print("All discrete Vars: " + stringDelimitList(List.map(unsolvedDiscreteVars,intString),",") + "\n");
+
+  if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+    print("\nAll discrete Vars:\n");
+    print(stringDelimitList(List.map(unsolvedDiscreteVars,intString),",") + "\n");
+  end if;
 
   // Look for algorithm equations. If there is an algorithm equation
   // remove all discrete variables solved in it. The algorithm is added as
@@ -1843,21 +1854,38 @@ try
       case BackendDAE.INNEREQUATION() algorithm
           ieqn.vars := selectFromList_rev(vindx, ieqn.vars);
           ieqn.eqn := listGet(eindex,ieqn.eqn);
-       then ieqn;
+      then ieqn;
       else fail();
     end match for ieqn in innerEquationsLocalIndex);
 
-  iterationVars := selectFromList_rev(vindx, iterationVars);
-  residualequations := selectFromList_rev(eindex, residualequations);
+  iterationVars := listReverse(selectFromList_rev(vindx, iterationVars));
+  residualequations := listReverse(selectFromList_rev(eindex, residualequations));
 
   // dumpTearingSetGlobalIndexes(BackendDAE.TEARINGSET(iterationVars, residualequations, listReverse(innerEquations), BackendDAE.EMPTY_JACOBIAN()),size," - STRICT SET");
 
   // Return torn system
-  ocomp := BackendDAE.TORNSYSTEM(BackendDAE.TEARINGSET(listReverse(iterationVars), listReverse(residualequations), listReverse(innerEquations), BackendDAE.EMPTY_JACOBIAN()), NONE(), linear, mixedSystem);
+  ocomp := BackendDAE.TORNSYSTEM(BackendDAE.TEARINGSET(iterationVars, residualequations, listReverse(innerEquations), BackendDAE.EMPTY_JACOBIAN()), NONE(), linear, mixedSystem);
+
+  if Flags.isSet(Flags.TEARING_DUMP) or Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+     print("\n" + BORDER + "\n* TEARING RESULTS:\n*\n* No of equations in strong component: "+intString(size)+"\n");
+     print("* No of tVars: "+intString(listLength(iterationVars))+"\n");
+     print("*\n* tVars: "+ stringDelimitList(List.map(iterationVars,intString),",") + "\n");
+     print("*\n* resEq: "+ stringDelimitList(List.map(residualequations,intString),",") + "\n*\n*");
+     print("\n* Related to entire Equationsystem:\n* =====\n* tVars: "+ stringDelimitList(List.map(iterationVars,intString),",") + "\n* =====\n");
+     print("*\n* =====\n* resEq: "+ stringDelimitList(List.map(residualequations,intString),",") + "\n* =====\n" + BORDER + "\n");
+  end if;
+  if Flags.isSet(Flags.TEARING_DUMPVERBOSE) then
+     print("\n\nStrongComponents:\n");
+     BackendDump.dumpComponent(ocomp);
+     print("\n\nEND of omcTearing\n" + BORDER + "\n\n");
+  end if;
+
+
 else
   Error.addInternalError("function minimalTearing failed", sourceInfo());
   fail();
 end try;
+
 end minimalTearing;
 
 
