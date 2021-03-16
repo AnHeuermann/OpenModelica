@@ -44,6 +44,7 @@
 #include "nonlinearSolverHybrd.h"
 #include "nonlinearSolverNewton.h"
 #include "newtonIteration.h"
+#include "newton_diagnostics.h"
 #endif
 #include "nonlinearSolverHomotopy.h"
 #include "../options.h"
@@ -1070,6 +1071,15 @@ int solve_nonlinear_system(DATA *data, threadData_t *threadData, int sysNumber)
   /* print debug initial information */
   infoStreamPrint(LOG_NLS, 1, "############ Solve nonlinear system %ld at time %g ############", nonlinsys->equationIndex, data->localData[0]->timeValue);
   printNonLinearInitialInfo(LOG_NLS, data, nonlinsys);
+
+#if !defined(OMC_MINIMAL_RUNTIME)
+  /* Improve start values with newton diagnostics method */
+  if(omc_flag[FLAG_NEWTON_DIAGNOSTICS] && data->simulationInfo->initial) {
+    infoStreamPrint(LOG_NLS, 0, "Running newton diagnostics");
+    newtonDiagnostics(data, threadData);
+  }
+#endif
+
 
   /* try */
 #ifndef OMC_EMCC
