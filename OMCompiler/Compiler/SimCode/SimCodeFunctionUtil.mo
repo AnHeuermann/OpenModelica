@@ -2628,9 +2628,10 @@ public function createMakefileParams
   input list<String> libPaths;
   input Boolean isFunction;
   input Boolean isFMU=false;
+  input String targetPlatform=System.modelicaPlatform();
   output SimCodeFunction.MakefileParams makefileParams;
 protected
-  String omhome, ccompiler, cxxcompiler, linker, exeext, dllext, cflags, ldflags, rtlibs, platform, fopenmp,compileDir;
+  String omhome, ccompiler, cxxcompiler, linker, exeext, dllext, cflags, ldflags, rtlibs, fopenmp,compileDir;
 algorithm
   ccompiler   := if stringEq(Config.simCodeTarget(),"JavaScript") then "emcc" else
                  (if Flags.isSet(Flags.HPCOM) then System.getOMPCCompiler() else System.getCCompiler());
@@ -2648,10 +2649,9 @@ algorithm
     ldflags := "-lParModelicaAuto -ltbb_static -lboost_system" + ldflags;
   end if;
   rtlibs := if isFunction then Autoconf.ldflags_runtime else (if isFMU then Autoconf.ldflags_runtime_fmu else Autoconf.ldflags_runtime_sim);
-  platform := System.modelicaPlatform();
   compileDir :=  System.pwd() + Autoconf.pathDelimiter;
   makefileParams := SimCodeFunction.MAKEFILE_PARAMS(ccompiler, cxxcompiler, linker, exeext, dllext,
-        omhome, cflags, ldflags, rtlibs, includes, libs,libPaths, platform,compileDir);
+        omhome, cflags, ldflags, rtlibs, includes, libs,libPaths, targetPlatform, compileDir);
 end createMakefileParams;
 
 public

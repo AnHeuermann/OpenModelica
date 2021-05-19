@@ -151,6 +151,7 @@ protected function generateModelCodeFMU "
   input String filenamePrefix;
   input String fmuTargetName;
   input Option<SimCode.SimulationSettings> simSettings;
+  input String targetPlatform=System.modelicaPlatform();
   output list<String> libs;
   output String fileDir;
   output Real timeSimCode;
@@ -180,7 +181,7 @@ algorithm
     inRemovedInitialEquationLst, className, filenamePrefix, fileDir, functions,
     includes, includeDirs, libs, libPaths, p, simSettings, recordDecls,
     literals, Absyn.FUNCTIONARGS({},{}), isFMU=true, FMUVersion=FMUVersion,
-    fmuTargetName=fmuTargetName, inFMIDer=inFMIDer);
+    fmuTargetName=fmuTargetName, inFMIDer=inFMIDer, targetPlatform=targetPlatform);
   timeSimCode := System.realtimeTock(ClockIndexes.RT_CLOCK_SIMCODE);
   ExecStat.execStat("SimCode");
 
@@ -334,6 +335,7 @@ protected function createSimCode "
   input String FMUVersion="";
   input String fmuTargetName="";
   input BackendDAE.SymbolicJacobians inFMIDer = {};
+  input String targetPlatform=System.modelicaPlatform();
   output SimCode.SimCode simCode;
 algorithm
   simCode := matchcontinue(inBackendDAE, inClassName, filenamePrefix, inString11, functions, externalFunctionIncludes, includeDirs, libs, libPaths, program,simSettingsOpt, recordDecls, literals, args)
@@ -372,7 +374,7 @@ algorithm
     then HpcOmSimCodeMain.createSimCode(inBackendDAE, inInitDAE, inInitDAE_lambda0, inRemovedInitialEquationLst, inClassName, filenamePrefix, inString11, functions, externalFunctionIncludes, includeDirs, libs, libPaths,program,simSettingsOpt, recordDecls, literals, args);
 
     else equation
-      (tmpSimCode, _) = SimCodeUtil.createSimCode(inBackendDAE, inInitDAE, inInitDAE_lambda0, inInlineData, inRemovedInitialEquationLst, inClassName, filenamePrefix, inString11, functions, externalFunctionIncludes, includeDirs, libs,libPaths,program, simSettingsOpt, recordDecls, literals, args, isFMU=isFMU, FMUVersion=FMUVersion, fmuTargetName=fmuTargetName, inFMIDer=inFMIDer);
+      (tmpSimCode, _) = SimCodeUtil.createSimCode(inBackendDAE, inInitDAE, inInitDAE_lambda0, inInlineData, inRemovedInitialEquationLst, inClassName, filenamePrefix, inString11, functions, externalFunctionIncludes, includeDirs, libs,libPaths,program, simSettingsOpt, recordDecls, literals, args, isFMU=isFMU, FMUVersion=FMUVersion, fmuTargetName=fmuTargetName, inFMIDer=inFMIDer, targetPlatform=targetPlatform);
     then tmpSimCode;
   end matchcontinue;
 end createSimCode;
@@ -895,6 +897,7 @@ public function translateModel "
   input Boolean addDummy "if true, add a dummy state";
   input Option<SimCode.SimulationSettings> inSimSettingsOpt;
   input Absyn.FunctionArgs args=Absyn.emptyFunctionArgs "labels for remove terms";
+  input String targetPlatform=System.modelicaPlatform();
   output list<String> outStringLst;
   output String outFileDir;
   output list<tuple<String, Values.Value>> resultValues;
@@ -1024,7 +1027,7 @@ algorithm
         case TranslateModelKind.FMU()
           algorithm
 
-            (libs,file_dir,timeSimCode,timeTemplates) := generateModelCodeFMU(dlow, initDAE, initDAE_lambda0, fmiDer, removedInitialEquationLst, SymbolTable.getAbsyn(), className, FMI.getFMIVersionString(), kind.kind, filenameprefix, kind.targetName, inSimSettingsOpt);
+            (libs,file_dir,timeSimCode,timeTemplates) := generateModelCodeFMU(dlow, initDAE, initDAE_lambda0, fmiDer, removedInitialEquationLst, SymbolTable.getAbsyn(), className, FMI.getFMIVersionString(), kind.kind, filenameprefix, kind.targetName, inSimSettingsOpt, targetPlatform);
           then (libs, file_dir, timeSimCode, timeTemplates);
         case TranslateModelKind.XML()
           algorithm

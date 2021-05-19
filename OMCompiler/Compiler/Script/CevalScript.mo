@@ -233,7 +233,8 @@ protected
          fileEXE = workDir + fileprefix + Autoconf.exeExt,
          fileLOG = workDir + fileprefix + ".log";
   Integer numParallel,res;
-  Boolean isWindows = Autoconf.os == "Windows_NT";
+  //Boolean isWindows = Autoconf.os == "Windows_NT";
+  Boolean isWindows = false;
   list<String> makeVarsNoBinding;
 algorithm
   libsfilename := workDir + fileprefix + ".libs";

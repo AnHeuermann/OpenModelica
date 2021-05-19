@@ -211,6 +211,7 @@ public function createSimCode "entry point to create SimCode from BackendDAE."
   input String FMUVersion="";
   input String fmuTargetName="";
   input BackendDAE.SymbolicJacobians inFMIDer = {};
+  input String targetPlatform=System.modelicaPlatform();
   output SimCode.SimCode simCode;
   output tuple<Integer, list<tuple<Integer, Integer>>> outMapping "the highest simEqIndex in the mapping and the mapping simEq-Index -> scc-Index itself";
 protected
@@ -447,7 +448,7 @@ algorithm
     if debug then execStat("simCode: createAlgorithmAndEquationAsserts"); end if;
     discreteModelVars := BackendDAEUtil.foldEqSystem(dlow, extractDiscreteModelVars, {});
     if debug then execStat("simCode: extractDiscreteModelVars"); end if;
-    makefileParams := SimCodeFunctionUtil.createMakefileParams(includeDirs, libs, libPaths, false, isFMU);
+    makefileParams := SimCodeFunctionUtil.createMakefileParams(includeDirs, libs, libPaths, false, isFMU, targetPlatform);
     (delayedExps, maxDelayedExpIndex) := extractDelayedExpressions(dlow);
     spatialInfo := extractSpatialDistributionInfo(dlow);
     execStat("simCode: created of all other equations (e.g. parameter, nominal, assert, etc)");

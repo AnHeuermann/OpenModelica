@@ -3596,11 +3596,11 @@ protected
     dir=fmutmp+"/sources/", cmd="",
     quote="'",
     dquote = if isWindows then "\"" else "'",
-    includeDefaultFmi, volumeID, cidFile, containerID;
+    includeDefaultFmi, volumeID, cidFile, containerID, cmd2;
   list<String> rest;
   Boolean finishedBuild;
   Integer uid, status;
-  Boolean verbose = false;
+  Boolean verbose = true;
 algorithm
   includeDefaultFmi := dquote + Settings.getInstallationDirectoryPath() + "/include/omc/c/fmi" + dquote;
 
@@ -3735,8 +3735,15 @@ algorithm
         elseif verbose then
            print(cmd + "\n" + System.readFile(logfile) +"\n");
         end if;
+        // Copy configure from container to FMU
+        // This assumes that the container hast a configure in /usr/share/omc/runtime/c/fmi/buildproject/
+        if isWindows then
+          cmd2 := "cp -a /usr/share/omc/runtime/c/fmi/buildproject/* . && ";
+        else
+          cmd2 := "";
+        end if;
         cmd := "docker run "+(if uid<>0 then "--user " + String(uid) else "")+" --rm -w /fmu -v "+volumeID+":/fmu "+stringDelimitList(rest," ")+ " sh -c " + dquote +
-               "cd " + dquote + "/fmu/" + System.basename(fmutmp) + "/sources" + dquote + " && " +
+               "cd " + dquote + "/fmu/" + System.basename(fmutmp) + "/sources" + dquote + " && " + cmd2 +
                "./configure --host="+quote+host+quote+" CFLAGS="+quote+"-Os"+quote+" CPPFLAGS=-I/fmu/fmiInclude LDFLAGS= && " +
                nozip + dquote;
         if 0 <> System.systemCall(cmd, outFile=logfile) then
@@ -3843,7 +3850,7 @@ algorithm
   FlagsUtil.setConfigBool(Flags.BUILDING_FMU, true);
   FlagsUtil.setConfigString(Flags.FMI_VERSION, FMUVersion);
   try
-    (success, cache, libs, _, _) := SimCodeMain.translateModel(SimCodeMain.TranslateModelKind.FMU(FMUType, fmuTargetName), cache, inEnv, className, filenameprefix, addDummy, SOME(simSettings));
+    (success, cache, libs, _, _) := SimCodeMain.translateModel(SimCodeMain.TranslateModelKind.FMU(FMUType, fmuTargetName), cache, inEnv, className, filenameprefix, addDummy, SOME(simSettings), Absyn.emptyFunctionArgs, List.first(platforms));
     true := success;
     outValue := Values.STRING((if not Testsuite.isRunning() then System.pwd() + Autoconf.pathDelimiter else "") + fmuTargetName + ".fmu");
   else
