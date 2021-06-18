@@ -1109,7 +1109,10 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   assertStreamPrint(threadData, 0 == data->modelData->nDelayExpressions || 0 != data->simulationInfo->delayStructure, "out of memory");
 
   for(i=0; i<data->modelData->nDelayExpressions; i++)
+  {
+    // TODO: Calculate how big ringbuffer should be for each delay expression
     data->simulationInfo->delayStructure[i] = allocRingBuffer(1024, sizeof(TIME_AND_VALUE));
+  }
 #endif
 
 #if !defined(OMC_NO_STATESELECTION)
