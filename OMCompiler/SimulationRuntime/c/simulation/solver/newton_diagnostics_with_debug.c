@@ -65,7 +65,7 @@ extern int dgetrf_(int *n, int *nrhs, double *a, int *lda,
 extern int dgetri_(int *n, double *a, int *lda,
                    int *ipiv, double *work, int *lwork, int *info);
 
-unsigned var_id( idx)
+/*unsigned var_id( idx)
 {
    // DC circuit case
 
@@ -101,9 +101,9 @@ unsigned var_id( idx)
    else
       id = idx;
    return id;
-}
+}*/
 
-/*unsigned var_id( idx)
+unsigned var_id( idx)
 {
    // Thermo-hydraulic case
 
@@ -128,7 +128,8 @@ unsigned var_id( idx)
    else if (idx == 5)
       id = 3;
    return id;
-}*/
+}
+
 // --------------------------------------------------------------------------------------------------------------------------------
 
 void MatMult( unsigned rA, unsigned cArB, unsigned cB, double A[rA][cArB], double B[cArB][cB], double C[rA][cB])
@@ -179,7 +180,7 @@ void getJacobian( DATA* data, threadData_t *threadData, unsigned sysNumber, unsi
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-void getFirstNewtonStep( unsigned m, double f[m], double fx[m][m], double dx[m])
+void getFirstNewtonStep( unsigned m, double f[m], double fx[m][m], double dx[m], int info)
 {
    // Function values iteration 0: vector f(x0)
    // Values Jacobian iteration 0: vector fx(x0)
@@ -191,7 +192,6 @@ void getFirstNewtonStep( unsigned m, double f[m], double fx[m][m], double dx[m])
    int LDA = N;
    int LDB = N;
    int ipiv[N];
-   int info;
 
    double a[N][N];
    double b[NRHS][N];
@@ -245,6 +245,12 @@ double maxNonLinearResiduals( unsigned m, unsigned l, unsigned z_idx[l],
       if (r_x0[i] > maxRes)
          maxRes = r_x0[i];
    }
+
+   // Prints values of vector r_x0
+   /*printf("\n   Vector r_x0 ....\n");
+   for( i = 0; i < m; i++)
+      printf("\n               r_x0[%d] = %14.10f", i+1, r_x0[i]);
+   printf("\n\n");*/
 
    return maxRes;
 }
@@ -510,10 +516,10 @@ void PrintResults( DATA* data, unsigned p, unsigned w_idx[p], unsigned n_idx[p],
    printf("\n");
 
    for( j = 0; j < p; j++)
-      printf("      var_%d: %8s = %10.8g\n", w_idx[j]+1, data->modelData->realVarsData[var_id(w_idx[j])].info.name, x0[w_idx[j]]);
+      printf("      var_%d: %8s = %7.3f\n", w_idx[j]+1, data->modelData->realVarsData[var_id(w_idx[j])].info.name, x0[w_idx[j]]);
    printf("\n");
 
-   printf("      lambda    = %8.3g\n\n", lambda);
+   printf("      lambda    = %8.3f\n\n", lambda);
 
    for( i = 0; i < p; ++i)
    {
@@ -607,10 +613,15 @@ void newtonDiagnostics(DATA* data, threadData_t *threadData, int sysNumber)
 
   unsigned m = systemData->size;
 
+  unsigned i;      // Function counter
+  unsigned j, k;   // Variable counters
+
+  double x0[m], f[m];
+
   // --------------------------------------------------------------------------------------------------------------------------------
   //  Thermo hydraulic case
   // --------------------------------------------------------------------------------------------------------------------------------
-  /*
+
   // Obtain vector w0: initial guesses of vars where Jacobian matrix J(w) of f(x) only depends on
   unsigned p = m;
   double w0[p];
@@ -635,15 +646,20 @@ void newtonDiagnostics(DATA* data, threadData_t *threadData, int sysNumber)
   // Linear dependables "z":
   double z[1];
   unsigned z_idx[1];
-  */
+
+  // Linear equations "l":
+  double l[1];
+  unsigned l_idx[1];
+
+
   // --------------------------------------------------------------------------------------------------------------------------------
   //  DC circuit case
   // --------------------------------------------------------------------------------------------------------------------------------
-
+  /*
   // Obtain vector w0: initial guesses of vars where Jacobian matrix J(w) of f(x) only depends on
   unsigned p = 3;
-  double w0[p];
-  unsigned w_idx[p];
+  double w0[q];
+  unsigned w_idx[q];
   w_idx[0] = 2;  // var^3
   w_idx[1] = 3;  // var^4
   w_idx[2] = 4;  // var^5
@@ -669,63 +685,296 @@ void newtonDiagnostics(DATA* data, threadData_t *threadData, int sysNumber)
   z_idx[8]  = 11;
   z_idx[9]  = 12;
 
-// --------------------------------------------------------------------------------------------------------------------------------
+  // Linear equations "l":
+  double l[m-p];
+  unsigned l_idx[m-p];
+  l_idx[0]  =  0;
+  l_idx[1]  =  2;
+  l_idx[2]  =  5;
+  l_idx[3]  =  6;
+  l_idx[4]  =  7;
+  l_idx[5]  =  8;
+  l_idx[6]  =  9;
+  l_idx[7]  = 10;
+  l_idx[8]  = 11;
+  l_idx[9]  = 12;
+*/
+  // --------------------------------------------------------------------------------------------------------------------------------
 
-   unsigned i;
-   double x0[m], f[m];
+  // Store all dependents in x0
+  for( j = 0; j < m; j++)
+     x0[j] = systemData->nlsx[j];
 
-   // Store all all dependents in x0 and function values as function of x0 in f
-   for( i = 0; i < m; i++)
-   {
-      x0[i] = systemData->nlsx[i];
-      f[i]  = systemData->resValues[i];
-   }
+  // Store all function values f as function of x0
+  for( i = 0; i < m; i++)
+     f[i] = systemData->resValues[i];
 
-   // Store non-linear dependents in w0
-   for( i = 0; i < p; i++)
-      w0[i] = x0[w_idx[i]];
+  // Store non-linear dependents in w0
+  for( j = 0; j < p; j++)
+     w0[j] = x0[w_idx[j]];
+
+  // Store function values of non-linear equations n
+  for( i = 0; i < p; i++)
+     n[i] = f[n_idx[i]];
+
+  // Store linear variables z0
+  for( j = 0; j < m - p; j++)
+     z[j] = x0[z_idx[j]];
+
+  // Store function values of linear equations l
+  for( i = 0; i < m - p; i++)
+     l[i] = f[l_idx[i]];
+
+  // --------------------------------------------------------------------------------------------------------------------------------
 
    // Prints values of vector x0
-   printf("\n   Vector x0 ....\n");
-   for( i = 0; i < m; i++)
-      printf("\n               x0[%d] = %14.10f  (%s)", i+1, x0[i], data->modelData->realVarsData[var_id(i)].info.name);
+  printf("\n   Vector x0 ....\n");
+  for( j = 0; j < m; ++j)
+     printf("\n               x0[%d] = %14.10f  (%s)", j+1, x0[j], data->modelData->realVarsData[var_id(j)].info.name);
 
-   // Prints function values "f", i.e. residuals as function of x0
-   printf("\n\n   Function values of all equations f(x0) ....\n");
-   for( i = 0; i < m; i++)
-      printf("\n               f^%d = %14.10f", i+1, f[i]);
-   printf("\n");
+  //SIMULATION_DATA *sData2 = data->localData[0];
+  //unsigned nRealVar = data->modelData->nVariablesReal;
+  //printf("\n\n   Vector x0 .... sData->realVars[j]\n");
+  //for( j = 1; j < nRealVar; ++j)
+  //   printf("\n               x0[%d] = %14.10f  (%s)", j, sData2->realVars[j], data->modelData->realVarsData[j].info.name);
 
-// --------------------------------------------------------------------------------------------------------------------------------
+  // Prints function values "f", i.e. residuals as function of x0
+  printf("\n\n   Function values of all equations f(x0) ....\n");
+  for( i = 0; i < m; ++i)
+     printf("\n               f^%d = %14.10f", i+1, f[i]);
+
+  // Prints values of vector w0
+  printf("\n\n   Vector w0 .... \n");
+  for( j = 0; j < p; j++)
+     printf("\n               w0[%d] = %14.10f  (%s)", w_idx[j]+1, w0[j], data->modelData->realVarsData[var_id(w_idx[j])].info.name);
+
+  // Prints function values of non-linear functions "n", i.e. residuals as function of w0
+  printf("\n\n   Function values non-linear functions n(w0) ....\n");
+  for( i = 0; i < p; i++)
+     printf("\n               n^%d = %14.10f", n_idx[i]+1, n[i]);
+
+  // Prints function values all linear functions "l", i.e. residuals as function of z0
+  if (m - p > 0) printf("\n\n   Function values of linear functions l(z0) ....\n");
+  for( i = 0; i < m - p; ++i)
+     printf("\n               l^%d = %14.10f", l_idx[i]+1, l[i]);
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+   //                                             Calculate Jacobian fx as function of x0
+   // --------------------------------------------------------------------------------------------------------------------------------
 
    double fx[m][m];
    getJacobian( data, threadData, sysNumber, m, fx);
 
-   double dx[m];
-   getFirstNewtonStep( m, f, fx, dx);
+   // Prints values of Jacobian: each row i contains function f^i and each column variabele j
+   printf("\n\n   Jacobian (per equation i).... J(x0)\n\n                   ");
 
-   double maxRes = maxNonLinearResiduals( m, m - p, z_idx, f, fx, dx);
+   for( j = 0; j < m; j++)
+      printf("     j=%2d", j+1);
+
+   printf("\n                   ");
+   for( j = 0; j < m; j++)
+      printf("%9s", data->modelData->realVarsData[var_id(j)].info.name);
+
+   for( i = 0; i < m; i++)
+   {
+      printf("\n               f^%2d", i+1);
+      for( j = 0; j < m; j++)
+         printf(" %8.6g", fx[i][j]);
+   }
+   printf("\n");
+
+   if (p < m)
+   {
+      printf("\n   Jacobian (per non-linear equation i).... J(w0)\n\n                   ");
+
+      for( j = 0; j < p; j++)
+         printf("     j=%2d", w_idx[j]+1);
+
+      printf("\n                   ");
+      for( j = 0; j < p; j++)
+         printf("%9s", data->modelData->realVarsData[var_id(w_idx[j])].info.name);
+
+      for( i = 0; i < p; i++)
+      {
+         printf("\n               f^%2d", n_idx[i]+1);
+         for( j = 0; j < p; j++)
+            printf(" %8.6g", fx[n_idx[i]][w_idx[j]]);
+      }
+      printf("\n");
+   }
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+   //                                               Calculate first new Newton step delta
+   // --------------------------------------------------------------------------------------------------------------------------------
+
+   double dx[m];
+   int info;
+   getFirstNewtonStep( m, f, fx, dx, info);
+
+   if (info > 0)
+   {
+      // Prints values of vector x1
+      printf("\n   Newton steps for x....\n");
+      for( j = 0; j < m; ++j)
+         printf("\n               step[%d] = %14.10f", j+1, dx[j]);
+      printf("\n");
+
+      // Prints values of vector x1
+      printf("\n   Vector x1 ....\n");
+      for( j = 0; j < m; ++j)
+         printf("\n               x1[%d] = %14.10f", j+1, x0[j] + dx[j]);
+      printf("\n\n");
+   }
+
+   // Calculate non-linear residuals r_x0 = f_x0 + fz * (z1 - z0) at iteration point x0, where z1 - z0 = dx and fz = J.
+   double max_res = maxNonLinearResiduals( m, m - p, z_idx, f, fx, dx);
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+   //                                 Calculate fxx values with finite differences from Jacobian
+   // --------------------------------------------------------------------------------------------------------------------------------
 
    double fxx[m][m][m];
    getHessian( data, threadData, sysNumber, m, fxx);
 
-// --------------------------------------------------------------------------------------------------------------------------------
+   // Prints values of Hessian per equation
+   printf("\n   Hessian (per equation i).... H(x0)\n\n                   ");
+   for( j = 0; j < m; j++)
+      printf("     j=%2d", j+1);
 
-   double lambda = 1.0; //0.49;
+   printf("\n                   ");
+   for( j = 0; j < m; j++)
+      printf("%9s", data->modelData->realVarsData[var_id(j)].info.name);
+
+   for( i = 0; i < m; i++)
+   {
+      printf("\n\n      i = %2d   ", i+1);
+      for( k = 0; k < m; k++)
+      {
+         if (k == 0)
+            printf(               "k = %2d", k+1);
+         else
+            printf("               k = %2d", k+1);
+
+         for( j = 0; j < m; j++)
+            printf(" %8.6g", fxx[i][k][j]);
+         printf("\n");
+      }
+   }
+   printf("\n\n");
+
+   // Prints values of Hessian per non-linear equation
+   if (p < m)
+   {
+      printf("\n   Hessian (per non-linear equation i).... H(w0)\n\n                   ");
+      for( j = 0; j < p; j++)
+         printf("     j=%2d", w_idx[j]+1);
+
+      printf("\n                   ");
+      for( j = 0; j < p; j++)
+         printf("%9s", data->modelData->realVarsData[var_id(w_idx[j])].info.name);
+
+      for( i = 0; i < p; i++)
+      {
+         printf("\n\n      i = %2d   ", n_idx[i]+1);
+         for( k = 0; k < p; k++)
+         {
+            if (k == 0)
+               printf(               "k = %2d", w_idx[k]+1);
+            else
+               printf("               k = %2d", w_idx[k]+1);
+
+            for( j = 0; j < p; j++)
+               printf(" %8.6g", fxx[n_idx[i]][w_idx[k]][w_idx[j]]);
+            printf("\n");
+         }
+      }
+      printf("\n\n");
+   }
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+   //                                                   Calculate alpha coefficients
+   // --------------------------------------------------------------------------------------------------------------------------------
+
+   printf("\n   Calculating alpha coefficients....\n\n");
+
+   double lambda = 0.49;
+
+   printf("      max residual = %f\n\n", max_res);
+   printf("      lambda  = %6.3f\n\n", lambda);
 
    double alpha[p];
-   calcAlpha( data, threadData, sysNumber, m, p, w_idx, n_idx, x0, dx, f, fxx, lambda, maxRes, alpha);
+   calcAlpha( data, threadData, sysNumber, m, p, w_idx, n_idx, x0, dx, f, fxx, lambda, max_res, alpha);
+
+   for( i = 0; i < p; ++i)
+   {
+     if (alpha[i] < 1.e5)
+        printf("      alpha_%d = %7.4f\n", n_idx[i]+1, alpha[i]);
+     else
+        printf("      alpha_%d = %7.4e\n", n_idx[i]+1, alpha[i]);
+   }
+
+   printf("\n   Calculating alpha coefficients finished!!\n\n");
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+   //                                                  Calculate curvature factors
+   // --------------------------------------------------------------------------------------------------------------------------------
+
+   printf("\n   Calculating curvature factors Gamma_ijk....\n\n");
 
    double Gamma_ijk[p][p][p];
-   calcGamma( m, p, w_idx, n_idx, dx, fxx, maxRes, Gamma_ijk);
+   calcGamma( m, p, w_idx, n_idx, dx, fxx, max_res, Gamma_ijk);
+
+   for( i = 0; i < p; i++)
+   {
+      printf("               ");
+      for( k = 0; k < p; k++)
+         printf("          k=%2d", w_idx[k]+1);
+
+      printf("\n              ");
+      for( k = 0; k < p; ++k)
+         printf("%14s", data->modelData->realVarsData[var_id(w_idx[k])].info.name);
+
+      printf("\n     i = %2d ", n_idx[i]+1);
+      for( j = 0; j < p; j++)
+      {
+         printf("j = %2d:   ", w_idx[j]+1);
+         for( k = 0; k < p; k++)
+         {
+            if (Gamma_ijk[i][j][k] > 1.e-6)
+               printf(" %10.8f   ", Gamma_ijk[i][j][k]);
+            else
+               printf("     0        ");
+         }
+         printf("\n            ");
+      }
+      printf("\n");
+   }
+
+   printf("   Calculating curvature factors finished!!\n\n");
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+   //                                                 Calculate solution sensitivities
+   // --------------------------------------------------------------------------------------------------------------------------------
+
+   printf("\n   Calculating solution sensitivities....\n");
 
    double Sigma[p][p];
    calcSigma( m, p, w_idx, n_idx, dx, fx, fxx, Sigma);
 
+   for( i = 0; i < p; ++i)
+   {
+      printf("\n      i = %2d ", i+1);
+      for( j = 0; j < p; ++j)
+         printf("%10.4f", Sigma[i][j]);
+   }
+
+   printf("\n\n   Calculating solution sensitivities finished!!\n");
+
+   // --------------------------------------------------------------------------------------------------------------------------------
+
    PrintResults( data, p, w_idx, n_idx, x0, lambda, alpha, Gamma_ijk, Sigma);
 
    infoStreamPrint(LOG_NLS_NEWTON_DIAG, 0, "Newton diagnostics (version Teus) finished!!");
-
    return;
 }
 

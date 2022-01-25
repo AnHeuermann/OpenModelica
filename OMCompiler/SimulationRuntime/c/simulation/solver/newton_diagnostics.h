@@ -38,4 +38,4 @@
 
 
 /* Function prototypes */
-void newtonDiagnostics(DATA* data, threadData_t *threadData);
+void newtonDiagnostics(DATA* data, threadData_t *threadData, int sysNumber);

@@ -29,6 +29,7 @@ SET(solver_sources  ../../../../3rdParty/Cdaskr/solver/daux.c
                     model_help.c
                     newton_diagnostics.c
                     newtonIteration.c
+                    newton_diagnostics.c
                     nonlinearSolverHomotopy.c
                     nonlinearSolverHybrd.c
                     nonlinearSolverNewton.c

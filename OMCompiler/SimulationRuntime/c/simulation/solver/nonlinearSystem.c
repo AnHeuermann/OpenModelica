@@ -1065,6 +1065,7 @@ int solve_nonlinear_system(DATA *data, threadData_t *threadData, int sysNumber)
   /* update non continuous */
   if (data->simulationInfo->discreteCall)
   {
+    // TS, 23/08/2021: printf("   #### data->simulationInfo->discreteCall....\n");
     constraintsSatisfied = updateInnerEquation(dataAndThreadData, sysNumber, 1);
   }
 
@@ -1074,9 +1075,9 @@ int solve_nonlinear_system(DATA *data, threadData_t *threadData, int sysNumber)
 
 #if !defined(OMC_MINIMAL_RUNTIME)
   /* Improve start values with newton diagnostics method */
-  if(omc_flag[FLAG_NEWTON_DIAGNOSTICS] && data->simulationInfo->initial) {
+  if(omc_flag[FLAG_NEWTON_DIAGNOSTICS] && data->simulationInfo->initial && sysNumber == 0) {
     infoStreamPrint(LOG_NLS, 0, "Running newton diagnostics");
-    newtonDiagnostics(data, threadData);
+    newtonDiagnostics(data, threadData, sysNumber);
   }
 #endif
 
