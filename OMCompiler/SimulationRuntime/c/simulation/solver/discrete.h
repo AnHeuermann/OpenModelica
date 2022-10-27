@@ -40,6 +40,8 @@
 extern "C" {
 #endif
 
+/* Function prototypes */
+void updateDiscreteSystem(DATA *data, threadData_t *threadData);
 int checkForDiscreteChanges(DATA* data, threadData_t *threadData);
 
 #ifdef __cplusplus

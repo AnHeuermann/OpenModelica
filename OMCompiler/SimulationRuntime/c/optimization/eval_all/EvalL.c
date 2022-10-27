@@ -33,7 +33,7 @@
 
 #include "../OptimizerData.h"
 #include "../OptimizerLocalFunction.h"
-#include "../../simulation/solver/model_help.h"
+#include "../../simulation/solver/discrete.h"
 
 static inline void num_hessian0(double * v, const double * const lambda, const double objFactor , OptData *optData, const int i, const int j);
 static inline void sumLagrange0(const int i, const int j, double * res,  const modelica_boolean upC, OptData *optData);

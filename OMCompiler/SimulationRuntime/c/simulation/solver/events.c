@@ -28,18 +28,19 @@
  *
  */
 
-#include "simulation/solver/events.h"
-#include "util/omc_error.h"
-#include "simulation/options.h"
-#include "simulation_data.h"
-#include "simulation/results/simulation_result.h"
-#include "openmodelica.h"         /* for modelica types */
 #include "openmodelica_func.h"    /* for modelica functions */
+#include "openmodelica.h"         /* for modelica types */
+#include "simulation_data.h"
+#include "simulation/options.h"
+#include "simulation/results/simulation_result.h"
 #include "simulation/simulation_runtime.h"
-#include "simulation/solver/solver_main.h"
-#include "simulation/solver/model_help.h"
-#include "simulation/solver/external_input.h"
+#include "simulation/solver/discrete.h"
 #include "simulation/solver/epsilon.h"
+#include "simulation/solver/events.h"
+#include "simulation/solver/external_input.h"
+#include "simulation/solver/model_help.h"
+#include "simulation/solver/solver_main.h"
+#include "util/omc_error.h"
 
 #include <math.h>
 #include <stdio.h>

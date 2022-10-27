@@ -31,50 +31,53 @@
  /*! \file solver_main.c
  */
 
-#include "omc_config.h"
-#include "simulation/simulation_runtime.h"
-#include "simulation/results/simulation_result.h"
-#include "solver_main.h"
-#include "openmodelica_func.h"
-#include "initialization/initialization.h"
-#include "nonlinearSystem.h"
-#include "newtonIteration.h"
-#include "cvode_solver.h"
-#include "dassl.h"
-#include "ida_solver.h"
-#include "delay.h"
-#include "events.h"
-#include "util/parallel_helper.h"
-#include "util/varinfo.h"
-#include "radau.h"
-#include "model_help.h"
-#include "meta/meta_modelica.h"
-#include "simulation/solver/epsilon.h"
-#include "simulation/solver/external_input.h"
-#include "synchronous.h"
-#include "linearSystem.h"
-#include "sym_solver_ssc.h"
-#include "gbode_main.h"
-#include "irksco.h"
-#if !defined(OMC_MINIMAL_RUNTIME)
-#include "simulation/solver/embedded_server.h"
-#include "simulation/solver/real_time_sync.h"
-#endif
-#include "simulation/simulation_input_xml.h"
-
-#include "optimization/OptimizerInterface.h"
-
-/*
- * #include "dopri45.h"
- */
-#include "util/rtclock.h"
-#include "util/omc_error.h"
-#include "simulation/options.h"
 #include <math.h>
 #include <string.h>
 #include <errno.h>
 #include <float.h>
 
+#include "cvode_solver.h"
+#include "dassl.h"
+#include "delay.h"
+#include "discrete.h"
+#include "events.h"
+#include "gbode_main.h"
+#include "ida_solver.h"
+#include "irksco.h"
+#include "linearSystem.h"
+#include "model_help.h"
+#include "newtonIteration.h"
+#include "nonlinearSystem.h"
+#include "omc_config.h"
+#include "openmodelica_func.h"
+#include "radau.h"
+#include "solver_main.h"
+#include "sym_solver_ssc.h"
+#include "synchronous.h"
+
+#include "initialization/initialization.h"
+
+#include "meta/meta_modelica.h"
+
+#include "optimization/OptimizerInterface.h"
+
+#include "simulation/options.h"
+#include "simulation/results/simulation_result.h"
+#include "simulation/simulation_input_xml.h"
+#include "simulation/simulation_runtime.h"
+#include "simulation/solver/epsilon.h"
+#include "simulation/solver/external_input.h"
+#if !defined(OMC_MINIMAL_RUNTIME)
+#include "simulation/solver/embedded_server.h"
+#include "simulation/solver/real_time_sync.h"
+#endif
+
+#include "util/parallel_helper.h"
+#include "util/varinfo.h"
+#include "util/rtclock.h"
+#include "util/omc_error.h"
+
+/* Global variables */
 double** work_states;
 
 typedef struct RK4_DATA

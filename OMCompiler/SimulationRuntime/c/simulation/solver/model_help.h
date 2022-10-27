@@ -36,7 +36,6 @@ extern "C" {
 
 #include "../../simulation_data.h"
 
-extern int maxEventIterations;
 extern double linearSparseSolverMaxDensity;
 extern int linearSparseSolverMinSize;
 extern double nonlinearSparseSolverMaxDensity;
@@ -67,8 +66,6 @@ extern int homBacktraceStrategy;
 void initializeDataStruc(DATA *data, threadData_t *threadData);
 
 void deInitializeDataStruc(DATA *data);
-
-void updateDiscreteSystem(DATA *data, threadData_t *threadData);
 
 void saveZeroCrossings(DATA *data, threadData_t *threadData);
 

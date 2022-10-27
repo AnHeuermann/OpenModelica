@@ -57,7 +57,6 @@
   #include <omp.h>
 #endif
 
-int maxEventIterations = 20;
 double linearSparseSolverMaxDensity = DEFAULT_FLAG_LSS_MAX_DENSITY;
 int linearSparseSolverMinSize = DEFAULT_FLAG_LSS_MIN_SIZE;
 double nonlinearSparseSolverMaxDensity = DEFAULT_FLAG_NLSS_MAX_DENSITY;
@@ -86,65 +85,6 @@ double homTauStart = 0.2;
 int homBacktraceStrategy = 1;
 
 static double tolZC;
-
-/*! \fn updateDiscreteSystem
- *
- *  Function to update the whole system with event iteration.
- *  Evaluates functionDAE()
- *
- *  \param [ref] [data]
- */
-void updateDiscreteSystem(DATA *data, threadData_t *threadData)
-{
-  TRACE_PUSH
-  int numEventIterations = 0;
-  int discreteChanged = 0;
-  modelica_boolean relationChanged = 0;
-  data->simulationInfo->needToIterate = 0;
-
-  data->simulationInfo->callStatistics.updateDiscreteSystem++;
-
-  data->callback->function_updateRelations(data, threadData, 1);
-  updateRelationsPre(data);
-  storeRelations(data);
-
-  data->callback->functionDAE(data, threadData);
-  debugStreamPrint(LOG_EVENTS_V, 0, "updated discrete System");
-
-  relationChanged = checkRelations(data);
-  discreteChanged = checkForDiscreteChanges(data, threadData);
-  while(discreteChanged || data->simulationInfo->needToIterate || relationChanged)
-  {
-    if(data->simulationInfo->needToIterate) {
-      debugStreamPrint(LOG_EVENTS_V, 0, "reinit() call. Iteration needed!");
-    }
-    if(relationChanged) {
-      debugStreamPrint(LOG_EVENTS_V, 0, "relations changed. Iteration needed.");
-    }
-    if(discreteChanged) {
-      debugStreamPrint(LOG_EVENTS_V, 0, "discrete Variable changed. Iteration needed.");
-    }
-
-    storePreValues(data);
-    updateRelationsPre(data);
-
-    printRelations(data, LOG_EVENTS_V);
-    printZeroCrossings(data, LOG_EVENTS_V);
-
-    data->callback->functionDAE(data, threadData);
-
-    numEventIterations++;
-    if(numEventIterations > maxEventIterations) {
-      throwStreamPrint(threadData, "Simulation terminated due to too many, i.e. %d, event iterations.\nThis could either indicate an inconsistent system or an undersized limit of event iterations.\nThe limit of event iterations can be specified using the runtime flag '–%s=<value>'.", maxEventIterations, FLAG_NAME[FLAG_MAX_EVENT_ITERATIONS]);
-    }
-
-    relationChanged = checkRelations(data);
-    discreteChanged = checkForDiscreteChanges(data, threadData);
-  }
-  storeRelations(data);
-
-  TRACE_POP
-}
 
 /*! \fn saveZeroCrossings
  *

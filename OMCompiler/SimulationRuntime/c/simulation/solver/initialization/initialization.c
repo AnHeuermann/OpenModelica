@@ -38,6 +38,7 @@
 #include "../../../openmodelica.h"
 #include "../../../openmodelica_func.h"
 #include "../../../simulation/options.h"
+#include "../discrete.h"
 #include "../model_help.h"
 #if !defined(OMC_MINIMAL_RUNTIME)
 #include "../../../util/read_matlab4.h"

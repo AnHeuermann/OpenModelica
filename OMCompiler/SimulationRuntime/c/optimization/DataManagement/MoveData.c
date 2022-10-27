@@ -36,7 +36,7 @@
 #include "../../openmodelica.h"
 #include "../../simulation/options.h"
 #include "../../simulation/results/simulation_result.h"
-#include "../../simulation/solver/model_help.h"
+#include "../../simulation/solver/discrete.h"
 #include "../../util/context.h"
 #include "../../util/omc_file.h"
 #include "../OptimizerData.h"
