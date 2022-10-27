@@ -661,29 +661,32 @@ typedef struct SIMULATION_SETTINGS
   int useStopTime;
 
   /* ODE solver settings */
-  const char *solverMethod;           /* ODE solver method */
-  modelica_real stepSize;             /* ODE solver step size */
-  modelica_real minStepSize;          /* ODE solver minimum step size */
-  modelica_real tolerance;            /* ODE solver tolerance */
-  modelica_integer numSteps;          /* Number of ODE solver steps */
+  const char *solverMethod;            /* ODE solver method */
+  modelica_real stepSize;              /* ODE solver step size */
+  modelica_real minStepSize;           /* ODE solver minimum step size */
+  modelica_real tolerance;             /* ODE solver tolerance */
+  modelica_integer numSteps;           /* Number of ODE solver steps */
 
   /* Linear solver settings */
-  LINEAR_SOLVER lsMethod;              /* linear solver */
-  LINEAR_SPARSE_SOLVER lssMethod;      /* linear sparse solver */
-  int mixedMethod;                     /* mixed solver */
+  LINEAR_SOLVER lsMethod;               /* linear solver */
+  LINEAR_SPARSE_SOLVER lssMethod;       /* linear sparse solver */
+  int mixedMethod;                      /* mixed solver */
+  int linearSparseSolverMinSize;        /* Minimum size of linear system to use sparse solver */
+  double linearSparseSolverMaxDensity;  /* Maximum allowed density for sparse linear solver */
 
   /* Non-linear solver settings */
-  NONLINEAR_SOLVER nlsMethod;          /* nonlinear solver */
-  NEWTON_STRATEGY newtonStrategy;      /* newton damping strategy solver */
-  int nlsCsvInfomation;                /* = 1 csv files with detailed nonlinear solver process are generated */
-  NLS_LS nlsLinearSolver;              /* nls linear solver */
+  NONLINEAR_SOLVER nlsMethod;             /* nonlinear solver */
+  NEWTON_STRATEGY newtonStrategy;         /* newton damping strategy solver */
+  int nlsCsvInfomation;                   /* = 1 csv files with detailed nonlinear solver process are generated */
+  NLS_LS nlsLinearSolver;                 /* nls linear solver */
+  double nonlinearSparseSolverMaxDensity; /* Maximum allowed density for sparse non-linear solver */
 
   /* Logging settings */
-  double loggingTimeRecord[2];         /* Time interval in which logging is active. Only used if useLoggingTime=1 */
-  int useLoggingTime;                  /* 0 if logging is currently disabled, 1 if enabled */
+  double loggingTimeRecord[2];          /* Time interval in which logging is active. Only used if useLoggingTime=1 */
+  int useLoggingTime;                   /* 0 if logging is currently disabled, 1 if enabled */
 
   /* Homotopy settings */
-  int homotopySteps;                   /* the number of homotopy lambda steps during initialization, =0 no homotopy was used */
+  int homotopySteps;                    /* the number of homotopy lambda steps during initialization, =0 no homotopy was used */
 
   /* Result file settings */
   const char *outputFormat;

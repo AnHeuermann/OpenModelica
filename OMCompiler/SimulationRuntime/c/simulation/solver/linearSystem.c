@@ -72,6 +72,7 @@ int initializeLinearSystems(DATA *data, threadData_t *threadData)
   int size;
   int res;
   unsigned int j, maxNumberThreads;
+  SIMULATION_SETTINGS* settings = &(data->simulationInfo->settings);
   LINEAR_SYSTEM_DATA *linsys = data->simulationInfo->linearSystemData;
   modelica_boolean someSmallDensity = 0;  /* pretty dumping of flag info */
   modelica_boolean someBigSize = 0;       /* analogous to someSmallDensity */
@@ -133,30 +134,30 @@ int initializeLinearSystems(DATA *data, threadData_t *threadData)
 #endif
     }
 
-    if (nnz/(double)(size*size) < linearSparseSolverMaxDensity) {
+    if (nnz/(double)(size*size) < settings->linearSparseSolverMaxDensity) {
       linsys[i].useSparseSolver = 1;
       someSmallDensity = 1;
-      if (size > linearSparseSolverMinSize) {
+      if (size > settings->linearSparseSolverMinSize) {
         someBigSize = 1;
         infoStreamPrint(LOG_STDOUT, 0,
                         "Using sparse solver for linear system %d,\n"
                         "because density of %.3f remains under threshold of %.3f\n"
                         "and size of %d exceeds threshold of %d.",
-                        i, nnz/(double)(size*size), linearSparseSolverMaxDensity,
-                        size, linearSparseSolverMinSize);
+                        i, nnz/(double)(size*size), settings->linearSparseSolverMaxDensity,
+                        size, settings->linearSparseSolverMinSize);
       } else {
         infoStreamPrint(LOG_STDOUT, 0,
                         "Using sparse solver for linear system %d,\n"
                         "because density of %.3f remains under threshold of %.3f.",
-                        i, nnz/(double)(size*size), linearSparseSolverMaxDensity);
+                        i, nnz/(double)(size*size), settings->linearSparseSolverMaxDensity);
       }
-    } else if (size > linearSparseSolverMinSize) {
+    } else if (size > settings->linearSparseSolverMinSize) {
       linsys[i].useSparseSolver = 1;
       someBigSize = 1;
         infoStreamPrint(LOG_STDOUT, 0,
                         "Using sparse solver for linear system %d,\n"
                         "because size of %d exceeds threshold of %d.",
-                        i, size, linearSparseSolverMinSize);
+                        i, size, settings->linearSparseSolverMinSize);
     }
 
     /* Allocate nominal, min and max */

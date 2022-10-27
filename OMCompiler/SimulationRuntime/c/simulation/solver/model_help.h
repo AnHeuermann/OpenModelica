@@ -36,9 +36,6 @@ extern "C" {
 
 #include "../../simulation_data.h"
 
-extern double linearSparseSolverMaxDensity;
-extern int linearSparseSolverMinSize;
-extern double nonlinearSparseSolverMaxDensity;
 extern int nonlinearSparseSolverMinSize;
 extern double newtonXTol;
 extern double newtonFTol;

@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 /* Global variable */
+// AHeu: Remove global variable
 int maxEventIterations = 20;
 
 /**

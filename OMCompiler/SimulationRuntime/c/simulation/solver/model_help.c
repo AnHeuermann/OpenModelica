@@ -57,9 +57,7 @@
   #include <omp.h>
 #endif
 
-double linearSparseSolverMaxDensity = DEFAULT_FLAG_LSS_MAX_DENSITY;
-int linearSparseSolverMinSize = DEFAULT_FLAG_LSS_MIN_SIZE;
-double nonlinearSparseSolverMaxDensity = DEFAULT_FLAG_NLSS_MAX_DENSITY;
+// AHeu: remove global variables
 int nonlinearSparseSolverMinSize = DEFAULT_FLAG_NLSS_MIN_SIZE;
 double maxStepFactor = 1e12;
 double newtonXTol = 1e-12;
