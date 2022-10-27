@@ -39,12 +39,14 @@ extern "C" {
 /* Global variable */
 int maxEventIterations = 20;
 
-/*! \fn updateDiscreteSystem
+/**
+ * @brief Update discrete system.
  *
- *  Function to update the whole system with event iteration.
- *  Evaluates functionDAE()
+ * Function to update the whole system with event iteration.
+ * Evaluates functionDAE.
  *
- *  \param [ref] [data]
+ * @param data        Pointer to data structure.
+ * @param threadData  Thread data for error handling.
  */
 void updateDiscreteSystem(DATA *data, threadData_t *threadData)
 {
@@ -104,7 +106,7 @@ void updateDiscreteSystem(DATA *data, threadData_t *threadData)
  * @param data                Pointer to data structure.
  * @return modelica_boolean   Return true if at least one discrete variable changed.
  */
-modelica_boolean checkForDiscreteChanges(DATA *data)
+modelica_boolean checkForDiscreteChanges(DATA* data)
 {
   TRACE_PUSH
   MODEL_DATA *modelData = data->modelData;
