@@ -40,9 +40,12 @@
 extern "C" {
 #endif
 
+/* Global variable */
+extern int maxEventIterations;
+
 /* Function prototypes */
 void updateDiscreteSystem(DATA *data, threadData_t *threadData);
-int checkForDiscreteChanges(DATA* data, threadData_t *threadData);
+modelica_boolean checkForDiscreteChanges(DATA* data);
 
 #ifdef __cplusplus
 }

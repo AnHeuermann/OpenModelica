@@ -36,6 +36,9 @@
 extern "C" {
 #endif
 
+/* Global variable */
+int maxEventIterations = 20;
+
 /*! \fn updateDiscreteSystem
  *
  *  Function to update the whole system with event iteration.
@@ -47,11 +50,9 @@ void updateDiscreteSystem(DATA *data, threadData_t *threadData)
 {
   TRACE_PUSH
   int numEventIterations = 0;
-  int discreteChanged = 0;
-  modelica_boolean relationChanged = 0;
+  modelica_boolean discreteChanged = FALSE;
+  modelica_boolean relationChanged = FALSE;
   data->simulationInfo->needToIterate = 0;
-
-  int maxEventIterations = 20;
 
   data->simulationInfo->callStatistics.updateDiscreteSystem++;
 
@@ -63,7 +64,7 @@ void updateDiscreteSystem(DATA *data, threadData_t *threadData)
   debugStreamPrint(LOG_EVENTS_V, 0, "updated discrete System");
 
   relationChanged = checkRelations(data);
-  discreteChanged = checkForDiscreteChanges(data, threadData);
+  discreteChanged = checkForDiscreteChanges(data);
   while(discreteChanged || data->simulationInfo->needToIterate || relationChanged)
   {
     if(data->simulationInfo->needToIterate) {
@@ -90,14 +91,20 @@ void updateDiscreteSystem(DATA *data, threadData_t *threadData)
     }
 
     relationChanged = checkRelations(data);
-    discreteChanged = checkForDiscreteChanges(data, threadData);
+    discreteChanged = checkForDiscreteChanges(data);
   }
   storeRelations(data);
 
   TRACE_POP
 }
 
-int checkForDiscreteChanges(DATA *data, threadData_t *threadData)
+/**
+ * @brief Check if discrete variables have changed compared to saved pre value.
+ *
+ * @param data                Pointer to data structure.
+ * @return modelica_boolean   Return true if at least one discrete variable changed.
+ */
+modelica_boolean checkForDiscreteChanges(DATA *data)
 {
   TRACE_PUSH
   MODEL_DATA *modelData = data->modelData;

@@ -734,7 +734,7 @@ fmiStatus fmiEventUpdate(fmiComponent c, fmiBoolean intermediateResults, fmiEven
       if((i == 0) || (comp->fmuData->simulationInfo->nextSampleTimes[i] < comp->fmuData->simulationInfo->nextSampleEvent))
         comp->fmuData->simulationInfo->nextSampleEvent = comp->fmuData->simulationInfo->nextSampleTimes[i];
 
-    if (checkForDiscreteChanges(comp->fmuData, threadData) || comp->fmuData->simulationInfo->needToIterate || checkRelations(comp->fmuData) || eventInfo->stateValuesChanged)
+    if (checkForDiscreteChanges(comp->fmuData) || comp->fmuData->simulationInfo->needToIterate || checkRelations(comp->fmuData) || eventInfo->stateValuesChanged)
     {
       intermediateResults = fmiTrue;
       if (comp->loggingOn)
