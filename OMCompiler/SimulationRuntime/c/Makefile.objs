@@ -137,7 +137,7 @@ SOLVER_OBJS_FMU=$(SOLVER_OBJS_LINEAR_SYSTEMS) \
                 $(SOLVER_OBJS_MIXED_SYSTEMS) \
                 $(SOLVER_OBJS_NONLINEAR_SYSTEMS) \
                 delay$(OBJ_EXT) \
-                fmi_events$(OBJ_EXT) \
+                discrete$(OBJ_EXT) \
                 model_help$(OBJ_EXT) \
                 omc_math$(OBJ_EXT) \
                 spatialDistribution$(OBJ_EXT) \
@@ -186,10 +186,10 @@ SOLVER_HFILES = cvode_solver.h \
                 dae_mode.h \
                 dassl.h \
                 delay.h \
+                discrete.h \
                 epsilon.h \
                 events.h \
                 external_input.h \
-                fmi_events.h \
                 ida_solver.h \
                 jacobianSymbolical.h \
                 linearSystem.h \

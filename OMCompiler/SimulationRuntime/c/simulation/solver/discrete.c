@@ -28,7 +28,7 @@
  *
  */
 
-#include "fmi_events.h"
+#include "discrete.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -82,11 +82,11 @@ RUNTIMESIMSOLVER_HEADERS = ./simulation/solver/cvode_solver.h \
 ./simulation/solver/dae_mode.h \
 ./simulation/solver/dassl.h \
 ./simulation/solver/delay.h \
+./simulation/solver/discrete.h \
 ./simulation/solver/embedded_server.h \
 ./simulation/solver/epsilon.h \
 ./simulation/solver/events.h \
 ./simulation/solver/external_input.h \
-./simulation/solver/fmi_events.h \
 ./simulation/solver/ida_solver.h \
 ./simulation/solver/linearSolverLapack.h \
 ./simulation/solver/linearSolverTotalPivot.h \
