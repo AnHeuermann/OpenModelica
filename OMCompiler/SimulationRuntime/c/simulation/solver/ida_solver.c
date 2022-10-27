@@ -200,7 +200,7 @@ int ida_solver_initial(DATA* data, threadData_t *threadData,
   }
 
   flag = IDAInit(idaData->ida_mem, idaData->residualFunction,
-                 data->simulationInfo->startTime, idaData->y, idaData->yp);
+                 data->simulationInfo->settings.startTime, idaData->y, idaData->yp);
   checkReturnFlag_SUNDIALS(flag, SUNDIALS_IDA_FLAG, "IDAInit");
 
   /* Allocate memory for jacobians calculation */
@@ -225,7 +225,7 @@ int ida_solver_initial(DATA* data, threadData_t *threadData,
   checkReturnFlag_SUNDIALS(flag, SUNDIALS_IDA_FLAG, "IDASetErrHandlerFn");
 
   /* Set nominal values of the states for absolute tolerances */
-  infoStreamPrint(LOG_SOLVER, 1, "The relative tolerance is %g. Following absolute tolerances are used for the states: ", data->simulationInfo->tolerance);
+  infoStreamPrint(LOG_SOLVER, 1, "The relative tolerance is %g. Following absolute tolerances are used for the states: ", data->simulationInfo->settings.tolerance);
 
   /* Allocate memory for initialization process */
   tmp = (double*) malloc(idaData->N*sizeof(double));
@@ -240,10 +240,10 @@ int ida_solver_initial(DATA* data, threadData_t *threadData,
   }
   /* multiply by tolerance to obtain a relative tolerace */
   for(i=0; i < idaData->N; ++i) {
-    tmp[i] *= data->simulationInfo->tolerance;
+    tmp[i] *= data->simulationInfo->settings.tolerance;
   }
   messageClose(LOG_SOLVER);
-  flag = IDASVtolerances(idaData->ida_mem, data->simulationInfo->tolerance,
+  flag = IDASVtolerances(idaData->ida_mem, data->simulationInfo->settings.tolerance,
                          N_VMake_Serial(idaData->N, tmp));
   checkReturnFlag_SUNDIALS(flag, SUNDIALS_IDA_FLAG, "IDASVtolerances");
 
@@ -745,7 +745,7 @@ int ida_event_update(DATA* data, threadData_t *threadData)
   if (checkIDAflag(flag)){
     infoStreamPrint(LOG_SOLVER, 0, "##IDA## first event iteration failed. Start next try without line search!");
     IDASetLineSearchOffIC(idaData->ida_mem, 1 /* TRUE */);
-    flag = IDACalcIC(idaData->ida_mem, IDA_YA_YDP_INIT, data->localData[0]->timeValue+data->simulationInfo->tolerance);
+    flag = IDACalcIC(idaData->ida_mem, IDA_YA_YDP_INIT, data->localData[0]->timeValue+data->simulationInfo->settings.tolerance);
     IDAGetNumNonlinSolvIters(idaData->ida_mem, &nonLinIters);
     infoStreamPrint(LOG_SOLVER, 0, "##IDA## IDACalcIC run status %d.\nIterations : %ld\n", flag, nonLinIters);
     if (checkIDAflag(flag)){
@@ -901,13 +901,13 @@ int ida_solver_step(DATA* data, threadData_t *threadData, SOLVER_INFO* solverInf
   if (idaData->internalSteps)
   {
     /* If internalSteps are selected, let IDA run to stopTime or next sample event */
-    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->stopTime)
+    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->settings.stopTime)
     {
       tout = data->simulationInfo->nextSampleEvent;
     }
     else
     {
-      tout = data->simulationInfo->stopTime;
+      tout = data->simulationInfo->settings.stopTime;
     }
     stepsMode = IDA_ONE_STEP;
     flag = IDASetStopTime(idaData->ida_mem, tout);

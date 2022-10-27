@@ -558,7 +558,7 @@ int cvode_solver_initial(DATA *data, threadData_t *threadData, SOLVER_INFO *solv
   /* Provide problem and solution specifications, allocate internal memory and initializes CVODE */
   flag = CVodeInit(cvodeData->cvode_mem,
                    cvodeRightHandSideODEFunction,
-                   data->simulationInfo->startTime,
+                   data->simulationInfo->settings.startTime,
                    cvodeData->y);
   checkReturnFlag_SUNDIALS(flag, SUNDIALS_CV_FLAG, "CVodeInit");
 
@@ -567,13 +567,13 @@ int cvode_solver_initial(DATA *data, threadData_t *threadData, SOLVER_INFO *solv
   assertStreamPrint(threadData, abstol_tmp != NULL, "Out of memory.");
   for (i = 0; i < cvodeData->N; ++i)
   {
-    abstol_tmp[i] = fmax(fabs(data->modelData->realVarsData[i].attribute.nominal), 1e-32) * data->simulationInfo->tolerance;
+    abstol_tmp[i] = fmax(fabs(data->modelData->realVarsData[i].attribute.nominal), 1e-32) * data->simulationInfo->settings.tolerance;
   }
   cvodeData->absoluteTolerance = N_VMake_Serial(cvodeData->N, abstol_tmp);
   assertStreamPrint(threadData, NULL != cvodeData->absoluteTolerance, "SUNDIALS_ERROR: N_VMake_Serial failed - returned NULL pointer.");
-  flag = CVodeSVtolerances(cvodeData->cvode_mem, data->simulationInfo->tolerance, cvodeData->absoluteTolerance);
+  flag = CVodeSVtolerances(cvodeData->cvode_mem, data->simulationInfo->settings.tolerance, cvodeData->absoluteTolerance);
   checkReturnFlag_SUNDIALS(flag, SUNDIALS_CV_FLAG, "CVodeSVtolerances");
-  infoStreamPrint(LOG_SOLVER, 0, "CVODE Using relative error tolerance %e", data->simulationInfo->tolerance);
+  infoStreamPrint(LOG_SOLVER, 0, "CVODE Using relative error tolerance %e", data->simulationInfo->settings.tolerance);
 
   /* Provide cvodeData as user data */
   flag = CVodeSetUserData(cvodeData->cvode_mem, cvodeData);

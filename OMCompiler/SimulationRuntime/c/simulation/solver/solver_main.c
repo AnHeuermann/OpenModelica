@@ -217,8 +217,8 @@ int initializeSolverData(DATA* data, threadData_t *threadData, SOLVER_INFO* solv
   SIMULATION_INFO *simInfo = data->simulationInfo;
 
   /* initial solverInfo */
-  solverInfo->currentTime = simInfo->startTime;
-  solverInfo->currentStepSize = simInfo->stepSize;
+  solverInfo->currentTime = simInfo->settings.startTime;
+  solverInfo->currentStepSize = simInfo->settings.stepSize;
   solverInfo->laststep = 0;
   solverInfo->solverRootFinding = 0;
   solverInfo->solverNoEquidistantGrid = 0;
@@ -242,7 +242,7 @@ int initializeSolverData(DATA* data, threadData_t *threadData, SOLVER_INFO* solv
 
   /* set tolerance for ZeroCrossings */
   /*  TODO: Check this! */
-  /*  setZCtol(fmin(simInfo->stepSize, simInfo->tolerance)); */
+  /*  setZCtol(fmin(simInfo->settings.stepSize, simInfo->settings.tolerance)); */
 
   switch (solverInfo->solverMethod)
   {
@@ -490,7 +490,7 @@ int initializeModel(DATA* data, threadData_t *threadData, const char* init_initM
   data->callback->input_function_updateStartValues(data, threadData);
   data->callback->input_function(data, threadData);
 
-  data->localData[0]->timeValue = simInfo->startTime;
+  data->localData[0]->timeValue = simInfo->settings.startTime;
 
   threadData->currentErrorStage = ERROR_SIMULATION;
   /* try */
@@ -502,17 +502,17 @@ int initializeModel(DATA* data, threadData_t *threadData, const char* init_initM
     if(initialization(data, threadData, init_initMethod, init_file, init_time))
     {
       warningStreamPrint(LOG_STDOUT, 0, "Error in initialization. Storing results and exiting.\nUse -lv=LOG_INIT -w for more information.");
-      simInfo->stopTime = simInfo->startTime;
+      simInfo->settings.stopTime = simInfo->settings.startTime;
       retValue = -1;
     }
     if (!retValue)
     {
-      if (data->simulationInfo->homotopySteps == 0) {
+      if (data->simulationInfo->settings.homotopySteps == 0) {
         infoStreamPrint(LOG_SUCCESS, 0, "The initialization finished successfully without homotopy method.");
       }
       else {
         usedLocal = data->callback->useHomotopy == 0 || data->callback->useHomotopy == 3;
-        infoStreamPrint(LOG_SUCCESS, 0, "The initialization finished successfully with %d %shomotopy steps.", data->simulationInfo->homotopySteps, usedLocal? "local ":"");
+        infoStreamPrint(LOG_SUCCESS, 0, "The initialization finished successfully with %d %shomotopy steps.", data->simulationInfo->settings.homotopySteps, usedLocal? "local ":"");
       }
     }
 
@@ -561,7 +561,7 @@ int finishSimulation(DATA* data, threadData_t *threadData, SOLVER_INFO* solverIn
   SIMULATION_INFO *simInfo = data->simulationInfo;
 
   /* Last step with terminal()=true */
-  if(solverInfo->currentTime >= simInfo->stopTime && solverInfo->solverMethod != S_OPTIMIZATION) {
+  if(solverInfo->currentTime >= simInfo->settings.stopTime && solverInfo->solverMethod != S_OPTIMIZATION) {
     infoStreamPrint(LOG_EVENTS_V, 0, "terminal event at stop time %g", solverInfo->currentTime);
     data->simulationInfo->terminal = 1;
     updateDiscreteSystem(data, threadData);
@@ -574,7 +574,7 @@ int finishSimulation(DATA* data, threadData_t *threadData, SOLVER_INFO* solverIn
     data->simulationInfo->terminal = 0;
   }
 
-  if (0 != strcmp("ia", data->simulationInfo->outputFormat)) {
+  if (0 != strcmp("ia", data->simulationInfo->settings.outputFormat)) {
     communicateStatus("Finished", 1, solverInfo->currentTime, solverInfo->currentStepSize);
   }
 
@@ -748,21 +748,21 @@ int solver_main(DATA* data, threadData_t *threadData, const char* init_initMetho
   /* first initialize the model then allocate SolverData memory
    * due to be able to use the initialized values for the integrator
    */
-  simInfo->useStopTime = 1;
+  simInfo->settings.useStopTime = 1;
 
   /* Use minStepSize if stepSize is getting too small, but
    * allow stepSize to be zero if startTime == stopTime.
    */
-  if ((simInfo->stepSize < simInfo->minStepSize) && (simInfo->stopTime > simInfo->startTime)){
-    warningStreamPrint(LOG_STDOUT, 0, "The step-size %g is too small. Adjust the step-size to %g.", simInfo->stepSize, simInfo->minStepSize);
-    simInfo->stepSize = simInfo->minStepSize;
-    simInfo->numSteps = round((simInfo->stopTime - simInfo->startTime)/simInfo->stepSize);
+  if ((simInfo->settings.stepSize < simInfo->settings.minStepSize) && (simInfo->settings.stopTime > simInfo->settings.startTime)){
+    warningStreamPrint(LOG_STDOUT, 0, "The step-size %g is too small. Adjust the step-size to %g.", simInfo->settings.stepSize, simInfo->settings.minStepSize);
+    simInfo->settings.stepSize = simInfo->settings.minStepSize;
+    simInfo->settings.numSteps = round((simInfo->settings.stopTime - simInfo->settings.startTime)/simInfo->settings.stepSize);
   }
   /* Check step size is not larger then stopTime-startTime, up to 6 decimals
    * Ignored when linearizing model */
-  if (!data->modelData->create_linearmodel && simInfo->stepSize > (simInfo->stopTime - simInfo->startTime + 1e-7)) {
+  if (!data->modelData->create_linearmodel && simInfo->settings.stepSize > (simInfo->settings.stopTime - simInfo->settings.startTime + 1e-7)) {
     warningStreamPrint(LOG_STDOUT, 1, "Integrator step size greater than length of experiment");
-    infoStreamPrint(LOG_STDOUT, 0, "start time: %f, stop time: %f, integrator step size: %f",simInfo->startTime, simInfo->stopTime, simInfo->stepSize);
+    infoStreamPrint(LOG_STDOUT, 0, "start time: %f, stop time: %f, integrator step size: %f",simInfo->settings.startTime, simInfo->settings.stopTime, simInfo->settings.stepSize);
     messageClose(LOG_STDOUT);
   }
 #if !defined(OMC_EMCC)
@@ -772,7 +772,7 @@ int solver_main(DATA* data, threadData_t *threadData, const char* init_initMetho
   /*  initialize external input structure */
   externalInputallocate(data);
   /* set tolerance for ZeroCrossings */
-  setZCtol(fmin(data->simulationInfo->stepSize, data->simulationInfo->tolerance));
+  setZCtol(fmin(data->simulationInfo->settings.stepSize, data->simulationInfo->settings.tolerance));
   omc_alloc_interface.collect_a_little();
 
   /* initialize solver data */
@@ -822,8 +822,8 @@ int solver_main(DATA* data, threadData_t *threadData, const char* init_initMetho
       }
 
       infoStreamPrint(LOG_SOLVER, 0, "The model has no time changing variables, no integration will be performed.");
-      solverInfo.currentTime = simInfo->stopTime;
-      data->localData[0]->timeValue = simInfo->stopTime;
+      solverInfo.currentTime = simInfo->settings.stopTime;
+      data->localData[0]->timeValue = simInfo->settings.stopTime;
       overwriteOldSimulationData(data);
       retVal = finishSimulation(data, threadData, &solverInfo, outputVariablesAtEnd);
     } else if(S_QSS == solverInfo.solverMethod) {
@@ -833,7 +833,7 @@ int solver_main(DATA* data, threadData_t *threadData, const char* init_initMetho
       /* overwrite the whole ring-buffer with initialized values */
       overwriteOldSimulationData(data);
 
-      infoStreamPrint(LOG_SOLVER, 0, "Start numerical integration (startTime: %g, stopTime: %g)", simInfo->startTime, simInfo->stopTime);
+      infoStreamPrint(LOG_SOLVER, 0, "Start numerical integration (startTime: %g, stopTime: %g)", simInfo->settings.startTime, simInfo->settings.stopTime);
       retVal = data->callback->performQSSSimulation(data, threadData, &solverInfo);
       omc_alloc_interface.collect_a_little();
 
@@ -854,7 +854,7 @@ int solver_main(DATA* data, threadData_t *threadData, const char* init_initMetho
       /* store all values for non-dassl event search */
       storeOldValues(data);
 
-      infoStreamPrint(LOG_SOLVER, 0, "Start numerical solver from %g to %g", simInfo->startTime, simInfo->stopTime);
+      infoStreamPrint(LOG_SOLVER, 0, "Start numerical solver from %g to %g", simInfo->settings.startTime, simInfo->settings.stopTime);
       retVal = data->callback->performSimulation(data, threadData, &solverInfo);
       omc_alloc_interface.collect_a_little();
       /* terminate the simulation */
@@ -933,8 +933,8 @@ static int rungekutta_step_ssc(DATA* data, threadData_t *threadData, SOLVER_INFO
   // A. E. Novikov...
 
   RK4_DATA *rk = ((RK4_DATA*)(solverInfo->solverData));
-  const double Atol = data->simulationInfo->tolerance;
-  const double Rtol = data->simulationInfo->tolerance;
+  const double Atol = data->simulationInfo->settings.tolerance;
+  const double Rtol = data->simulationInfo->settings.tolerance;
   const int nx = data->modelData->nStates;
   modelica_real h = rk->h;
   double** k = rk->work_states;

@@ -81,11 +81,11 @@ int initializeLinearSystems(DATA *data, threadData_t *threadData)
   infoStreamPrint(LOG_LS, 1, "initialize linear system solvers");
   infoStreamPrint(LOG_LS, 0, "%ld linear systems", data->modelData->nLinearSystems);
 
-  if (LSS_DEFAULT == data->simulationInfo->lssMethod) {
+  if (LSS_DEFAULT == data->simulationInfo->settings.lssMethod) {
 #ifdef WITH_SUITESPARSE
-    data->simulationInfo->lssMethod = LSS_KLU;
+    data->simulationInfo->settings.lssMethod = LSS_KLU;
 #elif !defined(OMC_MINIMAL_RUNTIME)
-    data->simulationInfo->lssMethod = LSS_LIS;
+    data->simulationInfo->settings.lssMethod = LSS_LIS;
 #endif
   }
 
@@ -171,7 +171,7 @@ int initializeLinearSystems(DATA *data, threadData_t *threadData)
     /* the implementation of matrix A is solver-specific */
     if(linsys[i].useSparseSolver == 1)
     {
-      switch(data->simulationInfo->lssMethod)
+      switch(data->simulationInfo->settings.lssMethod)
       {
     #ifdef WITH_SUITESPARSE
       case LSS_UMFPACK:
@@ -220,12 +220,12 @@ int initializeLinearSystems(DATA *data, threadData_t *threadData)
         }
     #endif
       default:
-        throwStreamPrint(threadData, "unrecognized sparse linear solver (%d)", data->simulationInfo->lssMethod);
+        throwStreamPrint(threadData, "unrecognized sparse linear solver (%d)", data->simulationInfo->settings.lssMethod);
       }
     }
     if(linsys[i].useSparseSolver == 0) /* Not an else-statement because there might not be a sparse linear solver available */
     {
-      switch(data->simulationInfo->lsMethod)
+      switch(data->simulationInfo->settings.lsMethod)
       {
       case LS_LAPACK:
         linsys[i].setAElement = setAElement;
@@ -293,7 +293,7 @@ int initializeLinearSystems(DATA *data, threadData_t *threadData)
         break;
 
       default:
-        throwStreamPrint(threadData, "unrecognized dense linear solver (%d)", data->simulationInfo->lsMethod);
+        throwStreamPrint(threadData, "unrecognized dense linear solver (%d)", data->simulationInfo->settings.lsMethod);
       }
     }
   }
@@ -453,7 +453,7 @@ int freeLinearSystems(DATA *data, threadData_t *threadData)
 
     if(linsys[i].useSparseSolver == 1)
     {
-      switch(data->simulationInfo->lssMethod)
+      switch(data->simulationInfo->settings.lssMethod)
       {
     #if !defined(OMC_MINIMAL_RUNTIME)
       case LSS_LIS:
@@ -484,11 +484,11 @@ int freeLinearSystems(DATA *data, threadData_t *threadData)
     #endif
 
       default:
-        throwStreamPrint(threadData, "unrecognized sparse linear solver (%d)", data->simulationInfo->lssMethod);
+        throwStreamPrint(threadData, "unrecognized sparse linear solver (%d)", data->simulationInfo->settings.lssMethod);
       }
     }
     else { // useSparseSolver == 0
-      switch(data->simulationInfo->lsMethod) {
+      switch(data->simulationInfo->settings.lsMethod) {
       case LS_LAPACK:
         for (j=0; j<omc_get_max_threads(); ++j) {
           free(linsys[i].parDynamicData[j].A);
@@ -540,7 +540,7 @@ int freeLinearSystems(DATA *data, threadData_t *threadData)
         break;
 
       default:
-        throwStreamPrint(threadData, "unrecognized dense linear solver (%d)", data->simulationInfo->lsMethod);
+        throwStreamPrint(threadData, "unrecognized dense linear solver (%d)", data->simulationInfo->settings.lsMethod);
       }
     }
 
@@ -576,7 +576,7 @@ int solve_linear_system(DATA *data, threadData_t *threadData, int sysNumber, dou
 
   if(linsys->useSparseSolver == 1)
   {
-    switch(data->simulationInfo->lssMethod)
+    switch(data->simulationInfo->settings.lssMethod)
     {
   #if !defined(OMC_MINIMAL_RUNTIME)
     case LSS_LIS:
@@ -606,12 +606,12 @@ int solve_linear_system(DATA *data, threadData_t *threadData, int sysNumber, dou
       break;
   #endif
     default:
-      throwStreamPrint(threadData, "unrecognized sparse linear solver (%d)", data->simulationInfo->lssMethod);
+      throwStreamPrint(threadData, "unrecognized sparse linear solver (%d)", data->simulationInfo->settings.lssMethod);
     }
   }
 
   else{
-    switch(data->simulationInfo->lsMethod)
+    switch(data->simulationInfo->settings.lsMethod)
     {
     case LS_LAPACK:
       success = solveLapack(data, threadData, sysNumber, aux_x);
@@ -677,7 +677,7 @@ int solve_linear_system(DATA *data, threadData_t *threadData, int sysNumber, dou
       break;
 
     default:
-      throwStreamPrint(threadData, "unrecognized dense linear solver (%d)", data->simulationInfo->lsMethod);
+      throwStreamPrint(threadData, "unrecognized dense linear solver (%d)", data->simulationInfo->settings.lsMethod);
     }
   }
   linsys->solved = success;

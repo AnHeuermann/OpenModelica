@@ -421,8 +421,8 @@ int printModelInfo(DATA *data, threadData_t *threadData, const char *outputPath,
   indent(fout, 2); fprintf(fout, "<name>");printStrXML(fout,data->modelData->modelName);fprintf(fout,"</name>\n");
   indent(fout, 2); fprintf(fout, "<prefix>");printStrXML(fout,data->modelData->modelFilePrefix);fprintf(fout,"</prefix>\n");
   indent(fout, 2); fprintf(fout, "<date>");printStrXML(fout,buf);fprintf(fout,"</date>\n");
-  indent(fout, 2); fprintf(fout, "<method>");printStrXML(fout,data->simulationInfo->solverMethod);fprintf(fout,"</method>\n");
-  indent(fout, 2); fprintf(fout, "<outputFormat>");printStrXML(fout,data->simulationInfo->outputFormat);fprintf(fout,"</outputFormat>\n");
+  indent(fout, 2); fprintf(fout, "<method>");printStrXML(fout,data->simulationInfo->settings.solverMethod);fprintf(fout,"</method>\n");
+  indent(fout, 2); fprintf(fout, "<outputFormat>");printStrXML(fout,data->simulationInfo->settings.outputFormat);fprintf(fout,"</outputFormat>\n");
   indent(fout, 2); fprintf(fout, "<outputFilename>");printStrXML(fout,outputFilename);fprintf(fout,"</outputFilename>\n");
   indent(fout, 2); fprintf(fout, "<outputFilesize>%ld</outputFilesize>\n", (long) fileSize(outputFilename));
   indent(fout, 2); fprintf(fout, "<overheadTime>%f</overheadTime>\n", rt_accumulated(SIM_TIMER_OVERHEAD));
@@ -643,9 +643,9 @@ int printModelInfoJSON(DATA *data, threadData_t *threadData, const char *outputP
   fprintf(fout, "\",\n\"date\":\"");
   escapeJSON(fout, buf);
   fprintf(fout, "\",\n\"method\":\"");
-  escapeJSON(fout, data->simulationInfo->solverMethod);
+  escapeJSON(fout, data->simulationInfo->settings.solverMethod);
   fprintf(fout, "\",\n\"outputFormat\":\"");
-  escapeJSON(fout, data->simulationInfo->outputFormat);
+  escapeJSON(fout, data->simulationInfo->settings.outputFormat);
   fprintf(fout, "\",\n\"outputFilename\":\"");
   escapeJSON(fout, outputFilename);
   fprintf(fout, "\",\n\"outputFilesize\":%ld",(long) fileSize(outputFilename));

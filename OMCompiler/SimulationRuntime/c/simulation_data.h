@@ -653,37 +653,52 @@ typedef struct SPATIAL_DISTRIBUTION_DATA {
   int lastStoredEventValue;
 } SPATIAL_DISTRIBUTION_DATA;
 
-typedef struct SIMULATION_INFO
+typedef struct SIMULATION_SETTINGS
 {
+  /* Experiment settings */
   modelica_real startTime;             /* Start time of the simulation */
   modelica_real stopTime;              /* Stop time of the simulation */
   int useStopTime;
-  modelica_integer numSteps;
-  modelica_real stepSize;
-  modelica_real minStepSize;           /* defines the minimal step size */
-  modelica_real tolerance;
-  const char *solverMethod;
-  const char *outputFormat;
-  const char *variableFilter;
 
-  double loggingTimeRecord[2];         /* Time interval in which logging is active. Only used if useLoggingTime=1 */
-  int useLoggingTime;                  /* 0 if logging is currently disabled, 1 if enabled */
+  /* ODE solver settings */
+  const char *solverMethod;           /* ODE solver method */
+  modelica_real stepSize;             /* ODE solver step size */
+  modelica_real minStepSize;          /* ODE solver minimum step size */
+  modelica_real tolerance;            /* ODE solver tolerance */
+  modelica_integer numSteps;          /* Number of ODE solver steps */
 
+  /* Linear solver settings */
   LINEAR_SOLVER lsMethod;              /* linear solver */
   LINEAR_SPARSE_SOLVER lssMethod;      /* linear sparse solver */
   int mixedMethod;                     /* mixed solver */
 
+  /* Non-linear solver settings */
   NONLINEAR_SOLVER nlsMethod;          /* nonlinear solver */
   NEWTON_STRATEGY newtonStrategy;      /* newton damping strategy solver */
   int nlsCsvInfomation;                /* = 1 csv files with detailed nonlinear solver process are generated */
   NLS_LS nlsLinearSolver;              /* nls linear solver */
+
+  /* Logging settings */
+  double loggingTimeRecord[2];         /* Time interval in which logging is active. Only used if useLoggingTime=1 */
+  int useLoggingTime;                  /* 0 if logging is currently disabled, 1 if enabled */
+
+  /* Homotopy settings */
+  int homotopySteps;                   /* the number of homotopy lambda steps during initialization, =0 no homotopy was used */
+
+  /* Result file settings */
+  const char *outputFormat;
+  const char *variableFilter;
+} SIMULATION_SETTINGS;
+
+typedef struct SIMULATION_INFO
+{
+  SIMULATION_SETTINGS settings;        /* Simulation and experiment settings */
 
   EVAL_CONTEXT currentContext;         /* Simulation context */
   EVAL_CONTEXT currentContextOld;      /* Previous value of currentContext */
   int jacobianEvals;                   /* number of different columns to evaluate functionODE */
   int currentJacobianEval;             /* current column to evaluate functionODE for Jacobian */
 
-  int homotopySteps;                   /* the number of homotopy lambda steps during initialization, =0 no homotopy was used */
   double lambda;                       /* homotopy parameter E [0, 1.0] */
 
   /* indicators for simulations state */

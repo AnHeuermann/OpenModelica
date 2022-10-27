@@ -216,11 +216,11 @@ int dassl_initial(DATA* data, threadData_t *threadData,
 
   /* set nominal values of the states for absolute tolerances */
   dasslData->info[1] = 1;
-  infoStreamPrint(LOG_SOLVER, 1, "The relative tolerance is %g. Following absolute tolerances are used for the states: ", data->simulationInfo->tolerance);
+  infoStreamPrint(LOG_SOLVER, 1, "The relative tolerance is %g. Following absolute tolerances are used for the states: ", data->simulationInfo->settings.tolerance);
   for(i=0; i<dasslData->N; ++i)
   {
-    dasslData->rtol[i] = data->simulationInfo->tolerance;
-    dasslData->atol[i] = data->simulationInfo->tolerance * fmax(fabs(data->modelData->realVarsData[i].attribute.nominal), 1e-32);
+    dasslData->rtol[i] = data->simulationInfo->settings.tolerance;
+    dasslData->atol[i] = data->simulationInfo->settings.tolerance * fmax(fabs(data->modelData->realVarsData[i].attribute.nominal), 1e-32);
     infoStreamPrint(LOG_SOLVER_V, 0, "%d. %s -> %g", i+1, data->modelData->realVarsData[i].info.name, dasslData->atol[i]);
   }
   messageClose(LOG_SOLVER);
@@ -584,13 +584,13 @@ int dassl_step(DATA* data, threadData_t *threadData, SOLVER_INFO* solverInfo)
   if (dasslData->dasslSteps)
   {
     /* If dasslsteps is selected, the dassl run to stopTime or next sample event */
-    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->stopTime)
+    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->settings.stopTime)
     {
       tout = data->simulationInfo->nextSampleEvent;
     }
     else
     {
-      tout = data->simulationInfo->stopTime;
+      tout = data->simulationInfo->settings.stopTime;
     }
   }
   else
@@ -654,14 +654,14 @@ int dassl_step(DATA* data, threadData_t *threadData, SOLVER_INFO* solverInfo)
       warningStreamPrint(LOG_DASSL, 0, "A large amount of work has been expended.(About 500 steps). Trying to continue ...");
       infoStreamPrint(LOG_DASSL, 0, "DASSL will try again...");
       dasslData->info[0] = 1; /* try again */
-      if (solverInfo->currentTime <= data->simulationInfo->stopTime)
+      if (solverInfo->currentTime <= data->simulationInfo->settings.stopTime)
         continue;
     }
     else if(dasslData->idid < 0)
     {
       fflush(stderr);
       fflush(stdout);
-      retVal = continue_DASSL(&dasslData->idid, &data->simulationInfo->tolerance);
+      retVal = continue_DASSL(&dasslData->idid, &data->simulationInfo->settings.tolerance);
       warningStreamPrint(LOG_STDOUT, 0, "can't continue. time = %f", sData->timeValue);
       TRACE_POP
       break;

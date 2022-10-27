@@ -266,7 +266,7 @@ static int symbolic_initialization(DATA *data, threadData_t *threadData)
   int kinsol = 0;
 
 #if !defined(OMC_MINIMAL_RUNTIME)
-  kinsol = (data->simulationInfo->nlsMethod == NLS_KINSOL);
+  kinsol = (data->simulationInfo->settings.nlsMethod == NLS_KINSOL);
 #endif
 
 #if !defined(OMC_NUM_NONLINEAR_SYSTEMS) || OMC_NUM_NONLINEAR_SYSTEMS>0
@@ -412,7 +412,7 @@ static int symbolic_initialization(DATA *data, threadData_t *threadData)
       throwStreamPrint(threadData, "Unable to solve initialization problem.");
     }
 
-    data->simulationInfo->homotopySteps += init_lambda_steps;
+    data->simulationInfo->settings.homotopySteps += init_lambda_steps;
     messageClose(LOG_INIT_HOMOTOPY);
   }
 
@@ -705,7 +705,7 @@ int initialization(DATA *data, threadData_t *threadData, const char* pInitMethod
   int retVal = -1;
   int i;
 
-  data->simulationInfo->homotopySteps = 0;
+  data->simulationInfo->settings.homotopySteps = 0;
 
   infoStreamPrint(LOG_INIT, 0, "### START INITIALIZATION ###");
 
@@ -829,11 +829,11 @@ int initialization(DATA *data, threadData_t *threadData, const char* pInitMethod
   data->simulationInfo->initial = 0;
   /* initialization is done */
 
-  initSample(data, threadData, data->simulationInfo->startTime, data->simulationInfo->stopTime);
+  initSample(data, threadData, data->simulationInfo->settings.startTime, data->simulationInfo->settings.stopTime);
   data->callback->function_storeDelayed(data, threadData);
   data->callback->function_storeSpatialDistribution(data, threadData);
   data->callback->function_updateRelations(data, threadData, 1);
-  initSynchronous(data, threadData, data->simulationInfo->startTime);
+  initSynchronous(data, threadData, data->simulationInfo->settings.startTime);
 
 #if !defined(OMC_MINIMAL_LOGGING)
   printRelations(data, LOG_EVENTS);

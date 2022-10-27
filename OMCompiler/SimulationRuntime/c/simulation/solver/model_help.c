@@ -979,7 +979,7 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   data->modelData->stringAlias = (DATA_STRING_ALIAS*) omc_alloc_interface.malloc_uncollectable(data->modelData->nAliasString * sizeof(DATA_STRING_ALIAS));
 
   data->modelData->samplesInfo = (SAMPLE_INFO*) omc_alloc_interface.malloc_uncollectable(data->modelData->nSamples * sizeof(SAMPLE_INFO));
-  data->simulationInfo->nextSampleEvent = data->simulationInfo->startTime;
+  data->simulationInfo->nextSampleEvent = data->simulationInfo->settings.startTime;
   data->simulationInfo->nextSampleTimes = (double*) calloc(data->modelData->nSamples, sizeof(double));
   data->simulationInfo->samples = (modelica_boolean*) calloc(data->modelData->nSamples, sizeof(modelica_boolean));
 
@@ -995,16 +995,16 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
 
   /* set default solvers for algebraic loops */
 #if !defined(OMC_MINIMAL_RUNTIME)
-  data->simulationInfo->nlsMethod = NLS_MIXED;
+  data->simulationInfo->settings.nlsMethod = NLS_MIXED;
 #else
-  data->simulationInfo->nlsMethod = NLS_HOMOTOPY;
+  data->simulationInfo->settings.nlsMethod = NLS_HOMOTOPY;
 #endif
-  data->simulationInfo->nlsLinearSolver = NLS_LS_DEFAULT;
-  data->simulationInfo->lsMethod = LS_DEFAULT;
-  data->simulationInfo->lssMethod = LSS_DEFAULT;
-  data->simulationInfo->mixedMethod = MIXED_SEARCH;
-  data->simulationInfo->newtonStrategy = NEWTON_DAMPED2;
-  data->simulationInfo->nlsCsvInfomation = 0;
+  data->simulationInfo->settings.nlsLinearSolver = NLS_LS_DEFAULT;
+  data->simulationInfo->settings.lsMethod = LS_DEFAULT;
+  data->simulationInfo->settings.lssMethod = LSS_DEFAULT;
+  data->simulationInfo->settings.mixedMethod = MIXED_SEARCH;
+  data->simulationInfo->settings.newtonStrategy = NEWTON_DAMPED2;
+  data->simulationInfo->settings.nlsCsvInfomation = 0;
   data->simulationInfo->currentContext = CONTEXT_ALGEBRAIC;
   data->simulationInfo->jacobianEvals = data->modelData->nStates;
 

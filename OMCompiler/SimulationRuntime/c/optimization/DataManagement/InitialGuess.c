@@ -115,11 +115,11 @@ static short initial_guess_ipopt_sim(OptData *optData, SOLVER_INFO* solverInfo, 
 
    /* Initial DASSL solver */
    DASSL_DATA* dasslData = (DASSL_DATA*) malloc(sizeof(DASSL_DATA));
-   tol = data->simulationInfo->tolerance;
-   data->simulationInfo->tolerance = fmin(fmax(tol,1e-8),1e-3);
+   tol = data->simulationInfo->settings.tolerance;
+   data->simulationInfo->settings.tolerance = fmin(fmax(tol,1e-8),1e-3);
 
    infoStreamPrint(LOG_SOLVER, 0, "Initial Guess: Initializing DASSL");
-   sInfo->solverMethod = "dassl";
+   sInfo->settings.solverMethod = "dassl";
    solverInfo->solverMethod = S_DASSL;
    dassl_initial(data, threadData, solverInfo, dasslData);
    solverInfo->solverMethod = S_OPTIMIZATION;
@@ -134,8 +134,8 @@ static short initial_guess_ipopt_sim(OptData *optData, SOLVER_INFO* solverInfo, 
 
    printGuess = (short)(ACTIVE_STREAM(LOG_INIT) && !ACTIVE_STREAM(LOG_SOLVER));
 
-   if((double)data->simulationInfo->startTime < optData->time.t0){
-     double t = data->simulationInfo->startTime;
+   if((double)data->simulationInfo->settings.startTime < optData->time.t0){
+     double t = data->simulationInfo->settings.startTime;
 
      FILE * pFile = optData->pFile;
      fprintf(pFile, "%lf ",(double)t);
@@ -146,7 +146,7 @@ static short initial_guess_ipopt_sim(OptData *optData, SOLVER_INFO* solverInfo, 
      if(1){
        printf("\nPreSim");
        printf("\n========================================================\n");
-       printf("\ndone: time[%i] = %g",0,(double)data->simulationInfo->startTime);
+       printf("\ndone: time[%i] = %g",0,(double)data->simulationInfo->settings.startTime);
      }
      while(t < optData->time.t0){
        externalInputUpdate(data);
@@ -220,8 +220,8 @@ static short initial_guess_ipopt_sim(OptData *optData, SOLVER_INFO* solverInfo, 
 
   dassl_deinitial(data, solverInfo->solverData);
   solverInfo->solverData = (void*)optData;
-  sInfo->solverMethod = "optimization";
-  data->simulationInfo->tolerance = tol;
+  sInfo->settings.solverMethod = "optimization";
+  data->simulationInfo->settings.tolerance = tol;
 
   externalInputFree(data);
   return op;

@@ -532,34 +532,34 @@ void read_input_xml(MODEL_DATA* modelData,
   /* read all the DefaultExperiment values */
   infoStreamPrint(LOG_SIMULATION, 1, "read all the DefaultExperiment values:");
 
-  read_value_real(findHashStringString(mi.de,"startTime"), &(simulationInfo->startTime), 0);
-  infoStreamPrint(LOG_SIMULATION, 0, "startTime = %g", simulationInfo->startTime);
+  read_value_real(findHashStringString(mi.de,"startTime"), &(simulationInfo->settings.startTime), 0);
+  infoStreamPrint(LOG_SIMULATION, 0, "startTime = %g", simulationInfo->settings.startTime);
 
-  read_value_real(findHashStringString(mi.de,"stopTime"), &(simulationInfo->stopTime), 1.0);
-  infoStreamPrint(LOG_SIMULATION, 0, "stopTime = %g", simulationInfo->stopTime);
+  read_value_real(findHashStringString(mi.de,"stopTime"), &(simulationInfo->settings.stopTime), 1.0);
+  infoStreamPrint(LOG_SIMULATION, 0, "stopTime = %g", simulationInfo->settings.stopTime);
 
   if (reCalcStepSize) {
-    simulationInfo->stepSize = (simulationInfo->stopTime - simulationInfo->startTime) / 500;
+    simulationInfo->settings.stepSize = (simulationInfo->settings.stopTime - simulationInfo->settings.startTime) / 500;
     warningStreamPrint(LOG_STDOUT, 1, "Start or stop time was overwritten, but no new integrator step size was provided.");
     infoStreamPrint(LOG_STDOUT, 0, "Re-calculating step size for 500 intervals.");
     infoStreamPrint(LOG_STDOUT, 0, "Add `stepSize=<value>` to `-override=` or override file to silence this warning.");
     messageClose(LOG_STDOUT);
   } else {
-    read_value_real(findHashStringString(mi.de,"stepSize"), &(simulationInfo->stepSize), (simulationInfo->stopTime - simulationInfo->startTime) / 500);
+    read_value_real(findHashStringString(mi.de,"stepSize"), &(simulationInfo->settings.stepSize), (simulationInfo->settings.stopTime - simulationInfo->settings.startTime) / 500);
   }
-  infoStreamPrint(LOG_SIMULATION, 0, "stepSize = %g", simulationInfo->stepSize);
+  infoStreamPrint(LOG_SIMULATION, 0, "stepSize = %g", simulationInfo->settings.stepSize);
 
-  read_value_real(findHashStringString(mi.de,"tolerance"), &(simulationInfo->tolerance), 1e-5);
-  infoStreamPrint(LOG_SIMULATION, 0, "tolerance = %g", simulationInfo->tolerance);
+  read_value_real(findHashStringString(mi.de,"tolerance"), &(simulationInfo->settings.tolerance), 1e-5);
+  infoStreamPrint(LOG_SIMULATION, 0, "tolerance = %g", simulationInfo->settings.tolerance);
 
-  read_value_string(findHashStringString(mi.de,"solver"), &simulationInfo->solverMethod);
-  infoStreamPrint(LOG_SIMULATION, 0, "solver method: %s", simulationInfo->solverMethod);
+  read_value_string(findHashStringString(mi.de,"solver"), &simulationInfo->settings.solverMethod);
+  infoStreamPrint(LOG_SIMULATION, 0, "solver method: %s", simulationInfo->settings.solverMethod);
 
-  read_value_string(findHashStringString(mi.de,"outputFormat"), &(simulationInfo->outputFormat));
-  infoStreamPrint(LOG_SIMULATION, 0, "output format: %s", simulationInfo->outputFormat);
+  read_value_string(findHashStringString(mi.de,"outputFormat"), &(simulationInfo->settings.outputFormat));
+  infoStreamPrint(LOG_SIMULATION, 0, "output format: %s", simulationInfo->settings.outputFormat);
 
-  read_value_string(findHashStringString(mi.de,"variableFilter"), &(simulationInfo->variableFilter));
-  infoStreamPrint(LOG_SIMULATION, 0, "variable filter: %s", simulationInfo->variableFilter);
+  read_value_string(findHashStringString(mi.de,"variableFilter"), &(simulationInfo->settings.variableFilter));
+  infoStreamPrint(LOG_SIMULATION, 0, "variable filter: %s", simulationInfo->settings.variableFilter);
 
   read_value_string(findHashStringString(mi.md,"OPENMODELICAHOME"), &simulationInfo->OPENMODELICAHOME);
   infoStreamPrint(LOG_SIMULATION, 0, "OPENMODELICAHOME: %s", simulationInfo->OPENMODELICAHOME);

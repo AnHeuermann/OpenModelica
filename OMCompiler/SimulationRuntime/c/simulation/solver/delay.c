@@ -119,7 +119,7 @@ void storeDelayedExpression(DATA* data, threadData_t *threadData, int exprNumber
 
   assertStreamPrint(threadData, exprNumber < data->modelData->nDelayExpressions, "storeDelayedExpression: invalid expression number %d", exprNumber);
   assertStreamPrint(threadData, 0 <= exprNumber, "storeDelayedExpression: invalid expression number %d", exprNumber);
-  assertStreamPrint(threadData, data->simulationInfo->startTime <= time, "storeDelayedExpression: time is smaller than starting time.");
+  assertStreamPrint(threadData, data->simulationInfo->settings.startTime <= time, "storeDelayedExpression: time is smaller than starting time.");
 
   /* Check if time is greater equal then last stored time in delay structure */
   if (length > 0) {
@@ -196,7 +196,7 @@ double delayImpl(DATA* data, threadData_t *threadData, int exprNumber, double ex
   assertStreamPrint(threadData, delayTime >=  0, "Negative delay requested: delayTime = %g", delayTime);
 
   /* Return expression value before simulation start */
-  if(time <= data->simulationInfo->startTime)
+  if(time <= data->simulationInfo->settings.startTime)
   {
     return (exprValue);
   }
@@ -209,7 +209,7 @@ double delayImpl(DATA* data, threadData_t *threadData, int exprNumber, double ex
   }
 
   /* Return oldest element in ring buffer */
-  if(time <= data->simulationInfo->startTime + delayTime)
+  if(time <= data->simulationInfo->settings.startTime + delayTime)
   {
     return ((TIME_AND_VALUE*)getRingData(delayStruct, 0))->value;
   }

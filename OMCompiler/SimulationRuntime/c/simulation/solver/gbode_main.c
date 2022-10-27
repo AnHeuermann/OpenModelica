@@ -689,11 +689,11 @@ int gbodef_main(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo, d
   DATA_GBODE *gbData = (DATA_GBODE *)solverInfo->solverData;
   DATA_GBODEF *gbfData = gbData->gbfData;
 
-  double stopTime = data->simulationInfo->stopTime;
+  double stopTime = data->simulationInfo->settings.stopTime;
 
   double err, eventTime;
-  double Atol = data->simulationInfo->tolerance;
-  double Rtol = data->simulationInfo->tolerance;
+  double Atol = data->simulationInfo->settings.tolerance;
+  double Rtol = data->simulationInfo->settings.tolerance;
 
   int i, ii, j, jj, l, ll, r, rr;
   int integrator_step_info;
@@ -1054,8 +1054,8 @@ int gbode_birate(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo)
   DATA_GBODE *gbData = (DATA_GBODE *)solverInfo->solverData;
 
   double err, err_threshold;
-  double Atol = data->simulationInfo->tolerance;
-  double Rtol = data->simulationInfo->tolerance;
+  double Atol = data->simulationInfo->settings.tolerance;
+  double Rtol = data->simulationInfo->settings.tolerance;
   int i, ii, l;
   int nStates = gbData->nStates;
   int nStages = gbData->tableau->nStages;
@@ -1063,7 +1063,7 @@ int gbode_birate(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo)
 
   double targetTime;
   double eventTime;
-  double stopTime = data->simulationInfo->stopTime;
+  double stopTime = data->simulationInfo->settings.stopTime;
 
   int *sortedStates;
   modelica_boolean foundEvent;
@@ -1074,10 +1074,10 @@ int gbode_birate(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo)
   /* Calculate steps until targetTime is reached */
   // 1 => emit result at integrator step points; 0 => equidistant grid
   if (solverInfo->integratorSteps) {
-    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->stopTime) {
+    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->settings.stopTime) {
       targetTime = data->simulationInfo->nextSampleEvent;
     } else {
-      targetTime = data->simulationInfo->stopTime;
+      targetTime = data->simulationInfo->settings.stopTime;
     }
   } else {
     targetTime = solverInfo->currentTime + solverInfo->currentStepSize;
@@ -1565,8 +1565,8 @@ int gbode_singlerate(DATA *data, threadData_t *threadData, SOLVER_INFO *solverIn
   modelica_real *fODE = sData->realVars + data->modelData->nStates;
   DATA_GBODE *gbData = (DATA_GBODE *)solverInfo->solverData;
 
-  double stopTime = data->simulationInfo->stopTime;
-  double Atol = data->simulationInfo->tolerance;
+  double stopTime = data->simulationInfo->settings.stopTime;
+  double Atol = data->simulationInfo->settings.tolerance;
   double Rtol = Atol;
 
   int nStates = gbData->nStates;
@@ -1584,10 +1584,10 @@ int gbode_singlerate(DATA *data, threadData_t *threadData, SOLVER_INFO *solverIn
   /* Calculate steps until targetTime is reached */
   // 1 => emit result at integrator step points; 0 => equidistant grid
   if (solverInfo->integratorSteps) {
-    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->stopTime) {
+    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->settings.stopTime) {
       targetTime = data->simulationInfo->nextSampleEvent;
     } else {
-      targetTime = data->simulationInfo->stopTime;
+      targetTime = data->simulationInfo->settings.stopTime;
     }
   } else {
     targetTime = solverInfo->currentTime + solverInfo->currentStepSize;

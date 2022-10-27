@@ -161,7 +161,7 @@ static inline void pickUpDim(OptDataDim * dim, DATA* data, OptDataTime * time){
   time->model_grid = (modelica_boolean)(dim->nsi > 0);
 
   if (!time->model_grid) {
-    dim->nsi = data->simulationInfo->numSteps;
+    dim->nsi = data->simulationInfo->settings.numSteps;
   }
 
   if (cflags) {
@@ -191,8 +191,8 @@ static inline void pickUpTime(OptDataTime * time, OptDataDim * dim, DATA* data, 
   double t;
   char * cflags = NULL;
 
-  time->t0 = (long double)fmax(data->simulationInfo->startTime, preSimTime);
-  time->tf = (long double)data->simulationInfo->stopTime;
+  time->t0 = (long double)fmax(data->simulationInfo->settings.startTime, preSimTime);
+  time->tf = (long double)data->simulationInfo->settings.stopTime;
 
   time->dt = (long double*) malloc((nsi+1)*sizeof(long double));
   time->dt[0] = (time->tf - time->t0)/nsi;

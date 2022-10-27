@@ -100,7 +100,7 @@ static inline void optimizationWithIpopt(OptData*optData){
   /********************************************************************/
 
   /*tol */
-  AddIpoptNumOption(nlp, "tol", optData->data->simulationInfo->tolerance);
+  AddIpoptNumOption(nlp, "tol", optData->data->simulationInfo->settings.tolerance);
   AddIpoptStrOption(nlp, "evaluate_orig_obj_at_resto_trial", "yes");
 
   /* print level */

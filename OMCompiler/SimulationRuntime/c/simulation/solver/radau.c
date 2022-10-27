@@ -102,8 +102,8 @@ int allocateKinOde(DATA* data, threadData_t *threadData, SOLVER_INFO* solverInfo
 
 
   kinsolData->mset = 50;
-  kinsolData->fnormtol = kinOde->data->simulationInfo->tolerance;
-  kinsolData->scsteptol = kinOde->data->simulationInfo->tolerance;
+  kinsolData->fnormtol = kinOde->data->simulationInfo->settings.tolerance;
+  kinsolData->scsteptol = kinOde->data->simulationInfo->settings.tolerance;
 
   /* Configure KINSOL */
   flag = KINSetFuncNormTol(kinsolData->kin_mem, kinsolData->fnormtol);

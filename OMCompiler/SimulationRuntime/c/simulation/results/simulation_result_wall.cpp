@@ -370,8 +370,8 @@ void recon_wall_writeParameterData(simulation_result *self,DATA *data, threadDat
   std::ofstream &fp = storage->fp;
   MODEL_DATA *modelData = data->modelData;
   const SIMULATION_INFO *sInfo = data->simulationInfo;
-  write_parameter_data(fp, sInfo->startTime, modelData, sInfo);
-  write_parameter_data(fp, sInfo->stopTime, modelData, sInfo);
+  write_parameter_data(fp, sInfo->settings.startTime, modelData, sInfo);
+  write_parameter_data(fp, sInfo->settings.stopTime, modelData, sInfo);
 }
 
 void recon_wall_emit(simulation_result *self,DATA *data, threadData_t *threadData)

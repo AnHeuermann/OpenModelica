@@ -1346,7 +1346,7 @@ static int newtonAlgorithm(DATA_HOMOTOPY* solverData, double* x)
   DATA* data = solverData->userData->data;
   threadData_t *threadData = solverData->userData->threadData;
   NONLINEAR_SYSTEM_DATA* nlsData = solverData->userData->nlsData;
-  int linearSolverMethod = data->simulationInfo->nlsLinearSolver;
+  int linearSolverMethod = data->simulationInfo->settings.nlsLinearSolver;
 
   /* debug information */
   debugString(LOG_NLS_V, "******************************************************");
@@ -1558,7 +1558,7 @@ static int newtonAlgorithm(DATA_HOMOTOPY* solverData, double* x)
     debugDouble(LOG_NLS_V, "newtonFTol          =", sqrt(solverData->ftol_sqrd));
 
 #if !defined(OMC_MINIMAL_RUNTIME)
-    if (data->simulationInfo->nlsCsvInfomation){
+    if (data->simulationInfo->settings.nlsCsvInfomation){
       print_csvLineIterStats(((struct csvStats*) nlsData->csvData)->iterStats,
                              nlsData->size,
                              nlsData->numberOfCall+1,
@@ -2120,7 +2120,7 @@ static int homotopyAlgorithm(DATA_HOMOTOPY* solverData, double *x)
 
   debugString(LOG_NLS_HOMOTOPY, "HOMOTOPY ALGORITHM SUCCEEDED");
   if (solverData->initHomotopy) {
-    data->simulationInfo->homotopySteps += numSteps;
+    data->simulationInfo->settings.homotopySteps += numSteps;
     debugInt(LOG_INIT_HOMOTOPY, "Total number of lambda steps for this homotopy loop:", numSteps);
   }
   debugString(LOG_NLS_HOMOTOPY, "======================================================");

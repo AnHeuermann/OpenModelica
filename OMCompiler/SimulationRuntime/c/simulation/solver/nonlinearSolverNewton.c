@@ -257,7 +257,7 @@ NLS_SOLVER_STATUS solveNewton(DATA *data, threadData_t *threadData, NONLINEAR_SY
   {
 
     giveUp = 1;
-    solverData->newtonStrategy = data->simulationInfo->newtonStrategy;
+    solverData->newtonStrategy = data->simulationInfo->settings.newtonStrategy;
     _omc_newton((genericResidualFunc*)wrapper_fvec_newton, solverData, solverData->userData);
 
     /* check for proper inputs */

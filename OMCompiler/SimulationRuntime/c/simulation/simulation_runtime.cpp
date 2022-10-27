@@ -263,7 +263,7 @@ void setGlobalLoggingTime(int argc, char**argv, SIMULATION_INFO *simulationInfo)
   if (flagStr==NULL || *flagStr=='\0')
   {
     /* default activated --> Log everything*/
-    simulationInfo->useLoggingTime = 0;
+    simulationInfo->settings.useLoggingTime = 0;
     return;
   }
 
@@ -284,10 +284,10 @@ void setGlobalLoggingTime(int argc, char**argv, SIMULATION_INFO *simulationInfo)
   }
 
   /* Save logging time */
-  simulationInfo->useLoggingTime = 1;
-  simulationInfo->loggingTimeRecord[0] = loggingStartTime;
-  simulationInfo->loggingTimeRecord[1] = loggingStopTime;
-  infoStreamPrint(LOG_STDOUT, 0, "Time dependent logging enabled. Activate loggin in intervall [%f, %f]", simulationInfo->loggingTimeRecord[0], simulationInfo->loggingTimeRecord[1]);
+  simulationInfo->settings.useLoggingTime = 1;
+  simulationInfo->settings.loggingTimeRecord[0] = loggingStartTime;
+  simulationInfo->settings.loggingTimeRecord[1] = loggingStopTime;
+  infoStreamPrint(LOG_STDOUT, 0, "Time dependent logging enabled. Activate loggin in intervall [%f, %f]", simulationInfo->settings.loggingTimeRecord[0], simulationInfo->settings.loggingTimeRecord[1]);
 
   /* Deactivate Logging */
   deactivateLogging();
@@ -455,8 +455,8 @@ int startNonInteractiveSimulation(int argc, char**argv, DATA* data, threadData_t
   }
 
   /* calc numStep */
-  data->simulationInfo->numSteps = static_cast<modelica_integer>(round((data->simulationInfo->stopTime - data->simulationInfo->startTime)/data->simulationInfo->stepSize));
-  infoStreamPrint(LOG_SOLVER, 0, "numberOfIntervals = %ld", (long) data->simulationInfo->numSteps);
+  data->simulationInfo->settings.numSteps = static_cast<modelica_integer>(round((data->simulationInfo->settings.stopTime - data->simulationInfo->settings.startTime)/data->simulationInfo->settings.stepSize));
+  infoStreamPrint(LOG_SOLVER, 0, "numberOfIntervals = %ld", (long) data->simulationInfo->settings.numSteps);
 
   { /* Setup the clock */
     enum omc_rt_clock_t clock = OMC_CLOCK_REALTIME;
@@ -496,11 +496,11 @@ int startNonInteractiveSimulation(int argc, char**argv, DATA* data, threadData_t
   if(create_linearmodel)
   {
     if(lintime == NULL) {
-      data->simulationInfo->stopTime = data->simulationInfo->startTime;
+      data->simulationInfo->settings.stopTime = data->simulationInfo->settings.startTime;
     } else {
-      data->simulationInfo->stopTime = atof(lintime);
+      data->simulationInfo->settings.stopTime = atof(lintime);
     }
-    infoStreamPrint(LOG_STDOUT, 0, "Linearization will be performed at point of time: %f", data->simulationInfo->stopTime);
+    infoStreamPrint(LOG_STDOUT, 0, "Linearization will be performed at point of time: %f", data->simulationInfo->settings.stopTime);
   }
 
   /* set delta x for linearization */
@@ -521,14 +521,14 @@ int startNonInteractiveSimulation(int argc, char**argv, DATA* data, threadData_t
 
   if(omc_flag[FLAG_S]) {
     if (omc_flagValue[FLAG_S]) {
-      data->simulationInfo->solverMethod = GC_strdup(omc_flagValue[FLAG_S]);
-      infoStreamPrint(LOG_SOLVER, 0, "overwrite solver method: %s [from command line]", data->simulationInfo->solverMethod);
+      data->simulationInfo->settings.solverMethod = GC_strdup(omc_flagValue[FLAG_S]);
+      infoStreamPrint(LOG_SOLVER, 0, "overwrite solver method: %s [from command line]", data->simulationInfo->settings.solverMethod);
     }
   }
   /* if the model is compiled in daeMode then we have to use ida solver */
-  if (compiledInDAEMode && std::string("ida") != data->simulationInfo->solverMethod) {
-    data->simulationInfo->solverMethod = GC_strdup(std::string("ida").c_str());
-    infoStreamPrint(LOG_SIMULATION, 0, "overwrite solver method: %s [DAEmode works only with IDA solver]", data->simulationInfo->solverMethod);
+  if (compiledInDAEMode && std::string("ida") != data->simulationInfo->settings.solverMethod) {
+    data->simulationInfo->settings.solverMethod = GC_strdup(std::string("ida").c_str());
+    infoStreamPrint(LOG_SIMULATION, 0, "overwrite solver method: %s [DAEmode works only with IDA solver]", data->simulationInfo->settings.solverMethod);
   }
 
   // Create a result file
@@ -537,12 +537,12 @@ int startNonInteractiveSimulation(int argc, char**argv, DATA* data, threadData_t
   if (result_file) {
     data->modelData->resultFileName = GC_strdup(result_file);
   } else if (omc_flag[FLAG_OUTPUT_PATH]) { /* read the output path from the command line (if any) */
-    if (0 > GC_asprintf(&result_file, "%s/%s_res.%s", omc_flagValue[FLAG_OUTPUT_PATH], data->modelData->modelFilePrefix, data->simulationInfo->outputFormat)) {
+    if (0 > GC_asprintf(&result_file, "%s/%s_res.%s", omc_flagValue[FLAG_OUTPUT_PATH], data->modelData->modelFilePrefix, data->simulationInfo->settings.outputFormat)) {
       throwStreamPrint(NULL, "simulation_runtime.c: Error: can not allocate memory.");
     }
     data->modelData->resultFileName = GC_strdup(result_file);
   } else {
-    result_file_cstr = string(data->modelData->modelFilePrefix) + string("_res.") + data->simulationInfo->outputFormat;
+    result_file_cstr = string(data->modelData->modelFilePrefix) + string("_res.") + data->simulationInfo->settings.outputFormat;
     data->modelData->resultFileName = GC_strdup(result_file_cstr.c_str());
   }
 
@@ -606,14 +606,14 @@ int startNonInteractiveSimulation(int argc, char**argv, DATA* data, threadData_t
   }
 
   /* Check if logging should be enabled */
-  if ((data->simulationInfo->useLoggingTime == 1) && (data->simulationInfo->startTime >= data->simulationInfo->loggingTimeRecord[0])) {
+  if ((data->simulationInfo->settings.useLoggingTime == 1) && (data->simulationInfo->settings.startTime >= data->simulationInfo->settings.loggingTimeRecord[0])) {
     reactivateLogging();
   }
 
   retVal = callSolver(data, threadData, init_initMethod, init_file, init_time, outputVariablesAtEnd, cpuTime, argv[0]);
 
   /* Check if logging should be disabled */
-  if (data->simulationInfo->useLoggingTime == 1) {
+  if (data->simulationInfo->settings.useLoggingTime == 1) {
     deactivateLogging();
   }
 
@@ -659,7 +659,7 @@ int startNonInteractiveSimulation(int argc, char**argv, DATA* data, threadData_t
     rt_accumulate(SIM_TIMER_TOTAL);
     const char* plotFormat = omc_flagValue[FLAG_MEASURETIMEPLOTFORMAT];
     retVal = printModelInfo(data, threadData, output_path.c_str(), modelInfo.c_str(), plotFile.c_str(), plotFormat ? plotFormat : "svg",
-        data->simulationInfo->solverMethod, data->simulationInfo->outputFormat, data->modelData->resultFileName) && retVal;
+        data->simulationInfo->settings.solverMethod, data->simulationInfo->settings.outputFormat, data->modelData->resultFileName) && retVal;
     retVal = printModelInfoJSON(data, threadData, output_path.c_str(), jsonInfo.c_str(), data->modelData->resultFileName) && retVal;
   }
 
@@ -678,50 +678,50 @@ int initializeResultData(DATA* simData, threadData_t *threadData, int cpuTime)
 {
   int resultFormatHasCheapAliasesAndParameters = 0;
   int retVal = 0;
-  mmc_sint_t maxSteps = 4 * simData->simulationInfo->numSteps;
+  mmc_sint_t maxSteps = 4 * simData->simulationInfo->settings.numSteps;
   sim_result.filename = strdup(simData->modelData->resultFileName);
   sim_result.numpoints = maxSteps;
   sim_result.cpuTime = cpuTime;
-  if (sim_noemit || 0 == strcmp("empty", simData->simulationInfo->outputFormat)) {
+  if (sim_noemit || 0 == strcmp("empty", simData->simulationInfo->settings.outputFormat)) {
     /* Default is set to noemit */
-  } else if(0 == strcmp("csv", simData->simulationInfo->outputFormat)) {
+  } else if(0 == strcmp("csv", simData->simulationInfo->settings.outputFormat)) {
     sim_result.init = omc_csv_init;
     sim_result.emit = omc_csv_emit;
     /* sim_result.writeParameterData = omc_csv_writeParameterData; */
     sim_result.free = omc_csv_free;
-  } else if(0 == strcmp("mat", simData->simulationInfo->outputFormat)) {
+  } else if(0 == strcmp("mat", simData->simulationInfo->settings.outputFormat)) {
     sim_result.init = mat4_init4;
     sim_result.emit = mat4_emit4;
     sim_result.writeParameterData = mat4_writeParameterData4;
     sim_result.free = mat4_free4;
     resultFormatHasCheapAliasesAndParameters = 1;
 #if !defined(OMC_MINIMAL_RUNTIME)
-  } else if(0 == strcmp("wall", simData->simulationInfo->outputFormat)) {
+  } else if(0 == strcmp("wall", simData->simulationInfo->settings.outputFormat)) {
     sim_result.init = recon_wall_init;
     sim_result.emit = recon_wall_emit;
     sim_result.writeParameterData = recon_wall_writeParameterData;
     sim_result.free = recon_wall_free;
     resultFormatHasCheapAliasesAndParameters = 1;
-  } else if(0 == strcmp("plt", simData->simulationInfo->outputFormat)) {
+  } else if(0 == strcmp("plt", simData->simulationInfo->settings.outputFormat)) {
     sim_result.init = plt_init;
     sim_result.emit = plt_emit;
     /* sim_result.writeParameterData = plt_writeParameterData; */
     sim_result.free = plt_free;
   }
   //NEW interactive
-  else if(0 == strcmp("ia", simData->simulationInfo->outputFormat)) {
+  else if(0 == strcmp("ia", simData->simulationInfo->settings.outputFormat)) {
     sim_result.init = ia_init;
     sim_result.emit = ia_emit;
     //sim_result.writeParameterData = ia_writeParameterData;
     sim_result.free = ia_free;
 #endif
   } else {
-    cerr << "Unknown output format: " << simData->simulationInfo->outputFormat << endl;
+    cerr << "Unknown output format: " << simData->simulationInfo->settings.outputFormat << endl;
     return 1;
   }
-  initializeOutputFilter(simData->modelData, simData->simulationInfo->variableFilter, resultFormatHasCheapAliasesAndParameters);
+  initializeOutputFilter(simData->modelData, simData->simulationInfo->settings.variableFilter, resultFormatHasCheapAliasesAndParameters);
   sim_result.init(&sim_result, simData, threadData);
-  infoStreamPrint(LOG_SOLVER, 0, "Allocated simulation result data storage for method '%s' and file='%s'", (char*) simData->simulationInfo->outputFormat, sim_result.filename);
+  infoStreamPrint(LOG_SOLVER, 0, "Allocated simulation result data storage for method '%s' and file='%s'", (char*) simData->simulationInfo->settings.outputFormat, sim_result.filename);
   return 0;
 }
 
@@ -750,7 +750,7 @@ static int callSolver(DATA* simData, threadData_t *threadData, string init_initM
   }
   simData->real_time_sync.scaling = getFlagReal(FLAG_RT, 0.0);
 
-  if(std::string("") == simData->simulationInfo->solverMethod) {
+  if(std::string("") == simData->simulationInfo->settings.solverMethod) {
 #if defined(WITH_DASSL)
     solverID = S_DASSL;
 #else
@@ -758,7 +758,7 @@ static int callSolver(DATA* simData, threadData_t *threadData, string init_initM
 #endif
   } else {
     for(i=1; i<S_MAX; ++i) {
-      if(std::string(SOLVER_METHOD_NAME[i]) == simData->simulationInfo->solverMethod) {
+      if(std::string(SOLVER_METHOD_NAME[i]) == simData->simulationInfo->settings.solverMethod) {
         solverID = i;
       }
     }
@@ -784,7 +784,7 @@ static int callSolver(DATA* simData, threadData_t *threadData, string init_initM
   }
 
   if(S_UNKNOWN == solverID) {
-    warningStreamPrint(LOG_STDOUT, 0, "unrecognized option -s %s", (char*) simData->simulationInfo->solverMethod);
+    warningStreamPrint(LOG_STDOUT, 0, "unrecognized option -s %s", (char*) simData->simulationInfo->settings.solverMethod);
     warningStreamPrint(LOG_STDOUT, 0, "current options are:");
     for(i=1; i<S_MAX; ++i) {
       warningStreamPrint(LOG_STDOUT, 0, "%-18s [%s]", SOLVER_METHOD_NAME[i], SOLVER_METHOD_DESC[i]);
@@ -796,9 +796,9 @@ static int callSolver(DATA* simData, threadData_t *threadData, string init_initM
     /* special solvers */
 #ifdef _OMC_QSS_LIB
     if(S_QSS == solverID) {
-      retVal = qss_main(argc, argv, simData->simulationInfo->startTime,
-                        simData->simulationInfo->stopTime, simData->simulationInfo->stepSize,
-                        simData->simulationInfo->numSteps, simData->simulationInfo->tolerance, 3);
+      retVal = qss_main(argc, argv, simData->simulationInfo->settings.startTime,
+                        simData->simulationInfo->settings.stopTime, simData->simulationInfo->settings.stepSize,
+                        simData->simulationInfo->settings.numSteps, simData->simulationInfo->settings.tolerance, 3);
     } else /* standard solver interface */
 #endif
       retVal = solver_main(simData, threadData, init_initMethod.c_str(), init_file.c_str(), init_time, solverID, outVars, argv_0);
@@ -962,13 +962,13 @@ int initRuntimeAndSimulation(int argc, char**argv, DATA *data, threadData_t *thr
     EXIT(1);
   }
 
-  readFlag((int*)&data->simulationInfo->nlsMethod, NLS_MAX, omc_flagValue[FLAG_NLS], "-nls", NLS_NAME, NLS_DESC);
-  readFlag((int*)&data->simulationInfo-> lsMethod,  LS_MAX, omc_flagValue[FLAG_LS ],  "-ls",  LS_NAME,  LS_DESC);
-  readFlag((int*)&data->simulationInfo->lssMethod, LSS_MAX, omc_flagValue[FLAG_LSS], "-lss", LSS_NAME, LSS_DESC);
+  readFlag((int*)&data->simulationInfo->settings.nlsMethod, NLS_MAX, omc_flagValue[FLAG_NLS], "-nls", NLS_NAME, NLS_DESC);
+  readFlag((int*)&data->simulationInfo->settings.lsMethod,  LS_MAX, omc_flagValue[FLAG_LS ],  "-ls",  LS_NAME,  LS_DESC);
+  readFlag((int*)&data->simulationInfo->settings.lssMethod, LSS_MAX, omc_flagValue[FLAG_LSS], "-lss", LSS_NAME, LSS_DESC);
   readFlag((int*)&homBacktraceStrategy, HOM_BACK_STRAT_MAX, omc_flagValue[FLAG_HOMOTOPY_BACKTRACE_STRATEGY], "-homBacktraceStrategy", HOM_BACK_STRAT_NAME, HOM_BACK_STRAT_DESC);
-  readFlag((int*)&data->simulationInfo->newtonStrategy, NEWTON_MAX, omc_flagValue[FLAG_NEWTON_STRATEGY], "-newton", NEWTONSTRATEGY_NAME, NEWTONSTRATEGY_DESC);
-  data->simulationInfo->nlsCsvInfomation = omc_flag[FLAG_NLS_INFO];
-  readFlag((int*)&data->simulationInfo->nlsLinearSolver, NLS_LS_MAX, omc_flagValue[FLAG_NLS_LS], "-nlsLS", NLS_LS_METHOD, NLS_LS_METHOD_DESC);
+  readFlag((int*)&data->simulationInfo->settings.newtonStrategy, NEWTON_MAX, omc_flagValue[FLAG_NEWTON_STRATEGY], "-newton", NEWTONSTRATEGY_NAME, NEWTONSTRATEGY_DESC);
+  data->simulationInfo->settings.nlsCsvInfomation = omc_flag[FLAG_NLS_INFO];
+  readFlag((int*)&data->simulationInfo->settings.nlsLinearSolver, NLS_LS_MAX, omc_flagValue[FLAG_NLS_LS], "-nlsLS", NLS_LS_METHOD, NLS_LS_METHOD_DESC);
 
   if(omc_flag[FLAG_HOMOTOPY_ADAPT_BEND]) {
     homAdaptBend = atof(omc_flagValue[FLAG_HOMOTOPY_ADAPT_BEND]);
@@ -1073,7 +1073,7 @@ int initRuntimeAndSimulation(int argc, char**argv, DATA *data, threadData_t *thr
 
   rt_tick(SIM_TIMER_INIT_XML);
   read_input_xml(data->modelData, data->simulationInfo);
-  data->simulationInfo->minStepSize = 4.0 * DBL_EPSILON * fmax(fabs(data->simulationInfo->startTime),fabs(data->simulationInfo->stopTime));
+  data->simulationInfo->settings.minStepSize = 4.0 * DBL_EPSILON * fmax(fabs(data->simulationInfo->settings.startTime),fabs(data->simulationInfo->settings.stopTime));
   rt_accumulate(SIM_TIMER_INIT_XML);
 
   /* Set the maximum number of threads prior to any allocation w.r.t.
@@ -1115,8 +1115,8 @@ int initRuntimeAndSimulation(int argc, char**argv, DATA *data, threadData_t *thr
 
 #ifndef NO_INTERACTIVE_DEPENDENCY
   if(omc_flag[FLAG_PORT]) {
-    if(0 != strcmp("ia", data->simulationInfo->outputFormat)) {
-      communicateStatus("Starting", 0.0, data->simulationInfo->startTime, 0);
+    if(0 != strcmp("ia", data->simulationInfo->settings.outputFormat)) {
+      communicateStatus("Starting", 0.0, data->simulationInfo->settings.startTime, 0);
     }
   }
 #endif
@@ -1132,7 +1132,7 @@ void SimulationRuntime_printStatus(int sig)
   printf("<status>\n");
   printf("<model>%s</model>\n", data->modelData->modelFilePrefix);
   printf("<phase>UNKNOWN</phase>\n");
-  printf("<currentStepSize>%g</currentStepSize>\n", data->simulationInfo->stepSize);
+  printf("<currentStepSize>%g</currentStepSize>\n", data->simulationInfo->settings.stepSize);
   printf("<oldTime>%.12g</oldTime>\n", data->localData[1]->timeValue);
   printf("<oldTime2>%.12g</oldTime2>\n", data->localData[2]->timeValue);
   printf("<diffOldTime>%g</diffOldTime>\n", data->localData[1]->timeValue-data->localData[2]->timeValue);

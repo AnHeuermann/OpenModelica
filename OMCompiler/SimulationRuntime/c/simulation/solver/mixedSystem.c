@@ -61,7 +61,7 @@ int initializeMixedSystems(DATA *data, threadData_t *threadData)
     system[i].iterationPreVarsPtr = (modelica_boolean**) malloc(size*sizeof(modelica_boolean*));
 
     /* allocate solver data */
-    switch(data->simulationInfo->mixedMethod)
+    switch(data->simulationInfo->settings.mixedMethod)
     {
     case MIXED_SEARCH:
       allocateMixedSearchData(size, &system[i].solverData);
@@ -95,7 +95,7 @@ int freeMixedSystems(DATA *data, threadData_t *threadData)
     free(system[i].iterationPreVarsPtr);
 
     /* allocate solver data */
-    switch(data->simulationInfo->mixedMethod)
+    switch(data->simulationInfo->settings.mixedMethod)
     {
     case MIXED_SEARCH:
       freeMixedSearchData(&system[i].solverData);
@@ -124,7 +124,7 @@ int solve_mixed_system(DATA *data, threadData_t *threadData, int sysNumber)
   MIXED_SYSTEM_DATA* system = data->simulationInfo->mixedSystemData;
 
   /* for now just use lapack solver as before */
-  switch(data->simulationInfo->mixedMethod)
+  switch(data->simulationInfo->settings.mixedMethod)
   {
   case MIXED_SEARCH:
     success = solveMixedSearch(data, sysNumber);

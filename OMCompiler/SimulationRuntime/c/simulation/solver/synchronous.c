@@ -164,7 +164,7 @@ modelica_boolean handleBaseClock(DATA* data, threadData_t *threadData, long idx,
       .base_idx =  idx,
       .sub_idx = -1,
       .type = SYNC_BASE_CLOCK,
-      .activationTime = data->simulationInfo->startTime};
+      .activationTime = data->simulationInfo->settings.startTime};
     insertTimer(data->simulationInfo->intvlTimers, &nextTimer);
     return frstSubClockIsBaseClock;
   }

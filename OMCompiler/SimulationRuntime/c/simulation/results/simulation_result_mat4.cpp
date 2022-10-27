@@ -642,8 +642,8 @@ void mat4_writeParameterData4(simulation_result *self, DATA *data, threadData_t 
   cur = 0;
   void* data_1 = malloc(size * matData->nData1 * 2);
 
-  WRITE_REAL_VALUE(data_1, cur, data->simulationInfo->startTime);
-  WRITE_REAL_VALUE(data_1, cur + matData->nData1, data->simulationInfo->stopTime);
+  WRITE_REAL_VALUE(data_1, cur, data->simulationInfo->settings.startTime);
+  WRITE_REAL_VALUE(data_1, cur + matData->nData1, data->simulationInfo->settings.stopTime);
   cur++;
 
   for (int i=0; i < mData->nVariablesReal; i++)

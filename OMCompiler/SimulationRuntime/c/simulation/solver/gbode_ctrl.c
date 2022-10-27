@@ -176,7 +176,7 @@ void getInitStepSize(DATA* data, threadData_t* threadData, DATA_GBODE* gbData)
   double sc;
   double d, d0 = 0.0, d1 = 0.0, d2 = 0.0;
   double h0, h1;
-  double absTol = data->simulationInfo->tolerance;
+  double absTol = data->simulationInfo->settings.tolerance;
   double relTol = absTol;
 
   // This flag will be used in order to reduce the step size for the first Euler step below

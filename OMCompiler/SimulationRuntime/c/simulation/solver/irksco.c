@@ -410,7 +410,7 @@ int irksco_midpoint_rule(DATA* data, threadData_t* threadData, SOLVER_INFO* solv
   DATA_NEWTON* solverData = (DATA_NEWTON*)userdata->newtonData;
 
   double sc, err, a, b, diff;
-  double Atol = data->simulationInfo->tolerance, Rtol = data->simulationInfo->tolerance;
+  double Atol = data->simulationInfo->settings.tolerance, Rtol = data->simulationInfo->settings.tolerance;
   int i;
   double fac = 0.9;
   double facmax = 3.5;
@@ -423,13 +423,13 @@ int irksco_midpoint_rule(DATA* data, threadData_t* threadData, SOLVER_INFO* solv
   /* Calculate steps until targetTime is reached */
   if (solverInfo->integratorSteps)
   {
-    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->stopTime)
+    if (data->simulationInfo->nextSampleEvent < data->simulationInfo->settings.stopTime)
     {
       targetTime = data->simulationInfo->nextSampleEvent;
    }
     else
     {
-      targetTime = data->simulationInfo->stopTime;
+      targetTime = data->simulationInfo->settings.stopTime;
     }
   }
   else

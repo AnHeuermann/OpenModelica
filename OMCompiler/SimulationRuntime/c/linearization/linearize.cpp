@@ -663,10 +663,10 @@ int linearize(DATA* data, threadData_t *threadData)
     if(do_data_recovery > 0){
         fprintf(fout, data->callback->linear_model_datarecovery_frame(), strX.c_str(), strU.c_str(), strZ0.c_str(), strA.c_str(), strB.c_str(), strC.c_str(), strD.c_str(), strCz.c_str(), strDz.c_str());
     }else{
-        fprintf(fout, data->callback->linear_model_frame(), strX.c_str(), strU.c_str(), strA.c_str(), strB.c_str(), strC.c_str(), strD.c_str(), (double) data->simulationInfo->stopTime);
+        fprintf(fout, data->callback->linear_model_frame(), strX.c_str(), strU.c_str(), strA.c_str(), strB.c_str(), strC.c_str(), strD.c_str(), (double) data->simulationInfo->settings.stopTime);
     }
     if(ACTIVE_STREAM(LOG_STATS)) {
-      infoStreamPrint(LOG_STATS, 0, data->callback->linear_model_frame(), strX.c_str(), strU.c_str(), strA.c_str(), strB.c_str(), strC.c_str(), strD.c_str(), (double) data->simulationInfo->stopTime);
+      infoStreamPrint(LOG_STATS, 0, data->callback->linear_model_frame(), strX.c_str(), strU.c_str(), strA.c_str(), strB.c_str(), strC.c_str(), strD.c_str(), (double) data->simulationInfo->settings.stopTime);
     }
 
     fflush(fout);

@@ -108,7 +108,7 @@ int sym_solver_ssc_step(DATA* data, threadData_t *threadData, SOLVER_INFO* solve
   modelica_real* stateDer = sDataOld->realVars + data->modelData->nStates;
 
   double sc, err, a, b, diff;
-  double Atol = data->simulationInfo->tolerance, Rtol = data->simulationInfo->tolerance;
+  double Atol = data->simulationInfo->settings.tolerance, Rtol = data->simulationInfo->settings.tolerance;
   int i,j;
   double fac = 0.9;
   double facmax = 3.5;
@@ -258,7 +258,7 @@ int first_step(DATA* data, threadData_t *threadData, SOLVER_INFO* solverInfo)
   modelica_real* stateDer = sData->realVars + data->modelData->nStates;
   modelica_real* stateDerOld = sDataOld->realVars + data->modelData->nStates;
   double sc, d, d0 = 0.0, d1 = 0.0, d2 = 0.0, h0, h1, delta_ti, infNorm, sum = 0;
-  double Atol = data->simulationInfo->tolerance, Rtol = data->simulationInfo->tolerance;
+  double Atol = data->simulationInfo->settings.tolerance, Rtol = data->simulationInfo->settings.tolerance;
   int i,j,retVal;
 /* it seems that jacobian is not used yet!
 #if defined(_MSC_VER) // handle crap compilers

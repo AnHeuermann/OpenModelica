@@ -485,8 +485,8 @@ int full_implicit_RK(DATA* data, threadData_t* threadData, SOLVER_INFO* solverIn
   int nStates = data->modelData->nStates;
   int nStages = gbData->tableau->nStages;
 
-  double Atol = data->simulationInfo->tolerance;
-  double Rtol = data->simulationInfo->tolerance;
+  double Atol = data->simulationInfo->settings.tolerance;
+  double Rtol = data->simulationInfo->settings.tolerance;
   NLS_SOLVER_STATUS solved = NLS_FAILED;
 
   // NLS - used values for extrapolation
