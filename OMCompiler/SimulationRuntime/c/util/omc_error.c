@@ -80,6 +80,7 @@ const char *LOG_STREAM_NAME[SIM_LOG_MAX] = {
   "LOG_NLS_JAC_TEST",
   "LOG_NLS_RES",
   "LOG_NLS_EXTRAPOLATE",
+  "LOG_NOEVENT",
   "LOG_RES_INIT",
   "LOG_RT",
   "LOG_SIMULATION",
@@ -132,6 +133,7 @@ const char *LOG_STREAM_DESC[SIM_LOG_MAX] = {
   "tests the analytical jacobian of nonlinear systems",                         /* LOG_NLS_JAC_TEST */
   "outputs every evaluation of the residual function",                          /* LOG_NLS_RES */
   "outputs debug information about extrapolate process",                        /* LOG_NLS_EXTRAPOLATE */
+  "log changes of conditions inside noEvent or Smooth",                         /* LOG_NOEVENT */
   "outputs residuals of the initialization",                                    /* LOG_RES_INIT */
   "additional information regarding real-time processes",                       /* LOG_RT */
   "additional information about simulation process",                            /* LOG_SIMULATION */

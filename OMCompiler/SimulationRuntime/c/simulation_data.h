@@ -554,6 +554,7 @@ typedef struct MODEL_DATA
 
   long nZeroCrossings;
   long nRelations;
+  long nNoEvent;                       /* Number of noEvent and smooth operators*/
   long nMathEvents;                    /* number of math triggering functions e.g. cail, floor, integer */
   long nDelayExpressions;
   long nSpatialDistributions;          /* Number of different spatialDistribution-calls. */
@@ -719,6 +720,7 @@ typedef struct SIMULATION_INFO
   modelica_boolean* storedRelations;   /* this array contains a copy of relations each time the event iteration starts */
   modelica_real* mathEventsValuePre;
   long* zeroCrossingIndex;             /* := {0, 1, 2, ..., data->modelData->nZeroCrossings-1}; pointer for a list events at event instants */
+  modelica_boolean* noEventConditions; /* Values of conditions of noEvent */
   modelica_real* states_left;          /* work array for findRoot in event.c */
   modelica_real* states_right;         /* work array for findRoot in event.c */
 

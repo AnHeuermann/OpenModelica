@@ -1076,6 +1076,7 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   data->simulationInfo->storedRelations = (modelica_boolean*) calloc(data->modelData->nRelations, sizeof(modelica_boolean));
   data->simulationInfo->mathEventsValuePre = (modelica_real*) malloc(data->modelData->nMathEvents*sizeof(modelica_real));
   data->simulationInfo->zeroCrossingIndex = (long*) malloc(data->modelData->nZeroCrossings*sizeof(long));
+  data->simulationInfo->noEventConditions = (modelica_boolean*) calloc(data->modelData->nNoEvent, sizeof(modelica_boolean));
   /* initialize zeroCrossingsIndex with corresponding index is used by events lists */
   for(i=0; i<data->modelData->nZeroCrossings; i++)
     data->simulationInfo->zeroCrossingIndex[i] = (long)i;
@@ -1302,6 +1303,7 @@ void deInitializeDataStruc(DATA *data)
   free(data->simulationInfo->storedRelations);
   free(data->simulationInfo->mathEventsValuePre);
   free(data->simulationInfo->zeroCrossingIndex);
+  free(data->simulationInfo->noEventConditions);
   free(data->simulationInfo->states_left);
   free(data->simulationInfo->states_right);
 

@@ -494,6 +494,27 @@ void saveZeroCrossingsAfterEvent(DATA *data, threadData_t *threadData)
   TRACE_POP
 }
 
+/**
+ * @brief Log changes of noEvent and smooth conditions.
+ *
+ * Saves new value of condition for next logging.
+ *
+ * @param data          Storing all simulation/model data.
+ * @param threadData    Used for error handling.
+ * @param newCond       New condition of noEvent / smooth.
+ * @param idx           Index of noEvent condition.
+ */
+void debugPrintNoEvent(DATA *data, threadData_t *threadData, modelica_boolean newCond, const size_t idx) {
+  assertStreamPrint(threadData, data->simulationInfo->noEventConditions, "noEventConditions memory not allocated");
+
+  if (useStream[LOG_NOEVENT] && data->simulationInfo->noEventConditions[idx] != newCond) {
+    infoStreamPrint(LOG_NOEVENT, 0,
+                    "At time %.15g noEvent condition %lu changed: %s",
+                    data->localData[0]->timeValue, idx, newCond?"true":"false");
+  }
+  data->simulationInfo->noEventConditions[idx] = newCond;
+}
+
 
 #ifdef __cplusplus
 }
