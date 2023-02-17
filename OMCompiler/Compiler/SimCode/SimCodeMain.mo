@@ -751,6 +751,7 @@ algorithm
       list<String> dgesv_sources, cminpack_sources, simrt_c_sundials_sources, simrt_linear_solver_sources, simrt_non_linear_solver_sources;
       list<String> simrt_mixed_solver_sources, fmi_export_files, model_gen_files, model_all_gen_files, shared_source_files;
       SimCode.VarInfo varInfo;
+      list<String> resourcePathsTmp;
     case (SimCode.SIMCODE(),"C")
       algorithm
         fmutmp := simCode.fileNamePrefix + ".fmutmp";
@@ -763,6 +764,13 @@ algorithm
         Util.createDirectoryTree(fmutmp + "/sources/include/");
         Util.createDirectoryTree(fmutmp + "/resources/");
         resourcesDir := fmutmp + "/resources/";
+
+        print("AHeu Old:\n");
+        for path in simCode.modelInfo.resourcePaths loop
+          print(path + "\n");
+        end for;
+
+        resourcePathsTmp:= {};
         for path in simCode.modelInfo.resourcePaths loop
           bname := System.basename(path);
           newpath := resourcesDir + bname;
@@ -774,7 +782,15 @@ algorithm
           if 0 <> System.systemCall("cp -rf \"" + path + "\" \"" + newpath + "\"") then
             Error.addInternalError("Failed to copy path " + path + " to " + fmutmp + "/resources/" + bname, sourceInfo());
           end if;
+          resourcePathsTmp := newpath :: resourcePathsTmp;
         end for;
+
+        //simCode.modelInfo.resourcePaths := resourcePathsTmp;
+
+        //print("AHeu New:\n");
+        //for path in simCode.modelInfo.resourcePaths loop
+        //  print(path+ "\n");
+        //end for;
 
         // Add optional _flags.json to resources
         _ := match simCode.fmiSimulationFlags
