@@ -549,6 +549,35 @@ public
     end collectAlgebraicLoops;
   end SimCode;
 
+  uniontype ResourcePath "Paths to FMU resouce used by model and shortened version for resources directory."
+    record RESOURCE_PATH
+      String absPath "Absolute path on host system";
+      String relPath "Relative path inside FMU/resources/";
+    end RESOURCE_PATH;
+
+    function convert
+      input ResourcePath resourcePath;
+      output OldSimCode.ResourcePath oldResourcePath = OldSimCode.RESOURCE_PATH(resourcePath.absPath, resourcePath.relPath);
+    end convert;
+
+    function convertList
+      input list<ResourcePath> resourcePaths;
+      output list<OldSimCode.ResourcePath> oldResourcePaths = {};
+    algorithm
+      for path in resourcePaths loop
+        oldResourcePaths := convert(path) :: oldResourcePaths;
+      end for;
+      oldResourcePaths := listReverse(oldResourcePaths);
+    end convertList;
+
+    function toString
+      input ResourcePath resourcePath;
+      input output String str ="";
+    algorithm
+      str := str + "(" + resourcePath.absPath + ", " + resourcePath.relPath + ")";
+    end toString;
+  end ResourcePath;
+
   uniontype ModelInfo
     record MODEL_INFO
       Absyn.Path name;
@@ -558,7 +587,7 @@ public
       VarInfo varInfo;
       list<SimCodeFunction.Function> functions;
       list<String> labels;
-      list<String> resourcePaths "Paths of all resources used by the model. Used in FMI2 to package resources in the FMU.";
+      list<ResourcePath> resourcePaths "Paths of all resources used by the model. Used in FMI2 to package resources in the FMU.";
       list<Absyn.Class> sortedClasses;
       //Files files "all the files from SourceInfo and DAE.ElementSource";
       Integer nClocks;
@@ -626,7 +655,7 @@ public
         vars                            = SimVar.SimVars.convert(modelInfo.vars),
         functions                       = modelInfo.functions,
         labels                          = modelInfo.labels,
-        resourcePaths                   = modelInfo.resourcePaths,
+        resourcePaths                   = ResourcePath.convertList(modelInfo.resourcePaths),
         sortedClasses                   = modelInfo.sortedClasses,
         //Files files "all the files from SourceInfo and DAE.ElementSource";
         nClocks                         = modelInfo.nClocks,

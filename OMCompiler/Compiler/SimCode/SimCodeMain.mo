@@ -739,7 +739,7 @@ algorithm
   setGlobalRoot(Global.optionSimCode, SOME(simCode));
   _ := match (simCode,target)
     local
-      String str, newpath, resourcesDir, bname;
+      String str, resourcesDir, bname, newpath;
       String fmutmp;
       String guid;
       Boolean b;
@@ -751,7 +751,6 @@ algorithm
       list<String> dgesv_sources, cminpack_sources, simrt_c_sundials_sources, simrt_linear_solver_sources, simrt_non_linear_solver_sources;
       list<String> simrt_mixed_solver_sources, fmi_export_files, model_gen_files, model_all_gen_files, shared_source_files;
       SimCode.VarInfo varInfo;
-      list<String> resourcePathsTmp;
     case (SimCode.SIMCODE(),"C")
       algorithm
         fmutmp := simCode.fileNamePrefix + ".fmutmp";
@@ -765,32 +764,27 @@ algorithm
         Util.createDirectoryTree(fmutmp + "/resources/");
         resourcesDir := fmutmp + "/resources/";
 
-        print("AHeu Old:\n");
+        print("AHeu 2:\n");
         for path in simCode.modelInfo.resourcePaths loop
-          print(path + "\n");
+          print(path.absPath + ", " + path.relPath + "\n");
         end for;
 
-        resourcePathsTmp:= {};
         for path in simCode.modelInfo.resourcePaths loop
-          bname := System.basename(path);
-          newpath := resourcesDir + bname;
+          bname := System.basename(path.absPath);
+          newpath := resourcesDir + path.relPath;
+          // on windows, remove ":" from the path!
+          if Autoconf.os == "Windows_NT" then
+            newpath := System.stringReplace(newpath, ":", "");
+          end if;
           if System.regularFileExists(newpath) or System.directoryExists(newpath) then
             /* Already copied. Maybe one resource loaded a library and this one only a file in the directory */
             continue;
           end if;
           // copy the file or directory
-          if 0 <> System.systemCall("cp -rf \"" + path + "\" \"" + newpath + "\"") then
-            Error.addInternalError("Failed to copy path " + path + " to " + fmutmp + "/resources/" + bname, sourceInfo());
+          if 0 <> System.systemCall("cp -rf \"" + path.absPath + "\" \"" + newpath + "/\"") then
+            Error.addInternalError("Failed to copy " + path.absPath + " to " + newpath, sourceInfo());
           end if;
-          resourcePathsTmp := newpath :: resourcePathsTmp;
         end for;
-
-        //simCode.modelInfo.resourcePaths := resourcePathsTmp;
-
-        //print("AHeu New:\n");
-        //for path in simCode.modelInfo.resourcePaths loop
-        //  print(path+ "\n");
-        //end for;
 
         // Add optional _flags.json to resources
         _ := match simCode.fmiSimulationFlags
@@ -1752,6 +1746,29 @@ algorithm
     Error.assertion(System.copyFile(source + "/" + f, f2), "Failed to copy file " + f + " from " + source + " to " + destination, sourceInfo());
   end for;
 end copyFiles;
+
+protected function copyResources
+  input output String path;
+  input String resourcesDir;
+  input String fmutmp;
+protected
+  String bname;
+  String newpath;
+
+algorithm
+  bname := System.basename(path);
+  newpath := resourcesDir + bname;
+  if System.regularFileExists(newpath) or System.directoryExists(newpath) then
+    /* Already copied. Maybe one resource loaded a library and this one only a file in the directory */
+    return;
+  end if;
+  // copy the file or directory
+  if 0 <> System.systemCall("cp -rf \"" + path + "\" \"" + newpath + "\"") then
+    Error.addInternalError("Failed to copy path " + path + " to " + fmutmp + "/resources/" + bname, sourceInfo());
+  end if;
+
+  path := newpath;
+end copyResources;
 
 annotation(__OpenModelica_Interface="backend");
 end SimCodeMain;

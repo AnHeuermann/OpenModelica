@@ -1542,6 +1542,8 @@ algorithm
       algorithm
         s2 := OpenModelica.Scripting.uriToFilename(s1);
         if Flags.getConfigBool(Flags.BUILDING_FMU) then
+          // TODO AHeu: Improve this to be still unique. Maybe keep some stuff from the uri
+          s2 := System.basename(s1);
           e := Expression.makeImpureBuiltinCall("OpenModelica_fmuLoadResource",{DAE.SCONST(s2)},DAE.T_STRING_DEFAULT);
         else
           e := DAE.SCONST(s2);

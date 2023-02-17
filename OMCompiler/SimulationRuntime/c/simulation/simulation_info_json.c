@@ -383,7 +383,7 @@ static const char* readEquation(const char *str, EQUATION_INFO *xml, int i, cons
  *
  * @param str           Point to beginning of equation array at '['.
  * @param xml           Model data from xml
- * @return const char*  Point to end of equation array dirreclty after ']'.
+ * @return const char*  Point to end of equation array directly after ']'.
  */
 static const char* readEquations(const char *str, MODEL_DATA_XML *xml)
 {

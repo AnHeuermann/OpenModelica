@@ -256,6 +256,13 @@ uniontype BaseUnit
   end NOBASEUNIT;
 end BaseUnit;
 
+uniontype ResourcePath "Paths to FMU resouce used by model and shortened version for resources directory."
+  record RESOURCE_PATH
+    String absPath "Absolute path on host system";
+    String relPath "Relative path inside FMU/resources/";
+  end RESOURCE_PATH;
+end ResourcePath;
+
 uniontype ModelInfo "Container for metadata about a Modelica model."
   record MODELINFO
     Absyn.Path name;
@@ -265,7 +272,7 @@ uniontype ModelInfo "Container for metadata about a Modelica model."
     SimCodeVar.SimVars vars;
     list<SimCodeFunction.Function> functions;
     list<String> labels;
-    list<String> resourcePaths "Paths of all resources used by the model. Used in FMI2 to package resources in the FMU.";
+    list<ResourcePath> resourcePaths "Paths of all resources used by the model. Used in FMI2 to package resources in the FMU.";
     list<Absyn.Class> sortedClasses;
     //Files files "all the files from SourceInfo and DAE.ElementSource";
     Integer nClocks;

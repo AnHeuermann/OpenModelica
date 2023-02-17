@@ -15420,14 +15420,30 @@ algorithm
   end for;
 end getValueReferenceMapping2;
 
+function shortUniqueResourcePath
+  input String absPath;
+  input list<String> allAbsPath;
+  output SimCode.ResourcePath resourcePath;
+protected
+  String relPath;
+algorithm
+  // TODO AHeu: Shorten the name of absPath and make it unique.
+  // Maybe check if there is already a file with the same base name in list allAbsPath
+  relPath := absPath;
+  resourcePath := SimCode.RESOURCE_PATH(absPath, relPath);
+  print("Generating SimCode.RESOURCE_PATH:\n");
+  print(resourcePath.absPath + ", " + resourcePath.relPath + "\n\n");
+end shortUniqueResourcePath;
+
 function getResources
   input list<Absyn.Class> classes;
   input BackendDAE.BackendDAE dlow1, dlow2;
-  output list<String> resources;
+  output list<SimCode.ResourcePath> resourcePaths;
 protected
   AvlSetString.Tree tree;
   list<DAE.Function> fns;
   Mutable<Boolean> unknownUri;
+  list<String> resources;
 partial function Func
   input output DAE.Exp e;
   input output AvlSetString.Tree tree;
@@ -15452,6 +15468,7 @@ algorithm
       end if;
     end for;
   end if;
+  resourcePaths := list(shortUniqueResourcePath(path, resources) for path in resources);
 end getResources;
 
 function findResources

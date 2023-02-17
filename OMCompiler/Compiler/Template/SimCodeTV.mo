@@ -760,6 +760,13 @@ package SimCode
     end SES_STATESET;
   end StateSet;
 
+  uniontype ResourcePath "Paths to FMU resouce used by model and shortened version for resources directory."
+    record RESOURCE_PATH
+      String absPath "Absolute path on host system";
+      String relPath "Relative path inside FMU/resources/";
+    end RESOURCE_PATH;
+  end ResourcePath;
+
   uniontype ModelInfo
     record MODELINFO
       Absyn.Path name;
@@ -769,6 +776,7 @@ package SimCode
       SimCodeVar.SimVars vars;
       list<SimCodeFunction.Function> functions;
       list<String> labels;
+      list<ResourcePath> resourcePaths "Paths of all resources used by the model. Used in FMI2 to package resources in the FMU.";
       list<Absyn.Class> sortedClasses;
       Integer nClocks;
       Integer nSubClocks;
