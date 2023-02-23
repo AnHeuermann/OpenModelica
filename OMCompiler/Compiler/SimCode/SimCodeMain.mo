@@ -781,9 +781,11 @@ algorithm
             continue;
           end if;
           // copy the file or directory
-          if 0 <> System.systemCall("cp -rf \"" + path.absPath + "\" \"" + newpath + "/\"") then
+          print("AHeu 3: cp -rf \"" + path.absPath + "\" \"" + newpath + "/\"\n");
+          if 0 <> System.systemCall("cp -rf \"" + path.absPath + "\" \"" + newpath + "\"") then
             Error.addInternalError("Failed to copy " + path.absPath + " to " + newpath, sourceInfo());
           end if;
+          print("AHeu 4\n");
         end for;
 
         // Add optional _flags.json to resources

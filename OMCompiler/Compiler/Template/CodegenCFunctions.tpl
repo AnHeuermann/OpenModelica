@@ -3836,6 +3836,8 @@ template literalExpConst(Exp lit, Integer litindex) "These should all be declare
   match lit
   case SCONST(__) then
     let escstr = Util.escapeModelicaStringToCString(string)
+    // TODO AHeu: Check if we are in FMU case
+    let fmuString = System.basename(escstr)
       /* TODO: Change this when OMC takes constant input arguments (so we cannot write to them)
                The cost of not doing this properly is small (<257 bytes of constants)
       match unescapedStringLength(escstr)
@@ -3843,8 +3845,8 @@ template literalExpConst(Exp lit, Integer litindex) "These should all be declare
       case 1 then '#define <%name%> mmc_strings_len1["<%escstr%>"[0]]'
       else */
       <<
-      #define <%name%>_data "<%escstr%>"
-      static const MMC_DEFSTRINGLIT(<%tmp%>,<%unescapedStringLength(escstr)%>,<%name%>_data);
+      #define <%name%>_data "<%fmuString%>"
+      static const MMC_DEFSTRINGLIT(<%tmp%>,<%unescapedStringLength(fmuString)%>,<%name%>_data);
       #define <%name%> MMC_REFSTRINGLIT(<%tmp%>)
       >>
   case lit as MATRIX(ty=ty as T_ARRAY(__))

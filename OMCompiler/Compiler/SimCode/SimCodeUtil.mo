@@ -15429,7 +15429,7 @@ protected
 algorithm
   // TODO AHeu: Shorten the name of absPath and make it unique.
   // Maybe check if there is already a file with the same base name in list allAbsPath
-  relPath := absPath;
+  relPath := System.basename(absPath);
   resourcePath := SimCode.RESOURCE_PATH(absPath, relPath);
   print("Generating SimCode.RESOURCE_PATH:\n");
   print(resourcePath.absPath + ", " + resourcePath.relPath + "\n\n");

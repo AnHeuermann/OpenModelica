@@ -1871,6 +1871,11 @@ package System
     output Boolean success;
   end covertTextFileToCLiteral;
 
+  function basename
+    input String filename;
+    output String base;
+  end basename;
+
 end System;
 
 package Autoconf
