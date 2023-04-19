@@ -253,6 +253,14 @@ typedef struct STRING_ATTRIBUTE
   modelica_string start;               /* = "" */
 } STRING_ATTRIBUTE;
 
+typedef enum
+{
+  REAL_ATTRIBUTE_TYPE,
+  INTEGER_ATTRIBUTE_TYPE,
+  BOOLEAN_ATTRIBUTE_TYPE,
+  STRING_ATTRIBUTE_TYPE
+} ATTRIBUTE_TYPE;
+
 typedef struct STATIC_REAL_DATA
 {
   VAR_INFO info;

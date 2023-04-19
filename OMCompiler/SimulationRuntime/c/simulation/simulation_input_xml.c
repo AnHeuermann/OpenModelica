@@ -422,14 +422,160 @@ static void read_var_attribute_string(omc_ScalarVariable *v, STRING_ATTRIBUTE *a
   infoStreamPrint(LOG_DEBUG, 0, "String %s(start=%s)", findHashStringString(v,"name"), MMC_STRINGDATA(attribute->start));
 }
 
-/* \brief
+/**
+ * @brief Check if variable should be filtered in output.
+ *
+ * The check is like this:
+ * - we filter if isProtected (protected variables)
+ * - we filter if annotation(HideResult=true)
+ * - we emit (remove filtering) if emitProtected && isProtected
+ * - we emit (remove filtering) if ignoreHideResult && annotation(HideResult=true)
+ *
+ * @param v                   Variable.
+ * @param name                Name of variable.
+ * @return modelica_boolean 
+ */
+static modelica_boolean filterOuput(omc_ScalarVariable* v, const char *name)
+{
+  int ep = omc_flag[FLAG_EMIT_PROTECTED];
+  int ihr = omc_flag[FLAG_IGNORE_HIDERESULT];
+  const char *ipstr = findHashStringString((v), "isProtected");
+  const char *hrstr = findHashStringString((v), "hideResult");
+  modelica_boolean ipcmptrue = (0 == strcmp(ipstr, "true"));
+  modelica_boolean hrcmptrue = (0 == strcmp(hrstr, "true"));
+
+  if (ipcmptrue)
+  {
+    infoStreamPrint(LOG_DEBUG, 0, "filtering protected variable %s", name);
+    return 1;
+  }
+  if (hrcmptrue)
+  {
+    infoStreamPrint(LOG_DEBUG, 0, "filtering variable %s due to HideResult annotation", name);
+    return 1;
+  }
+  if (ep && ipcmptrue)
+  {
+    infoStreamPrint(LOG_DEBUG, 0, "emitting protected variable %s due to flag %s", name, omc_flagValue[FLAG_EMIT_PROTECTED]);
+    return 0;
+  }
+  if (ihr && hrcmptrue)
+  {
+    infoStreamPrint(LOG_DEBUG, 0, "emitting variable %s with HideResult=true annotation due to flag %s", name, omc_flagValue[FLAG_IGNORE_HIDERESULT]);
+    return 0;
+  }
+}
+
+/**
+ * @brief Read real variable to filter
+ *
+ * @param simulationInfo 
+ * @param out 
+ * @param in 
+ * @param debugName 
+ * @param start 
+ * @param nStates 
+ * @param k                 Counter to increment and return when finished.
+ * @param mapAlias 
+ * @param mapAliasParam 
+ */
+static int read_variables_real(SIMULATION_INFO* simulationInfo,
+                                STATIC_REAL_DATA* out,
+                                omc_ModelVariables* in,
+                                const char* debugName,
+                                int start,
+                                unsigned int nStates,
+                                unsigned int k,
+                                hash_string_long* mapAlias,
+                                hash_string_long* mapAliasParam)
+{
+  /* Variables */
+  int i;
+  VAR_INFO* info;
+  mmc_sint_t j;
+  REAL_ATTRIBUTE* attribute;
+  omc_ScalarVariable* v;
+
+  infoStreamPrint(LOG_DEBUG, 1, "read xml file for %s", debugName);
+  for(i = 0; i < nStates; i++) {
+    j = start+i;
+    info = &out[j].info;
+    attribute = &out[j].attribute;
+    v = *findHashLongVar(in, i);
+    read_var_info(v, info);
+    read_var_attribute_real(v, attribute);
+    out[j].filterOutput = filterOuput(v, info->name);
+    if (!omc_flag[FLAG_EMIT_PROTECTED] && 0 == strcmp(findHashStringString(v, "isProtected"), "true") && 0 == strcmp(findHashStringString(v, "hideResult"), "true"))
+    {
+      infoStreamPrint(LOG_DEBUG, 0, "filtering protected variable %s", info->name);
+      out[j].filterOutput = 1;
+    }
+    else if (!omc_flag[FLAG_IGNORE_HIDERESULT] && 0 == strcmp(findHashStringString(v, "hideResult"), "true") && 0 == strcmp(findHashStringString(v, "isProtected"), "false"))
+    {
+      infoStreamPrint(LOG_DEBUG, 0, "filtering variable %s due to HideResult annotation", info->name);
+      out[j].filterOutput = 1;
+    }
+    addHashStringLong(&mapAlias, info->name, j); /* create a mapping for Alias variable to get the correct index */
+    debugStreamPrint(LOG_DEBUG, 0, "real %s: mapAlias[%s] = %ld", debugName, info->name, (long) j);
+    if (omc_flag[FLAG_IDAS] && 0 == strcmp(debugName, "real sensitivities")) {
+      if (0 == strcmp(findHashStringString(v, "isValueChangeable"), "true")) {
+        long *it = findHashStringLongPtr(mapAliasParam, info->name);
+        simulationInfo->sensitivityParList[k] = *it;
+        infoStreamPrint(LOG_SOLVER, 0, "%d. sensitivity parameter %s at index %d", k, info->name, simulationInfo->sensitivityParList[k]);
+        (k)++;
+      }
+    }
+  }
+  messageClose(LOG_DEBUG);
+  return k;
+}
+
+/**
+ * @brief Read real, integer, boolean or string variable attributes.
+ *
+ * @param simulationInfo 
+ * @param type 
+ * @param out 
+ * @param in 
+ * @param debugName 
+ * @param start 
+ * @param nStates 
+ * @param k 
+ * @param mapAlias 
+ * @param mapAliasParam 
+ */
+static unsigned int read_variables(SIMULATION_INFO* simulationInfo,
+                           ATTRIBUTE_TYPE type,
+                           STATIC_REAL_DATA* out,
+                           omc_ModelVariables* in,
+                           const char* debugName,
+                           int start,
+                           unsigned int nStates,
+                           unsigned int k,
+                           hash_string_long* mapAlias,
+                           hash_string_long* mapAliasParam)
+{
+  /* Check type and call read_variables_type function */
+  switch (type) {
+  case REAL_ATTRIBUTE_TYPE:
+    k = read_variables_real(simulationInfo, out, in, debugName, start, nStates, *k, mapAlias, mapAliasParam);
+    break;
+  default:
+    throwStreamPrint(NULL, "Unhandled case in function read_variables!");
+    break;
+  }
+
+  return k;
+}
+
+/**
  *  Reads initial values from a text file.
  *
  *  The textfile should be given as argument to the main function using
  *  the -f file flag.
  */
 void read_input_xml(MODEL_DATA* modelData,
-    SIMULATION_INFO* simulationInfo)
+                    SIMULATION_INFO* simulationInfo)
 {
   omc_ModelInput mi = {0};
   const char *filename, *guid, *override, *overrideFile;
@@ -677,7 +823,8 @@ void read_input_xml(MODEL_DATA* modelData,
   } \
   messageClose(LOG_DEBUG);
 
-  READ_VARIABLES(modelData->realVarsData,mi.rSta,REAL_ATTRIBUTE,read_var_attribute_real,"real states",0,modelData->nStates,mapAlias);
+  /* read all static data from File for every variable */
+  k = read_variables(simulationInfo, REAL_ATTRIBUTE_TYPE, modelData->realVarsData, mi.rSta, "real states", 0, modelData->nStates, k, mapAlias, NULL);
   READ_VARIABLES(modelData->realVarsData,mi.rDer,REAL_ATTRIBUTE,read_var_attribute_real,"real state derivatives",modelData->nStates,modelData->nStates,mapAlias);
   READ_VARIABLES(modelData->realVarsData,mi.rAlg,REAL_ATTRIBUTE,read_var_attribute_real,"real algebraics",2*modelData->nStates,modelData->nVariablesReal - 2*modelData->nStates,mapAlias);
 
