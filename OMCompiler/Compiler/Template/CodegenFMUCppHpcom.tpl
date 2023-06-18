@@ -82,7 +82,7 @@ template translateModel(SimCode simCode, String FMUVersion, String FMUType)
       let()= textFile(fmuModelCppFile(simCode, extraFuncs, extraFuncsDecl, "",guid, FMUVersion), 'OMCpp<%fileNamePrefix%>FMU.cpp')
       //let()= textFile(modelInitXMLFile(simCode, numRealVars, numIntVars, numBoolVars, true, FMUVersion, FMUType, guid), '')
       // Def file is only used on windows, to define exported symbols
-      //let()= textFile(fmudeffile(simCode, FMUVersion), '<%fileNamePrefix%>.def')
+      //let()= textFile(fmuDeffile(simCode, FMUVersion), '<%fileNamePrefix%>.def')
       let()= textFile(fmuMakefile(target,simCode, extraFuncs, extraFuncsDecl, "", FMUVersion), '<%fileNamePrefix%>_FMU.makefile')
       let()= textFile(fmuCalcHelperMainfile(simCode), 'OMCpp<%fileNamePrefix%>CalcHelperMain.cpp')
 

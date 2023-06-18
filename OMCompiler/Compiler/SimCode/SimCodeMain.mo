@@ -816,19 +816,15 @@ algorithm
 
         SerializeModelInfo.serialize(simCode, Flags.isSet(Flags.INFO_XML_OPERATIONS));
         str := fmutmp + "/sources/" + simCode.fileNamePrefix;
-        if FMUVersion == "1.0" then
-          b := System.covertTextFileToCLiteral(simCode.fileNamePrefix + "_info.json", str + "_info.c", Flags.getConfigString(Flags.TARGET));
-          if not b then
-            Error.addMessage(Error.INTERNAL_ERROR, {"System.covertTextFileToCLiteral failed. Could not write " + str + "_info.c\n"});
-            fail();
-          end if;
-        else
+        if FMUVersion == "2.0" then
           // Add _info.json file to resources/ directory if neither --fmiFilter=blackBox nor --fmiFilter=protected are used
           if Flags.getConfigEnum(Flags.FMI_FILTER) <> Flags.FMI_BLACKBOX and Flags.getConfigEnum(Flags.FMI_FILTER) <> Flags.FMI_PROTECTED then
             if 0 <> System.systemCall("mv '" + simCode.fileNamePrefix + "_info.json" + "' '" + resourcesDir + "'") then
               Error.addInternalError("Failed to move " + simCode.fileNamePrefix + "_info.json file", sourceInfo());
             end if;
           end if;
+        else
+          Error.addCompilerError("Unsupported FMI version " + FMUVersion + ".");
         end if;
         SimCodeUtil.resetFunctionIndex();
         varInfo := simCode.modelInfo.varInfo;
@@ -886,10 +882,18 @@ algorithm
         // This fmu export files of OMC are located in a very unexpected place. Right now they are in SimulationRuntime/fmi/export/openmodelica
         // and then then they are installed to include/omc/c/fmi-export for some reason. The source, install, and source fmu location
         // for these files should be made consistent. For now to avoid modifing things a lot they are left as they are and copied here.
-        fmi_export_files := if FMUVersion == "1.0" then RuntimeSources.fmi1Files else RuntimeSources.fmi2Files;
+        if FMUVersion == "2.0" then
+          fmi_export_files := RuntimeSources.fmi2Files;
+        else
+          Error.addCompilerError("Unsupported FMI version " + FMUVersion + ".");
+        end if;
         copyFiles(fmi_export_files, source=install_include_omc_c_dir, destination=fmu_tmp_sources_dir);
 
-        System.writeFile(fmutmp+"/sources/isfmi" + (if FMUVersion=="1.0" then "1" else "2"), "");
+        if FMUVersion == "2.0" then
+          System.writeFile(fmutmp+"/sources/isfmi2", "");
+        else
+          Error.addCompilerError("Unsupported FMI version " + FMUVersion + ".");
+        end if;
 
         model_gen_files := list(simCode.fileNamePrefix + f for f in RuntimeSources.defaultFileSuffixes);
 

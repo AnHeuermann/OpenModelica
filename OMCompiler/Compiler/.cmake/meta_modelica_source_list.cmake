@@ -434,7 +434,6 @@ set(OMC_MM_BACKEND_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Template/CodegenCppHpcomOMSI.mo
     ${CMAKE_CURRENT_SOURCE_DIR}/Template/CodegenCppInit.mo
     ${CMAKE_CURRENT_SOURCE_DIR}/Template/CodegenFMU.mo
-    ${CMAKE_CURRENT_SOURCE_DIR}/Template/CodegenFMU1.mo
     ${CMAKE_CURRENT_SOURCE_DIR}/Template/CodegenFMU2.mo
     ${CMAKE_CURRENT_SOURCE_DIR}/Template/CodegenFMUCommon.mo
     ${CMAKE_CURRENT_SOURCE_DIR}/Template/CodegenFMUCpp.mo

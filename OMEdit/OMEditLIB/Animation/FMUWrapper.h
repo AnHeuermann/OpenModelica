@@ -42,7 +42,6 @@
 #include <memory>
 #include <map>
 
-
 typedef struct
 {
   double* _states;
@@ -55,9 +54,7 @@ typedef struct
   std::vector<std::string> _stateNames;
   size_t _nStates;
   size_t _nEventIndicators;
-  fmi1_status_t _fmiStatus;
   fmi2_status_t fmiStatus2;
-  fmi1_event_info_t _eventInfo;
   fmi2_event_info_t eventInfo2;
   double _tcur;
   double _hcur;
@@ -78,13 +75,13 @@ class SimSettingsFMU
   ~SimSettingsFMU() = default;
   SimSettingsFMU(const SimSettingsFMU& ss) = delete;
   SimSettingsFMU& operator=(const SimSettingsFMU& ss) = delete;
-  void setTend(const fmi1_real_t t);
+  void setTend(const fmi2_real_t t);
   double getTend() const;
-  void setTstart(const fmi1_real_t t);
+  void setTstart(const fmi2_real_t t);
   double getTstart() const;
-  void setHdef(const fmi1_real_t h);
+  void setHdef(const fmi2_real_t h);
   double getHdef();
-  void setRelativeTolerance(const fmi1_real_t t);
+  void setRelativeTolerance(const fmi2_real_t t);
   double getRelativeTolerance();
   int getToleranceControlled() const;
   void setSolver(const Solver& solver);
@@ -129,71 +126,6 @@ class FMUWrapperAbstract
   virtual const FMUData* getFMUData()  = 0;
   virtual void fmi_get_real(unsigned int* valueRef, double* res) = 0;
   virtual unsigned int fmi_get_variable_by_name(const char* name) = 0;
-};
-
-class FMUWrapper_ME_1 : public FMUWrapperAbstract
-{
- public:
-
-  FMUWrapper_ME_1();
-  ~FMUWrapper_ME_1();
-
-  void load(const std::string& modelFile, const std::string& path, fmi_import_context_t* mpContext);
-  void initialize(const std::shared_ptr<SimSettingsFMU> simSettings);
-  //to run simulation
-  bool checkForTriggeredEvent();
-  bool itsEventTime();
-  void handleEvents(const int intermediateResults);
-  void prepareSimulationStep(const double time);
-  void updateNextTimeStep(const double hdef);
-  void setLastStepSize(const double simTimeEnd);
-  void solveSystem();
-  void doEulerStep();
-  void setContinuousStates();
-  void completedIntegratorStep(int* callEventUpdate);
-
-  const FMUData* getFMUData();
-  fmi1_import_t* getFMU();
-  void fmi_get_real(unsigned int* valueRef, double* res);
-  unsigned int fmi_get_variable_by_name(const char* name);
-
- private:
-  fmi1_import_t* mpFMU;
-  fmi1_callback_functions_t mCallBackFunctions;
-  FMUData mFMUdata;
-};
-
-
-class FMUWrapper_ME_2 : public FMUWrapperAbstract
-{
- public:
-
-  FMUWrapper_ME_2();
-  ~FMUWrapper_ME_2();
-
-  void load(const std::string& modelFile, const std::string& path, fmi_import_context_t* mpContext);
-  void initialize(const std::shared_ptr<SimSettingsFMU> simSettings);
-  void setContinuousStates();
-  bool checkForTriggeredEvent();
-  bool itsEventTime();
-  void updateNextTimeStep(const double hdef);
-  void handleEvents(const int intermediateResults);
-  void prepareSimulationStep(const double time);
-  void setLastStepSize(const double simTimeEnd);
-  void solveSystem();
-  void doEulerStep();
-  void completedIntegratorStep(int* callEventUpdate);
-  void do_event_iteration(fmi2_import_t *fmu, fmi2_event_info_t *eventInfo);
-
-  const FMUData* getFMUData();
-  fmi2_import_t* getFMU();
-  void fmi_get_real(unsigned int* valueRef, double* res);
-  unsigned int fmi_get_variable_by_name(const char* name);
-
- private:
-  fmi2_import_t* mpFMU;
-  fmi2_callback_functions_t mCallBackFunctions;
-  FMUData mFMUdata;
 };
 
 #endif // end FMUWRAPPER_H

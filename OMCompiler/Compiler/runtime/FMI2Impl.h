@@ -28,42 +28,29 @@
  *
  */
 
-#ifndef __FMU1_MODEL_INTERFACE_H__
-#define __FMU1_MODEL_INTERFACE_H__
-
-#include "fmiModelFunctions.h"
-#include "../simulation_data.h"
+#ifndef __FMI2_IMPL_H
+#define __FMI2_IMPL_H
 
 #ifdef __cplusplus
-extern "C" {
+  extern "C" {
 #endif
 
-// macros used to define variables
-#define pos(z) comp->isPositive[z]
-#define copy(vr, value) setString(comp, vr, value)
+#ifndef FMILIB_BUILDING_LIBRARY
+#define FMILIB_BUILDING_LIBRARY
+#endif
+#include "fmilib.h"
 
-#define not_modelError (modelInstantiated|modelInitialized|modelTerminated)
-
-typedef enum {
-  modelInstantiated = 1<<0,
-  modelInitialized  = 1<<1,
-  modelTerminated   = 1<<2,
-  modelError        = 1<<3
-} ModelState;
-
-typedef struct {
-  fmiString instanceName;
-  fmiString GUID;
-  fmiCallbackFunctions functions;
-  fmiBoolean loggingOn;
-  fmiEventInfo eventInfo;
-  ModelState state;
-  DATA* fmuData;
-  threadData_t *threadData;
-} ModelInstance;
+void fmi2logger(fmi2_component_t c, fmi2_string_t instanceName, fmi2_status_t status, fmi2_string_t category, fmi2_string_t message, ...);
+const char* getFMI2ModelVariableVariability(fmi2_import_variable_t* variable);
+const char* getFMI2ModelVariableCausality(fmi2_import_variable_t* variable);
+const char* getFMI2ModelVariableBaseType(fmi2_import_variable_t* variable);
+char* getFMI2ModelVariableName(fmi2_import_variable_t* variable);
+void* getFMI2ModelVariableStartValue(fmi2_import_variable_t* variable, int hasStartValue);
+void FMIImpl__initializeFMI2Import(fmi2_import_t* fmi, void** fmiInfo, fmi_version_enu_t version, void** typeDefinitionsList, void** experimentAnnotation,
+    void** modelVariablesInstance, void** modelVariablesList, int input_connectors, int output_connectors);
 
 #ifdef __cplusplus
-}
+  }
 #endif
 
-#endif
+#endif // __FMI2_IMPL_H

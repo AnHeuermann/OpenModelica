@@ -58,7 +58,7 @@ install_bootstrapping:
 endif
 endif
 
-libomcbackendruntime.a: HpcOmSchedulerExt_omc.o HpcOmBenchmarkExt_omc.o TaskGraphResults_omc.o BackendDAEEXT_omc.o matching.o matching_cheap.o Dynload_omc$(OBJEXT) FMI_omc.o cJSON.o
+libomcbackendruntime.a: HpcOmSchedulerExt_omc.o HpcOmBenchmarkExt_omc.o TaskGraphResults_omc.o BackendDAEEXT_omc.o matching.o matching_cheap.o Dynload_omc$(OBJEXT) FMI2_omc.o FMI_omc.o fmiVersion cJSON.o
 	rm -f $@
 	$(AR) -s -r "$@.tmp" $^
 	mv "$@.tmp" "$@"
@@ -124,6 +124,7 @@ HpcOmBenchmarkExt_omc$(OBJEXT) : HpcOmBenchmarkExt.cpp $(BOOTH)
 HpcOmSchedulerExt_omc$(OBJEXT) : TaskGraphResultsCmp.h HpcOmSchedulerExt.cpp $(BOOTH)
 ptolemyio_omc$(OBJEXT) : ptolemyio.cpp errorext.h $(RML_COMPAT) $(BOOTH)
 FMI_omc$(OBJEXT) : FMIImpl.c $(BOOTH)
+FMI2_omc$(OBJEXT) : FMI2Impl.c $(BOOTH)
 Settings_omc$(OBJEXT) : Settings_omc.cpp settingsimpl.c $(configUnix) $(BOOTH) $(OMC_CONFIG_INC)/omc_config.h
 
 %.boot.o: %.c

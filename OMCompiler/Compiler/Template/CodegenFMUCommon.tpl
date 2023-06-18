@@ -796,6 +796,166 @@ match simulationSettings
     >>
 end DefaultExperimentAttribute;
 
+template aliasSetVR(SimCode simCode, AliasVariable v)
+::=
+  match v
+  case NOALIAS(__) then error(sourceInfo(), "aliasSetVR expected an alias")
+  case ALIAS(__) then lookupVR(varName,simCode)
+  case NEGATEDALIAS(__) then intSub(-1, lookupVR(varName,simCode)) /* Subtracting 1 is necessary to make vr=0 possible to have a negative alias */
+end aliasSetVR;
+
+template SwitchVars(SimCode simCode, SimVar simVar, String arrayName)
+ "Generates code for defining variables in c file for FMU target. "
+::=
+match simVar
+  case SIMVAR(__) then
+  let description = if comment then '// "<%comment%>"'
+  if stringEq(crefStr(name),"$dummy") then
+  <<>>
+  else if stringEq(crefStr(name),"der($dummy)") then
+  <<>>
+  else
+  if stringEq(arrayName, "stringVars")
+  then
+  <<
+  case <%lookupVR(name,simCode)%> : return MMC_STRINGDATA(comp->fmuData->localData[0]-><%arrayName%>[<%index%>]); break;
+  >>
+  else
+  <<
+  case <%lookupVR(name,simCode)%> : return comp->fmuData->localData[0]-><%arrayName%>[<%index%>]; break;
+  >>
+end SwitchVars;
+
+
+template SwitchVarsSet(SimCode simCode, SimVar simVar, String arrayName)
+ "Generates code for defining variables in c file for FMU target. "
+::=
+match simVar
+  case SIMVAR(__) then
+  let description = if comment then '// "<%comment%>"'
+  if stringEq(crefStr(name),"$dummy") then
+  <<>>
+  else if stringEq(crefStr(name),"der($dummy)") then
+  <<>>
+  else
+  if stringEq(arrayName, "stringVars")
+  then
+  <<
+  case <%lookupVR(name,simCode)%> : comp->fmuData->localData[0]-><%arrayName%>[<%index%>] = mmc_mk_scon(value); break;
+  >>
+  else
+  <<
+  case <%lookupVR(name,simCode)%> : comp->fmuData->localData[0]-><%arrayName%>[<%index%>] = value; break;
+  >>
+end SwitchVarsSet;
+
+template SwitchParameters(SimCode simCode, SimVar simVar, String arrayName)
+ "Generates code for defining variables in c file for FMU target. "
+::=
+match simVar
+  case SIMVAR(__) then
+  let description = if comment then '// "<%comment%>"'
+  if stringEq(arrayName,  "stringParameter")
+  then
+  <<
+  case <%lookupVR(name,simCode)%> : return MMC_STRINGDATA(comp->fmuData->simulationInfo-><%arrayName%>[<%index%>]); break;
+  >>
+  else
+  <<
+  case <%lookupVR(name,simCode)%> : return comp->fmuData->simulationInfo-><%arrayName%>[<%index%>]; break;
+  >>
+end SwitchParameters;
+
+template SwitchParametersSet(SimCode simCode, SimVar simVar, String arrayName)
+ "Generates code for defining variables in c file for FMU target. "
+::=
+match simVar
+  case SIMVAR(__) then
+  let description = if comment then '// "<%comment%>"'
+  if stringEq(arrayName, "stringParameter")
+  then
+  <<
+  case <%lookupVR(name,simCode)%> : comp->fmuData->simulationInfo-><%arrayName%>[<%index%>] = mmc_mk_scon(value); break;
+  >>
+  else
+  <<
+  case <%lookupVR(name,simCode)%> : comp->fmuData->simulationInfo-><%arrayName%>[<%index%>] = value; break;
+  >>
+end SwitchParametersSet;
+
+template SwitchAliasVars(SimCode simCode, SimVar simVar, String arrayName, String negate)
+ "Generates code for defining variables in c file for FMU target. "
+::=
+match simVar
+  case SIMVAR(__) then
+    let description = if comment then '// "<%comment%>"'
+    let crefName = lookupVR(name,simCode)
+      match aliasvar
+        case ALIAS(__) then
+        if stringEq(crefStr(varName),"time") then
+        <<
+        case <%crefName%> : return comp->fmuData->localData[0]->timeValue; break;
+        >>
+        else
+        <<
+        case <%crefName%> : return get<%arrayName%>(comp, <%lookupVR(varName,simCode)%>); break;
+        >>
+        case NEGATEDALIAS(__) then
+        if stringEq(crefStr(varName),"time") then
+        <<
+        case <%crefName%> : return comp->fmuData->localData[0]->timeValue; break;
+        >>
+        else
+        <<
+        case <%crefName%> : return (<%negate%> get<%arrayName%>(comp, <%lookupVR(varName,simCode)%>)); break;
+        >>
+     end match
+end SwitchAliasVars;
+
+template SwitchAliasVarsSet(SimCode simCode, SimVar simVar, String arrayName, String negate)
+ "Generates code for defining variables in c file for FMU target. "
+::=
+match simVar
+  case SIMVAR(__) then
+    let description = if comment then '// "<%comment%>"'
+    let crefName = lookupVR(name,simCode)
+      match aliasvar
+        case ALIAS(__) then
+        if stringEq(crefStr(varName),"time") then
+        <<
+        >>
+        else
+        <<
+        case <%crefName%> : return set<%arrayName%>(comp, <%lookupVR(varName,simCode)%>, value); break;
+        >>
+        case NEGATEDALIAS(__) then
+        if stringEq(crefStr(varName),"time") then
+        <<
+        >>
+        else
+        <<
+        case <%crefName%> : return set<%arrayName%>(comp, <%lookupVR(varName,simCode)%>, (<%negate%> value)); break;
+        >>
+     end match
+end SwitchAliasVarsSet;
+
+template setExternalFunctionsSwitch(list<Function> functions)
+ "Generates external function definitions."
+::=
+  (functions |> fn => setExternalFunctionSwitch(fn) ; separator="\n")
+end setExternalFunctionsSwitch;
+
+template setExternalFunctionSwitch(Function fn)
+ "Generates external function definitions."
+::=
+  match fn
+    case EXTERNAL_FUNCTION(dynamicLoad=true) then
+      let fname = extFunctionName(extName, language)
+      <<
+      case $P<%fname%> : ptr_<%fname%>=(ptrT_<%fname%>)value; break;
+      >>
+end setExternalFunctionSwitch;
+
 annotation(__OpenModelica_Interface="backend");
 end CodegenFMUCommon;
 
