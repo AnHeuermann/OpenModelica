@@ -43,9 +43,6 @@
 #include <solver_api.h>
 #include <solver_helper.h>
 
-#include <stdio.h>
-#include <stddef.h>
-
 /* Headers for sundials kinsol */
 #include <kinsol/kinsol.h>
 #include <nvector/nvector_serial.h>

@@ -31,10 +31,6 @@
 #ifndef _SOLVERHELPER_H_
 #define _SOLVERHELPER_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-
 #include <omsi_solver.h>
 #include <solver_global.h>
 

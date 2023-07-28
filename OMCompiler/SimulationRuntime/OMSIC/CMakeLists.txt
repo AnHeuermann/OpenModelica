@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 MESSAGE(STATUS "CMake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
 
@@ -43,26 +43,31 @@ ELSE(MSVC)
 ENDIF(MSVC)
 message(STATUS "Libs will be installed in ${CMAKE_INSTALL_PREFIX}/${LIBINSTALLEXT}")
 
-
-SET(OMSICName ${LIBPREFIX}OMSIC${LIBSUFFIX})
-
 SET(OMSI_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../OMSI)
 
-include_directories ("${OMSI_SOURCE_DIR}/include")
-include_directories ("${OMSI_SOURCE_DIR}/include/fmi2")
-include_directories ("${OMSI_SOURCE_DIR}/base/include")
-include_directories ("${OMSI_SOURCE_DIR}/solver/include")
+#target_include_directories(OMSICSimulationRuntime PUBLIC include include/omsu)
 
 # omsic simulation runtime
-ADD_SUBDIRECTORY(src/omsu)
+add_library(OMSIC)
+add_library(omc::simrt::omsic ALIAS OMSIC)
 
+target_sources(OMSIC PRIVATE
+  src/omsu/omsu_helper.c
+  src/omsu/omsu_initialization.c
+  src/omsu/omsu_getters_and_setters.c
+  src/omsu/omsu_event_simulation.c
+  src/omsu/omsu_continuous_simulation.c
+  src/fmi2/omsi_fmi2_wrapper.c
+)
 
-install(FILES
-  ${OMSI_SOURCE_DIR}/include/omsi.h
-  ${OMSI_SOURCE_DIR}/include/omsi_callbacks.h
-  ${OMSI_SOURCE_DIR}/include/omsi_api_functions.h
-DESTINATION include/omc/omsi)
+target_link_libraries(OMSIC PUBLIC omc::simrt::omsi)
+target_link_libraries(OMSIC PRIVATE ${CMAKE_DL_LIBS})
 
+target_include_directories(OMSIC PUBLIC include include/omsu)
+
+install(TARGETS OMSIC DESTINATION ${LIBINSTALLEXT})
+
+# TODO AHeu: Do this install differently (better)
 install(FILES
   ${CMAKE_SOURCE_DIR}/include/omsic.h
   ${CMAKE_SOURCE_DIR}/include/omsu/omsu_common.h
@@ -72,7 +77,6 @@ install(FILES
   ${CMAKE_SOURCE_DIR}/include/omsu/omsu_continuous_simulation.h
   ${CMAKE_SOURCE_DIR}/include/omsu/omsu_event_simulation.h
 DESTINATION include/omc/omsic)
-
 
 # uninstall target
 if(NOT TARGET uninstall)

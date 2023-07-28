@@ -49,9 +49,6 @@
 #include <solver_api.h>
 #include <solver_helper.h>
 
-#include <stdio.h>
-#include <stddef.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

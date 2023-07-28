@@ -15,6 +15,8 @@ if(NOT MSVC)
   omc_add_subdirectory(ModelicaExternalC)
 endif()
 
+#omc_add_subdirectory(OMSI)
+
 # omc_add_subdirectory(opc)
 
 # ParModelica

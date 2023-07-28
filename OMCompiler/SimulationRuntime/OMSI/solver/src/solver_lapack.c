@@ -37,6 +37,8 @@
  *  \ingroup LIN_SOLVER
   *  @{ */
 
+#include <stdio.h>
+#include <stddef.h>
 
 #include <solver_lapack.h>
 

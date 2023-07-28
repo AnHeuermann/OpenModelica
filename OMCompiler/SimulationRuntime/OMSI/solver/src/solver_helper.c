@@ -36,6 +36,10 @@
 /** @addtogroup SOLVER OMSI Solver Library
   *  @{ */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+
 #include <solver_helper.h>
 
 solver_bool solver_instance_correct(solver_data*    general_solver_data,

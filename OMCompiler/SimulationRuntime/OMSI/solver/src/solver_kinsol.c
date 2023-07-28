@@ -37,6 +37,9 @@
  *  \ingroup NONLIN_SOLVER
   *  @{ */
 
+#include <stdio.h>
+#include <stddef.h>
+
 #include <solver_kinsol.h>
 
 #define UNUSED(x) (void)(x)     /* ToDo: delete later */
