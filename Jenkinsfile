@@ -249,9 +249,10 @@ pipeline {
                 writeFile file: 'testsuite/special/FmuExportCrossCompile/VERSION', text: common.getVersion()
                 sh 'make -C testsuite/special/FmuExportCrossCompile/ dockerpull'
                 sh 'make -C testsuite/special/FmuExportCrossCompile/ test'
-                stash name: 'cross-fmu', includes: 'testsuite/special/FmuExportCrossCompile/*.fmu'
-                stash name: 'cross-fmu-extras', includes: 'testsuite/special/FmuExportCrossCompile/*.mos, testsuite/special/FmuExportCrossCompile/*.csv, testsuite/special/FmuExportCrossCompile/*.sh, testsuite/special/FmuExportCrossCompile/*.opt, testsuite/special/FmuExportCrossCompile/*.txt, testsuite/special/FmuExportCrossCompile/VERSION'
-                archiveArtifacts "testsuite/special/FmuExportCrossCompile/*.fmu"
+                stash name: 'cross-fmu-autoconf', includes: 'testsuite/special/FmuExportCrossCompile/MakeCrossCompile/*.fmu'
+                stash name: 'cross-fmu-cmake', includes: 'testsuite/special/FmuExportCrossCompile/CMakeCrossCompile/*.fmu'
+                stash name: 'cross-fmu-extras', includes: 'testsuite/special/FmuExportCrossCompile/*.mos, testsuite/special/FmuExportCrossCompile/*.sh, testsuite/special/FmuExportCrossCompile/*.txt, testsuite/special/FmuExportCrossCompile/MakeCrossCompile/*.csv, testsuite/special/FmuExportCrossCompile/MakeCrossCompile/*.opt'
+                archiveArtifacts "testsuite/special/FmuExportCrossCompile/**/*.fmu"
               }
             }
           }
@@ -642,7 +643,7 @@ pipeline {
           steps {
             echo "${env.NODE_NAME}"
             sh 'rm -rf testsuite/'
-            unstash 'cross-fmu'
+            unstash 'cross-fmu-autoconf'
             unstash 'cross-fmu-extras'
             sh '''
             export HOME="$PWD"
@@ -671,7 +672,8 @@ pipeline {
           }
           steps {
             echo "${env.NODE_NAME}"
-            unstash 'cross-fmu'
+            unstash 'cross-fmu-autoconf'
+            unstash 'cross-fmu-cmake'
             sh '''
             export HOME="$PWD"
             cd testsuite/special/FMPy/
@@ -694,7 +696,7 @@ pipeline {
           steps {
             echo "${env.NODE_NAME}"
             sh 'rm -rf testsuite/'
-            unstash 'cross-fmu'
+            unstash 'cross-fmu-autoconf'
             unstash 'cross-fmu-extras'
             sh '''
             cd testsuite/special/FmuExportCrossCompile/
@@ -720,7 +722,7 @@ pipeline {
           steps {
             echo "${env.NODE_NAME}"
             sh 'rm -rf testsuite/'
-            unstash 'cross-fmu'
+            unstash 'cross-fmu-autoconf'
             unstash 'cross-fmu-extras'
             sh '''
             cd testsuite/special/FmuExportCrossCompile/

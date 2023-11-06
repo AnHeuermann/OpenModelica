@@ -1,7 +1,8 @@
 
 FMPY_CALL = python3 -m fmpy
+FMU_EXPORT_DIR ?= CMakeCrossCompile
 
-FMU_DIRECTORY = ../FmuExportCrossCompile
+FMU_DIRECTORY = ../FmuExportCrossCompile/$(FMU_EXPORT_DIR)
 FMU = FmuExportCrossCompile.fmu \
       RoomHeating_OM_RH.fmu \
       WaterTank_Control.fmu \
@@ -11,7 +12,8 @@ FMU = FmuExportCrossCompile.fmu \
 .PHONY: all test
 
 all: compile_FMUs
-	$(MAKE) test
+	$(MAKE) test FMU_EXPORT_DIR=MakeCrossCompile
+	$(MAKE) test FMU_EXPORT_DIR=CMakeCrossCompile
 test: $(FMU)
 
 %.fmu:

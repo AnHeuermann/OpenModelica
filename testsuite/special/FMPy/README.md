@@ -1,6 +1,7 @@
 # Re-compilation and simulation of OpenModelica FMUs with FMPy
 
-Build FMUs from [../FmuExportCrossCompile/](../FmuExportCrossCompile):
+Build FMUs from [../FmuExportCrossCompile/](../FmuExportCrossCompile) with Autoconf and
+CMake:
 
 ```bash
 make compile_FMUs
