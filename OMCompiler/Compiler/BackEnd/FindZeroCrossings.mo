@@ -1963,7 +1963,12 @@ algorithm
       size  := DAE.BINARY(size, DAE.DIV(ty), step);
       size  := DAE.BINARY(size, DAE.ADD(ty), DAE.ICONST(1));
       size  := ExpressionSimplify.simplify(size);
-      non_resizable_size := Expression.getEvaluatedConstInteger(size);
+      try
+        non_resizable_size := Expression.getEvaluatedConstInteger(size);
+      else
+        Error.addCompilerWarning(getInstanceName() + " failed to get constant size for expression: " + ExpressionDump.printExpStr(red_iter.exp) + "\nsize: " + ExpressionDump.printExpStr(size) + "\n");
+        non_resizable_size := -1;
+      end try;
     then BackendDAE.SIM_ITERATOR_RANGE(DAE.CREF_IDENT(red_iter.id, DAE.T_INTEGER_DEFAULT, {}), exp.start, step, exp.stop, size, non_resizable_size, {});
 
     case exp as DAE.ARRAY() algorithm

@@ -1613,9 +1613,9 @@ end ReductionInfo;
 
 public uniontype ReductionIterator
   record REDUCTIONITER
-    String id;
-    Exp exp;
-    Option<Exp> guardExp;
+    String id "Name of iterator";
+    Exp exp "Iterator expression";
+    Option<Exp> guardExp "Guard expression";
     Type ty;
   end REDUCTIONITER;
 end ReductionIterator;
