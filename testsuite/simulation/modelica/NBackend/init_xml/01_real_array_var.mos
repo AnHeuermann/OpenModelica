@@ -20,8 +20,11 @@ end RealArrayVariable;
 
 buildModel(RealArrayVariable); getErrorString();
 
-system("sed -n '/<ArrayVariable/,/<\\/ArrayVariable>/p' RealArrayVariable_init.xml > RealArrayVariable_init.tmp.xml");
-initFileContent := readFile("RealArrayVariable_init.tmp.xml");
+// Life's to short to learn regex. LLM to the rescue!
+system("sed -n 's/.*\\(numberOf[[:alnum:]_]*\\)[[:space:]]*=[[:space:]]*\"\\([0-9][0-9]*\\)\".*/\\1 \\2/p' RealArrayVariable_init.xml > RealArrayVariable_init.numberOf.xml ");
+initFileContent := readFile("RealArrayVariable_init.numberOf.xml");
+system("sed -n '/<ArrayVariable/,/<\\/ArrayVariable>/p' RealArrayVariable_init.xml > RealArrayVariable_init.ArrayVariable.xml");
+initFileContent := readFile("RealArrayVariable_init.ArrayVariable.xml");
 
 // Result:
 // true
@@ -29,6 +32,27 @@ initFileContent := readFile("RealArrayVariable_init.tmp.xml");
 // ""
 // {"RealArrayVariable", "RealArrayVariable_init.xml"}
 // ""
+// 0
+// "numberOfEventIndicators 0
+// numberOfTimeEvents 0
+// numberOfInputVariables 0
+// numberOfOutputVariables 0
+// numberOfExternalObjects 0
+// numberOfFunctions 0
+// numberOfContinuousStates 0
+// numberOfRealAlgebraicVariables 1
+// numberOfRealAlgebraicAliasVariables 0
+// numberOfRealParameters 0
+// numberOfIntegerAlgebraicVariables 0
+// numberOfIntegerAliasVariables 0
+// numberOfIntegerParameters 1
+// numberOfStringAlgebraicVariables 0
+// numberOfStringAliasVariables 0
+// numberOfStringParameters 0
+// numberOfBooleanAlgebraicVariables 0
+// numberOfBooleanAliasVariables 0
+// numberOfBooleanParameters 0
+// "
 // 0
 // "  <ArrayVariable
 //     name = \"x\"
