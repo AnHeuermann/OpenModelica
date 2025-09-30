@@ -37,16 +37,16 @@ initFileContent := readFile("MultiDimArrayVar_init.tmp.xml");
 // "  <ArrayVariable
 //     name = \"A\"
 //     valueReference = \"1000\"
-//     variability = \"continuous\" isDiscrete = \"false\"
-//     causality = \"local\" isValueChangeable = \"false\"
+//     variability = \"parameter\" isDiscrete = \"true\"
+//     causality = \"local\" isValueChangeable = \"true\"
 //     alias = \"noAlias\"
-//     classIndex = \"0\" classType = \"rAlg\"
+//     classIndex = \"0\" classType = \"iPar\"
 //     isProtected = \"false\" hideResult = \"false\" isEncrypted = \"false\" initNonlinear = \"false\"
 //     fileName = \"\" startLine = \"0\" startColumn = \"0\" endLine = \"0\" endColumn = \"0\" fileWritable = \"true\">
 //     <Dimension start=\"2\"/>
 //     <Dimension start=\"3\"/>
 //     <Dimension start=\"4\"/>
-//     <Integer start=\"1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\" />
+//     <Integer start=\"1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\" fixed=\"true\"/>
 //   </ArrayVariable>
 // "
 // endResult
