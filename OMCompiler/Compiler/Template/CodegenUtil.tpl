@@ -221,6 +221,7 @@ template initValXml(Exp exp)
   case RCONST(__) then real
   case SCONST(__) then '<%Util.escapeModelicaStringToXmlString(string)%>'
   case BCONST(__) then if bool then "true" else "false"
+  case ARRAY(__)  then '<%array |> elem => initValXml(elem) ;separator=" "%>'
   case ENUM_LITERAL(__) then '<%index%>'
   else error(sourceInfo(), 'initial value of unknown type: <%dumpExp(exp,"\"")%>')
 end initValXml;

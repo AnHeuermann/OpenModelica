@@ -13,7 +13,7 @@ loadString("
 model MatrixArrayVariable
   parameter Integer m = 3;
   parameter Integer n = 2;
-  Real A[m,n] = [0.0, 0.1;
+  parameter Real A[m,n] = [0.0, 0.1;
                  1.0, 1.1;
                  2.0, 2.1];
 end MatrixArrayVariable;
@@ -28,16 +28,16 @@ initFileContent := readFile("MatrixArrayVariable_init.tmp.xml");
 // true
 // true
 // ""
-// {"ParameterArrayVariable", "MatrixArrayVariable_init.xml"}
+// {"MatrixArrayVariable", "MatrixArrayVariable_init.xml"}
 // ""
 // 0
 // "  <ArrayVariable
 //     name = \"A\"
 //     valueReference = \"1000\"
-//     variability = \"continuous\" isDiscrete = \"false\"
-//     causality = \"local\" isValueChangeable = \"false\"
+//     variability = \"parameter\" isDiscrete = \"true\"
+//     causality = \"local\" isValueChangeable = \"true\"
 //     alias = \"noAlias\"
-//     classIndex = \"0\" classType = \"rAlg\"
+//     classIndex = \"0\" classType = \"rPar\"
 //     isProtected = \"false\" hideResult = \"false\" isEncrypted = \"false\" initNonlinear = \"false\"
 //     fileName = \"\" startLine = \"0\" startColumn = \"0\" endLine = \"0\" endColumn = \"0\" fileWritable = \"true\">
 //     <Dimension start=\"3\"/>

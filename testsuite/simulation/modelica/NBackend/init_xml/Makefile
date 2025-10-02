@@ -4,8 +4,8 @@ TESTFILES = \
   01_real_array_var.mos \
   02_int_param_array_var.mos \
   03_real_state_array_var.mos \
-  04_real_matrix_var \
-  05_int_multi_dim_array_var \
+  04_real_matrix_var.mos \
+  05_int_multi_dim_array_var.mos \
 
 # test that currently fail. Move up when fixed.
 # Run make failingtest

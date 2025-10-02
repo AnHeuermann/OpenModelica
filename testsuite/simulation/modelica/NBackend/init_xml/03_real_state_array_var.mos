@@ -25,8 +25,9 @@ initFileContent := readFile("StateArrayVariable_init.tmp.xml");
 // true
 // true
 // ""
-// {"ParameterArrayVariable", "StateArrayVariable_init.xml"}
-// ""
+// {"StateArrayVariable", "StateArrayVariable_init.xml"}
+// "Warning: NSimJacobian.SimJacobian.create could not generate sparsity pattern.
+// "
 // 0
 // "  <ArrayVariable
 //     name = \"x\"

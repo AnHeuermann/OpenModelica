@@ -28,15 +28,15 @@ initFileContent := readFile("ParameterArrayVariable_init.tmp.xml");
 // 0
 // "  <ArrayVariable
 //     name = \"intParamArray\"
-//     valueReference = \"1000\"
-//     variability = \"continuous\" isDiscrete = \"false\"
+//     valueReference = \"1001\"
+//     variability = \"parameter\" isDiscrete = \"true\"
 //     causality = \"local\" isValueChangeable = \"false\"
 //     alias = \"noAlias\"
-//     classIndex = \"0\" classType = \"rAlg\"
+//     classIndex = \"1\" classType = \"iPar\"
 //     isProtected = \"false\" hideResult = \"false\" isEncrypted = \"false\" initNonlinear = \"false\"
 //     fileName = \"\" startLine = \"0\" startColumn = \"0\" endLine = \"0\" endColumn = \"0\" fileWritable = \"true\">
 //     <Dimension start=\"5\"/>
-//     <Real fixed=\"false\" useNominal=\"false\" />
+//     <Integer start=\"1\" fixed=\"false\" />
 //   </ArrayVariable>
 // "
 // endResult
