@@ -1087,7 +1087,7 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   }
 
   /* allocate index map */
-  allocIndexMaps(data->modelData, data->simulationInfo, threadData);
+  allocateArrayIndexMaps(data->modelData, data->simulationInfo, threadData);
 
   /* compute index map */
   // TODO: Remove generated code from CodegenC

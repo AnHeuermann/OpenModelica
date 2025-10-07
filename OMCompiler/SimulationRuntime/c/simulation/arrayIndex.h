@@ -30,8 +30,10 @@
 
 #include "simulation_data.h"
 
-void allocateArrayIndexMaps(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData, threadData_t *threadData);
+void allocateArrayIndexMaps(MODEL_DATA *modelData, SIMULATION_INFO *simulationInfo, threadData_t *threadData);
+
 void freeArrayIndexMaps(SIMULATION_INFO *simulationInfo);
+
 size_t calculateLength(DIMENSION_INFO *dimensionInfo);
+
 size_t collectArrayVariableSizes(void *variableData, enum var_type type, size_t num_variables);
-void allocIndexMaps(MODEL_DATA *modelData, SIMULATION_INFO *simulationInfo, threadData_t *threadData);

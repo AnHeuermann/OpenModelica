@@ -35,30 +35,43 @@
  */
 
 #include "arrayIndex.h"
-#include "omc_error.h"
+#include "util/omc_error.h"
 
 /**
  * @brief Allocate memory for index maps.
+ *
+ * Free with `freeArrayIndexMaps`.
  *
  * @param simulationInfo
  * @param modelData
  * @param threadData
  */
-void allocateArrayIndexMaps(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData, threadData_t *threadData)
+void allocateArrayIndexMaps(MODEL_DATA *modelData, SIMULATION_INFO *simulationInfo, threadData_t *threadData)
 {
+  modelData->nVariablesRealArray = collectArrayVariableSizes(modelData->realVarsData, T_REAL, modelData->nVariablesReal);
   simulationInfo->realVarsIndex = (size_t *)calloc(modelData->nVariablesRealArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != simulationInfo->realVarsIndex, "Out of memory");
+  assertStreamPrint(threadData, simulationInfo->realVarsIndex != NULL, "Out of memory");
 
+  modelData->nVariablesIntegerArray = collectArrayVariableSizes(modelData->integerVarsData, T_INTEGER, modelData->nVariablesInteger);
   simulationInfo->integerVarsIndex = (size_t *)calloc(modelData->nVariablesIntegerArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != simulationInfo->integerVarsIndex, "Out of memory");
+  assertStreamPrint(threadData, simulationInfo->integerVarsIndex != NULL, "Out of memory");
 
+  modelData->nVariablesBooleanArray = collectArrayVariableSizes(modelData->booleanVarsData, T_BOOLEAN, modelData->nVariablesBoolean);
   simulationInfo->booleanVarsIndex = (size_t *)calloc(modelData->nVariablesBooleanArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != simulationInfo->booleanVarsIndex, "Out of memory");
+  assertStreamPrint(threadData, simulationInfo->booleanVarsIndex != NULL, "Out of memory");
 
+  modelData->nVariablesStringArray = collectArrayVariableSizes(modelData->stringVarsData, T_STRING, modelData->nVariablesString);
   simulationInfo->stringVarsIndex = (size_t *)calloc(modelData->nVariablesStringArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != simulationInfo->stringVarsIndex, "Out of memory");
+  assertStreamPrint(threadData, simulationInfo->stringVarsIndex != NULL, "Out of memory");
 }
 
+/**
+ * @brief Free memory of variable index maps.
+ *
+ * Free memory allocated by `allocateArrayIndexMaps`.
+ *
+ * @param simulationInfo
+ */
 void freeArrayIndexMaps(SIMULATION_INFO *simulationInfo)
 {
   free(simulationInfo->realVarsIndex);
@@ -137,7 +150,6 @@ size_t collectArrayVariableSizes(void *variableData, enum var_type type, size_t 
 
   for (i = 0; i < num_variables; i++)
   {
-
     switch (type)
     {
     case T_REAL:
@@ -165,34 +177,6 @@ size_t collectArrayVariableSizes(void *variableData, enum var_type type, size_t 
 
   return num_array_variables;
 }
-
-/**
- * @brief Iterate over model variables and count number of array variables and dimensions
- *
- */
-void allocIndexMaps(MODEL_DATA *modelData, SIMULATION_INFO *simulationInfo, threadData_t *threadData)
-{
-
-  size_t total_array_size;
-
-  modelData->nVariablesRealArray = collectArrayVariableSizes(modelData->realVarsData, T_REAL, modelData->nVariablesReal);
-  simulationInfo->realVarsIndex = (size_t *)calloc(modelData->nVariablesRealArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, simulationInfo->realVarsIndex != NULL, "Out of memory");
-
-  modelData->nVariablesIntegerArray = collectArrayVariableSizes(modelData->integerVarsData, T_INTEGER, modelData->nVariablesInteger);
-  simulationInfo->integerVarsIndex = (size_t *)calloc(modelData->nVariablesIntegerArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, simulationInfo->integerVarsIndex != NULL, "Out of memory");
-
-  modelData->nVariablesBooleanArray = collectArrayVariableSizes(modelData->booleanVarsData, T_BOOLEAN, modelData->nVariablesBoolean);
-  simulationInfo->booleanVarsIndex = (size_t *)calloc(modelData->nVariablesBooleanArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, simulationInfo->booleanVarsIndex != NULL, "Out of memory");
-
-  modelData->nVariablesStringArray = collectArrayVariableSizes(modelData->stringVarsData, T_STRING, modelData->nVariablesString);
-  simulationInfo->stringVarsIndex = (size_t *)calloc(modelData->nVariablesStringArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, simulationInfo->stringVarsIndex != NULL, "Out of memory");
-}
-
-// todo: Add freeIndexMaps function
 
 void computeVarIndices()
 {
