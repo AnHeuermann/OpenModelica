@@ -14,7 +14,7 @@ model RealArrayVariable
 equation
   for i in 1:p loop
     x[i] = i;
- end for;
+  end for;
 end RealArrayVariable;
 "); getErrorString();
 

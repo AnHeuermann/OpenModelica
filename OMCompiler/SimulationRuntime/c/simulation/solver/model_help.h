@@ -66,7 +66,7 @@ extern double homTauMin;
 extern double homTauStart;
 extern int homBacktraceStrategy;
 
-void allocModelDataVars (MODEL_DATA* modelData);
+void allocModelDataVars(MODEL_DATA* modelData);
 
 void initializeDataStruc(DATA *data, threadData_t *threadData);
 
