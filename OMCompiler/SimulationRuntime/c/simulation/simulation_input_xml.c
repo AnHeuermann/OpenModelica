@@ -883,22 +883,20 @@ void validate_model_description_sizes(omc_ModelDescription *md, MODEL_DATA* mode
  *
  * Fill if parameter is negated, its ID, and alias type (variable, parameter, time).
  *
- * TODO: Let this function alloc, fill and return DATA_ALIAS* alias.
- *
- * @param realAlias     Will be filled with values from hash map on return.
  * @param rAli          Real alias hash map.
  * @param nAliasReal    Number of alias variables in hash map.
  * @param mapAlias      Hash map for alias variables.
  * @param mapAliasParam Hash map for alias parameters.
+ * @return              Alias variable filled with values from hash map. Free with `omc_alloc_interface.free_uncollectable`
  */
-void read_alias_var(DATA_ALIAS* alias,
-                    omc_ModelVariables *aliasHashMap,
-                    unsigned long nAliasVariables,
-                    hash_string_long *mapAlias,
-                    hash_string_long *mapAliasParam)
+DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
+                           unsigned long nAliasVariables,
+                           hash_string_long *mapAlias,
+                           hash_string_long *mapAliasParam)
 {
   long *it, *itParam;
   const char *aliasTmp = NULL;
+  DATA_ALIAS* alias = (DATA_ALIAS*) omc_alloc_interface.malloc_uncollectable(nAliasVariables * sizeof(DATA_ALIAS));
 
   for(unsigned long i=0; i < nAliasVariables; i++)
   {
@@ -936,6 +934,8 @@ void read_alias_var(DATA_ALIAS* alias,
     free((char*)aliasTmp);
     aliasTmp = NULL;
   }
+
+  return alias;
 }
 
 /**
@@ -975,7 +975,6 @@ void read_input_xml(MODEL_DATA* modelData, SIMULATION_INFO* simulationInfo)
         filename,
         modelData->modelGUID);
   }
-}
 
   /* Update inital values from override flag */
   override = omc_flagValue[FLAG_OVERRIDE];
@@ -1010,13 +1009,13 @@ void read_input_xml(MODEL_DATA* modelData, SIMULATION_INFO* simulationInfo)
 
   /* Real all alias variables */
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for real alias vars");
-  read_alias_var(modelData->realAlias, mi->rAli, modelData->nAliasReal, mapAlias, mapAliasParam);
+  modelData->realAlias = read_alias_var(mi->rAli, modelData->nAliasReal, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for integer alias vars");
-  read_alias_var(modelData->integerAlias, mi->iAli, modelData->nAliasInteger, mapAlias, mapAliasParam);
+  modelData->integerAlias = read_alias_var(mi->iAli, modelData->nAliasInteger, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for boolean alias vars");
-  read_alias_var(modelData->booleanAlias, mi->bAli, modelData->nAliasBoolean, mapAlias, mapAliasParam);
+  modelData->booleanAlias = read_alias_var(mi->bAli, modelData->nAliasBoolean, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for string alias vars");
-  read_alias_var(modelData->stringAlias, mi->sAli, modelData->nAliasString, mapAlias, mapAliasParam);
+  modelData->stringAlias = read_alias_var(mi->sAli, modelData->nAliasString, mapAlias, mapAliasParam);
 
   free((char*)filename);
   free(mi);
