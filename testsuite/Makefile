@@ -63,6 +63,7 @@ simulationnewbackend-differentation.log \
 simulationnewbackend-event_handling.log \
 simulationnewbackend-functions.log \
 simulationnewbackend-index_reduction.log \
+simulationnewbackend-init_xml.log \
 simulationnewbackend-ModelicaTest.log \
 simulationnewbackend-msl.log \
 simulationnewbackend-records.log \

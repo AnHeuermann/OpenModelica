@@ -394,31 +394,40 @@ static void XMLCALL endElement(void *userData, const char *name)
   /* do nothing! */
 }
 
-static void read_var_info(omc_ModelVariable *v, VAR_INFO *info)
+/**
+ * @brief Fill variable info.
+ *
+ * Allocates memory for strings `name`, `comment`, `filename`.
+ * Needs to be freed with `freeVarInfo`.
+ *
+ * @param var   Model variable hash map containing variable info.
+ * @param info
+ */
+static void read_var_info(omc_ModelVariable *var, VAR_INFO *info)
 {
   modelica_integer inputIndex;
-  read_value_string(findHashStringString(v,"name"), &info->name);
+  read_value_string(findHashStringString(var,"name"), &info->name);
   debugStreamPrint(OMC_LOG_DEBUG, 1, "read var %s from setup file", info->name);
 
-  read_value_long(findHashStringStringNull(v,"inputIndex"), &inputIndex, -1);
+  read_value_long(findHashStringStringNull(var,"inputIndex"), &inputIndex, -1);
   info->inputIndex = inputIndex;
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read input index %d from setup file", info->inputIndex);
 
-  read_value_int(findHashStringString(v,"valueReference"), &info->id);
+  read_value_int(findHashStringString(var,"valueReference"), &info->id);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s id %d from setup file", info->name, info->id);
-  read_value_string(findHashStringStringEmpty(v,"description"), &info->comment);
+  read_value_string(findHashStringStringEmpty(var,"description"), &info->comment);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s description \"%s\" from setup file", info->name, info->comment);
-  read_value_string(findHashStringString(v,"fileName"), &info->info.filename);
+  read_value_string(findHashStringString(var,"fileName"), &info->info.filename);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s filename %s from setup file", info->name, info->info.filename);
-  read_value_long(findHashStringString(v,"startLine"), (modelica_integer*)&(info->info.lineStart), 0);
+  read_value_long(findHashStringString(var,"startLine"), (modelica_integer*)&(info->info.lineStart), 0);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s lineStart %d from setup file", info->name, info->info.lineStart);
-  read_value_long(findHashStringString(v,"startColumn"), (modelica_integer*)&(info->info.colStart), 0);
+  read_value_long(findHashStringString(var,"startColumn"), (modelica_integer*)&(info->info.colStart), 0);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s colStart %d from setup file", info->name, info->info.colStart);
-  read_value_long(findHashStringString(v,"endLine"), (modelica_integer*)&(info->info.lineEnd), 0);
+  read_value_long(findHashStringString(var,"endLine"), (modelica_integer*)&(info->info.lineEnd), 0);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s lineEnd %d from setup file", info->name, info->info.lineEnd);
-  read_value_long(findHashStringString(v,"endColumn"), (modelica_integer*)&(info->info.colEnd), 0);
+  read_value_long(findHashStringString(var,"endColumn"), (modelica_integer*)&(info->info.colEnd), 0);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s colEnd %d from setup file", info->name, info->info.colEnd);
-  read_value_long(findHashStringString(v,"fileWritable"), (modelica_integer*)&(info->info.readonly), 0);
+  read_value_long(findHashStringString(var,"fileWritable"), (modelica_integer*)&(info->info.readonly), 0);
   debugStreamPrint(OMC_LOG_DEBUG, 0, "read for %s readonly %d from setup file", info->name, info->info.readonly);
   if (OMC_DEBUG_STREAM(OMC_LOG_DEBUG)) messageClose(OMC_LOG_DEBUG);
 }
@@ -869,6 +878,7 @@ DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
   long *it, *itParam;
   const char *aliasTmp = NULL;
   DATA_ALIAS* alias = (DATA_ALIAS*) omc_alloc_interface.malloc_uncollectable(nAliasVariables * sizeof(DATA_ALIAS));
+  assertStreamPrint(NULL, nAliasVariables == 0 || alias != NULL, "Out of memory");
 
   for(unsigned long i=0; i < nAliasVariables; i++)
   {

@@ -943,26 +943,42 @@ int getNextSampleTimeFMU(DATA *data, double *nextSampleEvent)
 /**
  * @brief Allocates `modelData-><TYPE>VarsData` and `modelData-><TYPE>ParameterData`
  *
- * Free with `freeModelDataVars`
+ * Free with `freeModelDataVars`.
  *
  * @param modelData   Pointer to model data.
  */
-void allocModelDataVars (MODEL_DATA* modelData) {
+void allocModelDataVars (MODEL_DATA* modelData, threadData_t* threadData) {
   modelData->realVarsData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesReal * sizeof(STATIC_REAL_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesReal == 0 || modelData->realVarsData != NULL, "Out of memory");
+
   modelData->integerVarsData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesInteger * sizeof(STATIC_INTEGER_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesInteger == 0 || modelData->integerVarsData != NULL, "Out of memory");
+
   modelData->booleanVarsData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesBoolean * sizeof(STATIC_BOOLEAN_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesBoolean == 0 || modelData->booleanVarsData != NULL, "Out of memory");
+
 #if !defined(OMC_NVAR_STRING) || OMC_NVAR_STRING>0
   modelData->stringVarsData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesString * sizeof(STATIC_STRING_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesString == 0 || modelData->stringVarsData != NULL, "Out of memory");
 #endif
 
   modelData->realParameterData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersReal * sizeof(STATIC_REAL_DATA));
+  assertStreamPrint(threadData, modelData->nParametersReal == 0 || modelData->realParameterData != NULL, "Out of memory");
+
   modelData->integerParameterData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersInteger * sizeof(STATIC_INTEGER_DATA));
+  assertStreamPrint(threadData, modelData->nParametersInteger == 0 || modelData->integerParameterData != NULL, "Out of memory");
+
   modelData->booleanParameterData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersBoolean * sizeof(STATIC_BOOLEAN_DATA));
+  assertStreamPrint(threadData, modelData->nParametersBoolean == 0 || modelData->booleanParameterData != NULL, "Out of memory");
+
   modelData->stringParameterData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersString * sizeof(STATIC_STRING_DATA));
+  assertStreamPrint(threadData, modelData->nParametersString == 0 || modelData->stringParameterData != NULL, "Out of memory");
 }
 
 /**
  * @brief Free var info and var data.
+ *
+ * VAR_INFO strings get allocated in `read_var_info`.
  *
  * @param modelData   Pointer to model data.
  */
