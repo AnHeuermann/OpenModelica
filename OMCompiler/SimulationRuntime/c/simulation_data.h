@@ -631,7 +631,6 @@ typedef struct MODEL_DATA
 
   long nBaseClocks;                    /* total number of base-clocks*/
 
-  fortran_integer nStates;
 
   /* numbers of unscalarized variables (arrays counted as one variable, used for index map) */
   size_t nVariablesRealArray;
@@ -639,17 +638,18 @@ typedef struct MODEL_DATA
   size_t nVariablesBooleanArray;
   size_t nVariablesStringArray;
 
-  long nVariablesReal;                 /* all Real Variables of the model (states, statesderivatives, algebraics, real discretes) */
-  long nDiscreteReal;                  /* only all _discrete_ reals */
-  long nVariablesInteger;
-  long nVariablesBoolean;
-  long nVariablesString;
-  long nParametersReal;
-  long nParametersInteger;
-  long nParametersBoolean;
-  long nParametersString;
-  long nInputVars;
-  long nOutputVars;
+  long nStates;               /* Number of state variables*/
+  long nVariablesReal;        /* Number of real variables: states + state derivatives + real algebraic variables + real discrete variables */
+  long nDiscreteReal;         /* Number of all discrete real variables */
+  long nVariablesInteger;     /* Number of integer variables */
+  long nVariablesBoolean;     /* Number of boolean variables */
+  long nVariablesString;      /* Number of string variables */
+  long nParametersReal;       /* Number of real parameters */
+  long nParametersInteger;    /* Number of integer parameters */
+  long nParametersBoolean;    /* Number of boolean parameters */
+  long nParametersString;     /* Number of string parameters */
+  long nInputVars;            /* Number of input variables */
+  long nOutputVars;           /* Number of output variables */
 
   long nZeroCrossings;
   long nRelations;

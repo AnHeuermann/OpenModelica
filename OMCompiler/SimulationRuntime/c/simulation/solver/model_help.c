@@ -940,6 +940,98 @@ int getNextSampleTimeFMU(DATA *data, double *nextSampleEvent)
   return 0 /* FALSE */;
 }
 
+/**
+ * @brief Allocates `modelData-><TYPE>VarsData` and `modelData-><TYPE>ParameterData`
+ *
+ * Free with `freeModelDataVars`
+ *
+ * @param modelData   Pointer to model data.
+ */
+void allocModelDataVars (MODEL_DATA* modelData) {
+  modelData->realVarsData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesReal * sizeof(STATIC_REAL_DATA));
+  modelData->integerVarsData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesInteger * sizeof(STATIC_INTEGER_DATA));
+  modelData->booleanVarsData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesBoolean * sizeof(STATIC_BOOLEAN_DATA));
+#if !defined(OMC_NVAR_STRING) || OMC_NVAR_STRING>0
+  modelData->stringVarsData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesString * sizeof(STATIC_STRING_DATA));
+#endif
+
+  modelData->realParameterData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersReal * sizeof(STATIC_REAL_DATA));
+  modelData->integerParameterData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersInteger * sizeof(STATIC_INTEGER_DATA));
+  modelData->booleanParameterData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersBoolean * sizeof(STATIC_BOOLEAN_DATA));
+  modelData->stringParameterData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersString * sizeof(STATIC_STRING_DATA));
+}
+
+/**
+ * @brief Free var info and var data.
+ *
+ * @param modelData   Pointer to model data.
+ */
+void freeModelDataVars (MODEL_DATA* modelData) {
+  unsigned int i;
+
+  for(i=0; i < modelData->nVariablesReal; i++) {
+    freeVarInfo(&modelData->realVarsData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->realVarsData);
+
+  for(i=0; i < modelData->nVariablesInteger; i++) {
+    freeVarInfo(&modelData->integerVarsData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->integerVarsData);
+
+  for(i=0; i < modelData->nVariablesBoolean; i++) {
+    freeVarInfo(&modelData->booleanVarsData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->booleanVarsData);
+
+#if !defined(OMC_NVAR_STRING) || OMC_NVAR_STRING>0
+  for(i=0; i < modelData->nVariablesString; i++) {
+    freeVarInfo(&modelData->stringVarsData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->stringVarsData);
+#endif
+
+  for(i=0; i < modelData->nParametersReal; i++) {
+    freeVarInfo(&modelData->realParameterData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->realParameterData);
+
+  for(i=0; i < modelData->nParametersInteger; i++) {
+    freeVarInfo(&modelData->integerParameterData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->integerParameterData);
+
+  for(i=0; i < modelData->nParametersBoolean; i++) {
+    freeVarInfo(&modelData->booleanParameterData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->booleanParameterData);
+
+  for(i=0; i < modelData->nParametersString; i++) {
+    freeVarInfo(&modelData->stringParameterData[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->stringParameterData);
+
+  for(i=0; i < modelData->nAliasReal; i++) {
+    freeVarInfo(&modelData->realAlias[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->realAlias);
+
+  for(i=0; i < modelData->nAliasInteger; i++) {
+    freeVarInfo(&modelData->integerAlias[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->integerAlias);
+
+  for(i=0; i < modelData->nAliasBoolean; i++) {
+    freeVarInfo(&modelData->booleanAlias[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->booleanAlias);
+
+  for(i=0; i < modelData->nAliasString; i++) {
+    freeVarInfo(&modelData->stringAlias[i].info);
+  }
+  omc_alloc_interface.free_uncollectable(modelData->stringAlias);
+}
+
  /*!
   * @brief Initialize `data` struct.
   *
@@ -1019,17 +1111,17 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   memset(data->localData, 0, SIZERINGBUFFER * sizeof(SIMULATION_DATA));
   lookupRingBuffer(data->simulationData, (void**) data->localData);
 
-  /* create modelData var arrays */
-  data->modelData->realVarsData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nVariablesReal * sizeof(STATIC_REAL_DATA));
-  data->modelData->integerVarsData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nVariablesInteger * sizeof(STATIC_INTEGER_DATA));
-  data->modelData->booleanVarsData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nVariablesBoolean * sizeof(STATIC_BOOLEAN_DATA));
+  // modelData vars, parameter and alias arrays are allocated in read_input_xml
+  data->modelData->realVarsData = NULL;
+  data->modelData->integerVarsData = NULL;
+  data->modelData->booleanVarsData = NULL;
 #if !defined(OMC_NVAR_STRING) || OMC_NVAR_STRING>0
-  data->modelData->stringVarsData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nVariablesString * sizeof(STATIC_STRING_DATA));
+  data->modelData->stringVarsData = NULL;
 #endif
-  data->modelData->realParameterData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nParametersReal * sizeof(STATIC_REAL_DATA));
-  data->modelData->integerParameterData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nParametersInteger * sizeof(STATIC_INTEGER_DATA));
-  data->modelData->booleanParameterData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nParametersBoolean * sizeof(STATIC_BOOLEAN_DATA));
-  data->modelData->stringParameterData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(data->modelData->nParametersString * sizeof(STATIC_STRING_DATA));
+  data->modelData->realParameterData = NULL;
+  data->modelData->integerParameterData = NULL;
+  data->modelData->booleanParameterData = NULL;
+  data->modelData->stringParameterData = NULL;
 
   // Allocated in read_input_xml
   data->modelData->realAlias = NULL;
@@ -1260,28 +1352,9 @@ void deInitializeDataStruc(DATA *data)
   omc_alloc_interface.free_uncollectable(data->localData);
   freeRingBuffer(data->simulationData);
 
-  /* free modelData var arrays */
-  #define FREE_VARS(n,vars) { if (needToFree) { \
-    for(i=0; i < data->modelData->n; i++) { \
-      freeVarInfo(&((data->modelData->vars[i]).info)); \
-    } \
-  } \
-  omc_alloc_interface.free_uncollectable(data->modelData->vars); }
-
-  FREE_VARS(nVariablesReal,realVarsData)
-  FREE_VARS(nVariablesInteger,integerVarsData)
-  FREE_VARS(nVariablesBoolean,booleanVarsData)
-#if !defined(OMC_NVAR_STRING) || OMC_NVAR_STRING>0
-  FREE_VARS(nVariablesString,stringVarsData)
-#endif
-  FREE_VARS(nParametersReal,realParameterData)
-  FREE_VARS(nParametersInteger,integerParameterData)
-  FREE_VARS(nParametersBoolean,booleanParameterData)
-  FREE_VARS(nParametersString,stringParameterData)
-  FREE_VARS(nAliasReal,realAlias)
-  FREE_VARS(nAliasInteger,integerAlias)
-  FREE_VARS(nAliasBoolean,booleanAlias)
-  FREE_VARS(nAliasString,stringAlias)
+  if (needToFree) {
+    freeModelDataVars(data->modelData);
+  }
 
   omc_alloc_interface.free_uncollectable(data->modelData->samplesInfo);
   free(data->simulationInfo->nextSampleTimes);
@@ -1391,7 +1464,10 @@ void deInitializeDataStruc(DATA *data)
   {
     free(data->simulationInfo->sensitivityParList);
     free(data->simulationInfo->sensitivityMatrix);
-    FREE_VARS(nSensitivityVars, realSensitivityData)
+    for(i=0; i < data->modelData->nSensitivityVars; i++) {
+      freeVarInfo(&data->modelData->realSensitivityData[i].info);
+    }
+    omc_alloc_interface.free_uncollectable(data->modelData->realSensitivityData);
   }
 
   /* Free model info xml data */

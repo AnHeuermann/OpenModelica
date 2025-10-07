@@ -45,6 +45,7 @@
 #include "../util/omc_file.h"
 #include "../meta/meta_modelica.h"
 #include "../util/modelica_string.h"
+#include "solver/model_help.h"
 
 #include <limits.h>
 #include "../util/uthash.h"
@@ -825,57 +826,28 @@ void read_default_experiment(SIMULATION_INFO* simulationInfo, omc_DefaultExperim
 }
 
 /**
- * @brief Validate if number of variables / parameters from model description matches values from `modelData`.
- *
- * Throws if numbers are different.
+ * @brief Read number of variables / parameters from model description into `modelData`.
  *
  * @param md          Model description hash map.
- * @param modelData   Model data containing number of variables / parameters.
- * @param threadData  For error handling, can be NULL.
+ * @param modelData   Model data to contain number of variables / parameters on return.
  */
-void validate_model_description_sizes(omc_ModelDescription *md, MODEL_DATA* modelData, threadData_t* threadData) {
-  modelica_integer nxchk, nychk, npchk;
-  modelica_integer npintchk, nyintchk;
-  modelica_integer npboolchk, nyboolchk;
-  modelica_integer npstrchk, nystrchk;
+void read_model_description_sizes(omc_ModelDescription *md, MODEL_DATA* modelData) {
+  modelica_integer numRealAlgVars;
 
-  read_value_long(findHashStringString(md,"numberOfContinuousStates"),          &nxchk, 0);
-  read_value_long(findHashStringString(md,"numberOfRealAlgebraicVariables"),    &nychk, 0);
-  read_value_long(findHashStringString(md,"numberOfRealParameters"),            &npchk, 0);
+  read_value_long(findHashStringString(md, "numberOfContinuousStates"), &modelData->nStates, 0);
+  read_value_long(findHashStringString(md, "numberOfRealAlgebraicVariables"), &numRealAlgVars, 0);
+  modelData->nVariablesReal = 2*modelData->nStates + numRealAlgVars;
+  // TODO: How to get data->modelData->nDiscreteReal?
+  read_value_long(findHashStringString(md, "numberOfRealParameters"), &modelData->nParametersReal, 0);
 
-  read_value_long(findHashStringString(md,"numberOfIntegerParameters"),         &npintchk, 0);
-  read_value_long(findHashStringString(md,"numberOfIntegerAlgebraicVariables"), &nyintchk, 0);
+  read_value_long(findHashStringString(md, "numberOfIntegerParameters"), &modelData->nParametersInteger, 0);
+  read_value_long(findHashStringString(md, "numberOfIntegerAlgebraicVariables"), &modelData->nVariablesInteger, 0);
 
-  read_value_long(findHashStringString(md,"numberOfBooleanParameters"),         &npboolchk, 0);
-  read_value_long(findHashStringString(md,"numberOfBooleanAlgebraicVariables"), &nyboolchk, 0);
+  read_value_long(findHashStringString(md, "numberOfBooleanParameters"), &modelData->nParametersBoolean, 0);
+  read_value_long(findHashStringString(md, "numberOfBooleanAlgebraicVariables"), &modelData->nVariablesBoolean, 0);
 
-  read_value_long(findHashStringString(md,"numberOfStringParameters"),          &npstrchk, 0);
-  read_value_long(findHashStringString(md,"numberOfStringAlgebraicVariables"),  &nystrchk, 0);
-
-  if(nxchk != modelData->nStates
-    || nychk != modelData->nVariablesReal - 2*modelData->nStates
-    || npchk != modelData->nParametersReal
-    || npintchk != modelData->nParametersInteger
-    || nyintchk != modelData->nVariablesInteger
-    || npboolchk != modelData->nParametersBoolean
-    || nyboolchk != modelData->nVariablesBoolean
-    || npstrchk != modelData->nParametersString
-    || nystrchk != modelData->nVariablesString)
-  {
-    errorStreamPrint(OMC_LOG_SIMULATION, 1, "Error, input data file does not match model.");
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "nx in setup file: %ld from model code: %d", nxchk, (int)modelData->nStates);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "ny in setup file: %ld from model code: %ld", nychk, modelData->nVariablesReal - 2*modelData->nStates);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "np in setup file: %ld from model code: %ld", npchk, modelData->nParametersReal);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "npint in setup file: %ld from model code: %ld", npintchk, modelData->nParametersInteger);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "nyint in setup file: %ld from model code: %ld", nyintchk, modelData->nVariablesInteger);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "npbool in setup file: %ld from model code: %ld", npboolchk, modelData->nParametersBoolean);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "nybool in setup file: %ld from model code: %ld", nyboolchk, modelData->nVariablesBoolean);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "npstr in setup file: %ld from model code: %ld", npstrchk, modelData->nParametersString);
-    warningStreamPrint(OMC_LOG_SIMULATION, 0, "nystr in setup file: %ld from model code: %ld", nystrchk, modelData->nVariablesString);
-    messageClose(OMC_LOG_SIMULATION);
-
-    omc_throw_function(threadData);
-  }
+  read_value_long(findHashStringString(md, "numberOfStringParameters"), &modelData->nParametersString, 0);
+  read_value_long(findHashStringString(md, "numberOfStringAlgebraicVariables"),  &modelData->nVariablesString, 0);
 }
 
 /**
@@ -987,7 +959,10 @@ void read_input_xml(MODEL_DATA* modelData, SIMULATION_INFO* simulationInfo)
   read_value_string(findHashStringString(mi->md,"OPENMODELICAHOME"), &simulationInfo->OPENMODELICAHOME);
   infoStreamPrint(OMC_LOG_SIMULATION, 0, "OPENMODELICAHOME: %s", simulationInfo->OPENMODELICAHOME);
 
-  validate_model_description_sizes(mi->md, modelData, NULL);
+  read_model_description_sizes(mi->md, modelData);
+  // TODO: set data->modelData->nVariablesRealArray?
+
+  allocModelDataVars(modelData);
 
   read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rSta, "real states",            0,                    modelData->nStates,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);
   read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rDer, "real state derivatives", modelData->nStates,   modelData->nStates,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);

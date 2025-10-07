@@ -1548,22 +1548,13 @@ template populateModelInfo(ModelInfo modelInfo, String fileNamePrefix, String gu
       >>
     %>
     data->modelData->runTestsuite = <%if Testsuite.isRunning() then "1" else "0"%>;
-    data->modelData->nStates = <%varInfo.numStateVars%>;
-    data->modelData->nVariablesRealArray = <%nVariablesReal(varInfo)%>;
     data->modelData->nDiscreteReal = <%varInfo.numDiscreteReal%>;
+    data->modelData->nVariablesRealArray = <%nVariablesReal(varInfo)%>;
     data->modelData->nVariablesIntegerArray = <%varInfo.numIntAlgVars%>;
     data->modelData->nVariablesBooleanArray = <%varInfo.numBoolAlgVars%>;
     data->modelData->nVariablesStringArray = <%varInfo.numStringAlgVars%>;
-    data->modelData->nParametersReal = <%varInfo.numParams%>;
-    data->modelData->nParametersInteger = <%varInfo.numIntParams%>;
-    data->modelData->nParametersBoolean = <%varInfo.numBoolParams%>;
-    data->modelData->nParametersString = <%varInfo.numStringParamVars%>;
     data->modelData->nInputVars = <%varInfo.numInVars%>;
     data->modelData->nOutputVars = <%varInfo.numOutVars%>;
-    data->modelData->nAliasReal = <%varInfo.numAlgAliasVars%>;
-    data->modelData->nAliasInteger = <%varInfo.numIntAliasVars%>;
-    data->modelData->nAliasBoolean = <%varInfo.numBoolAliasVars%>;
-    data->modelData->nAliasString = <%varInfo.numStringAliasVars%>;
     data->modelData->nZeroCrossings = <%varInfo.numZeroCrossings%>;
     data->modelData->nSamples = <%varInfo.numTimeEvents%>;
     data->modelData->nRelations = <%varInfo.numRelations%>;
