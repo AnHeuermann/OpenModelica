@@ -28,30 +28,10 @@
  *
  */
 
-/*
- * File: simulation_input.h
- *
- *
- *
- */
+#include "simulation_data.h"
 
-#ifndef _SIMULATION_INPUT_H
-#define _SIMULATION_INPUT_H
-
-#include "simulation_runtime.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void read_input_xml(MODEL_DATA* modelData,
-                    SIMULATION_INFO* simulationData,
-                    threadData_t* threadData);
-void parseVariableStr(char* variableStr);
-
-#ifdef __cplusplus
-}
-#endif
-
-
-#endif
+void allocateArrayIndexMaps(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData, threadData_t *threadData);
+void freeArrayIndexMaps(SIMULATION_INFO *simulationInfo);
+size_t calculateLength(DIMENSION_INFO *dimensionInfo);
+size_t collectArrayVariableSizes(void *variableData, enum var_type type, size_t num_variables);
+void allocIndexMaps(MODEL_DATA *modelData, SIMULATION_INFO *simulationInfo, threadData_t *threadData);

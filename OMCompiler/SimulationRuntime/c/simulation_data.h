@@ -253,6 +253,13 @@ typedef DATA_ALIAS DATA_INTEGER_ALIAS;
 typedef DATA_ALIAS DATA_BOOLEAN_ALIAS;
 typedef DATA_ALIAS DATA_STRING_ALIAS;
 
+enum var_type {
+  T_REAL,     /* Variable is of real type */
+  T_INTEGER,  /* Variable is of integer type */
+  T_BOOLEAN,  /* Variable is of boolean type */
+  T_STRING    /* Variable is of string type */
+};
+
 /* collect all attributes from one variable in one struct */
 typedef struct REAL_ATTRIBUTE
 {
@@ -293,9 +300,9 @@ enum DIMENSION_ATTRIBUTE_TYPE{
 
 typedef struct DIMENSION_ATTRIBUTE
 {
-  enum DIMENSION_ATTRIBUTE_TYPE type;      /* How the dimension is defined */
-  modelica_integer start;             /* If type=DIMENSION_BY_START: Dimension */
-  modelica_integer valueReference;    /* If type=DIMENSION_BY_VALUE_REFERENCE: Value reference of structural parameter specifying dimension */
+  enum DIMENSION_ATTRIBUTE_TYPE type;   /* How the dimension is defined */
+  modelica_integer start;               /* If type=DIMENSION_BY_START: Dimension */
+  modelica_integer valueReference;      /* If type=DIMENSION_BY_VALUE_REFERENCE: Value reference of structural parameter specifying dimension */
 } DIMENSION_ATTRIBUTE;
 
 typedef struct DIMENSION_INFO

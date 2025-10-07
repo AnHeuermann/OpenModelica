@@ -80,13 +80,6 @@ typedef struct hash_string_long
   UT_hash_handle hh;
 } hash_string_long;
 
-enum var_type {
-  T_REAL,
-  T_INTEGER,
-  T_BOOLEAN,
-  T_STRING
-};
-
 static inline const char* findHashStringStringNull(hash_string_string *ht, const char *key)
 {
   hash_string_string *res;
@@ -925,16 +918,21 @@ DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
  *
  * Can be FMI 1.0 modelDescription.xml or in a similar style.
  *
- *   * Parse init XML file or content written in C with Expat.
- *   * Perform some checks on GUID, number of variables / parameters.
- *   * Update initial values with overrides.
- *   * Read default experiment
- *   * Read all initial values into `modelData`.
+ *   - Parse init XML file or content written in C with Expat.
+ *   - Checks GUID.
+ *   - Read number of variables / parameters from XML.
+ *   - Update initial values with overrides.
+ *   - Read default experiment.
+ *   - Allocates model data variables --> free with `freeModelDataVars`.
+ *   - Read all initial values into `modelData`.
  *
- * @param modelData
- * @param simulationInfo
+ * @param modelData       Model data to update.
+ * @param simulationInfo  Simulation info to update.
+ * @param threadData      Thread data for error handling.
  */
-void read_input_xml(MODEL_DATA* modelData, SIMULATION_INFO* simulationInfo)
+void read_input_xml(MODEL_DATA* modelData,
+                    SIMULATION_INFO* simulationInfo,
+                    threadData_t* threadData)
 {
   omc_ModelInput* mi;
 
@@ -942,17 +940,17 @@ void read_input_xml(MODEL_DATA* modelData, SIMULATION_INFO* simulationInfo)
   hash_string_long *mapAlias = NULL, *mapAliasParam = NULL, *mapAliasSen = NULL;
   int sensitivityParIndex = 0;
 
-  filename = getXMLfileName(modelData->modelFilePrefix, NULL);
-  mi = parse_input_xml(filename, modelData->initXMLData, NULL);
+  filename = getXMLfileName(modelData->modelFilePrefix, threadData);
+  mi = parse_input_xml(filename, modelData->initXMLData, threadData);
 
   /* Check modelGUID */
-  guid = findHashStringStringNull(mi->md,"guid");
-  if (NULL==guid) {
+  guid = findHashStringStringNull(mi->md, "guid");
+  if (NULL == guid) {
     warningStreamPrint(OMC_LOG_STDOUT, 0, "The Model GUID: %s is not set in file: %s",
         modelData->modelGUID,
         filename);
   } else if (strcmp(modelData->modelGUID, guid)) {
-    throwStreamPrint(NULL, "GUID: %s from input data file: %s does not match the GUID compiled in the model: %s",
+    throwStreamPrint(threadData, "GUID: %s from input data file: %s does not match the GUID compiled in the model: %s",
         guid,
         filename,
         modelData->modelGUID);
@@ -972,7 +970,7 @@ void read_input_xml(MODEL_DATA* modelData, SIMULATION_INFO* simulationInfo)
   read_model_description_sizes(mi->md, modelData);
   // TODO: set data->modelData->nVariablesRealArray?
 
-  allocModelDataVars(modelData);
+  allocModelDataVars(modelData, threadData);
 
   read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rSta, "real states",            0,                    modelData->nStates,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);
   read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rDer, "real state derivatives", modelData->nStates,   modelData->nStates,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);
@@ -987,8 +985,7 @@ void read_input_xml(MODEL_DATA* modelData, SIMULATION_INFO* simulationInfo)
   read_variables(simulationInfo, T_BOOLEAN, modelData->booleanParameterData, mi->bPar, "boolean parameters",     0,                    modelData->nParametersBoolean,                    &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
   read_variables(simulationInfo, T_STRING,  modelData->stringParameterData,  mi->sPar, "string parameters",      0,                    modelData->nParametersString,                     &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
 
-  if (omc_flag[FLAG_IDAS])
-  {
+  if (omc_flag[FLAG_IDAS]) {
     read_variables(simulationInfo, T_REAL, modelData->realSensitivityData, mi->rSen, "real sensitivities", 0, modelData->nSensitivityVars, &mapAliasSen, &mapAliasParam, &sensitivityParIndex);
   }
 

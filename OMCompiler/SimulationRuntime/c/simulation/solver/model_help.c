@@ -40,6 +40,7 @@
 #include "../../util/omc_error.h"
 #include "../../util/varinfo.h"
 #include "model_help.h"
+#include "../arrayIndex.h"
 #include "../options.h"
 #include "../simulation_info_json.h"
 #include "../../util/omc_msvc.h" /* for freaking round! */
@@ -947,7 +948,8 @@ int getNextSampleTimeFMU(DATA *data, double *nextSampleEvent)
  *
  * @param modelData   Pointer to model data.
  */
-void allocModelDataVars (MODEL_DATA* modelData, threadData_t* threadData) {
+void allocModelDataVars(MODEL_DATA* modelData, threadData_t* threadData)
+{
   modelData->realVarsData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesReal * sizeof(STATIC_REAL_DATA));
   assertStreamPrint(threadData, modelData->nVariablesReal == 0 || modelData->realVarsData != NULL, "Out of memory");
 
@@ -982,7 +984,8 @@ void allocModelDataVars (MODEL_DATA* modelData, threadData_t* threadData) {
  *
  * @param modelData   Pointer to model data.
  */
-void freeModelDataVars (MODEL_DATA* modelData) {
+void freeModelDataVars(MODEL_DATA* modelData)
+{
   unsigned int i;
 
   for(i=0; i < modelData->nVariablesReal; i++) {
@@ -1084,16 +1087,11 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   }
 
   /* allocate index map */
-  data->simulationInfo->realVarsIndex     = (size_t*) calloc(data->modelData->nVariablesRealArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != data->simulationInfo->realVarsIndex, "out of memory");
-  data->simulationInfo->integerVarsIndex  = (size_t*) calloc(data->modelData->nVariablesIntegerArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != data->simulationInfo->integerVarsIndex, "out of memory");
-  data->simulationInfo->booleanVarsIndex  = (size_t*) calloc(data->modelData->nVariablesBooleanArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != data->simulationInfo->booleanVarsIndex, "out of memory");
-  data->simulationInfo->stringVarsIndex   = (size_t*) calloc(data->modelData->nVariablesStringArray + 1, sizeof(size_t));
-  assertStreamPrint(threadData, NULL != data->simulationInfo->stringVarsIndex, "out of memory");
+  allocIndexMaps(data->modelData, data->simulationInfo, threadData);
 
   /* compute index map */
+  // TODO: Remove generated code from CodegenC
+  // Add C function to compute var indices
   data->callback->computeVarIndices(data, data->simulationInfo->realVarsIndex, data->simulationInfo->integerVarsIndex, data->simulationInfo->booleanVarsIndex, data->simulationInfo->stringVarsIndex);
 
   /* compute scalar number of variables */
@@ -1127,7 +1125,7 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   memset(data->localData, 0, SIZERINGBUFFER * sizeof(SIMULATION_DATA));
   lookupRingBuffer(data->simulationData, (void**) data->localData);
 
-  // modelData vars, parameter and alias arrays are allocated in read_input_xml
+  /* modelData vars, parameter and alias arrays are allocated in read_input_xml */
   data->modelData->realVarsData = NULL;
   data->modelData->integerVarsData = NULL;
   data->modelData->booleanVarsData = NULL;
@@ -1395,11 +1393,7 @@ void deInitializeDataStruc(DATA *data)
   free(data->simulationInfo->states_left);
   free(data->simulationInfo->states_right);
 
-  /* free buffer for index map */
-  free(data->simulationInfo->realVarsIndex);
-  free(data->simulationInfo->integerVarsIndex);
-  free(data->simulationInfo->booleanVarsIndex);
-  free(data->simulationInfo->stringVarsIndex);
+  freeArrayIndexMaps(data->simulationInfo);
 
   /* free buffer for old state variables */
   free(data->simulationInfo->realVarsOld);
