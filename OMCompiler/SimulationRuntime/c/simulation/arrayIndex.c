@@ -146,7 +146,6 @@ size_t collectArrayVariableSizes(void *variableData, enum var_type type, size_t 
   modelica_integer numberOfDimensions;
 
   size_t num_array_variables = 0;
-  size_t total_array_size = 0;
 
   for (i = 0; i < num_variables; i++)
   {
@@ -171,13 +170,79 @@ size_t collectArrayVariableSizes(void *variableData, enum var_type type, size_t 
     if (dimensionInfo->numberOfDimensions > 0)
     {
       num_array_variables++;
-      total_array_size += calculateLength(dimensionInfo);
     }
   }
 
   return num_array_variables;
 }
 
-void computeVarIndices()
+/**
+ * @brief Compute variable index of one type.
+ *
+ * Compute where in `SIMULATION_DATA-><TYPE>Vars` a variable starts.
+ *
+ * Assumes order of array `variableData` is identical to order in `varsIndex`
+ * and SIMULATION_DATA arrays.
+ *
+ * #### Example
+ *
+ * We have variables `x[3]`, `y`, `z[2]` where `x` is an array of length 3, `y`
+ * a scalar and `z` an array of length 3. Then: `varsIndex = [0, 3, 4, 6]`.
+ *
+ * @param variableData    Model variable data. Is of type `STATIC_REAL_DATA*`,
+ *                        `STATIC_INTEGER_DATA*`, `STATIC_BOOLEAN_DATA*` or
+ *                        `STATIC_STRING_DATA*`.
+ * @param type            Specifies type of model variable `variableData`.
+ * @param num_variables   Number of variables in array `variableData`.
+ * @param varsIndex       Variable index to compute. Will be set on return.
+ */
+void computeVarsIndex(void *variableData, enum var_type type, size_t num_variables, size_t *varsIndex)
 {
+  size_t i;
+  int id;
+  int previous_id = -1;
+  DIMENSION_INFO *dimensionInfo;
+
+  varsIndex[0] = 0;
+  for (i = 0; i < num_variables; i++)
+  {
+    switch (type)
+    {
+    case T_REAL:
+      dimensionInfo = &((STATIC_REAL_DATA *)variableData)[i].dimension;
+      id = ((STATIC_REAL_DATA *)variableData)[i].info.id;
+      break;
+    case T_INTEGER:
+      dimensionInfo = &((STATIC_INTEGER_DATA *)variableData)[i].dimension;
+      id = ((STATIC_INTEGER_DATA *)variableData)[i].info.id;
+      break;
+    case T_BOOLEAN:
+      dimensionInfo = &((STATIC_BOOLEAN_DATA *)variableData)[i].dimension;
+      id = ((STATIC_BOOLEAN_DATA *)variableData)[i].info.id;
+      break;
+    case T_STRING:
+      dimensionInfo = &((STATIC_STRING_DATA *)variableData)[i].dimension;
+      id = ((STATIC_STRING_DATA *)variableData)[i].info.id;
+      break;
+    default:
+      throwStreamPrint(NULL, "collectArrayVariableSizes: Illegal variable type case.");
+    }
+
+    assertStreamPrint(NULL, id > previous_id, "Value reference not increasing. `realVarsData` isn't sorted correctly!")
+        previous_id = id;
+
+    varsIndex[i + 1] = varsIndex[i] + calculateLength(dimensionInfo);
+  }
+}
+
+void computeVarIndices(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData)
+{
+  computeVarsIndex(modelData->realVarsData, T_REAL, modelData->nVariablesRealArray, simulationInfo->realVarsIndex);
+  // TODO: Are states, state derivatives, algebraic variables and discrete algebraic variables handled with this?
+  computeVarsIndex(modelData->integerVarsData, T_INTEGER, modelData->nVariablesIntegerArray, simulationInfo->integerVarsIndex);
+  computeVarsIndex(modelData->booleanVarsData, T_BOOLEAN, modelData->nVariablesBooleanArray, simulationInfo->booleanVarsIndex);
+  computeVarsIndex(modelData->stringVarsData, T_STRING, modelData->nVariablesStringArray, simulationInfo->stringVarsIndex);
+
+  // TODO: What to do with parameters?
+  // TODO: What to do with sensitivity?
 }

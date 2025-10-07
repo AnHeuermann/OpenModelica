@@ -638,12 +638,15 @@ typedef struct MODEL_DATA
 
   long nBaseClocks;                    /* total number of base-clocks*/
 
+  size_t nVariablesRealArray;     /* Number of unscalarized variables (arrays counted as one variable, used for index map)
+                                   * TODO: Are these states + derivatives + algebraics + discrete?
+                                   * TODO: What's with realOptimizeConstraintsVars and realOptimizeFinalConstraintsVars?
+                                   */
 
-  /* numbers of unscalarized variables (arrays counted as one variable, used for index map) */
-  size_t nVariablesRealArray;
   size_t nVariablesIntegerArray;
   size_t nVariablesBooleanArray;
   size_t nVariablesStringArray;
+  // TODO: We also need this for parameters
 
   long nStates;               /* Number of state variables*/
   long nVariablesReal;        /* Number of real variables: states + state derivatives + real algebraic variables + real discrete variables */

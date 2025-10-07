@@ -1086,15 +1086,10 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
     throwStreamPrint(threadData, "Your memory is not strong enough for our ringbuffer!");
   }
 
-  /* allocate index map */
+  /* Index map for array variables */
   allocateArrayIndexMaps(data->modelData, data->simulationInfo, threadData);
+  computeVarIndices(data->simulationInfo, data->modelData);
 
-  /* compute index map */
-  // TODO: Remove generated code from CodegenC
-  // Add C function to compute var indices
-  data->callback->computeVarIndices(data, data->simulationInfo->realVarsIndex, data->simulationInfo->integerVarsIndex, data->simulationInfo->booleanVarsIndex, data->simulationInfo->stringVarsIndex);
-
-  /* compute scalar number of variables */
   data->modelData->nVariablesReal     = data->simulationInfo->realVarsIndex[data->modelData->nVariablesRealArray];
   data->modelData->nVariablesInteger  = data->simulationInfo->integerVarsIndex[data->modelData->nVariablesIntegerArray];
   data->modelData->nVariablesBoolean  = data->simulationInfo->booleanVarsIndex[data->modelData->nVariablesBooleanArray];
