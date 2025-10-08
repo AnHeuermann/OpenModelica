@@ -1090,20 +1090,21 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   allocateArrayIndexMaps(data->modelData, data->simulationInfo, threadData);
   computeVarIndices(data->simulationInfo, data->modelData);
 
+  data->modelData->nStates = data->simulationInfo->realVarsIndex[data->modelData->nStatesArray];
   data->modelData->nVariablesReal    = data->simulationInfo->realVarsIndex[data->modelData->nVariablesRealArray];
   data->modelData->nVariablesInteger = data->simulationInfo->integerVarsIndex[data->modelData->nVariablesIntegerArray];
   data->modelData->nVariablesBoolean = data->simulationInfo->booleanVarsIndex[data->modelData->nVariablesBooleanArray];
   data->modelData->nVariablesString  = data->simulationInfo->stringVarsIndex[data->modelData->nVariablesStringArray];
 
-  data->modelData->nParametersReal  = data->simulationInfo->realParamsIndex[data->modelData->nParametersRealArray];
-  data->modelData->nParametersInteger  = data->simulationInfo->integerParamsIndex[data->modelData->nParametersIntegerArray];
-  data->modelData->nParametersBoolean  = data->simulationInfo->booleanParamsIndex[data->modelData->nParametersBooleanArray];
+  data->modelData->nParametersReal    = data->simulationInfo->realParamsIndex[data->modelData->nParametersRealArray];
+  data->modelData->nParametersInteger = data->simulationInfo->integerParamsIndex[data->modelData->nParametersIntegerArray];
+  data->modelData->nParametersBoolean = data->simulationInfo->booleanParamsIndex[data->modelData->nParametersBooleanArray];
   data->modelData->nParametersString  = data->simulationInfo->stringParamsIndex[data->modelData->nParametersStringArray];
 
-  data->modelData->nAliasReal        = data->simulationInfo->realAliasIndex[data->modelData->nAliasRealArray];
-  data->modelData->nAliasInteger     = data->simulationInfo->integerAliasIndex[data->modelData->nAliasIntegerArray];
-  data->modelData->nAliasBoolean     = data->simulationInfo->booleanAliasIndex[data->modelData->nAliasBooleanArray];
-  data->modelData->nAliasString      = data->simulationInfo->stringAliasIndex[data->modelData->nAliasStringArray];
+  data->modelData->nAliasReal    = data->simulationInfo->realAliasIndex[data->modelData->nAliasRealArray];
+  data->modelData->nAliasInteger = data->simulationInfo->integerAliasIndex[data->modelData->nAliasIntegerArray];
+  data->modelData->nAliasBoolean = data->simulationInfo->booleanAliasIndex[data->modelData->nAliasBooleanArray];
+  data->modelData->nAliasString  = data->simulationInfo->stringAliasIndex[data->modelData->nAliasStringArray];
 
   /* prepare RingBuffer */
   for (i = 0; i < SIZERINGBUFFER; i++) {

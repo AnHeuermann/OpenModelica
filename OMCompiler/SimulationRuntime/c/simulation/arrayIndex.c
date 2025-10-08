@@ -48,28 +48,33 @@
  */
 void allocateArrayIndexMaps(MODEL_DATA *modelData, SIMULATION_INFO *simulationInfo, threadData_t *threadData)
 {
+  // Variables
   simulationInfo->realVarsIndex = (size_t *)calloc(modelData->nVariablesRealArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->realVarsIndex != NULL, "Out of memory");
-
   simulationInfo->integerVarsIndex = (size_t *)calloc(modelData->nVariablesIntegerArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->integerVarsIndex != NULL, "Out of memory");
-
   simulationInfo->booleanVarsIndex = (size_t *)calloc(modelData->nVariablesBooleanArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->booleanVarsIndex != NULL, "Out of memory");
-
   simulationInfo->stringVarsIndex = (size_t *)calloc(modelData->nVariablesStringArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->stringVarsIndex != NULL, "Out of memory");
+
+  // Parameters
+  simulationInfo->realParamsIndex = (size_t *)calloc(modelData->nParametersRealArray + 1, sizeof(size_t));
+  assertStreamPrint(threadData, simulationInfo->realParamsIndex != NULL, "Out of memory");
+  simulationInfo->integerParamsIndex = (size_t *)calloc(modelData->nParametersIntegerArray + 1, sizeof(size_t));
+  assertStreamPrint(threadData, simulationInfo->integerParamsIndex != NULL, "Out of memory");
+  simulationInfo->booleanParamsIndex = (size_t *)calloc(modelData->nParametersBooleanArray + 1, sizeof(size_t));
+  assertStreamPrint(threadData, simulationInfo->booleanParamsIndex != NULL, "Out of memory");
+  simulationInfo->stringParamsIndex = (size_t *)calloc(modelData->nParametersStringArray + 1, sizeof(size_t));
+  assertStreamPrint(threadData, simulationInfo->stringParamsIndex != NULL, "Out of memory");
 
   // Alias variables
   simulationInfo->realAliasIndex = (size_t *)calloc(modelData->nAliasRealArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->realAliasIndex != NULL, "Out of memory");
-
   simulationInfo->integerAliasIndex = (size_t *)calloc(modelData->nAliasIntegerArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->integerAliasIndex != NULL, "Out of memory");
-
   simulationInfo->booleanAliasIndex = (size_t *)calloc(modelData->nAliasBooleanArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->booleanAliasIndex != NULL, "Out of memory");
-
   simulationInfo->stringAliasIndex = (size_t *)calloc(modelData->nAliasStringArray + 1, sizeof(size_t));
   assertStreamPrint(threadData, simulationInfo->stringAliasIndex != NULL, "Out of memory");
 }
@@ -83,14 +88,23 @@ void allocateArrayIndexMaps(MODEL_DATA *modelData, SIMULATION_INFO *simulationIn
  */
 void freeArrayIndexMaps(SIMULATION_INFO *simulationInfo)
 {
+  // Variables
   free(simulationInfo->realVarsIndex);
   free(simulationInfo->integerVarsIndex);
   free(simulationInfo->booleanVarsIndex);
   free(simulationInfo->stringVarsIndex);
+
+  // Parameters
   free(simulationInfo->realParamsIndex);
   free(simulationInfo->integerParamsIndex);
   free(simulationInfo->booleanParamsIndex);
   free(simulationInfo->stringParamsIndex);
+
+  // Alias variables
+  free(simulationInfo->realAliasIndex);
+  free(simulationInfo->integerAliasIndex);
+  free(simulationInfo->booleanAliasIndex);
+  free(simulationInfo->stringAliasIndex);
 }
 
 /**
@@ -248,8 +262,23 @@ void computeVarsIndex(void *variableData, enum var_type type, size_t num_variabl
   }
 }
 
-void computeAliasIndex(void)
+/**
+ * @brief Compute alias index for array variables.
+ *
+ * Returns identity array mapping.
+ *
+ * TODO: This assumes we only create alias variables for scalar variables.
+ *
+ * @param num_variables
+ * @param varsIndex
+ */
+void computeAliasIndex(size_t num_variables, size_t *varsIndex)
 {
+  unsigned int i;
+  for (i = 0; i < num_variables + 1; i++)
+  {
+    varsIndex[i] = i;
+  }
 }
 
 void computeVarIndices(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData)
@@ -269,8 +298,8 @@ void computeVarIndices(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData)
   // TODO: Sensitivity parameter array + index
 
   // Alias
-  //computeAliasIndex(modelData->realAlias, T_REAL, modelData->nAliasRealArray, simulationInfo->realAliasIndex);
-  //computeAliasIndex(modelData->integerAlias, T_INTEGER, modelData->nAliasIntegerArray, simulationInfo->integerAliasIndex);
-  //computeAliasIndex(modelData->booleanAlias, T_BOOLEAN, modelData->nAliasBooleanArray, simulationInfo->booleanAliasIndex);
-  //computeAliasIndex(modelData->stringAlias, T_STRING, modelData->nAliasStringArray, simulationInfo->stringAliasIndex);
+  computeAliasIndex(modelData->nAliasRealArray, simulationInfo->realAliasIndex);
+  computeAliasIndex(modelData->nAliasIntegerArray, simulationInfo->integerAliasIndex);
+  computeAliasIndex(modelData->nAliasBooleanArray, simulationInfo->booleanAliasIndex);
+  computeAliasIndex(modelData->nAliasStringArray, simulationInfo->stringAliasIndex);
 }

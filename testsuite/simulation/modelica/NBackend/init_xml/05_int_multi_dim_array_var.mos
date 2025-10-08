@@ -3,8 +3,8 @@
 // status: correct
 // teardown_command: rm -f *MultiDimArrayVar*
 //
-// Check if init XML has array variable for integer array variable A of size (2,3,4)
-// Needs to be serialized in row major order
+// Check if init XML has array variable for integer array variable A of size
+// (2,3,4). Needs to be serialized in row major order
 
 setCommandLineOptions("--newBackend");
 

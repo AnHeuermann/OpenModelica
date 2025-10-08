@@ -3,7 +3,8 @@
 // status: correct
 // teardown_command: rm -f *ParameterArrayVariable*
 //
-// Check if init XML has array variable for integer parameter array intParamArray with size=p.
+// Check if init XML has array variable for integer parameter array
+// intParamArray with size=p.
 
 setCommandLineOptions("--newBackend");
 
