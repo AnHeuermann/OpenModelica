@@ -950,31 +950,31 @@ int getNextSampleTimeFMU(DATA *data, double *nextSampleEvent)
  */
 void allocModelDataVars(MODEL_DATA* modelData, threadData_t* threadData)
 {
-  modelData->realVarsData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesReal * sizeof(STATIC_REAL_DATA));
-  assertStreamPrint(threadData, modelData->nVariablesReal == 0 || modelData->realVarsData != NULL, "Out of memory");
+  modelData->realVarsData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesRealArray * sizeof(STATIC_REAL_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesRealArray == 0 || modelData->realVarsData != NULL, "Out of memory");
 
-  modelData->integerVarsData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesInteger * sizeof(STATIC_INTEGER_DATA));
-  assertStreamPrint(threadData, modelData->nVariablesInteger == 0 || modelData->integerVarsData != NULL, "Out of memory");
+  modelData->integerVarsData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesIntegerArray * sizeof(STATIC_INTEGER_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesIntegerArray == 0 || modelData->integerVarsData != NULL, "Out of memory");
 
-  modelData->booleanVarsData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesBoolean * sizeof(STATIC_BOOLEAN_DATA));
-  assertStreamPrint(threadData, modelData->nVariablesBoolean == 0 || modelData->booleanVarsData != NULL, "Out of memory");
+  modelData->booleanVarsData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesBooleanArray * sizeof(STATIC_BOOLEAN_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesBooleanArray == 0 || modelData->booleanVarsData != NULL, "Out of memory");
 
 #if !defined(OMC_NVAR_STRING) || OMC_NVAR_STRING>0
-  modelData->stringVarsData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesString * sizeof(STATIC_STRING_DATA));
-  assertStreamPrint(threadData, modelData->nVariablesString == 0 || modelData->stringVarsData != NULL, "Out of memory");
+  modelData->stringVarsData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nVariablesStringArray * sizeof(STATIC_STRING_DATA));
+  assertStreamPrint(threadData, modelData->nVariablesStringArray == 0 || modelData->stringVarsData != NULL, "Out of memory");
 #endif
 
-  modelData->realParameterData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersReal * sizeof(STATIC_REAL_DATA));
-  assertStreamPrint(threadData, modelData->nParametersReal == 0 || modelData->realParameterData != NULL, "Out of memory");
+  modelData->realParameterData = (STATIC_REAL_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersRealArray * sizeof(STATIC_REAL_DATA));
+  assertStreamPrint(threadData, modelData->nParametersRealArray == 0 || modelData->realParameterData != NULL, "Out of memory");
 
-  modelData->integerParameterData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersInteger * sizeof(STATIC_INTEGER_DATA));
-  assertStreamPrint(threadData, modelData->nParametersInteger == 0 || modelData->integerParameterData != NULL, "Out of memory");
+  modelData->integerParameterData = (STATIC_INTEGER_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersIntegerArray * sizeof(STATIC_INTEGER_DATA));
+  assertStreamPrint(threadData, modelData->nParametersIntegerArray == 0 || modelData->integerParameterData != NULL, "Out of memory");
 
-  modelData->booleanParameterData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersBoolean * sizeof(STATIC_BOOLEAN_DATA));
-  assertStreamPrint(threadData, modelData->nParametersBoolean == 0 || modelData->booleanParameterData != NULL, "Out of memory");
+  modelData->booleanParameterData = (STATIC_BOOLEAN_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersBooleanArray * sizeof(STATIC_BOOLEAN_DATA));
+  assertStreamPrint(threadData, modelData->nParametersBooleanArray == 0 || modelData->booleanParameterData != NULL, "Out of memory");
 
-  modelData->stringParameterData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersString * sizeof(STATIC_STRING_DATA));
-  assertStreamPrint(threadData, modelData->nParametersString == 0 || modelData->stringParameterData != NULL, "Out of memory");
+  modelData->stringParameterData = (STATIC_STRING_DATA*) omc_alloc_interface.malloc_uncollectable(modelData->nParametersStringArray * sizeof(STATIC_STRING_DATA));
+  assertStreamPrint(threadData, modelData->nParametersStringArray == 0 || modelData->stringParameterData != NULL, "Out of memory");
 }
 
 /**
@@ -1090,10 +1090,20 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   allocateArrayIndexMaps(data->modelData, data->simulationInfo, threadData);
   computeVarIndices(data->simulationInfo, data->modelData);
 
-  data->modelData->nVariablesReal     = data->simulationInfo->realVarsIndex[data->modelData->nVariablesRealArray];
-  data->modelData->nVariablesInteger  = data->simulationInfo->integerVarsIndex[data->modelData->nVariablesIntegerArray];
-  data->modelData->nVariablesBoolean  = data->simulationInfo->booleanVarsIndex[data->modelData->nVariablesBooleanArray];
-  data->modelData->nVariablesString   = data->simulationInfo->stringVarsIndex[data->modelData->nVariablesStringArray];
+  data->modelData->nVariablesReal    = data->simulationInfo->realVarsIndex[data->modelData->nVariablesRealArray];
+  data->modelData->nVariablesInteger = data->simulationInfo->integerVarsIndex[data->modelData->nVariablesIntegerArray];
+  data->modelData->nVariablesBoolean = data->simulationInfo->booleanVarsIndex[data->modelData->nVariablesBooleanArray];
+  data->modelData->nVariablesString  = data->simulationInfo->stringVarsIndex[data->modelData->nVariablesStringArray];
+
+  data->modelData->nParametersReal  = data->simulationInfo->realParameterIndex[data->modelData->nParametersRealArray];
+  data->modelData->nParametersInteger  = data->simulationInfo->integerParameterIndex[data->modelData->nParametersIntegerArray];
+  data->modelData->nParametersBoolean  = data->simulationInfo->booleanParameterIndex[data->modelData->nParametersBooleanArray];
+  data->modelData->nParametersString  = data->simulationInfo->stringParameterIndex[data->modelData->nParametersStringArray];
+
+  data->modelData->nAliasReal        = data->simulationInfo->realAliasIndex[data->modelData->nAliasRealArray];
+  data->modelData->nAliasInteger     = data->simulationInfo->integerAliasIndex[data->modelData->nAliasIntegerArray];
+  data->modelData->nAliasBoolean     = data->simulationInfo->booleanAliasIndex[data->modelData->nAliasBooleanArray];
+  data->modelData->nAliasString      = data->simulationInfo->stringAliasIndex[data->modelData->nAliasStringArray];
 
   /* prepare RingBuffer */
   for (i = 0; i < SIZERINGBUFFER; i++) {
@@ -1120,23 +1130,7 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   memset(data->localData, 0, SIZERINGBUFFER * sizeof(SIMULATION_DATA));
   lookupRingBuffer(data->simulationData, (void**) data->localData);
 
-  /* modelData vars, parameter and alias arrays are allocated in read_input_xml */
-  data->modelData->realVarsData = NULL;
-  data->modelData->integerVarsData = NULL;
-  data->modelData->booleanVarsData = NULL;
-#if !defined(OMC_NVAR_STRING) || OMC_NVAR_STRING>0
-  data->modelData->stringVarsData = NULL;
-#endif
-  data->modelData->realParameterData = NULL;
-  data->modelData->integerParameterData = NULL;
-  data->modelData->booleanParameterData = NULL;
-  data->modelData->stringParameterData = NULL;
-
-  // Allocated in read_input_xml
-  data->modelData->realAlias = NULL;
-  data->modelData->integerAlias = NULL;
-  data->modelData->booleanAlias = NULL;
-  data->modelData->stringAlias = NULL;
+  /* modelData vars, parameter and alias arrays are already allocated in read_input_xml */
 
   data->modelData->samplesInfo = (SAMPLE_INFO*) omc_alloc_interface.malloc_uncollectable(data->modelData->nSamples * sizeof(SAMPLE_INFO));
   data->simulationInfo->nextSampleEvent = data->simulationInfo->startTime;

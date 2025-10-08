@@ -828,28 +828,51 @@ void read_default_experiment(SIMULATION_INFO* simulationInfo, omc_DefaultExperim
 }
 
 /**
- * @brief Read number of variables / parameters from model description into `modelData`.
+ * @brief Read number of scalar and array variables / parameters.
+ *
+ * Read number of scalar and array variables or parameters from model
+ * description into `modelData`. Here one array variable of arbitrary size
+ * counts as one variable.
  *
  * @param md          Model description hash map.
- * @param modelData   Model data to contain number of variables / parameters on return.
+ * @param modelData   Model data to contain number of variables / parameters on
+ * return.
  */
-void read_model_description_sizes(omc_ModelDescription *md, MODEL_DATA* modelData) {
+void read_model_description_sizes(omc_ModelDescription *md, MODEL_DATA *modelData) {
   modelica_integer numRealAlgVars;
 
-  read_value_long(findHashStringString(md, "numberOfContinuousStates"), &modelData->nStates, 0);
+  read_value_long(findHashStringString(md, "numberOfContinuousStates"), &modelData->nStatesArray, 0);
   read_value_long(findHashStringString(md, "numberOfRealAlgebraicVariables"), &numRealAlgVars, 0);
-  modelData->nVariablesReal = 2*modelData->nStates + numRealAlgVars;
-  // TODO: How to get data->modelData->nDiscreteReal?
-  read_value_long(findHashStringString(md, "numberOfRealParameters"), &modelData->nParametersReal, 0);
+  modelData->nVariablesRealArray = 2*modelData->nStatesArray + numRealAlgVars;
+  read_value_long(findHashStringString(md, "numberOfRealAlgebraicAliasVariables"), &modelData->nAliasRealArray, 0);
+  // TODO: How to get data->modelData->nDiscreteReal or its array version?
+  read_value_long(findHashStringString(md, "numberOfRealParameters"), &modelData->nParametersRealArray, 0);
 
-  read_value_long(findHashStringString(md, "numberOfIntegerParameters"), &modelData->nParametersInteger, 0);
-  read_value_long(findHashStringString(md, "numberOfIntegerAlgebraicVariables"), &modelData->nVariablesInteger, 0);
+  read_value_long(findHashStringString(md, "numberOfIntegerParameters"), &modelData->nParametersIntegerArray, 0);
+  read_value_long(findHashStringString(md, "numberOfIntegerAlgebraicVariables"), &modelData->nVariablesIntegerArray, 0);
+  read_value_long(findHashStringString(md, "numberOfIntegerAliasVariables"), &modelData->nAliasIntegerArray, 0);
 
-  read_value_long(findHashStringString(md, "numberOfBooleanParameters"), &modelData->nParametersBoolean, 0);
-  read_value_long(findHashStringString(md, "numberOfBooleanAlgebraicVariables"), &modelData->nVariablesBoolean, 0);
+  read_value_long(findHashStringString(md, "numberOfBooleanParameters"), &modelData->nParametersBooleanArray, 0);
+  read_value_long(findHashStringString(md, "numberOfBooleanAlgebraicVariables"), &modelData->nVariablesBooleanArray, 0);
+  read_value_long(findHashStringString(md, "numberOfBooleanAliasVariables"), &modelData->nAliasBooleanArray, 0);
 
-  read_value_long(findHashStringString(md, "numberOfStringParameters"), &modelData->nParametersString, 0);
-  read_value_long(findHashStringString(md, "numberOfStringAlgebraicVariables"),  &modelData->nVariablesString, 0);
+  read_value_long(findHashStringString(md, "numberOfStringParameters"), &modelData->nParametersStringArray, 0);
+  read_value_long(findHashStringString(md, "numberOfStringAlgebraicVariables"),  &modelData->nVariablesStringArray, 0);
+  read_value_long(findHashStringString(md, "numberOfStringAliasVariables"),  &modelData->nAliasStringArray, 0);
+}
+
+size_t count_alias_variables(omc_ModelDescription *aliasHasMap) {
+  size_t num_alias_variables = 0;
+
+  hash_long_var *res = NULL;
+  HASH_FIND_INT(aliasHasMap, &num_alias_variables, res);
+
+  while(res) {
+    num_alias_variables++;
+    HASH_FIND_INT(aliasHasMap, &num_alias_variables, res);
+  }
+
+  return num_alias_variables;
 }
 
 /**
@@ -868,6 +891,10 @@ DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
                            hash_string_long *mapAlias,
                            hash_string_long *mapAliasParam)
 {
+  // Assert nAliasVariables has correct size
+  size_t num_alias_vars_xml = HASH_COUNT(aliasHashMap);
+  assertStreamPrint(NULL, nAliasVariables == num_alias_vars_xml, "Number of alias variables doesn't match up. Expected %zu but found %zu in XML!", nAliasVariables, num_alias_vars_xml);
+
   long *it, *itParam;
   const char *aliasTmp = NULL;
   DATA_ALIAS* alias = (DATA_ALIAS*) omc_alloc_interface.malloc_uncollectable(nAliasVariables * sizeof(DATA_ALIAS));
@@ -968,36 +995,36 @@ void read_input_xml(MODEL_DATA* modelData,
   infoStreamPrint(OMC_LOG_SIMULATION, 0, "OPENMODELICAHOME: %s", simulationInfo->OPENMODELICAHOME);
 
   read_model_description_sizes(mi->md, modelData);
-  // TODO: set data->modelData->nVariablesRealArray?
 
   allocModelDataVars(modelData, threadData);
 
-  read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rSta, "real states",            0,                    modelData->nStates,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);
-  read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rDer, "real state derivatives", modelData->nStates,   modelData->nStates,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);
-  read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rAlg, "real algebraics",        2*modelData->nStates, modelData->nVariablesReal - 2*modelData->nStates, &mapAlias,      &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rSta, "real states",            0,                    modelData->nStatesArray,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rDer, "real state derivatives", modelData->nStatesArray,   modelData->nStatesArray,                               &mapAlias,      &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_REAL,    modelData->realVarsData,         mi->rAlg, "real algebraics",        2*modelData->nStatesArray, modelData->nVariablesRealArray - 2*modelData->nStatesArray, &mapAlias,      &mapAliasParam, &sensitivityParIndex);
 
-  read_variables(simulationInfo, T_INTEGER, modelData->integerVarsData,      mi->iAlg, "integer variables",      0,                    modelData->nVariablesInteger,                     &mapAlias,      &mapAliasParam, &sensitivityParIndex);
-  read_variables(simulationInfo, T_BOOLEAN, modelData->booleanVarsData,      mi->bAlg, "boolean variables",      0,                    modelData->nVariablesBoolean,                     &mapAlias,      &mapAliasParam, &sensitivityParIndex);
-  read_variables(simulationInfo, T_STRING,  modelData->stringVarsData,       mi->sAlg, "string variables",       0,                    modelData->nVariablesString,                      &mapAlias,      &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_INTEGER, modelData->integerVarsData,      mi->iAlg, "integer variables",      0,                    modelData->nVariablesIntegerArray,                     &mapAlias,      &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_BOOLEAN, modelData->booleanVarsData,      mi->bAlg, "boolean variables",      0,                    modelData->nVariablesBooleanArray,                     &mapAlias,      &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_STRING,  modelData->stringVarsData,       mi->sAlg, "string variables",       0,                    modelData->nVariablesStringArray,                      &mapAlias,      &mapAliasParam, &sensitivityParIndex);
 
-  read_variables(simulationInfo, T_REAL,    modelData->realParameterData,    mi->rPar, "real parameters",        0,                    modelData->nParametersReal,                       &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
-  read_variables(simulationInfo, T_INTEGER, modelData->integerParameterData, mi->iPar, "integer parameters",     0,                    modelData->nParametersInteger,                    &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
-  read_variables(simulationInfo, T_BOOLEAN, modelData->booleanParameterData, mi->bPar, "boolean parameters",     0,                    modelData->nParametersBoolean,                    &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
-  read_variables(simulationInfo, T_STRING,  modelData->stringParameterData,  mi->sPar, "string parameters",      0,                    modelData->nParametersString,                     &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_REAL,    modelData->realParameterData,    mi->rPar, "real parameters",        0,                    modelData->nParametersRealArray,                       &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_INTEGER, modelData->integerParameterData, mi->iPar, "integer parameters",     0,                    modelData->nParametersIntegerArray,                    &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_BOOLEAN, modelData->booleanParameterData, mi->bPar, "boolean parameters",     0,                    modelData->nParametersBooleanArray,                    &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
+  read_variables(simulationInfo, T_STRING,  modelData->stringParameterData,  mi->sPar, "string parameters",      0,                    modelData->nParametersStringArray,                     &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
 
   if (omc_flag[FLAG_IDAS]) {
+    // TODO: We also need nSensitivityVarsArray
     read_variables(simulationInfo, T_REAL, modelData->realSensitivityData, mi->rSen, "real sensitivities", 0, modelData->nSensitivityVars, &mapAliasSen, &mapAliasParam, &sensitivityParIndex);
   }
 
   /* Real all alias variables */
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for real alias vars");
-  modelData->realAlias = read_alias_var(mi->rAli, modelData->nAliasReal, mapAlias, mapAliasParam);
+  modelData->realAlias = read_alias_var(mi->rAli, modelData->nAliasRealArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for integer alias vars");
-  modelData->integerAlias = read_alias_var(mi->iAli, modelData->nAliasInteger, mapAlias, mapAliasParam);
+  modelData->integerAlias = read_alias_var(mi->iAli, modelData->nAliasIntegerArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for boolean alias vars");
-  modelData->booleanAlias = read_alias_var(mi->bAli, modelData->nAliasBoolean, mapAlias, mapAliasParam);
+  modelData->booleanAlias = read_alias_var(mi->bAli, modelData->nAliasBooleanArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for string alias vars");
-  modelData->stringAlias = read_alias_var(mi->sAli, modelData->nAliasString, mapAlias, mapAliasParam);
+  modelData->stringAlias = read_alias_var(mi->sAli, modelData->nAliasStringArray, mapAlias, mapAliasParam);
 
   free((char*)filename);
   free(mi);
