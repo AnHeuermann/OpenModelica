@@ -87,6 +87,10 @@ void freeArrayIndexMaps(SIMULATION_INFO *simulationInfo)
   free(simulationInfo->integerVarsIndex);
   free(simulationInfo->booleanVarsIndex);
   free(simulationInfo->stringVarsIndex);
+  free(simulationInfo->realParamsIndex);
+  free(simulationInfo->integerParamsIndex);
+  free(simulationInfo->booleanParamsIndex);
+  free(simulationInfo->stringParamsIndex);
 }
 
 /**
@@ -244,63 +248,8 @@ void computeVarsIndex(void *variableData, enum var_type type, size_t num_variabl
   }
 }
 
-/**
- * @brief Compute variable index of one type.
- *
- * Compute where in `SIMULATION_DATA-><TYPE>Vars` a variable starts.
- *
- * Assumes order of array `variableData` is identical to order in `varsIndex`
- * and SIMULATION_DATA arrays.
- *
- * #### Example
- *
- * We have variables `x[3]`, `y`, `z[2]` where `x` is an array of length 3, `y`
- * a scalar and `z` an array of length 3. Then: `varsIndex = [0, 3, 4, 6]`.
- *
- * @param variableData    Model variable data. Is of type `STATIC_REAL_DATA*`,
- *                        `STATIC_INTEGER_DATA*`, `STATIC_BOOLEAN_DATA*` or
- *                        `STATIC_STRING_DATA*`.
- * @param type            Specifies type of model variable `variableData`.
- * @param num_variables   Number of variables in array `variableData`.
- * @param varsIndex       Variable index to compute. Will be set on return.
- */
-void computeVarsIndex(void *variableData, enum var_type type, size_t num_variables, size_t *varsIndex)
+void computeAliasIndex(void)
 {
-  size_t i;
-  int id;
-  int previous_id = -1;
-  DIMENSION_INFO *dimensionInfo;
-
-  varsIndex[0] = 0;
-  for (i = 0; i < num_variables; i++)
-  {
-    switch (type)
-    {
-    case T_REAL:
-      dimensionInfo = &((STATIC_REAL_DATA *)variableData)[i].dimension;
-      id = ((STATIC_REAL_DATA *)variableData)[i].info.id;
-      break;
-    case T_INTEGER:
-      dimensionInfo = &((STATIC_INTEGER_DATA *)variableData)[i].dimension;
-      id = ((STATIC_INTEGER_DATA *)variableData)[i].info.id;
-      break;
-    case T_BOOLEAN:
-      dimensionInfo = &((STATIC_BOOLEAN_DATA *)variableData)[i].dimension;
-      id = ((STATIC_BOOLEAN_DATA *)variableData)[i].info.id;
-      break;
-    case T_STRING:
-      dimensionInfo = &((STATIC_STRING_DATA *)variableData)[i].dimension;
-      id = ((STATIC_STRING_DATA *)variableData)[i].info.id;
-      break;
-    default:
-      throwStreamPrint(NULL, "collectArrayVariableSizes: Illegal variable type case.");
-    }
-
-    assertStreamPrint(NULL, id > previous_id, "Value reference not increasing. `realVarsData` isn't sorted correctly!")
-        previous_id = id;
-
-    varsIndex[i + 1] = varsIndex[i] + calculateLength(dimensionInfo);
-  }
 }
 
 void computeVarIndices(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData)
@@ -312,10 +261,10 @@ void computeVarIndices(SIMULATION_INFO *simulationInfo, MODEL_DATA *modelData)
   computeVarsIndex(modelData->stringVarsData, T_STRING, modelData->nVariablesStringArray, simulationInfo->stringVarsIndex);
 
   // Parameters
-  computeVarsIndex(modelData->realParameterData, T_REAL, modelData->nParametersRealArray, simulationInfo->realParameterIndex);
-  computeVarsIndex(modelData->integerParameterData, T_INTEGER, modelData->nParametersIntegerArray, simulationInfo->integerParameterIndex);
-  computeVarsIndex(modelData->booleanParameterData, T_BOOLEAN, modelData->nParametersBooleanArray, simulationInfo->booleanParameterIndex);
-  computeVarsIndex(modelData->stringParameterData, T_STRING, modelData->nParametersStringArray, simulationInfo->stringParameterIndex);
+  computeVarsIndex(modelData->realParameterData, T_REAL, modelData->nParametersRealArray, simulationInfo->realParamsIndex);
+  computeVarsIndex(modelData->integerParameterData, T_INTEGER, modelData->nParametersIntegerArray, simulationInfo->integerParamsIndex);
+  computeVarsIndex(modelData->booleanParameterData, T_BOOLEAN, modelData->nParametersBooleanArray, simulationInfo->booleanParamsIndex);
+  computeVarsIndex(modelData->stringParameterData, T_STRING, modelData->nParametersStringArray, simulationInfo->stringParamsIndex);
 
   // TODO: Sensitivity parameter array + index
 

@@ -644,10 +644,12 @@ typedef struct MODEL_DATA
   long nVariablesIntegerArray;  /* Number of array + scalar integer variables */
   long nVariablesBooleanArray;  /* Number of array + scalar boolean variables */
   long nVariablesStringArray;   /* Number of array + scalar string variables */
+
   long nParametersRealArray;    /* Number of array + scalar real parameters */
   long nParametersIntegerArray; /* Number of array + scalar integer parameters */
   long nParametersBooleanArray; /* Number of array + scalar boolean parameters */
   long nParametersStringArray;  /* Number of array + scalar string parameters */
+
   long nAliasRealArray;         /* Number of array + scalar real alias variables */
   long nAliasIntegerArray;      /* Number of array + scalar integer alias variables */
   long nAliasBooleanArray;      /* Number of array + scalar boolean alias variables */
@@ -655,22 +657,25 @@ typedef struct MODEL_DATA
   // TODO: array handling for input and output vars missing
 
   /* Number of scalarized variables (arrays are flatten to scalar elements.) */
-  long nStates;               /* Number of state variables*/
-  long nVariablesReal;        /* Number of real variables: states + state derivatives + real algebraic variables + real discrete variables */
-  long nDiscreteReal;         /* Number of all discrete real variables */
-  long nVariablesInteger;     /* Number of integer variables */
-  long nVariablesBoolean;     /* Number of boolean variables */
-  long nVariablesString;      /* Number of string variables */
-  long nParametersReal;       /* Number of real parameters */
-  long nParametersInteger;    /* Number of integer parameters */
-  long nParametersBoolean;    /* Number of boolean parameters */
-  long nParametersString;     /* Number of string parameters */
-  long nInputVars;            /* Number of input variables */
-  long nOutputVars;           /* Number of output variables */
-  long nAliasReal;            /* Number of real alias variables */
-  long nAliasInteger;         /* Number of integer alias variables */
-  long nAliasBoolean;         /* Number of boolean alias variables */
-  long nAliasString;          /* Number of string alias variables */
+  long nStates;                 /* Number of state variables*/
+  long nVariablesReal;          /* Number of real variables: states + state derivatives + real algebraic variables + real discrete variables */
+  long nDiscreteReal;           /* Number of all discrete real variables */
+  long nVariablesInteger;       /* Number of integer variables */
+  long nVariablesBoolean;       /* Number of boolean variables */
+  long nVariablesString;        /* Number of string variables */
+
+  long nParametersReal;         /* Number of real parameters */
+  long nParametersInteger;      /* Number of integer parameters */
+  long nParametersBoolean;      /* Number of boolean parameters */
+  long nParametersString;       /* Number of string parameters */
+
+  long nInputVars;              /* Number of input variables */
+  long nOutputVars;             /* Number of output variables */
+
+  long nAliasReal;              /* Number of real alias variables */
+  long nAliasInteger;           /* Number of integer alias variables */
+  long nAliasBoolean;           /* Number of boolean alias variables */
+  long nAliasString;            /* Number of string alias variables */
 
   long nZeroCrossings;
   long nRelations;
@@ -840,15 +845,17 @@ typedef struct SIMULATION_INFO
   modelica_real* states_left;          /* work array for findRoot in event.c */
   modelica_real* states_right;         /* work array for findRoot in event.c */
 
-  /* index map: arr_idx -> start_idx */
+  /* Index maps: arr_idx -> start_idx */
   size_t* realVarsIndex;
   size_t* integerVarsIndex;
   size_t* booleanVarsIndex;
   size_t* stringVarsIndex;
-  size_t* realParameterIndex;
-  size_t* integerParameterIndex;
-  size_t* booleanParameterIndex;
-  size_t* stringParameterIndex;
+
+  size_t* realParamsIndex;
+  size_t* integerParamsIndex;
+  size_t* booleanParamsIndex;
+  size_t* stringParamsIndex;
+
   size_t* realAliasIndex;
   size_t* integerAliasIndex;
   size_t* booleanAliasIndex;

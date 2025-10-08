@@ -1095,10 +1095,10 @@ void initializeDataStruc(DATA *data, threadData_t *threadData)
   data->modelData->nVariablesBoolean = data->simulationInfo->booleanVarsIndex[data->modelData->nVariablesBooleanArray];
   data->modelData->nVariablesString  = data->simulationInfo->stringVarsIndex[data->modelData->nVariablesStringArray];
 
-  data->modelData->nParametersReal  = data->simulationInfo->realParameterIndex[data->modelData->nParametersRealArray];
-  data->modelData->nParametersInteger  = data->simulationInfo->integerParameterIndex[data->modelData->nParametersIntegerArray];
-  data->modelData->nParametersBoolean  = data->simulationInfo->booleanParameterIndex[data->modelData->nParametersBooleanArray];
-  data->modelData->nParametersString  = data->simulationInfo->stringParameterIndex[data->modelData->nParametersStringArray];
+  data->modelData->nParametersReal  = data->simulationInfo->realParamsIndex[data->modelData->nParametersRealArray];
+  data->modelData->nParametersInteger  = data->simulationInfo->integerParamsIndex[data->modelData->nParametersIntegerArray];
+  data->modelData->nParametersBoolean  = data->simulationInfo->booleanParamsIndex[data->modelData->nParametersBooleanArray];
+  data->modelData->nParametersString  = data->simulationInfo->stringParamsIndex[data->modelData->nParametersStringArray];
 
   data->modelData->nAliasReal        = data->simulationInfo->realAliasIndex[data->modelData->nAliasRealArray];
   data->modelData->nAliasInteger     = data->simulationInfo->integerAliasIndex[data->modelData->nAliasIntegerArray];
