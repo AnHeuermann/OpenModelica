@@ -81,63 +81,69 @@ int main(int argc, char *argv[])
   // Validate
   if (test_success && strcmp(modelData.integerParameterData[0].info.name, "T"))
   {
-    fprintf(stderr, "Test failed: int parameter name mismatch. Expected 'T', got '%s'\n", modelData.integerParameterData[0].info.name);
+    fprintf(stderr, "Test failed: Int parameter name mismatch. Expected 'T', got '%s'\n", modelData.integerParameterData[0].info.name);
     test_success = 0;
   }
   if (test_success && modelData.integerParameterData[0].dimension.numberOfDimensions != 3)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected '3', got '%lu'\n", modelData.integerParameterData[0].dimension.numberOfDimensions);
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected '3', got '%lu'\n", modelData.integerParameterData[0].dimension.numberOfDimensions);
     test_success = 0;
   }
 
   // Dimension 1
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[0].type != DIMENSION_BY_VALUE_REFERENCE)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected <dimension> to contain 'valueReference'\n");
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected <dimension> to contain 'valueReference'\n");
     test_success = 0;
   }
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[0].start != -1)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected <dimension> to not contain 'start'\n");
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected <dimension> to not contain 'start'\n");
     test_success = 0;
   }
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[0].valueReference != 1001)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected 'valueReference=1001', got '%lu'\n", modelData.integerParameterData[0].dimension.dimensions[0].valueReference);
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected 'valueReference=1001', got '%lu'\n", modelData.integerParameterData[0].dimension.dimensions[0].valueReference);
     test_success = 0;
   }
 
   // Dimension 2
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[1].type != DIMENSION_BY_START)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected <dimension> to contain 'start'\n");
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected <dimension> to contain 'start'\n");
     test_success = 0;
   }
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[1].start != 3)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected 'start=3', got '%lu'\n", modelData.integerParameterData[0].dimension.dimensions[1].start);
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected 'start=3', got '%lu'\n", modelData.integerParameterData[0].dimension.dimensions[1].start);
     test_success = 0;
   }
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[1].valueReference != -1)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected <dimension> to not contain 'valueReference'\n");
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected <dimension> to not contain 'valueReference'\n");
     test_success = 0;
   }
 
   // Dimension 3
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[2].type != DIMENSION_BY_START)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected <dimension> to contain 'start'\n");
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected <dimension> to contain 'start'\n");
     test_success = 0;
   }
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[2].start != 4)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected 'start=4', got '%lu'\n", modelData.integerParameterData[0].dimension.dimensions[2].start);
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected 'start=4', got '%lu'\n", modelData.integerParameterData[0].dimension.dimensions[2].start);
     test_success = 0;
   }
   if (test_success && modelData.integerParameterData[0].dimension.dimensions[2].valueReference != -1)
   {
-    fprintf(stderr, "Test failed: int parameter dimension mismatch. Expected <dimension> to not contain 'valueReference'\n");
+    fprintf(stderr, "Test failed: Int parameter dimension mismatch. Expected <dimension> to not contain 'valueReference'\n");
+    test_success = 0;
+  }
+
+  if (test_success && modelData.integerParameterData[0].dimension.scalar_length != 24)
+  {
+    fprintf(stderr, "Test failed: Array length is wrong. Expected '24', got '%lu'\n", modelData.integerParameterData[0].dimension.scalar_length);
     test_success = 0;
   }
 

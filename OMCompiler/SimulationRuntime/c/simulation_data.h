@@ -307,15 +307,18 @@ typedef struct DIMENSION_ATTRIBUTE
 
 typedef struct DIMENSION_INFO
 {
-  modelica_integer numberOfDimensions;  /* number of dimension tags <dimension> */
-  DIMENSION_ATTRIBUTE* dimensions;      /* array of dimension sizes */
+  modelica_integer numberOfDimensions;  /* Number of dimension tags <dimension> */
+  DIMENSION_ATTRIBUTE* dimensions;      /* Array of dimension sizes */
+  size_t scalar_length;                 /* Length of variable after scalarization to 1-dimensional array*/
 } DIMENSION_INFO;
 
 typedef struct STATIC_REAL_DATA
 {
   DIMENSION_INFO dimension;
   VAR_INFO info;
-  REAL_ATTRIBUTE attribute;
+  REAL_ATTRIBUTE attribute;            // TODO: How to handle this for mult-dimensional variables?
+                                       // We could make this attribute an array or have each member of attribute be an array
+                                       // How to ensure that it's saved in the right order?
   modelica_boolean filterOutput;       /* true if this variable should be filtered */
   modelica_boolean time_unvarying;     /* true if the value is only computed once during initialization */
 } STATIC_REAL_DATA;
@@ -324,7 +327,7 @@ typedef struct STATIC_INTEGER_DATA
 {
   DIMENSION_INFO dimension;
   VAR_INFO info;
-  INTEGER_ATTRIBUTE attribute;
+  INTEGER_ATTRIBUTE attribute;         // TODO: How to handle this for mult-dimensional variables?
   modelica_boolean filterOutput;       /* true if this variable should be filtered */
   modelica_boolean time_unvarying;     /* true if the value is only computed once during initialization */
 } STATIC_INTEGER_DATA;
@@ -333,7 +336,7 @@ typedef struct STATIC_BOOLEAN_DATA
 {
   DIMENSION_INFO dimension;
   VAR_INFO info;
-  BOOLEAN_ATTRIBUTE attribute;
+  BOOLEAN_ATTRIBUTE attribute;        // TODO: How to handle this for mult-dimensional variables?
   modelica_boolean filterOutput;       /* true if this variable should be filtered */
   modelica_boolean time_unvarying;     /* true if the value is only computed once during initialization */
 } STATIC_BOOLEAN_DATA;
@@ -342,7 +345,7 @@ typedef struct STATIC_STRING_DATA
 {
   DIMENSION_INFO dimension;
   VAR_INFO info;
-  STRING_ATTRIBUTE attribute;
+  STRING_ATTRIBUTE attribute;          // TODO: How to handle this for mult-dimensional variables?
   modelica_boolean filterOutput;       /* true if this variable should be filtered */
   modelica_boolean time_unvarying;     /* true if the value is only computed once during initialization */
 } STATIC_STRING_DATA;

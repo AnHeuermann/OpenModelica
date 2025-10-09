@@ -20,15 +20,8 @@ target_link_libraries(test_array_length_matrix PRIVATE SimulationRuntimeC)
 add_test(NAME test_array_length_matrix COMMAND test_array_length_matrix)
 
 # Test 4
-add_executable(test_collect_array_sizes
-  04_test_collect_array_sizes.c
-)
-target_link_libraries(test_collect_array_sizes PRIVATE SimulationRuntimeC)
-add_test(NAME test_collect_array_sizes COMMAND test_collect_array_sizes)
-
-# Test 5
 add_executable(test_compute_var_index
-  05_test_compute_var_index.c
+  04_test_compute_var_index.c
 )
 target_link_libraries(test_compute_var_index PRIVATE SimulationRuntimeC)
 add_test(NAME test_compute_var_index COMMAND test_compute_var_index)
@@ -37,6 +30,5 @@ add_custom_target(ctestsuite-arrayIndex-unit DEPENDS
   test_array_length_scalar
   test_array_length_vector
   test_array_length_matrix
-  test_collect_array_sizes
   test_compute_var_index
 )

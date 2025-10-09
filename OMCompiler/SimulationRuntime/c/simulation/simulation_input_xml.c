@@ -38,6 +38,7 @@
  */
 
 
+#include "arrayIndex.h"
 #include "simulation_input_xml.h"
 #include "simulation_runtime.h"
 #include "options.h"
@@ -476,6 +477,8 @@ static void read_var_dimension(omc_ModelVariable *v, DIMENSION_INFO *dimension_i
                              "but only one is allowed");
     }
   }
+
+  dimension_info->scalar_length = -1; // We might not know the values of structural parameters yet.
 
   free(key);
 }
@@ -1016,7 +1019,7 @@ void read_input_xml(MODEL_DATA* modelData,
     read_variables(simulationInfo, T_REAL, modelData->realSensitivityData, mi->rSen, "real sensitivities", 0, modelData->nSensitivityVars, &mapAliasSen, &mapAliasParam, &sensitivityParIndex);
   }
 
-  /* Real all alias variables */
+  /* Read all alias variables */
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for real alias vars");
   modelData->realAlias = read_alias_var(mi->rAli, modelData->nAliasRealArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for integer alias vars");
@@ -1025,6 +1028,8 @@ void read_input_xml(MODEL_DATA* modelData,
   modelData->booleanAlias = read_alias_var(mi->bAli, modelData->nAliasBooleanArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for string alias vars");
   modelData->stringAlias = read_alias_var(mi->sAli, modelData->nAliasStringArray, mapAlias, mapAliasParam);
+
+  calculateAllScalarLength(modelData);
 
   free((char*)filename);
   free(mi);

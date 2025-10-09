@@ -83,27 +83,32 @@ int main(int argc, char *argv[])
   // Validate
   if (test_success && strcmp(modelData.realVarsData[0].info.name, "x"))
   {
-    fprintf(stderr, "Test failed: real variable name mismatch. Expected 'x', got '%s'\n", modelData.realVarsData[0].info.name);
+    fprintf(stderr, "Test failed: Real variable name mismatch. Expected 'x', got '%s'\n", modelData.realVarsData[0].info.name);
     test_success = 0;
   }
   if (test_success && modelData.realVarsData[0].dimension.numberOfDimensions != 1)
   {
-    fprintf(stderr, "Test failed: real variable dimension mismatch. Expected '1', got '%lu'\n", modelData.realVarsData[0].dimension.numberOfDimensions);
+    fprintf(stderr, "Test failed: Real variable dimension mismatch. Expected '1', got '%lu'\n", modelData.realVarsData[0].dimension.numberOfDimensions);
     test_success = 0;
   }
   if (test_success && modelData.realVarsData[0].dimension.dimensions[0].type != DIMENSION_BY_START)
   {
-    fprintf(stderr, "Test failed: real variable dimension mismatch. Expected <dimension> to contain 'start'\n");
+    fprintf(stderr, "Test failed: Real variable dimension mismatch. Expected <dimension> to contain 'start'\n");
     test_success = 0;
   }
   if (test_success && modelData.realVarsData[0].dimension.dimensions[0].start != 4)
   {
-    fprintf(stderr, "Test failed: real variable dimension mismatch. Expected 'start=4', got '%lu'\n", modelData.realVarsData[0].dimension.dimensions[0].start);
+    fprintf(stderr, "Test failed: Real variable dimension mismatch. Expected 'start=4', got '%lu'\n", modelData.realVarsData[0].dimension.dimensions[0].start);
     test_success = 0;
   }
   if (test_success && modelData.realVarsData[0].dimension.dimensions[0].valueReference != -1)
   {
-    fprintf(stderr, "Test failed: real variable dimension mismatch. Expected <dimension> to not contain 'valueReference'\n");
+    fprintf(stderr, "Test failed: Real variable dimension mismatch. Expected <dimension> to not contain 'valueReference'\n");
+    test_success = 0;
+  }
+  if (test_success && modelData.realVarsData[0].dimension.scalar_length != 4)
+  {
+    fprintf(stderr, "Test failed: Array length is wrong. Expected '4', got '%lu'\n", modelData.realVarsData[0].dimension.scalar_length);
     test_success = 0;
   }
   if (test_success && strcmp(modelData.integerParameterData[0].info.name, "p"))

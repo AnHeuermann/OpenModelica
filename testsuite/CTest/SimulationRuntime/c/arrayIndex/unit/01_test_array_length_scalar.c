@@ -20,7 +20,7 @@ int main(void)
   DIMENSION_INFO dimension_info = {0};
 
   // Test
-  size_t actual_length = calculateLength(&dimension_info);
+  size_t actual_length = calculateLength(&dimension_info, NULL, 0);
 
   // Validate
   if (actual_length != expected_length) {

@@ -18,9 +18,9 @@ int main(void)
   int test_success = 1;
   size_t dim1_1 = 2;
   size_t dim1_2 = 3;
-  size_t dim2_1 = 4;
-  size_t dim2_2 = 3;
-  size_t dim2_3 = 2;
+  size_t dim3_1 = 4;
+  size_t dim3_2 = 3;
+  size_t dim3_3 = 2;
 
   // Prepare dummy data
   DIMENSION_ATTRIBUTE dimensions_var1[] = {
@@ -32,28 +32,35 @@ int main(void)
        .valueReference = -1}};
   DIMENSION_INFO dimension_info_var1 = {
       .numberOfDimensions = 2,
-      .dimensions = dimensions_var1};
+      .dimensions = dimensions_var1,
+      .scalar_length = dim1_1 * dim1_2};
 
-  DIMENSION_ATTRIBUTE dimensions_var2[] = {
-      {.type = DIMENSION_BY_START,
-       .start = dim2_1,
-       .valueReference = -1},
-      {.type = DIMENSION_BY_START,
-       .start = dim2_2,
-       .valueReference = -1},
-      {.type = DIMENSION_BY_START,
-       .start = dim2_3,
-       .valueReference = -1}};
   DIMENSION_INFO dimension_info_var2 = {
+      .numberOfDimensions = 0,
+      .dimensions = NULL,
+      .scalar_length = 1};
+
+  DIMENSION_ATTRIBUTE dimensions_var3[] = {
+      {.type = DIMENSION_BY_START,
+       .start = dim3_1,
+       .valueReference = -1},
+      {.type = DIMENSION_BY_START,
+       .start = dim3_2,
+       .valueReference = -1},
+      {.type = DIMENSION_BY_START,
+       .start = dim3_3,
+       .valueReference = -1}};
+  DIMENSION_INFO dimension_info_var3 = {
       .numberOfDimensions = 3,
-      .dimensions = dimensions_var2};
+      .dimensions = dimensions_var3,
+      .scalar_length = dim3_1 * dim3_2 * dim3_3};
 
   STATIC_REAL_DATA realVarsData[] = {
       {.dimension = dimension_info_var1,
        .info = {.id = 0}},
-      {.dimension = {0},
-       .info = {.id = 1}},
       {.dimension = dimension_info_var2,
+       .info = {.id = 1}},
+      {.dimension = dimension_info_var3,
        .info = {.id = 2}}};
 
   // Test
@@ -76,9 +83,9 @@ int main(void)
     fprintf(stderr, "Test failed: Expected varsIndex[2]=%zu, but got '%zu'.\n", (dim1_1 * dim1_2) + 1, varsIndex[2]);
     test_success = 0;
   }
-  if (varsIndex[3] != (dim1_1 * dim1_2) + 1 + (dim2_1 * dim2_2 * dim2_3))
+  if (varsIndex[3] != (dim1_1 * dim1_2) + 1 + (dim3_1 * dim3_2 * dim3_3))
   {
-    fprintf(stderr, "Test failed: Expected varsIndex[3]=%zu, but got '%zu'.\n", (dim1_1 * dim1_2) + 1 + (dim2_1 * dim2_2 * dim2_3), varsIndex[3]);
+    fprintf(stderr, "Test failed: Expected varsIndex[3]=%zu, but got '%zu'.\n", (dim1_1 * dim1_2) + 1 + (dim3_1 * dim3_2 * dim3_3), varsIndex[3]);
     test_success = 0;
   }
 
