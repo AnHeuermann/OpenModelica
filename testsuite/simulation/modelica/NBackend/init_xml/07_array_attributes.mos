@@ -5,7 +5,7 @@
 //
 // Check if init XML generates correct attributes for array variables
 
-setCommandLineOptions("--newBackend -d=dumpSimCode");
+setCommandLineOptions("--newBackend");
 
 loadFile("ArrayAttributes.mo"); getErrorString();
 
