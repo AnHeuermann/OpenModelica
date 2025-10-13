@@ -876,10 +876,11 @@ void read_model_description_sizes(omc_ModelDescription *md, MODEL_DATA *modelDat
  * @param mapAlias        Hash map for alias variables.
  * @param mapAliasParam   Hash map for alias parameters.
  */
-DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
-                           unsigned long nAliasVariables,
-                           hash_string_long *mapAlias,
-                           hash_string_long *mapAliasParam)
+void read_alias_var(DATA_ALIAS* alias,
+                    omc_ModelVariables *aliasHashMap,
+                    unsigned long nAliasVariables,
+                    hash_string_long *mapAlias,
+                    hash_string_long *mapAliasParam)
 {
   // Assert nAliasVariables has correct size
   size_t num_alias_vars_xml = HASH_COUNT(aliasHashMap);
@@ -887,8 +888,6 @@ DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
 
   long *it, *itParam;
   const char *aliasTmp = NULL;
-  DATA_ALIAS* alias = (DATA_ALIAS*) omc_alloc_interface.malloc_uncollectable(nAliasVariables * sizeof(DATA_ALIAS));
-  assertStreamPrint(NULL, nAliasVariables == 0 || alias != NULL, "Out of memory");
 
   for(unsigned long i=0; i < nAliasVariables; i++)
   {
@@ -926,8 +925,6 @@ DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
     free((char*)aliasTmp);
     aliasTmp = NULL;
   }
-
-  return alias;
 }
 
 /**
