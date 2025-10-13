@@ -853,10 +853,6 @@ typedef struct SIMULATION_INFO
   size_t* integerVarsIndex;
   size_t* booleanVarsIndex;
   size_t* stringVarsIndex;
-  size_t* realParamsIndex;
-  size_t* integerParamsIndex;
-  size_t* booleanParamsIndex;
-  size_t* stringParamsIndex;
 
   size_t* realParamsIndex;
   size_t* integerParamsIndex;

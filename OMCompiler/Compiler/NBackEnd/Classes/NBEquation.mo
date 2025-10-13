@@ -2396,7 +2396,12 @@ public
         case qual as Binding.FLAT_BINDING()     then qual.bindingExp;
         case qual as Binding.UNBOUND() algorithm
           start := VariableAttributes.getStartAttribute(var.backendinfo.attributes);
-        then Util.getOptionOrDefault(start, Expression.makeZero(ComponentRef.getSubscriptedType(var.name, true)));
+        then match start
+          local
+            Expression start_exp;
+          case SOME(start_exp) then start_exp;
+          else Expression.makeZero(ComponentRef.getSubscriptedType(var.name, true)); // only making the zero when absolutely neccessary
+        end match;
         else algorithm
           Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed because of wrong binding type: " + Binding.toDebugString(var.binding) + " for variable " + Variable.toString(Pointer.access(var_ptr))});
         then fail();
@@ -2777,6 +2782,8 @@ public
         case IF_EQUATION() then {Statement.IF(IfEquationBody.toStatement(eqn.body), eqn.source)};
 
         case WHEN_EQUATION() then {Statement.WHEN(WhenEquationBody.toStatement(eqn.body), eqn.source)};
+
+        case ALGORITHM() then eqn.alg.statements;
 
         else algorithm
           Error.addMessage(Error.INTERNAL_ERROR,{getInstanceName() + " failed it is not yet supported for:\n" + toString(eqn)});

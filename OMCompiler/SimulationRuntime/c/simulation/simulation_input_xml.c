@@ -395,7 +395,7 @@ static void XMLCALL endElement(void *userData, const char *name)
  * Needs to be freed with `freeVarInfo`.
  *
  * @param var   Model variable hash map containing variable info.
- * @param info
+ * @param info  Variable info to fill.
  */
 static void read_var_info(omc_ModelVariable *var, VAR_INFO *info)
 {
@@ -680,6 +680,7 @@ static void read_variables(SIMULATION_INFO* simulationInfo,
     if (omc_flag[FLAG_IDAS] && 0 == strcmp(debugName, "real sensitivities")) {
       if (0 == strcmp(findHashStringString(v, "isValueChangeable"), "true")) {
         long *it = findHashStringLongPtr(*mapAliasParam, info->name);
+        // TODO: This should not be filled here. It's part of simulation info, not model data.
         simulationInfo->sensitivityParList[*sensitivityParIndex] = *it;
         infoStreamPrint(OMC_LOG_SOLVER, 0, "%d. sensitivity parameter %s at index %d", *sensitivityParIndex, info->name, simulationInfo->sensitivityParList[*sensitivityParIndex]);
         (*sensitivityParIndex)++;
@@ -864,30 +865,16 @@ void read_model_description_sizes(omc_ModelDescription *md, MODEL_DATA *modelDat
   read_value_long(findHashStringString(md, "numberOfStringAliasVariables"),  &modelData->nAliasStringArray, 0);
 }
 
-size_t count_alias_variables(omc_ModelDescription *aliasHasMap) {
-  size_t num_alias_variables = 0;
-
-  hash_long_var *res = NULL;
-  HASH_FIND_INT(aliasHasMap, &num_alias_variables, res);
-
-  while(res) {
-    num_alias_variables++;
-    HASH_FIND_INT(aliasHasMap, &num_alias_variables, res);
-  }
-
-  return num_alias_variables;
-}
-
 /**
  * @brief Read all alias variables from hash map.
  *
  * Fill if parameter is negated, its ID, and alias type (variable, parameter, time).
  *
- * @param rAli          Real alias hash map.
- * @param nAliasReal    Number of alias variables in hash map.
- * @param mapAlias      Hash map for alias variables.
- * @param mapAliasParam Hash map for alias parameters.
- * @return              Alias variable filled with values from hash map. Free with `omc_alloc_interface.free_uncollectable`
+ * @param alias           Alias variable to fill with values from hash map.
+ * @param aliasHashMap    Alias hash map.
+ * @param nAliasVariables Number of alias variables in hash map.
+ * @param mapAlias        Hash map for alias variables.
+ * @param mapAliasParam   Hash map for alias parameters.
  */
 DATA_ALIAS* read_alias_var(omc_ModelVariables *aliasHashMap,
                            unsigned long nAliasVariables,
@@ -986,6 +973,9 @@ void read_input_xml(MODEL_DATA* modelData,
         modelData->modelGUID);
   }
 
+  // Read sizes before using them
+  read_model_description_sizes(mi->md, modelData);
+
   /* Update inital values from override flag */
   override = omc_flagValue[FLAG_OVERRIDE];
   overrideFile = omc_flagValue[FLAG_OVERRIDE_FILE];
@@ -996,8 +986,6 @@ void read_input_xml(MODEL_DATA* modelData,
 
   read_value_string(findHashStringString(mi->md,"OPENMODELICAHOME"), &simulationInfo->OPENMODELICAHOME);
   infoStreamPrint(OMC_LOG_SIMULATION, 0, "OPENMODELICAHOME: %s", simulationInfo->OPENMODELICAHOME);
-
-  read_model_description_sizes(mi->md, modelData);
 
   allocModelDataVars(modelData, threadData);
 
@@ -1015,19 +1003,23 @@ void read_input_xml(MODEL_DATA* modelData,
   read_variables(simulationInfo, T_STRING,  modelData->stringParameterData,  mi->sPar, "string parameters",      0,                    modelData->nParametersStringArray,                     &mapAliasParam, &mapAliasParam, &sensitivityParIndex);
 
   if (omc_flag[FLAG_IDAS]) {
+    /* allocate memory for sensitivity analysis */
+    simulationInfo->sensitivityParList = (int*) calloc(modelData->nSensitivityParamVars, sizeof(int));
+    simulationInfo->sensitivityMatrix = (modelica_real*) calloc(modelData->nSensitivityVars - modelData->nSensitivityParamVars, sizeof(modelica_real));
+
     // TODO: We also need nSensitivityVarsArray
     read_variables(simulationInfo, T_REAL, modelData->realSensitivityData, mi->rSen, "real sensitivities", 0, modelData->nSensitivityVars, &mapAliasSen, &mapAliasParam, &sensitivityParIndex);
   }
 
   /* Read all alias variables */
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for real alias vars");
-  modelData->realAlias = read_alias_var(mi->rAli, modelData->nAliasRealArray, mapAlias, mapAliasParam);
+  read_alias_var(modelData->realAlias, mi->rAli, modelData->nAliasRealArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for integer alias vars");
-  modelData->integerAlias = read_alias_var(mi->iAli, modelData->nAliasIntegerArray, mapAlias, mapAliasParam);
+  read_alias_var(modelData->integerAlias, mi->iAli, modelData->nAliasIntegerArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for boolean alias vars");
-  modelData->booleanAlias = read_alias_var(mi->bAli, modelData->nAliasBooleanArray, mapAlias, mapAliasParam);
+  read_alias_var(modelData->booleanAlias, mi->bAli, modelData->nAliasBooleanArray, mapAlias, mapAliasParam);
   infoStreamPrint(OMC_LOG_DEBUG, 0, "Read XML file for string alias vars");
-  modelData->stringAlias = read_alias_var(mi->sAli, modelData->nAliasStringArray, mapAlias, mapAliasParam);
+  read_alias_var(modelData->stringAlias, mi->sAli, modelData->nAliasStringArray, mapAlias, mapAliasParam);
 
   calculateAllScalarLength(modelData);
 
@@ -1108,6 +1100,56 @@ static const char* getOverrideValue(omc_CommandLineOverrides *mOverrides, omc_Co
 {
   addHashStringLong(mOverridesUses, name, OMC_OVERRIDE_USED);
   return findHashStringString(mOverrides, name);
+}
+
+/**
+ * @brief Check override and do override.
+ *
+ * Overwrite start value if variable is changeable. Otherwise add it to
+ * `mOverridesUses`.
+ *
+ * @param mOverrides            Command line overrides.
+ * @param mOverridesUses
+ * @param variables             Hash map with variables to check override for.
+ * @param index                 Index of variable in map `variables`.
+ * @param warn_small_override   Issue warning if overriding small value or zero if set to `1`.
+ */
+static void singleOverride(omc_CommandLineOverrides *mOverrides,
+                           omc_CommandLineOverridesUses **mOverridesUses,
+                           omc_ModelVariables *variables,
+                           size_t index,
+                           int warn_small_override)
+{
+  if (findHashStringStringNull(mOverrides, findHashStringString(*findHashLongVar(variables, index), "name")))
+  {
+    if (0 == strcmp(findHashStringString(*findHashLongVar(variables, index), "isValueChangeable"), "true"))
+    {
+      infoStreamPrint(OMC_LOG_SOLVER, 0,
+                      "override %s = %s",
+                      findHashStringString(*findHashLongVar(variables, index), "name"),
+                      getOverrideValue(mOverrides, mOverridesUses, findHashStringString(*findHashLongVar(variables, index), "name")));
+      if (warn_small_override && fabs(atof(getOverrideValue(mOverrides, mOverridesUses, findHashStringString(*findHashLongVar(variables, index), "name")))) < 1e-6) {
+        warningStreamPrint(OMC_LOG_STDOUT, 0,
+                           "You are overriding %s with a small value or zero.\n"\
+                           "This could lead to numerically dirty solutions or divisions by zero if not tearingStrictness=veryStrict.",
+                           findHashStringString(*findHashLongVar(variables, index), "name"));
+      }
+      addHashStringString(
+        findHashLongVar(variables, index),
+        "start",
+        getOverrideValue(mOverrides, mOverridesUses, findHashStringString(*findHashLongVar(variables, index), "name")));
+    }
+    else
+    {
+      addHashStringLong(
+        mOverridesUses,
+        findHashStringString(*findHashLongVar(variables, index), "name"), OMC_OVERRIDE_USED);
+      warningStreamPrint(OMC_LOG_STDOUT, 0,
+                         "It is not possible to override the following quantity: %s\n"\
+                         "It seems to be structural, final, protected or evaluated or has a non-constant binding.",
+                         findHashStringString(*findHashLongVar(variables, index), "name"));
+    }
+  }
 }
 
 /**
@@ -1277,64 +1319,50 @@ modelica_boolean doOverride(omc_ModelInput *mi, MODEL_DATA *modelData, const cha
     }
     reCalcStepSize = changedStartStop && !changedStepSize;
 
-    #define CHECK_OVERRIDE(v,b) \
-      if (findHashStringStringNull(mOverrides, findHashStringString(*findHashLongVar(mi->v,i),"name"))) { \
-        if (0 == strcmp(findHashStringString(*findHashLongVar(mi->v,i), "isValueChangeable"), "true")){ \
-          infoStreamPrint(OMC_LOG_SOLVER, 0, "override %s = %s", findHashStringString(*findHashLongVar(mi->v,i),"name"), getOverrideValue(mOverrides, &mOverridesUses, findHashStringString(*findHashLongVar(mi->v,i),"name"))); \
-          if (b && fabs(atof(getOverrideValue(mOverrides, &mOverridesUses, findHashStringString(*findHashLongVar(mi->v,i),"name")))) < 1e-6) \
-            warningStreamPrint(OMC_LOG_STDOUT, 0, "You are overriding %s with a small value or zero.\nThis could lead to numerically dirty solutions or divisions by zero if not tearingStrictness=veryStrict.", findHashStringString(*findHashLongVar(mi->v,i),"name")); \
-          addHashStringString(findHashLongVar(mi->v,i), "start", getOverrideValue(mOverrides, &mOverridesUses, findHashStringString(*findHashLongVar(mi->v,i),"name"))); \
-        } \
-        else{ \
-          addHashStringLong(&mOverridesUses, findHashStringString(*findHashLongVar(mi->v,i),"name"), OMC_OVERRIDE_USED); \
-          warningStreamPrint(OMC_LOG_STDOUT, 0, "It is not possible to override the following quantity: %s\nIt seems to be structural, final, protected or evaluated or has a non-constant binding.", findHashStringString(*findHashLongVar(mi->v,i),"name")); \
-        } \
-      }
-
     // override all found!
-    for(i=0; i<modelData->nStates; i++) {
-      CHECK_OVERRIDE(rSta,0);
-      CHECK_OVERRIDE(rDer,0);
+    for(i=0; i<modelData->nStatesArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->rSta, i, 0);
+      singleOverride(mOverrides, &mOverridesUses, mi->rDer, i, 0);
     }
-    for(i=0; i<(modelData->nVariablesReal - 2*modelData->nStates); i++) {
-      CHECK_OVERRIDE(rAlg,0);
+    for(i=0; i<(modelData->nVariablesRealArray - 2*modelData->nStatesArray); i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->rAlg, i, 0);
     }
-    for(i=0; i<modelData->nVariablesInteger; i++) {
-      CHECK_OVERRIDE(iAlg,0);
+    for(i=0; i<modelData->nVariablesIntegerArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->iAlg, i, 0);
     }
-    for(i=0; i<modelData->nVariablesBoolean; i++) {
-      CHECK_OVERRIDE(bAlg,0);
+    for(i=0; i<modelData->nVariablesBooleanArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->bAlg, i, 0);
     }
-    for(i=0; i<modelData->nVariablesString; i++) {
-      CHECK_OVERRIDE(sAlg,0);
+    for(i=0; i<modelData->nVariablesStringArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->sAlg, i, 0);
     }
-    for(i=0; i<modelData->nParametersReal; i++) {
+    for(i=0; i<modelData->nParametersRealArray; i++) {
       // TODO: only allow to override primary parameters
-      CHECK_OVERRIDE(rPar,1);
+      singleOverride(mOverrides, &mOverridesUses, mi->rPar, i, 1);
     }
-    for(i=0; i<modelData->nParametersInteger; i++) {
+    for(i=0; i<modelData->nParametersIntegerArray; i++) {
       // TODO: only allow to override primary parameters
-      CHECK_OVERRIDE(iPar,1);
+      singleOverride(mOverrides, &mOverridesUses, mi->iPar, i, 1);
     }
-    for(i=0; i<modelData->nParametersBoolean; i++) {
+    for(i=0; i<modelData->nParametersBooleanArray; i++) {
       // TODO: only allow to override primary parameters
-      CHECK_OVERRIDE(bPar,0);
+      singleOverride(mOverrides, &mOverridesUses, mi->bPar, i, 0);
     }
-    for(i=0; i<modelData->nParametersString; i++) {
+    for(i=0; i<modelData->nParametersStringArray; i++) {
       // TODO: only allow to override primary parameters
-      CHECK_OVERRIDE(sPar,0);
+      singleOverride(mOverrides, &mOverridesUses, mi->sPar, i, 0);
     }
-    for(i=0; i<modelData->nAliasReal; i++) {
-      CHECK_OVERRIDE(rAli,0);
+    for(i=0; i<modelData->nAliasRealArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->rAli, i, 0);
     }
-    for(i=0; i<modelData->nAliasInteger; i++) {
-      CHECK_OVERRIDE(iAli,0);
+    for(i=0; i<modelData->nAliasIntegerArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->iAli, i, 0);
     }
-    for(i=0; i<modelData->nAliasBoolean; i++) {
-      CHECK_OVERRIDE(bAli,0);
+    for(i=0; i<modelData->nAliasBooleanArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->bAli, i, 0);
     }
-    for(i=0; i<modelData->nAliasString; i++) {
-      CHECK_OVERRIDE(sAli,0);
+    for(i=0; i<modelData->nAliasStringArray; i++) {
+      singleOverride(mOverrides, &mOverridesUses, mi->sAli, i, 0);
     }
 
     // give a warning if an override is not used #3204

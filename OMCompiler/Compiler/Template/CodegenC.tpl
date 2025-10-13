@@ -1545,6 +1545,7 @@ template populateModelInfo(ModelInfo modelInfo, String fileNamePrefix, String gu
       >>
     %>
     data->modelData->runTestsuite = <%if Testsuite.isRunning() then "1" else "0"%>;
+    data->modelData->nStatesArray = <%varInfo.numStateVars%>;
     data->modelData->nDiscreteReal = <%varInfo.numDiscreteReal%>;
     data->modelData->nInputVars = <%varInfo.numInVars%>;
     data->modelData->nOutputVars = <%varInfo.numOutVars%>;
@@ -7303,8 +7304,8 @@ template genericCallBodies(list<SimGenericCall> genericCalls, Context context)
       {
         <%idx_copy%>
         <%varDecls%>
-        <%preExp%>
         <%iter_%>
+        <%preExp%>
         <%body_%>;
       }
       >>
@@ -7323,8 +7324,8 @@ template genericCallBodies(list<SimGenericCall> genericCalls, Context context)
       {
         <%idx_copy%>
         <%varDecls%>
-        <%preExp%>
         <%iter_%>
+        <%preExp%>
         <%branches_%>
       }
       >>
@@ -7343,8 +7344,8 @@ template genericCallBodies(list<SimGenericCall> genericCalls, Context context)
       {
         <%idx_copy%>
         <%varDecls%>
-        <%preExp%>
         <%iter_%>
+        <%preExp%>
         <%branches_%>
       }
       >>
