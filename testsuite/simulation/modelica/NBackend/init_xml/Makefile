@@ -7,6 +7,7 @@ TESTFILES = \
   04_real_matrix_var.mos \
   05_int_multi_dim_array_var.mos \
   06_array_alias_var.mos \
+  07_array_attributes.mos \
 
 # test that currently fail. Move up when fixed.
 # Run make failingtest
