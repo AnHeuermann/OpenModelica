@@ -215,6 +215,7 @@ public
           SimStrongComponent.Block columnEqn;
           list<SimStrongComponent.Block> columnEqns = {};
           VarData varData;
+          VariablePointers seed_vec, res_vec, tmp_vec;
           Pointer<list<SimVar>> seedVars_ptr = Pointer.create({});
           Pointer<list<SimVar>> resVars_ptr = Pointer.create({});
           Pointer<list<SimVar>> tmpVars_ptr = Pointer.create({});
@@ -243,10 +244,21 @@ public
           generic_loop_calls := list(SimGenericCall.fromIdentifier(tpl) for tpl in UnorderedMap.toList(indices.generic_call_map));
           indices.generic_call_map := sim_map;
 
+          // scalarize variables for sim code
+          if Flags.getConfigBool(Flags.SIM_CODE_SCALARIZE) then
+            seed_vec := VariablePointers.scalarize(varData.seedVars);
+            res_vec  := VariablePointers.scalarize(varData.resultVars);
+            tmp_vec  := VariablePointers.scalarize(varData.tmpVars);
+          else
+            seed_vec := varData.seedVars;
+            res_vec  := varData.resultVars;
+            tmp_vec  := varData.tmpVars;
+          end if;
+
           // use dummy simcode indices to always start at 0 for column and seed vars
-          VariablePointers.map(varData.seedVars,    function SimVar.traverseCreate(acc = seedVars_ptr, indices_ptr = Pointer.create(NSimCode.EMPTY_SIM_CODE_INDICES()), varType = VarType.SIMULATION));
-          VariablePointers.map(varData.resultVars,  function SimVar.traverseCreate(acc = resVars_ptr,  indices_ptr = Pointer.create(NSimCode.EMPTY_SIM_CODE_INDICES()), varType = VarType.SIMULATION));
-          VariablePointers.map(varData.tmpVars,     function SimVar.traverseCreate(acc = tmpVars_ptr,  indices_ptr = Pointer.create(NSimCode.EMPTY_SIM_CODE_INDICES()), varType = VarType.SIMULATION));
+          VariablePointers.map(seed_vec,  function SimVar.traverseCreate(acc = seedVars_ptr, indices_ptr = Pointer.create(NSimCode.EMPTY_SIM_CODE_INDICES()), varType = VarType.SIMULATION));
+          VariablePointers.map(res_vec,   function SimVar.traverseCreate(acc = resVars_ptr,  indices_ptr = Pointer.create(NSimCode.EMPTY_SIM_CODE_INDICES()), varType = VarType.SIMULATION));
+          VariablePointers.map(tmp_vec,   function SimVar.traverseCreate(acc = tmpVars_ptr,  indices_ptr = Pointer.create(NSimCode.EMPTY_SIM_CODE_INDICES()), varType = VarType.SIMULATION));
           seedVars  := listReverse(Pointer.access(seedVars_ptr));
           resVars   := listReverse(Pointer.access(resVars_ptr));
           tmpVars   := listReverse(Pointer.access(tmpVars_ptr));

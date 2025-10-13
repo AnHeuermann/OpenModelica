@@ -562,7 +562,7 @@ public
         daeModeData                   = if isSome(simCode.daeModeData) then SOME(DaeModeData.convert(Util.getOption(simCode.daeModeData))) else NONE(),
         inlineEquations               = {},
         omsiData                      = NONE(),
-        scalarized                    = false);
+        scalarized                    = Flags.getConfigBool(Flags.SIM_CODE_SCALARIZE));
     end convert;
 
     function getDirectoryAndLibs
