@@ -3,7 +3,7 @@
 // status: correct
 // teardown_command: rm -rf roomM370*.c roomM370*.h roomM370-tmp index.html roomM370.fmu roomM370_cs_systemCall.log model_res.mat
 
-setCommandLineOptions("--fmiFlags=s:cvode"); getErrorString();
+setCommandLineOptions("--fmiFlags=s:cvode -d=gendebugsymbols --fmuCMakeBuild=true"); getErrorString();
 loadFile("roomM370.mo"); getErrorString();
 buildModelFMU(roomM370, version="2.0", fmuType="cs", platforms=["dynamic"]); getErrorString();
 
