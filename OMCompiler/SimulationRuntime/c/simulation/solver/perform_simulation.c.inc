@@ -445,11 +445,13 @@ int prefixedName_performSimulation(DATA* data, threadData_t *threadData, SOLVER_
         if (0 < data->modelData->nStates)
         {
           int i;
+          double nominal;
           double maxDer = 0.0;
           double currDer;
           for(i=data->modelData->nStates; i<2*data->modelData->nStates; ++i)
           {
-            currDer = fabs(data->localData[0]->realVars[i] / data->modelData->realVarsData[i].attribute.nominal);
+            nominal = fmax(fabs(data->modelData->realVarsData[i].attribute.nominal), 1e-32);
+            currDer = fabs(data->localData[0]->realVars[i] / nominal);
             if(maxDer < currDer)
               maxDer = currDer;
           }
