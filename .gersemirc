@@ -1,0 +1,8 @@
+indent: 2
+line_length: 100
+definitions:
+  - cmake/omc_check_exists.cmake
+  - cmake/omc_target_info.cmake
+  - cmake/omc_utils.cmake
+  - OMCompiler/Compiler/.cmake/template_compilation.cmake
+  - OMCompiler/Parser/.cmake/omc_antlr_target_macros.cmake

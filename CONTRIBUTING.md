@@ -52,6 +52,32 @@ After Jenkins checks that all is OK a developer will:
 * merge the PR in the OpenModelica glue project
 * delete the branch in the OMCompiler-3rdParty
 
+## CMake formatting
+
+All CMake files (`CMakeLists.txt` and `*.cmake`) are formatted with
+[gersemi](https://github.com/BlankSpruce/gersemi). Formatting is enforced on
+pull requests via GitHub Actions. Install the pre-commit hook locally so
+violations are caught before pushing:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+After that, `gersemi` runs automatically on every `git commit` and blocks the
+commit if any CMake file is not properly formatted. To check or reformat
+manually:
+
+```bash
+# Check without modifying
+gersemi --check cmake/ CMakeLists.txt OMCompiler/
+
+# Reformat in place
+gersemi cmake/ CMakeLists.txt OMCompiler/
+```
+
+Style settings are in [.gersemirc](.gersemirc) at the repository root.
+
 ## Bootstrapping sources
 
 Sometimes one would need to update the bootstrapping sources to add new features to the MetaModelica compiler. The bootstrapping sources are stored at: [OMBootstrapping](https://github.com/OpenModelica/OMBootstrapping.git), just make a PR for it with the contents of OMCompiler/Compiler/boot/build.

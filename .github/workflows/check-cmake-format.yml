@@ -1,0 +1,36 @@
+name: Check CMake Formatting
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**.cmake'
+      - '**/CMakeLists.txt'
+      - '.gersemirc'
+
+jobs:
+  check-cmake-format:
+    name: CMake formatting (gersemi)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install gersemi
+        run: pip install gersemi==0.27.4
+
+      - name: Check CMake formatting
+        run: |
+          gersemi --check          \
+            CMakeLists.txt         \
+            cmake/                 \
+            OMCompiler/CMakeLists.txt       \
+            OMCompiler/Compiler/   \
+            OMCompiler/Parser/     \
+            OMCompiler/SimulationRuntime/
