@@ -398,6 +398,7 @@ function generateModelCodeNewBackend
   input Absyn.Path className;
   input String fileNamePrefix;
   input Option<SimCode.SimulationSettings> simSettingsOpt;
+  input TranslateModelKind kind = TranslateModelKind.NORMAL() "FMU() to generate an FMU instead of a simulation";
   output list<String> libs;
   output String fileDir;
   output Real timeSimCode = 0.0;
@@ -431,7 +432,24 @@ algorithm
     end if;
 
     System.realtimeTick(ClockIndexes.RT_CLOCK_TEMPLATES);
-    callTargetTemplates(oldSimCode, Config.simCodeTarget());
+    () := match kind
+      local String fmuType, fmuTarget;
+      case TranslateModelKind.FMU(kind = fmuType, targetName = fmuTarget) algorithm
+        // The FMU model interface source files are written into the FMU's tmp
+        // sources directory; mirror the old backend (see createSimCode).
+        oldSimCode.fmuTargetName := fmuTarget;
+        oldSimCode.fullPathPrefix := Util.hashFileNamePrefix(fileNamePrefix) + ".fmutmp/sources/";
+        // cref -> value reference map used by the FMU model interface templates (lookupVR).
+        oldSimCode.valueReferences := SimCodeUtil.getValueReferenceMapping(oldSimCode.modelInfo);
+        // Minimal ModelStructure (state derivatives + outputs) so an FMI master
+        // can drive Model Exchange integration. TODO: add dependencies.
+        oldSimCode.modelStructure := SimCodeUtil.createMinimalFMIModelStructure(oldSimCode.modelInfo);
+        callTargetTemplatesFMU(oldSimCode, Config.simCodeTarget(), FMI.getFMIVersionString(), fmuType, SymbolTable.getAbsyn());
+      then ();
+      else algorithm
+        callTargetTemplates(oldSimCode, Config.simCodeTarget());
+      then ();
+    end match;
     timeTemplates := System.realtimeTock(ClockIndexes.RT_CLOCK_TEMPLATES);
     ExecStat.execStat("Templates");
   else
@@ -1224,7 +1242,7 @@ algorithm
 
     if runBackend then
       funcMap := UnorderedMap.fromLists(FunctionTreeImpl.listKeys(funcTree), FunctionTreeImpl.listValues(funcTree), AbsynUtil.pathHash, AbsynUtil.pathEqual);
-      (outLibs, outFileDir, resultValues, funcs) := translateModelCallBackendNB(flatModel, funcMap, className, inFileNamePrefix, inSimSettingsOpt);
+      (outLibs, outFileDir, resultValues, funcs) := translateModelCallBackendNB(flatModel, funcMap, className, inFileNamePrefix, inSimSettingsOpt, kind);
     else
       funcs := NFConvertDAE.convertFunctionTree(funcTree);
     end if;
@@ -1579,6 +1597,7 @@ protected function translateModelCallBackendNB
   input Absyn.Path inClassName "path for the model";
   input String inFileNamePrefix;
   input Option<SimCode.SimulationSettings> inSimSettingsOpt;
+  input TranslateModelKind kind = TranslateModelKind.NORMAL() "FMU() to generate an FMU instead of a simulation";
   output list<String> outLibs;
   output String outFileDir;
   output list<tuple<String, Values.Value>> resultValues;
@@ -1601,7 +1620,7 @@ algorithm
   ExecStat.execStat("backend");
   FlagsUtil.set(Flags.NF_API, nf_api);
 
-  (outLibs, outFileDir, timeSimCode, timeTemplates, oldFunctionTree) := generateModelCodeNewBackend(bdae, inClassName, inFileNamePrefix, inSimSettingsOpt);
+  (outLibs, outFileDir, timeSimCode, timeTemplates, oldFunctionTree) := generateModelCodeNewBackend(bdae, inClassName, inFileNamePrefix, inSimSettingsOpt, kind);
 
   resultValues := {("timeTemplates", Values.REAL(timeTemplates)),
                   ("timeSimCode", Values.REAL(timeSimCode)),
