@@ -1341,6 +1341,8 @@ public constant ErrorTypes.Message FMU_EXPORT_DAE_MODE_NOT_SUPPORTED = ErrorType
   "DAE mode (--daeMode) is not supported for FMU export. Please remove the --daeMode flag.");
 public constant ErrorTypes.Message USER_CANCELLED = ErrorTypes.MESSAGE(7028, ErrorTypes.SCRIPTING(), ErrorTypes.ERROR(),
   "Operation cancelled by user.");
+public constant ErrorTypes.Message FMU_DIRECTIONAL_DERIVATIVES_MISSING_FUNCTIONS = ErrorTypes.MESSAGE(7029, ErrorTypes.SYMBOLIC(), ErrorTypes.ERROR(),
+  "Failed to generate directional derivatives for the initial unknowns of the FMU: differentiating the initialization system created new derivative function(s) %s, which cannot be included in the simulation code anymore. Export the FMU with \"-d=disableDirectionalDerivatives\" to skip the generation of directional derivatives.");
 
 constant SourceInfo dummyInfo = SOURCEINFO("",false,0,0,0,0,0.0);
 

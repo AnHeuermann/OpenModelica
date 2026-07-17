@@ -46,6 +46,7 @@ public import FCore;
 public import FGraph;
 
 protected
+import AbsynUtil;
 import Array;
 import BackendDAEOptimize;
 import BackendDAETransform;
@@ -1747,6 +1748,8 @@ protected
   DAE.ComponentRef cr, rhsCr;
   list<DAE.ComponentRef> crefsVarsToRemove, protectedCrefs;
   BackendDAE.Variables newVars;
+  AvlTreePathFunction.Tree funcs;
+  list<Absyn.Path> missingFunctions = {};
 algorithm
 try
 
@@ -1871,7 +1874,14 @@ try
     depVarsArr := BackendVariable.listVar1(depVars);
 
     //(outJacobian, outFunctionTree, _, _) := generateGenericJacobian(backendDAE_1, indepVars, BackendVariable.emptyVars(), BackendVariable.emptyVars(), BackendVariable.emptyVars(), depVarsArr, depVars, "FMIDERINIT", Flags.isSet(Flags.DIS_SYMJAC_FMI20));
-    (outJacobian, _, _, _) := generateGenericJacobian(backendDAE_1, indepVars, statesarr, inputvarsarr, paramvarsarr, depVarsArr, varlst, "FMIDERINIT", Flags.isSet(Flags.DIS_SYMJAC_FMI20));
+    (outJacobian, funcs, _, _) := generateGenericJacobian(backendDAE_1, indepVars, statesarr, inputvarsarr, paramvarsarr, depVarsArr, varlst, "FMIDERINIT", Flags.isSet(Flags.DIS_SYMJAC_FMI20));
+
+    // Differentiating the initialization system can create new functions, e.g.
+    // "$DER" wrappers for functions with derivative annotation. The functions
+    // for the simulation code were already collected from the simulation DAE
+    // at this point, so calls to such functions would end up in the generated
+    // jacobian code without a definition, see #16054.
+    missingFunctions := getFunctionsMissingFromSimulationCode(outJacobian, funcs, simDAE.shared.functionTree);
 
     if Flags.isSet(Flags.JAC_DUMP2) then
       BackendDump.dumpSparsityPattern(sparsePattern_, "FMI sparsity");
@@ -1883,7 +1893,71 @@ else
   Error.addInternalError("function createFMIModelDerivativesForInitialization failed", sourceInfo());
   outJacobianMatrices := {};
 end try;
+
+// Report outside of the try block to not run into the generic internal error above.
+if not listEmpty(missingFunctions) then
+  Error.addMessage(Error.FMU_DIRECTIONAL_DERIVATIVES_MISSING_FUNCTIONS,
+    {stringDelimitList(list(AbsynUtil.pathString(fn) for fn in missingFunctions), ", ")});
+  fail();
+end if;
 end createFMIModelDerivativesForInitialization;
+
+protected function getFunctionsMissingFromSimulationCode
+  "Returns the paths of functions that are called in the given jacobian but are
+   not part of the function tree the simulation code is generated from.
+   Typically these are differentiated functions ($DER$<path>) created while
+   differentiating the initialization system for the FMIDERINIT jacobian, which
+   happens after the functions for the simulation code have already been
+   collected, see #16054."
+  input Option<BackendDAE.SymbolicJacobian> jacobian;
+  input AvlTreePathFunction.Tree jacobianFunctions "function tree extended by the differentiation";
+  input AvlTreePathFunction.Tree simulationFunctions "function tree the simulation code is generated from";
+  output list<Absyn.Path> missingFunctions = {};
+protected
+  BackendDAE.BackendDAE jacDAE;
+  list<Absyn.Path> candidates = {}, calledFunctions;
+algorithm
+  if isNone(jacobian) then
+    return;
+  end if;
+
+  // functions created during the differentiation are unknown to the simulation DAE
+  for path in AvlTreePathFunction.listKeys(jacobianFunctions) loop
+    if isNone(AvlTreePathFunction.getOpt(simulationFunctions, path)) then
+      candidates := path :: candidates;
+    end if;
+  end for;
+
+  if not listEmpty(candidates) then
+    // only functions that are actually called in the jacobian are a problem
+    SOME((jacDAE, _, _, _, _, _)) := jacobian;
+    calledFunctions := BackendDAEUtil.traverseBackendDAEExps(jacDAE, collectCallPaths, {});
+    missingFunctions := List.intersectionOnTrue(candidates, calledFunctions, AbsynUtil.pathEqual);
+  end if;
+end getFunctionsMissingFromSimulationCode;
+
+protected function collectCallPaths
+  "Expression traversal function collecting the paths of all function calls."
+  input DAE.Exp inExp;
+  input list<Absyn.Path> inPaths;
+  output DAE.Exp outExp = inExp;
+  output list<Absyn.Path> outPaths;
+algorithm
+  (_, outPaths) := Expression.traverseExpBottomUp(inExp, collectCallPaths2, inPaths);
+end collectCallPaths;
+
+protected function collectCallPaths2
+  input DAE.Exp inExp;
+  input list<Absyn.Path> inPaths;
+  output DAE.Exp outExp = inExp;
+  output list<Absyn.Path> outPaths;
+algorithm
+  outPaths := match inExp
+    case DAE.CALL() then inExp.path :: inPaths;
+    case DAE.PARTEVALFUNCTION() then inExp.path :: inPaths;
+    else inPaths;
+  end match;
+end collectCallPaths2;
 
 protected function createLinearModelMatrices "This function creates the linear model matrices column-wise
   author: wbraun"
