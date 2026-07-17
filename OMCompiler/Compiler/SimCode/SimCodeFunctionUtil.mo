@@ -597,7 +597,7 @@ algorithm
   end match;
 end recordDeclHasName;
 
-protected function isRecordDeclEqual
+public function isRecordDeclEqual
   input SimCodeFunction.RecordDeclaration decl1;
   input SimCodeFunction.RecordDeclaration decl2;
   output Boolean b;

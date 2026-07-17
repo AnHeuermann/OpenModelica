@@ -1732,6 +1732,7 @@ public function createFMIModelDerivativesForInitialization
   input BackendDAE.SparsePattern sparsePattern_;
   input BackendDAE.SparseColoring sparseColoring_;
   output BackendDAE.SymbolicJacobians outJacobianMatrices = {};
+  output list<DAE.Function> outExtraFunctions = {} "functions created during the differentiation, missing from the simulation code";
 protected
   BackendDAE.BackendDAE backendDAE, backendDAE_1, emptyBDAE;
   BackendDAE.EqSystem eqSyst, currentSystem;
@@ -1749,7 +1750,8 @@ protected
   list<DAE.ComponentRef> crefsVarsToRemove, protectedCrefs;
   BackendDAE.Variables newVars;
   AvlTreePathFunction.Tree funcs;
-  list<Absyn.Path> missingFunctions = {};
+  list<Absyn.Path> missingFunctions = {}, missingDefinitions = {};
+  Option<DAE.Function> optFn;
 algorithm
 try
 
@@ -1880,8 +1882,18 @@ try
     // "$DER" wrappers for functions with derivative annotation. The functions
     // for the simulation code were already collected from the simulation DAE
     // at this point, so calls to such functions would end up in the generated
-    // jacobian code without a definition, see #16054.
+    // jacobian code without a definition. Return them so the caller can add
+    // them to the simulation code, see #16054.
     missingFunctions := getFunctionsMissingFromSimulationCode(outJacobian, funcs, simDAE.shared.functionTree);
+    for path in missingFunctions loop
+      optFn := AvlTreePathFunction.get(funcs, path);
+      if isSome(optFn) then
+        outExtraFunctions := Util.getOption(optFn) :: outExtraFunctions;
+      else
+        // no definition available, the function cannot be added to the simulation code
+        missingDefinitions := path :: missingDefinitions;
+      end if;
+    end for;
 
     if Flags.isSet(Flags.JAC_DUMP2) then
       BackendDump.dumpSparsityPattern(sparsePattern_, "FMI sparsity");
@@ -1892,12 +1904,13 @@ try
 else
   Error.addInternalError("function createFMIModelDerivativesForInitialization failed", sourceInfo());
   outJacobianMatrices := {};
+  outExtraFunctions := {};
 end try;
 
 // Report outside of the try block to not run into the generic internal error above.
-if not listEmpty(missingFunctions) then
+if not listEmpty(missingDefinitions) then
   Error.addMessage(Error.FMU_DIRECTIONAL_DERIVATIVES_MISSING_FUNCTIONS,
-    {stringDelimitList(list(AbsynUtil.pathString(fn) for fn in missingFunctions), ", ")});
+    {stringDelimitList(list(AbsynUtil.pathString(fn) for fn in missingDefinitions), ", ")});
   fail();
 end if;
 end createFMIModelDerivativesForInitialization;

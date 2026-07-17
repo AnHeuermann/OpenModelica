@@ -249,6 +249,15 @@ protected
   Integer numberofFixedParameters, reasonableSize;
   Option<SimCode.FmiModelStructure> modelStructure = NONE();
   Option<SimCode.FmiSimulationFlags> fmiSimulationFlags = NONE();
+  list<DAE.Function> extraFuncs = {};
+  list<SimCodeFunction.Function> extraSimFuncs;
+  list<SimCodeFunction.RecordDeclaration> extraRecordDecls;
+  list<SimCodeFunction.RecordDeclaration> recordDecls2 = recordDecls;
+  list<String> extraIncludes;
+  list<String> externalFunctionIncludes2 = externalFunctionIncludes;
+  tuple<Integer, HashTableExpToIndex.HashTable, list<DAE.Exp>> literals2 = literals;
+  list<DAE.Exp> newLits;
+  Integer nLits;
   SimCode.BackendMapping backendMapping;
   SimCode.ExtObjInfo extObjInfo;
   SimCode.HashTableCrefToSimVar crefToSimVarHT;
@@ -602,9 +611,27 @@ algorithm
 
     // collect fmi partial derivative (FMI 2.0 and 3.0 both expose a ModelStructure)
     if FMI.isFMIVersion20(FMUVersion) or FMI.isFMIVersion30(FMUVersion) then
-      (SymbolicJacsFMI, modelStructure, modelInfo, SymbolicJacsTemp, uniqueEqIndex) := createFMIModelStructure(inFMIDer, modelInfo, uniqueEqIndex, inInitDAE, inBackendDAE);
+      (SymbolicJacsFMI, modelStructure, modelInfo, SymbolicJacsTemp, uniqueEqIndex, extraFuncs) := createFMIModelStructure(inFMIDer, modelInfo, uniqueEqIndex, inInitDAE, inBackendDAE);
       SymbolicJacsNLS := listAppend(SymbolicJacsTemp, SymbolicJacsNLS);
       if debug then execStat("simCode: create FMI model structure"); end if;
+    end if;
+
+    // Elaborate functions that were created during the FMI model structure
+    // generation, e.g. differentiated functions for the FMIDERINIT jacobian.
+    // The functions for the simulation code were already collected before
+    // createSimCode, so they have to be added here to get definitions in the
+    // generated code, see #16054.
+    if not listEmpty(extraFuncs) then
+      (_, _, lits) := literals2;
+      nLits := listLength(lits);
+      (extraFuncs, literals2) := DAEUtil.traverseDAEFunctions(extraFuncs, SimCodeFunctionUtil.findLiteralsHelper, literals2);
+      (_, _, lits) := literals2;
+      newLits := List.firstN(lits, listLength(lits) - nLits);
+      (extraSimFuncs, extraRecordDecls, extraIncludes, _, _, _) := SimCodeFunctionUtil.elaborateFunctions(program, extraFuncs, {}, newLits, {});
+      modelInfo.functions := listAppend(modelInfo.functions, extraSimFuncs);
+      recordDecls2 := List.unionOnTrue(recordDecls2, extraRecordDecls, SimCodeFunctionUtil.isRecordDeclEqual);
+      externalFunctionIncludes2 := List.union(externalFunctionIncludes2, extraIncludes);
+      if debug then execStat("simCode: elaborate extra functions from FMI model structure"); end if;
     end if;
 
     // Collect FMI sim flags
@@ -768,8 +795,8 @@ algorithm
     simCode := SimCode.SIMCODE(
       modelInfo                   = modelInfo,
       literals                    = {}, // Set by the traversal below...
-      recordDecls                 = recordDecls,
-      externalFunctionIncludes    = externalFunctionIncludes,
+      recordDecls                 = recordDecls2,
+      externalFunctionIncludes    = externalFunctionIncludes2,
       generic_loop_calls          = {}, // only used in new backend
       localKnownVars              = localKnownVars,
       allEquations                = allEquations,
@@ -820,7 +847,7 @@ algorithm
       scalarized                  = true
     );
 
-    (simCode, (_, _, lits)) := traverseExpsSimCode(simCode, SimCodeFunctionUtil.findLiteralsHelper, literals);
+    (simCode, (_, _, lits)) := traverseExpsSimCode(simCode, SimCodeFunctionUtil.findLiteralsHelper, literals2);
     simCode := setSimCodeLiterals(simCode, listReverse(lits));
 
     // dumpCrefToSimVarHashTable(crefToSimVarHT);
@@ -13724,6 +13751,7 @@ public function createFMIModelStructure
   output SimCode.ModelInfo outModelInfo = inModelInfo;
   output list<SimCode.JacobianMatrix> symJacs = {};
   output Integer uniqueEqIndex = inUniqueEqIndex;
+  output list<DAE.Function> outExtraFunctions = {} "functions created during the jacobian generation, to be added to the simulation code";
 protected
    BackendDAE.SparsePatternCrefs spTA, spTA1;
    SimCode.SparsityPattern sparseInts;
@@ -13819,7 +13847,7 @@ algorithm
 
     // get FMI initialUnknowns list with dependencies
     if not listEmpty(tmpInitialUnknowns) then
-      (allInitialUnknowns, fmiDerInit, sortedUnknownCrefs, sortedknownCrefs) := getFmiInitialUnknowns(inInitDAE, inSimDAE, crefSimVarHT, tmpInitialUnknowns);
+      (allInitialUnknowns, fmiDerInit, sortedUnknownCrefs, sortedknownCrefs, outExtraFunctions) := getFmiInitialUnknowns(inInitDAE, inSimDAE, crefSimVarHT, tmpInitialUnknowns);
     else
       allInitialUnknowns := {};
     end if;
@@ -13895,6 +13923,7 @@ else
 
     contPartSimDer := NONE();
     initPartSimDer := NONE();
+    outExtraFunctions := {};
     outFmiModelStructure :=
       SOME(
         SimCode.FMIMODELSTRUCTURE(
@@ -14000,6 +14029,7 @@ protected function getFmiInitialUnknowns
   output BackendDAE.SymbolicJacobians fmiDerInit = {} "partial derivative of initDAE";
   output list<tuple<Integer, DAE.ComponentRef>> sortedUnknownCrefs = {} "sorted crefs of unknowns";
   output list<tuple<Integer, DAE.ComponentRef>> sortedknownCrefs = {} "sorted crefs of knowns";
+  output list<DAE.Function> outExtraFunctions = {} "functions created during the jacobian generation, to be added to the simulation code";
 protected
   list<DAE.ComponentRef> initialUnknownCrefs, indepCrefs, depCrefs, crefs;
   DAE.ComponentRef cref;
@@ -14129,7 +14159,7 @@ algorithm
       BackendDump.dumpVarList(fmiDerInitDepVars, "fmiDerInit_unknownVars");
       BackendDump.dumpVarList(fmiDerInitIndepVars, "fmiDerInit_knownVars");
     end if;
-    fmiDerInit := SymbolicJacobian.createFMIModelDerivativesForInitialization(inInitDAE, inSimDAE, fmiDerInitDepVars, fmiDerInitIndepVars, currentSystem.orderedVars, sparsePattern, sparseColoring);
+    (fmiDerInit, outExtraFunctions) := SymbolicJacobian.createFMIModelDerivativesForInitialization(inInitDAE, inSimDAE, fmiDerInitDepVars, fmiDerInitIndepVars, currentSystem.orderedVars, sparsePattern, sparseColoring);
 
     // sort the cref according to FMIINDEX, to be used by fmi2GetDirectionalDerivative()
     sortedknownCrefs := sortInitialUnknowsSimVars(getSimVars2Crefs(indepCrefs, crefSimVarHT));
