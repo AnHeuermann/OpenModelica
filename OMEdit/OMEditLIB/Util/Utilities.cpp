@@ -701,30 +701,36 @@ QDetachableProcess::QDetachableProcess(QObject *pParent)
 
 /*!
  * \brief QDetachableProcess::start
- * Starts a process and detaches from it.
+ * Starts a process detached from OMEdit, so the spawned process keeps running
+ * (and OMEdit keeps running) independently of this QProcess object.
+ *
+ * We used to call QProcess::start() followed by forcing setProcessState(QProcess::NotRunning),
+ * a trick to fake detachment. That leaves QProcess's internal bookkeeping (SIGCHLD
+ * handling, socket notifiers, etc.) in an inconsistent state and could crash OMEdit,
+ * especially when the child exits immediately, e.g., because the executable does not
+ * exist (see https://github.com/OpenModelica/OpenModelica/issues/16702). Qt's own
+ * QProcess::startDetached() is the safe, supported way to fire-and-forget a process.
  * \param program
  * \param arguments
- * \param mode
+ * \return true if the process was started successfully, false otherwise.
  */
-void QDetachableProcess::start(const QString &program, const QStringList &arguments, QIODevice::OpenMode mode)
+bool QDetachableProcess::start(const QString &program, const QStringList &arguments, QIODevice::OpenMode mode)
 {
-  QProcess::start(program, arguments, mode);
-  waitForStarted();
-  setProcessState(QProcess::NotRunning);
+  Q_UNUSED(mode)
+  return QProcess::startDetached(program, arguments, workingDirectory());
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
 /*!
  * \brief QDetachableProcess::start
- * Starts a process and detaches from it.
+ * Starts a process detached from OMEdit. See the other overload for details.
  * \param command
- * \param mode
+ * \return true if the process was started successfully, false otherwise.
  */
-void QDetachableProcess::start(const QString &command, QIODevice::OpenMode mode)
+bool QDetachableProcess::start(const QString &command, QIODevice::OpenMode mode)
 {
-  QProcess::start(command, mode);
-  waitForStarted();
-  setProcessState(QProcess::NotRunning);
+  Q_UNUSED(mode)
+  return QProcess::startDetached(command);
 }
 #endif
 #endif // QT_CONFIG(process)

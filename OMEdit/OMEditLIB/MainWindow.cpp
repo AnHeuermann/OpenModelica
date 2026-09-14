@@ -3444,9 +3444,8 @@ void MainWindow::showOpenModelicaCommandPrompt()
   args << "/K" << promptBatch;
   QDetachableProcess process;
   process.setWorkingDirectory(OptionsDialog::instance()->getGeneralSettingsPage()->getWorkingDirectory());
-  process.start(commandPrompt, args);
-  if (process.error() == QProcess::FailedToStart) {
-    QString errorString = tr("Unable to run command <b>%1</b> with arguments <b>%2</b>. Process failed with error <b>%3</b>").arg(commandPrompt, args.join(" "), process.errorString());
+  if (!process.start(commandPrompt, args)) {
+    QString errorString = tr("Unable to run command <b>%1</b> with arguments <b>%2</b>.").arg(commandPrompt, args.join(" "));
     MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, errorString, Helper::scriptingKind, Helper::errorLevel));
   }
 }
@@ -3786,13 +3785,13 @@ void MainWindow::openTerminal()
   process.setWorkingDirectory(OptionsDialog::instance()->getGeneralSettingsPage()->getWorkingDirectory());
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
   const QStringList args(QProcess::splitCommand(arguments));
-  process.start(terminalCommand, args);
+  bool started = process.start(terminalCommand, args);
 #else
-  process.start(terminalCommand + " " + arguments);
+  bool started = process.start(terminalCommand + " " + arguments);
 #endif
-  if (process.error() == QProcess::FailedToStart) {
-    QString errorString = tr("Unable to run terminal command <b>%1</b> with arguments <b>%2</b>. Process failed with error <b>%3</b>")
-                          .arg(terminalCommand, arguments, process.errorString());
+  if (!started) {
+    QString errorString = tr("Unable to run terminal command <b>%1</b> with arguments <b>%2</b>. Make sure the terminal command is correct and can be found, see %3.")
+                          .arg(terminalCommand, arguments, Helper::toolsOptionsPath);
     MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, errorString, Helper::scriptingKind, Helper::errorLevel));
   }
 #else
