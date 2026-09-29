@@ -45,6 +45,7 @@ class BOOST_EXTENSION_XML_READER_DECL XmlPropertyReader : public IPropertyReader
     const output_bool_vars_t& getBoolOutVars();
     const output_der_vars_t& getDerOutVars();
   const output_res_vars_t& getResOutVars();
+    shared_ptr<IInputFile> getInputFile();
   private:
     IGlobalSettings *_globalSettings;
     string _propertyFile;
@@ -54,5 +55,6 @@ class BOOST_EXTENSION_XML_READER_DECL XmlPropertyReader : public IPropertyReader
     output_real_vars_t _realVars;
     output_der_vars_t _derVars;
     output_res_vars_t _resVars;
+    shared_ptr<IInputFile> _inputFile; ///< inputs from --input-file, null without
     bool _isInitialized;
 };

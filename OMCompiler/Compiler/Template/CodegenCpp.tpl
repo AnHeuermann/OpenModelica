@@ -5849,6 +5849,7 @@ case SIMCODE(modelInfo = MODELINFO(__),makefileParams = MAKEFILE_PARAMS(__))  th
       #if !defined(FMU_BUILD)
         _reader  = shared_ptr<IPropertyReader>(new XmlPropertyReader(_global_settings, "<%fileNamePrefix%>_init.xml"));
         _reader->readInitialValues(*this, getSimVars());
+        setInputFile(_reader->getInputFile());
       #endif
 
       _simTime = 0.0;

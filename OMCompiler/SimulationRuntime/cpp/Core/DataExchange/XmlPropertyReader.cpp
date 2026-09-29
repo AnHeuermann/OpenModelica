@@ -30,6 +30,7 @@
 #include <Core/DataExchange/FactoryExport.h>
 #include <Core/Utils/extension/logger.hpp>
 #include <Core/DataExchange/XmlPropertyReader.h>
+#include <Core/DataExchange/CsvInputFile.h>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/lexical_cast.hpp>
@@ -66,6 +67,17 @@ static std::string arrayElementName(const std::string& base, const std::vector<i
   return ss.str();
 }
 
+// Path of the input file: as given, or relative to the input path (-inputPath)
+static std::string resolveInputFile(IGlobalSettings *globalSettings, const std::string& fileName)
+{
+  if (std::ifstream(fileName.c_str()).good())
+    return fileName;
+  std::string inInputPath = globalSettings->getInputPath() + fileName;
+  if (std::ifstream(inInputPath.c_str()).good())
+    return inInputPath;
+  return fileName;
+}
+
 XmlPropertyReader::XmlPropertyReader(IGlobalSettings *globalSettings, std::string propertyFile)
   : IPropertyReader()
   ,_globalSettings(globalSettings)
@@ -93,6 +105,11 @@ void XmlPropertyReader::readInitialValues(IContinuous& system, shared_ptr<ISimVa
     boost::optional<int> refIdxOpt;
     std::regex filterRegex(_globalSettings->getVariableFilter());
     EmitResults emitResults = _globalSettings->getEmitResults();
+    // inputs from an input file (--input-file), connected to the top-level inputs below
+    shared_ptr<CsvInputFile> inputFile;
+    std::vector<std::string> inputsWithoutColumn;
+    if (!_globalSettings->getInputFile().empty())
+      inputFile = shared_ptr<CsvInputFile>(new CsvInputFile(resolveInputFile(_globalSettings, _globalSettings->getInputFile())));
     try
     {
       ptree tree;
@@ -157,6 +174,30 @@ void XmlPropertyReader::readInitialValues(IContinuous& system, shared_ptr<ISimVa
               bool hideResultIsFalse = hideResultOpt && *hideResultOpt == "false";
               emitResult &= emitResults == EMIT_HIDDEN || !hideResultIsTrue;
               emitResult &= emitResults == EMIT_PROTECTED || (!isProtected || (emitResults != EMIT_HIDDEN && hideResultIsFalse));
+            }
+          }
+
+          boost::optional<string> causalityOpt = vars.second.get_optional<string>("<xmlattr>.causality");
+          if (inputFile && causalityOpt && *causalityOpt == "input" && !(isAlias || isNegatedAlias))
+          {
+            // connect each element of the input to its column, arrays element-wise
+            FOREACH(ptree::value_type const& var, vars.second.get_child(""))
+            {
+              if (var.first != "Real" && var.first != "Integer" && var.first != "Boolean")
+                continue;
+              for (int off = 0; off < (isArray ? arraySize : 1); off++)
+              {
+                std::string elname = isArray ? arrayElementName(name, arrayDims, off) : name;
+                bool found;
+                if (var.first == "Real")
+                  found = inputFile->addReal(elname, &realVars[refIdx + off]);
+                else if (var.first == "Integer")
+                  found = inputFile->addInt(elname, &intVars[refIdx + off]);
+                else
+                  found = inputFile->addBool(elname, &boolVars[refIdx + off]);
+                if (!found)
+                  inputsWithoutColumn.push_back(elname);
+              }
             }
           }
 
@@ -295,6 +336,13 @@ void XmlPropertyReader::readInitialValues(IContinuous& system, shared_ptr<ISimVa
     _isInitialized = true;
     file.close();
 
+    if (inputFile)
+    {
+      for (size_t i = 0; i < inputsWithoutColumn.size(); i++)
+        LOGGER_WRITE("Input file " + _globalSettings->getInputFile() + " has no column for input " + inputsWithoutColumn[i] + ", it keeps its start value", LC_INIT, LL_WARNING);
+      _inputFile = inputFile;
+    }
+
   }
 }
 
@@ -346,4 +394,9 @@ std::string XmlPropertyReader::getPropertyFile()
 void XmlPropertyReader::setPropertyFile(std::string file)
 {
   _propertyFile = file;
+}
+
+shared_ptr<IInputFile> XmlPropertyReader::getInputFile()
+{
+  return _inputFile;
 }

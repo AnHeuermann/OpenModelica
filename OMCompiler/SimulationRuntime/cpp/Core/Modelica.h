@@ -253,6 +253,7 @@ typedef ublas::matrix<double, ublas::column_major> matrix_t;
 #include <Core/Math/ArrayOperations.h>
 #include <Core/Math/ArraySlice.h>
 #include <Core/Math/Utility.h>
+#include <Core/DataExchange/IInputFile.h>
 #include <Core/DataExchange/IPropertyReader.h>
 #include <Core/DataExchange/SimDouble.h>
 #ifdef USE_REDUCE_DAE

@@ -1,0 +1,83 @@
+// name: csvInputTest
+// keywords: cpp runtime input file csvInput
+// status: correct
+// teardown_command: rm -f *CppCsvInput* CppCsvInput*.csv
+//
+// Top-level inputs from a CSV file (-csvInput / --input-file) with the Cpp
+// runtime: scalar inputs of the old backend, including Integer and Boolean,
+// and non-scalarized array inputs of the new backend. Real inputs are
+// interpolated linearly, Integer and Boolean inputs hold the last row.
+// An input without a column keeps its start value.
+
+loadString("
+model CppCsvInput
+  input Real u(start = -1);
+  input Real w[2];
+  input Real m[2, 2];
+  input Integer k;
+  input Boolean b;
+  input Real notInFile(start = 7);
+  output Real y = u + w[1] + 2*w[2] + k + (if b then 100 else 0);
+  output Real z = m[1,1] + 10*m[1,2] + 100*m[2,1] + 1000*m[2,2];
+  output Real v = notInFile;
+end CppCsvInput;
+
+model CppCsvInputArray
+  input Real u(start = -1);
+  input Real w[2];
+  input Real m[2, 2];
+  input Real notInFile(start = 7);
+  output Real y = u + w[1] + 2*w[2];
+  output Real z = m[1,1] + 10*m[1,2] + 100*m[2,1] + 1000*m[2,2];
+  output Real v = notInFile;
+end CppCsvInputArray;
+"); getErrorString();
+
+// names with commas are quoted
+writeFile("CppCsvInput.csv", "time,u,w[1],w[2],\"m[1,1]\",\"m[1,2]\",\"m[2,1]\",\"m[2,2]\",k,b
+0,0,1,2,1,2,3,4,1,0
+0.5,1,1,2,1,2,3,4,2,1
+1,2,1,2,5,6,7,8,3,1
+"); getErrorString();
+// or the separator is given in the first line
+writeFile("CppCsvInputSep.csv", "\"sep=;\"
+time;u;w[1];w[2];m[1,1];m[1,2];m[2,1];m[2,2]
+0;0;1;2;1;2;3;4
+0.5;1;1;2;1;2;3;4
+1;2;1;2;5;6;7;8
+"); getErrorString();
+
+setCommandLineOptions("--simCodeTarget=Cpp"); getErrorString();
+simulate(CppCsvInput, stopTime = 1, numberOfIntervals = 4, simflags = "-csvInput=CppCsvInput.csv"); getErrorString();
+{val(y, 0.25), val(z, 0.25), val(y, 0.75), val(z, 0.75), val(y, 1), val(z, 1), val(v, 0.5)};
+
+setCommandLineOptions("--newBackend --simCodeScalarize=false"); getErrorString();
+simulate(CppCsvInputArray, stopTime = 1, numberOfIntervals = 4, simflags = "-csvInput=CppCsvInputSep.csv"); getErrorString();
+{val(y, 0.25), val(z, 0.25), val(y, 0.75), val(z, 0.75), val(y, 1), val(z, 1), val(v, 0.5)};
+
+// Result:
+// true
+// ""
+// true
+// ""
+// true
+// ""
+// true
+// ""
+// record SimulationResult
+//     resultFile = "CppCsvInput_res.mat",
+//     simulationOptions = "startTime = 0.0, stopTime = 1.0, numberOfIntervals = 4, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'CppCsvInput', options = '', outputFormat = 'mat', variableFilter = '.*', cflags = '', simflags = '-csvInput=CppCsvInput.csv'",
+//     messages = ""
+// end SimulationResult;
+// ""
+// {6.5, 4321.0, 108.5, 6543.0, 110.0, 8765.0, 7.0}
+// true
+// ""
+// record SimulationResult
+//     resultFile = "CppCsvInputArray_res.mat",
+//     simulationOptions = "startTime = 0.0, stopTime = 1.0, numberOfIntervals = 4, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'CppCsvInputArray', options = '', outputFormat = 'mat', variableFilter = '.*', cflags = '', simflags = '-csvInput=CppCsvInputSep.csv'",
+//     messages = ""
+// end SimulationResult;
+// ""
+// {5.5, 4321.0, 6.5, 6543.0, 7.0, 8765.0, 7.0}
+// endResult

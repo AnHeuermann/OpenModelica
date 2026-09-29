@@ -194,6 +194,16 @@ void GlobalSettings::setInputPath(string path)
   _input_path = path;
 }
 
+string GlobalSettings::getInputFile()
+{
+  return _input_file;
+}
+
+void GlobalSettings::setInputFile(string file)
+{
+  _input_file = file;
+}
+
 string GlobalSettings::getSelectedSolver()
 {
   return _selected_solver;

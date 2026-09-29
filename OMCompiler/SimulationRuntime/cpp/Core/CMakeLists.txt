@@ -153,7 +153,8 @@ endif()
 # OMCppDataExchange
 set(OMC_SIMRT_CPP_CORE_DATAEXCHANGE_SOURCES DataExchange/SimData.cpp
                                             DataExchange/FactoryExport.cpp
-                                            DataExchange/XmlPropertyReader.cpp)
+                                            DataExchange/XmlPropertyReader.cpp
+                                            DataExchange/CsvInputFile.cpp)
 
 add_library(OMCppDataExchange SHARED)
 add_library(omc::simrt::cpp::core::dataexchange ALIAS OMCppDataExchange)

@@ -53,6 +53,7 @@ struct SimSettings
   string variableFilter;
   string inputPath;
   string outputPath;
+  string inputFile; ///< time series of the top-level inputs, empty for none
 };
 
 /**

@@ -313,6 +313,16 @@ void SystemDefaultImplementation::initialize()
 void SystemDefaultImplementation::setTime(double t)
 {
   _simTime = t;
+  if (_inputFile)
+    _inputFile->apply(t);
+}
+
+void SystemDefaultImplementation::setInputFile(shared_ptr<IInputFile> inputFile)
+{
+  _inputFile = inputFile;
+  // values at the start, used by the initialization instead of the start values
+  if (_inputFile)
+    _inputFile->apply(_global_settings->getStartTime());
 }
 
 // Get current integration time

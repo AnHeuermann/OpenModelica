@@ -127,6 +127,9 @@ public:
   ///< Directory for input files, like init.xml
   virtual string getInputPath() = 0;
   virtual void setInputPath(string) = 0;
+  ///< File with time series of the top-level inputs, empty for none
+  virtual string getInputFile() = 0;
+  virtual void setInputFile(string) = 0;
 
   virtual void setNonLinearSolverContinueOnError(bool) = 0;
   virtual bool getNonLinearSolverContinueOnError() = 0;

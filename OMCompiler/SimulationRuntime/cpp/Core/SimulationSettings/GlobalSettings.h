@@ -64,6 +64,9 @@ public:
   ///path for input files, like init xml
   virtual string getInputPath();
   virtual void setInputPath(string);
+  ///file with time series of the top-level inputs, empty for none
+  virtual string getInputFile();
+  virtual void setInputFile(string);
   ///path for simulation results in textfile
   virtual string getOutputPath();
   virtual void setOutputPath(string);
@@ -112,6 +115,7 @@ private:
       _nonLinSolverContinueOnError;
   string
       _input_path,
+      _input_file,
       _output_path,
       _selected_solver,
       _selected_lin_solver,

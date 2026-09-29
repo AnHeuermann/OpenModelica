@@ -153,9 +153,11 @@ public:
 
   /// (Re-) initialize the system of equations
   void initialize();
-  /// Set current integration time
+  /// Set current integration time, and the inputs from the input file at that time
   void setTime(double t);
   double getTime();
+  /// Set the inputs from an input file at every time, null for none
+  void setInputFile(shared_ptr<IInputFile> inputFile);
   /// Set tolerance for zero crossings
   void setZeroTol(double dt);
   double getZeroTol();
@@ -261,6 +263,7 @@ protected:
     double _delay_max;
     double _start_time;
     IGlobalSettings* _global_settings; //this should be a reference, but this is not working if the libraries are linked statically
+    shared_ptr<IInputFile> _inputFile; ///< inputs from --input-file, null without
     IEvent* _event_system; //this pointer to event system
     string _modelName;
 

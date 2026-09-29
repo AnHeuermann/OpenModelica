@@ -41,7 +41,8 @@ testVectorizedBlocks.mos \
 testVectorizedPowerSystem.mos \
 testVectorizedSolarSystem.mos \
 trapezoidTest.mos \
-negatedParameter.mos
+negatedParameter.mos \
+csvInputTest.mos
 
 FAILINGTESTFILES= \
 clockedEventRotationalTest.mos \

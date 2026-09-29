@@ -70,12 +70,14 @@ class FMU2GlobalSettings : public IGlobalSettings
   virtual void            setInfoOutput(bool) {}
   virtual string          getOutputPath() { return "./"; }
   virtual string          getInputPath() { return "./"; }
+  virtual string          getInputFile() { return ""; }
   virtual LogSettings     getLogSettings() { return LogSettings(LF_FMI2); }
   virtual void            setLogSettings(LogSettings) {}
   virtual OutputPointType getOutputPointType() { return OPT_ALL; };
   virtual void            setOutputPointType(OutputPointType) {};
   virtual void            setOutputPath(string) {}
   virtual void            setInputPath(string) {}
+  virtual void            setInputFile(string) {}
   virtual string          getSelectedSolver() { return "euler"; }
   virtual void            setSelectedSolver(string) {}
   virtual string          getSelectedLinSolver() { return "dgesvSolver"; }
