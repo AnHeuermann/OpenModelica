@@ -14,7 +14,6 @@ BouncingBallSourceFMU.mos \
 EnumerationTest.mos \
 HelloFMIWorld.mos \
 InOutTest.mos \
-JuliansBib.mos \
 Modelica.Blocks.Sources.BooleanPulse.mos \
 Modelica.Electrical.Analog.Examples.ChuaCircuit.mos \
 Modelica_Mechanics_MultiBody_Examples_Elementary_Pendulum.mos \

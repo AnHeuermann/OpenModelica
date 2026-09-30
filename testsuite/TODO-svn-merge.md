@@ -11,7 +11,3 @@ large diffs when changing the frontend.
 - Reference files should be put in the root directory with an environment
 variable passing the path to each test case (started: msl32 files were moved).
 - Reference files should in no case be larger than 1MB.
-
-## List of stupid directories
-
-- flattening/libraries/3rdParty/HumMod
