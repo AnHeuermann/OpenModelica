@@ -11,7 +11,6 @@ ThermoPower.Examples.HRB.Simulators.ClosedLoopSimulator.mos \
 # test that currently fail. Move up when fixed.
 # Run make testfailing
 FAILINGTESTFILES = \
-ThermoPower.Examples.RankineCycle.Simulators.ClosedLoop.mos \
 
 
 # Dependency files that are not .mo .mos or Makefile

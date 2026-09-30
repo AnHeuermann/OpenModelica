@@ -63,8 +63,6 @@ TT.mos \
 # test that currently fail. Move up when fixed.
 # Run make testfailing
 FAILINGTESTFILES = \
-TT2.mos \
-TT3.mos \
 OSP2.mos \
 
 # Dependency files that are not .mo .mos or Makefile

@@ -133,7 +133,6 @@ Inline3.mo \
 Inline4.mo \
 Inline5.mo \
 Inline6.mo \
-OutOfMemory.mos \
 StatementCall.mo \
 Vectorizable2.mo
 

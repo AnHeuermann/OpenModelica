@@ -33,8 +33,6 @@ testSynchronousFMU_02.mos \
 whenTest.mos \
 
 FAILINGTESTFILES = \
-resetWithLoops.mos \
-test03.mos \
 
 # Dependency files that are not .mo .mos or Makefile
 # Add them here or they will be cleaned.

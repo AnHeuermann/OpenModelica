@@ -57,16 +57,11 @@ inverseTest.mos \
 # test that currently fail. Move up when fixed.
 # Run make testfailing
 FAILINGTESTFILES= \
-fullRobot.mos \
 nanTest_kinsol.mos \
 nonlinearDelayTest_kinsol.mos \
 problem2_kinsol.mos \
 problem4_kinsol.mos \
-problem4_newton.mos \
-NonlinearSolverFailureInitial.mos \
-NonlinearSolverSimulation.mos \
-FiniteEscapeTime.mos \
-WrongInitialSolutionSelected.mos
+problem4_newton.mos
 
 # Dependency files that are not .mo .mos or Makefile
 # Add them here or they will be cleaned.

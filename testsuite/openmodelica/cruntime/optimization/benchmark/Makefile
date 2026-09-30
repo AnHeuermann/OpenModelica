@@ -8,7 +8,6 @@ runExReduceDrumBoiler.mos \
 # test that currently fail. Move up when fixed. 
 # Run make testfailing
 FAILINGTESTFILES = \
-runReduceDrumBoiler.mos \
 
 
 # Dependency files that are not .mo .mos or Makefile

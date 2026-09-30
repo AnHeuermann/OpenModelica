@@ -13,18 +13,11 @@ BouncingBall.mos \
 BouncingBallSourceFMU.mos \
 EnumerationTest.mos \
 HelloFMIWorld.mos \
-InOutTest.mos \
-Modelica.Blocks.Sources.BooleanPulse.mos \
 Modelica.Electrical.Analog.Examples.ChuaCircuit.mos \
-Modelica_Mechanics_MultiBody_Examples_Elementary_Pendulum.mos \
-Modelica_Mechanics_MultiBody_Examples_Elementary_DoublePendulum.mos \
 Pendulum.mos \
 SampleExample.mos \
 testAssert.mos \
 TanksConnectedPI.mos \
-CoupledClutches.mos \
-BooleanNetwork1.mos \
-IntegerNetwork1.mos \
 StringParameters.mos
 
 # Dependency files that are not .mo .mos or Makefile

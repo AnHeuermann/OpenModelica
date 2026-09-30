@@ -190,10 +190,6 @@
 ./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/ColdWater/ColdWater_Test2_ref.mat
 ./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/ColdWater/ColdWater_Test3_ref.mat
 ./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/ColdWater/ColdWater_Test4_ref.mat
-./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/FlueGas/FlueGas_Test1_ref.mat
-./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/FlueGas/FlueGas_Test2_ref.mat
-./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/FlueGas/FlueGas_Test3_ref.mat
-./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/FlueGas/FlueGas_Test4_ref.mat
 ./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/Nitrogen/Nitrogen_Test1_ref.mat
 ./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/WaterIF97/WaterIF97_Test1_ref.mat
 ./simulation/libraries/3rdParty/TestMediaFrancesco/ReferenceFiles/WaterIF97/WaterIF97_Test2_ref.mat

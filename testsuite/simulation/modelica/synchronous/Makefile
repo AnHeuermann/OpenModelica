@@ -27,7 +27,6 @@ Ticket12245.mos
 # Run make failingtest
 FAILINGTESTFILES = \
 Modelica_Synchronous.Examples.Elementary.BooleanSignals.TimeBasedPulse.mos \
-synch.mos \
 
 # Dependency files that are not .mo .mos or Makefile
 # Add them here or they will be cleaned.

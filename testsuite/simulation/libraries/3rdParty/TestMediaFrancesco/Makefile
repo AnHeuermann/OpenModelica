@@ -17,10 +17,6 @@ TestMedia.TestModels.WaterIF97.Test8.mos
 # test that currently fail. Move up when fixed.
 # Run make testfailing
 FAILINGTESTFILES=  \
-TestMedia.TestModels.FlueGas.Test1.mos \
-TestMedia.TestModels.FlueGas.Test2.mos \
-TestMedia.TestModels.FlueGas.Test3.mos \
-TestMedia.TestModels.FlueGas.Test4.mos \
 
 # Dependency files that are not .mo .mos or Makefile
 # Add them here or they will be cleaned.

@@ -27,7 +27,6 @@ Modelica.Utilities.Examples.readRealParameterModel.mos \
 
 # Run make failingtest
 FAILINGTESTFILES=\
-Modelica.Mechanics.MultiBody.Examples.Elementary.FreeBody.mos \
 
 
 # Dependency files that are not .mo .mos or Makefile

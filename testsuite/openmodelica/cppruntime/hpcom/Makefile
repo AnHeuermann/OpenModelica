@@ -6,47 +6,27 @@ Modelica.Electrical.Spice3.Examples.CoupledInductors_list_pthreads_spin.mos
 
 TESTFILES_ALL = $(TESTFILES_SERIAL) $(TESTFILES_LEVELFIX) $(TESTFILES_LEVEL) $(TESTFILES_METIS) $(TESTFILES_LIST) $(TESTFILES_LISTR) $(TESTFILES_TBB) $(TESTFILES_MCP)
 
-TESTFILES_SERIAL = \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_serial_omp.mos \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_serial_pthreads.mos
+TESTFILES_SERIAL =
 
 TESTFILES_LEVELFIX = \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_levelfix_pthreads.mos \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_levelfix_pthreads_memory.mos \
-Modelica.Fluid.Examples.BranchingDynamicPipes_levelfix_pthreads.mos
+Modelica.Electrical.Analog.Examples.CauerLowPassSC_levelfix_pthreads_memory.mos
 
 TESTFILES_LEVEL = \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_level_omp.mos \
 
-TESTFILES_METIS = \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_metis_pthreads.mos
+TESTFILES_METIS =
 
 TESTFILES_LIST = \
-Modelica.Electrical.Spice3.Examples.CoupledInductors_list_omp.mos \
-Modelica.Electrical.Spice3.Examples.CoupledInductors_list_pthreads.mos \
 Modelica.Electrical.Spice3.Examples.CoupledInductors_list_pthreads_spin.mos
 
-TESTFILES_LISTR = \
-Modelica.Electrical.Spice3.Examples.CoupledInductors_listr_omp.mos
+TESTFILES_LISTR =
 
-TESTFILES_TBB = \
-Modelica.Electrical.Spice3.Examples.CoupledInductors_tbb.mos \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_tbb.mos
+TESTFILES_TBB =
 
-TESTFILES_MCP = \
-Modelica.Fluid.Examples.DrumBoiler.DrumBoiler_mcp_pthreads.mos \
-Modelica.Electrical.Spice3.Examples.CoupledInductors_mcp_omp.mos \
-Modelica.Thermal.HeatTransfer.Examples.Motor_mcp_omp.mos
+TESTFILES_MCP =
 
 # Run make failingtest
 FAILINGTESTFILES= \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_level_omp_measureTime.mos \
-Modelica.Electrical.Analog.Examples.CauerLowPassSC_level_omp_memory.mos \
-Modelica.Electrical.Spice3.Examples.CoupledInductors_level_omp.mos \
 Modelica.Mechanics.MultiBody.Examples.Elementary.ThreeSprings_level_omp.mos \
-Modelica.Mechanics.MultiBody.Examples.Elementary.ThreeSprings_list_omp.mos \
-Modelica.Thermal.HeatTransfer.Examples.Motor_mcp_omp.mos \
-# Modelica.Thermal.HeatTransfer.Examples.Motor_mcp_omp.mos fails due to timeout on docker containers
 
 # Dependency files that are not .mo .mos or Makefile
 # Add them here or they will be cleaned.

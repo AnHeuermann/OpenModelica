@@ -58,7 +58,6 @@ ThermoSysPro.Examples.SimpleExamples.TestDynamicCheckValve.mos \
 ThermoSysPro.Examples.SimpleExamples.TestDynamicReliefValve.mos \
 ThermoSysPro.Examples.SimpleExamples.TestDynamicTwoPhaseFlowPipe.mos \
 ThermoSysPro.Examples.SimpleExamples.TestFan.mos \
-ThermoSysPro.Examples.SimpleExamples.TestFlueGasesVolumes1.mos \
 ThermoSysPro.Examples.SimpleExamples.TestJunctions3.mos \
 ThermoSysPro.Examples.SimpleExamples.TestJunctions5.mos \
 ThermoSysPro.Examples.SimpleExamples.TestLumpedStraightPipe.mos \

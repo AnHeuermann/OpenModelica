@@ -91,7 +91,6 @@ unitConvertTests.mos
 # Run make testfailing
 FAILINGTESTFILES= \
 EngineV6_evalParams.mos \
-EngineV6_output.mos \
 MoonAndEarth.mos \
 pendulum4.mos \
 SpaceProbe.mos \
