@@ -12462,7 +12462,7 @@ pub fn getSolvedSystem(
                     __mm_s.push_str(&*literal!("\n"));
                     ArcStr::from(__mm_s)
                 });
-                BackendDump::dumpLoops(Util::getOption(outInitDAE_lambda0_option.clone())?)?;
+                BackendDump::dumpLoops(outInitDAE_lambda0_option.clone().ok_or("pattern mismatch")?)?;
             }
         }
         checkBackendDAEWithErrorMsg(&outSimDAE)?;
@@ -13130,7 +13130,7 @@ fn causalizeDAEWork(
                     let mut neqns: i32;
                     funcs = getFunctions(&ishared);
                     (syst, _, _, mapEqnIncRow, mapIncRowEqn) = getAdjacencyMatrixScalar(isyst.clone(), openmodelica_backend_types::BackendDAE::IndexType::SOLVABLE, Some(funcs.clone()), isInitializationDAE(&ishared))?;
-                    match_opts = Util::getOptionOrDefault(inMatchingOptions.clone(), (openmodelica_backend_types::BackendDAE::IndexReduction::INDEX_REDUCTION, openmodelica_backend_types::BackendDAE::EquationConstraints::EXACT));
+                    match_opts = inMatchingOptions.clone().unwrap_or((openmodelica_backend_types::BackendDAE::IndexReduction::INDEX_REDUCTION, openmodelica_backend_types::BackendDAE::EquationConstraints::EXACT));
                     arg = IndexReduction::getStructurallySingularSystemHandlerArg(&syst, &ishared, mapEqnIncRow.clone(), mapIncRowEqn.clone())?;
                     nvars = BackendVariable::daenumVariables(&syst);
                     neqns = systemSize(&syst)?;
@@ -14139,7 +14139,7 @@ pub(crate) fn getIndexReductionMethod(
         )
     ];
     strIndexReductionMethod = getIndexReductionMethodString()?;
-    strIndexReductionMethod = Util::getOptionOrDefault(ostrIndexReductionMethod, strIndexReductionMethod);
+    strIndexReductionMethod = ostrIndexReductionMethod.unwrap_or(strIndexReductionMethod);
     IndexReductionMethod = selectIndexReductionMethod(&strIndexReductionMethod, &allIndexReductionMethods)?;
     Ok(IndexReductionMethod)
 }
@@ -16311,7 +16311,7 @@ pub(crate) fn getMatchingAlgorithm(
         )
     ];
     strMatchingAlgorithm = getMatchingAlgorithmString()?;
-    strMatchingAlgorithm = Util::getOptionOrDefault(ostrMatchingAlgorithm, strMatchingAlgorithm);
+    strMatchingAlgorithm = ostrMatchingAlgorithm.unwrap_or(strMatchingAlgorithm);
     matchingAlgorithm = selectMatchingAlgorithm(&strMatchingAlgorithm, &allMatchingAlgorithms)?;
     Ok(matchingAlgorithm)
 }
@@ -17573,7 +17573,7 @@ pub(crate) fn getPreOptModules(
     let mut disabledModules: metamodelica::List<ArcStr> =
         Flags::getConfigStringList(Flags::PRE_OPT_MODULES_SUB.clone())?;
     preOptModules = getPreOptModulesString()?;
-    preOptModules = Util::getOptionOrDefault(inPreOptModules, preOptModules);
+    preOptModules = inPreOptModules.unwrap_or(preOptModules);
     if (openmodelica_util::Globals::isInStream.with(|__root| __root.borrow().clone())).is_some() {
         enabledModules = metamodelica::cons(literal!("simplifyInStream"), enabledModules);
     }
@@ -17660,7 +17660,7 @@ pub(crate) fn getPostOptModules(
     let mut disabledModules: metamodelica::List<ArcStr> =
         Flags::getConfigStringList(Flags::POST_OPT_MODULES_SUB.clone())?;
     postOptModules = getPostOptModulesString()?;
-    postOptModules = Util::getOptionOrDefault(inPostOptModules, postOptModules);
+    postOptModules = inPostOptModules.unwrap_or(postOptModules);
     if Flags::getConfigBool(Flags::DEFAULT_OPT_MODULES_ORDERING.clone())? {
         if Flags::getConfigBool(Flags::GENERATE_DYN_OPTIMIZATION_PROBLEM.clone())? {
             enabledModules = metamodelica::cons(literal!("simplifyConstraints"), enabledModules);
@@ -17766,7 +17766,7 @@ pub(crate) fn getInitOptModules(
     let mut disabledModules: metamodelica::List<ArcStr> =
         Flags::getConfigStringList(Flags::INIT_OPT_MODULES_SUB.clone())?;
     initOptModules = Config::getInitOptModules()?;
-    initOptModules = Util::getOptionOrDefault(inInitOptModules, initOptModules);
+    initOptModules = inInitOptModules.unwrap_or(initOptModules);
     if Flags::getConfigBool(Flags::DEFAULT_OPT_MODULES_ORDERING.clone())? {
         if Flags::getConfigInt(Flags::SIMPLIFY_LOOPS.clone())? > 0 {
             enabledModules = metamodelica::cons(literal!("simplifyLoops"), enabledModules);

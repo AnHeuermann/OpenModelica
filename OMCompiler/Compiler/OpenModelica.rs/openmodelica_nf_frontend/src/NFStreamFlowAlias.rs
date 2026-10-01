@@ -109,7 +109,7 @@ pub mod FlowAlias {
 
     pub(crate) fn isNonFlow(mut alias: &metamodelica::Ref<FlowAlias>) -> Result<bool> {
         let mut isNonFlow: bool =
-            (alias.variable).is_some() && !(Variable::isFlow(&(Util::getOption(alias.variable.clone())?)));
+            (alias.variable).is_some() && !(Variable::isFlow(&(alias.variable.clone().ok_or("pattern mismatch")?)));
         Ok(isNonFlow)
     }
 }
@@ -571,7 +571,7 @@ pub(crate) fn createAliases(
             let mut alias = alias.clone();
             negated = representative.negative.clone() != alias.negative.clone();
             (alias, alias_eqs) = defineAlias(alias, repr_binding.clone(), negated, alias_eqs)?;
-            alias_vars = metamodelica::cons(Util::getOption(alias.variable.clone())?, alias_vars);
+            alias_vars = metamodelica::cons(alias.variable.clone().ok_or("pattern mismatch")?, alias_vars);
         }
         aliases = metamodelica::cons((representative, rest_aliases), aliases);
     }
@@ -704,7 +704,7 @@ pub(crate) fn applyReplacementsInExp_traverser(
         Expression::CREF { cref: __exp_cref, .. } => {
             opt_val = UnorderedMap::get(__exp_cref.clone(), replacements)?;
             if ((opt_val).is_some()) {
-                Util::getOption(opt_val)?
+                opt_val.ok_or("pattern mismatch")?
             } else {
                 exp
             }

@@ -834,7 +834,7 @@ fn mergeFunctionApplicationArgs(
         if (s.default).is_some() {
             UnorderedMap::add(
                 InstNode::name(&s.node)?,
-                Expression::unbox(Util::getOption(s.default.clone())?),
+                Expression::unbox(s.default.clone().ok_or("pattern mismatch")?),
                 arg_map.clone(),
             )?;
         }
@@ -993,7 +993,7 @@ fn assertAssignedOutput(
             name_str = {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*name_str);
-                __mm_s.push_str(&*Util::getOption(opt_indices)?);
+                __mm_s.push_str(&*opt_indices.ok_or("pattern mismatch")?);
                 ArcStr::from(__mm_s)
             };
             if error {
@@ -1400,7 +1400,7 @@ fn evaluateFor(
     let mut i: i32 = 0;
     let mut limit: i32 = Flags::getConfigInt(Flags::EVAL_LOOP_LIMIT.clone())?;
     range_exp = Ceval::evalExp(
-        Util::getOption(range)?,
+        range.ok_or("pattern mismatch")?,
         &(evalTargetFromSource(source.clone(), STATEMENT_CONTEXT.clone(), context)),
     )?;
     range_iter = RangeIterator::fromExp(range_exp)?;

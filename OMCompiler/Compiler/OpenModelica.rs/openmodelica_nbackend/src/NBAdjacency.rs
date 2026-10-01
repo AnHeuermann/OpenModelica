@@ -2405,7 +2405,7 @@ pub mod Matrix {
                                             if (inner_opt).is_some() {
                                                 inner_deps = metamodelica::cons(dep_cref, List::flatten(({
                                     let mut __acc: metamodelica::List<metamodelica::List<metamodelica::Ref<ComponentRef::NFComponentRef>>> = metamodelica::nil();
-                                    for mut c in (Util::getOption(inner_opt)?).into_iter().cloned() {
+                                    for mut c in (inner_opt.ok_or("pattern mismatch")?).into_iter().cloned() {
                                         let __x = sparsityExpandForeignIterators(c.clone(), no_iters.clone(), seed_elements.clone())?;
                                         __acc = cons(__x, __acc);
                                     }
@@ -2482,7 +2482,7 @@ pub mod Matrix {
                                                 _ => unreachable!("match_deref! exhaustiveness placeholder"),
                                             } });
                                             if (oseed_cref).is_some() {
-                                                seed_cref = Util::getOption(oseed_cref)?;
+                                                seed_cref = oseed_cref.ok_or("pattern mismatch")?;
                                                 UnorderedMap::add(seed_cref.clone(), dep.clone(), dep_map.clone())?;
                                                 if repeated {
                                                     UnorderedSet::add(seed_cref.clone(), rep_set.clone())?;
@@ -7108,10 +7108,8 @@ pub mod Solvability {
     ) -> Result<()> {
         if rank(&sol)?
             > rank(
-                &(Util::getOptionOrDefault(
-                    UnorderedMap::get(cref.clone(), map.clone())?,
-                    crate::NBAdjacency::Solvability::interned_UNKNOWN(),
-                )),
+                &((UnorderedMap::get(cref.clone(), map.clone())?)
+                    .unwrap_or(crate::NBAdjacency::Solvability::interned_UNKNOWN())),
             )?
         {
             UnorderedMap::add(cref, sol, map)?;
@@ -7517,7 +7515,7 @@ pub(crate) fn collectDependencies(
                 let mut set2: metamodelica::Ref<UnorderedSet::UnorderedSet<metamodelica::Ref<ComponentRef::NFComponentRef>>>;
                 set = collectDependencies(__exp_exp.clone(), depth, map.clone(), dep_map.clone(), sol_map.clone(), rep_set.clone())?;
                 if (__exp_dimIndex).is_some() {
-                    set2 = collectDependencies(Util::getOption(__exp_dimIndex.clone())?, depth, map, dep_map, sol_map.clone(), rep_set)?;
+                    set2 = collectDependencies(__exp_dimIndex.clone().ok_or("pattern mismatch")?, depth, map, dep_map, sol_map.clone(), rep_set)?;
                     set = UnorderedSet::union(set, set2)?;
                 }
                 Solvability::updateList(&(UnorderedSet::toList(set.clone())), crate::NBAdjacency::Solvability::interned_UNSOLVABLE(), sol_map)?;
@@ -7586,7 +7584,7 @@ pub(crate) fn collectDependencies(
             Deref @ Expression::RANGE { start: __exp_start, step: __exp_step, stop: __exp_stop, .. } => {
                 sets = metamodelica::cons(collectDependencies(__exp_start.clone(), depth, map.clone(), dep_map.clone(), sol_map.clone(), rep_set.clone())?, sets);
                 if (__exp_step).is_some() {
-                    sets = metamodelica::cons(collectDependencies(Util::getOption(__exp_step.clone())?, depth, map.clone(), dep_map.clone(), sol_map.clone(), rep_set.clone())?, sets);
+                    sets = metamodelica::cons(collectDependencies(__exp_step.clone().ok_or("pattern mismatch")?, depth, map.clone(), dep_map.clone(), sol_map.clone(), rep_set.clone())?, sets);
                 }
                 sets = metamodelica::cons(collectDependencies(__exp_stop.clone(), depth, map, dep_map, sol_map.clone(), rep_set)?, sets);
                 set = UnorderedSet::union_list(&sets, (std::sync::Arc::new(move |__a0: metamodelica::Ref<ComponentRef::NFComponentRef>| ComponentRef::hash(&__a0)) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<ComponentRef::NFComponentRef>) -> Result<i32> + 'static>), (std::sync::Arc::new(move |__a0: metamodelica::Ref<ComponentRef::NFComponentRef>, __a1: metamodelica::Ref<ComponentRef::NFComponentRef>| ComponentRef::isEqual(&__a0, &__a1)) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<ComponentRef::NFComponentRef>, metamodelica::Ref<ComponentRef::NFComponentRef>) -> Result<bool> + 'static>))?;
@@ -7838,7 +7836,7 @@ pub(crate) fn collectDependenciesIf(
                 >),
         )?;
         set2 = collectDependenciesIf(
-            &(Util::getOption(body.else_if.clone())?),
+            &(body.else_if.clone().ok_or("pattern mismatch")?),
             kind,
             map,
             dep_map,
@@ -8013,7 +8011,7 @@ pub(crate) fn collectDependenciesWhen(
     if (body.else_when).is_some() {
         lst = metamodelica::cons(
             collectDependenciesWhen(
-                &(Util::getOption(body.else_when.clone())?),
+                &(body.else_when.clone().ok_or("pattern mismatch")?),
                 kind,
                 map,
                 dep_map,

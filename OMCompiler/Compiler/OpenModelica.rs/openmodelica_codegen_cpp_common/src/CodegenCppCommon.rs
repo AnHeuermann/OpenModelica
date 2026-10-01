@@ -1165,7 +1165,7 @@ fn fun_83(
             let mut ret_0;
             txt = contextSystem(txt, a_context)?;
             txt = Tpl::writeTok(txt, metamodelica::Ref::new(Tpl::StringToken::ST_STRING { value: literal!("_") }))?;
-            ret_0 = Util::getOption(a_matrixName.clone())?;
+            ret_0 = a_matrixName.clone().ok_or("pattern mismatch")?;
             txt = Tpl::writeStr(txt, ret_0)?;
             txt = Tpl::writeTok(txt, metamodelica::Ref::new(Tpl::StringToken::ST_STRING { value: literal!("jac_y(") }))?;
             txt = Tpl::writeStr(txt, intString(a_i))?;
@@ -1177,7 +1177,7 @@ fn fun_83(
             let mut ret_1;
             txt = contextSystem(txt, a_context)?;
             txt = Tpl::writeTok(txt, metamodelica::Ref::new(Tpl::StringToken::ST_STRING { value: literal!("_") }))?;
-            ret_1 = Util::getOption(a_matrixName.clone())?;
+            ret_1 = a_matrixName.clone().ok_or("pattern mismatch")?;
             txt = Tpl::writeStr(txt, ret_1)?;
             txt = Tpl::writeTok(txt, metamodelica::Ref::new(Tpl::StringToken::ST_STRING { value: literal!("jac_tmp(") }))?;
             txt = Tpl::writeStr(txt, intString(a_i))?;
@@ -1189,7 +1189,7 @@ fn fun_83(
             let mut ret_2;
             txt = contextSystem(txt, a_context)?;
             txt = Tpl::writeTok(txt, metamodelica::Ref::new(Tpl::StringToken::ST_STRING { value: literal!("_") }))?;
-            ret_2 = Util::getOption(a_matrixName.clone())?;
+            ret_2 = a_matrixName.clone().ok_or("pattern mismatch")?;
             txt = Tpl::writeStr(txt, ret_2)?;
             txt = Tpl::writeTok(txt, metamodelica::Ref::new(Tpl::StringToken::ST_STRING { value: literal!("jac_x(") }))?;
             txt = Tpl::writeStr(txt, intString(a_i))?;

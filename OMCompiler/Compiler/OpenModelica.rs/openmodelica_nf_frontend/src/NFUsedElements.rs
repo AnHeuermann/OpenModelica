@@ -1766,7 +1766,7 @@ fn walkClassDef(
                     exps = (*__esc_exps).clone();
                     ext_output = (*__esc_ext_output).clone();
                     if (ext_output).is_some() {
-                        walkCref(&(Util::getOption(ext_output.clone())?), cls, walk.clone(), true)?;
+                        walkCref(&(ext_output.clone().ok_or("pattern mismatch")?), cls, walk.clone(), true)?;
                     }
                     List::fold(metamodelica::AsArg::as_arg(&exps), &({ let __pe_b1 = cls.clone(); move |__pe_a0, __pe_a2| walkExp(__pe_a0, &__pe_b1, __pe_a2) }), walk.clone())?;
                     ()
@@ -1887,7 +1887,11 @@ fn walkElement(
             )?;
             if (__element_condition).is_some() {
                 setRole(literal!("condition"), &walk)?;
-                walkExp(Util::getOption(__element_condition.clone())?, &scope, walk.clone())?;
+                walkExp(
+                    __element_condition.clone().ok_or("pattern mismatch")?,
+                    &scope,
+                    walk.clone(),
+                )?;
             }
             setRole(literal!("constrainedby"), &walk)?;
             walkConstrainingClass(metamodelica::AsArg::as_arg(&__element_prefixes), &scope, &walk)?;
@@ -2166,7 +2170,7 @@ fn walkMod(
             }
             if (__mod_binding).is_some() {
                 site = setRole(literal!("binding"), walk)?;
-                walkExp(Util::getOption(__mod_binding.clone())?, scope, walk.clone())?;
+                walkExp(__mod_binding.clone().ok_or("pattern mismatch")?, scope, walk.clone())?;
                 leaveSite(site, walk);
             }
             ()
@@ -2440,7 +2444,7 @@ fn walkTypeSpec(
                 1,
             )?;
             if (__ty_arrayDim).is_some() {
-                walkDims(&(Util::getOption(__ty_arrayDim.clone())?), scope, walk)?;
+                walkDims(&(__ty_arrayDim.clone().ok_or("pattern mismatch")?), scope, walk)?;
             }
             ()
         }

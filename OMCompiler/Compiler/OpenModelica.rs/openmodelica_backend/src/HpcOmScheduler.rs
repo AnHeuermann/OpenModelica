@@ -2689,7 +2689,7 @@ fn convertScheduleStrucToInfoLevel1<'__b>(
                 let mut threadIdx: i32;
                 let mut tuplLst: metamodelica::List<(i32, i32, metamodelica::Real)>;
                 numNodes = ((nodeIdc).len() as i32);
-                threadIdx = Util::getOptionOrDefault(threadIdxOpt.clone(), -1);
+                threadIdx = threadIdxOpt.clone().unwrap_or(-1);
                 tuplLst = List::threadMap1(List::fill(threadIdx, numNodes), List::fill(-1, numNodes), &fnptr!(Util::make3Tuple, _, _, _), metamodelica::OrderedFloat(0.0_f64))?;
                 List::threadMap1_0(metamodelica::AsArg::as_arg(&nodeIdc), tuplLst, &Array::updateIndexFirst, iScheduleInfo.clone())?;
                 { (tasks, sectionsNumber, sectionIdx, iScheduleInfo) = (rest, sectionsNumber, sectionIdx + 1, iScheduleInfo.clone()); continue '__tco; }
@@ -5982,7 +5982,7 @@ fn TDS_assignNewSimEqSysIdxs(
         ),
         ass.clone(),
     )?;
-    assign_field!(simCodeOut.jacobianMatrices = List::map(jacObts, &Util::getOption)?);
+    assign_field!(simCodeOut.jacobianMatrices = List::map(jacObts, &|o: Option<_>| o.ok_or("pattern mismatch"))?);
     varInfo.numEquations = idx;
     modelInfo.varInfo = varInfo;
     assign_field!(simCodeOut.modelInfo = modelInfo);
@@ -9923,7 +9923,7 @@ pub(crate) fn predictExecutionTime(
         serTime = getSerialExecutionTime(taskGraphMetaIn.clone())?;
         (_, parTime) = getFinishingTimesForSchedule(scheduleIn, numProc, taskGraphIn.clone(), taskGraphMetaIn)?;
         speedUp = metamodelica::real_div_checked(serTime, parTime)?;
-        helper = Util::getOptionOrDefault(cpCostsOption, (metamodelica::OrderedFloat(-1.0_f64)) * (serTime));
+        helper = cpCostsOption.unwrap_or((metamodelica::OrderedFloat(-1.0_f64)) * (serTime));
         speedUpMax = realDiv(serTime, helper);
     }
     serialTimeOut = serTime;

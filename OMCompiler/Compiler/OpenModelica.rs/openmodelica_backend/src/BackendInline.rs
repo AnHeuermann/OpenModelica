@@ -421,7 +421,7 @@ fn mergeDAEAttributes(
         outOpt = dstOpt;
         return Ok(outOpt);
     }
-    src = Util::getOption(srcOpt)?;
+    src = srcOpt.ok_or("pattern mismatch")?;
     dst = (::match_deref::match_deref! { match &(&dstOpt) {
         Some(dst) if (sameAttrKind(metamodelica::AsArg::as_arg(&dst), &src)) => dst.clone(),
         _ => emptyAttrLike(src.clone()),

@@ -3203,7 +3203,7 @@ fn collectRecDeclsFromElems(
                 collectRecDeclsFromType(metamodelica::AsArg::as_arg(&__elem_ty), recDeclsMap.clone())?;
                 if (__elem_binding).is_some() && Config::acceptMetaModelicaGrammar()? {
                     Expression::traverseExpBottomUp(
-                        Util::getOption(__elem_binding.clone())?,
+                        __elem_binding.clone().ok_or("pattern mismatch")?,
                         &collectRecDeclsFromMetaRecCallExp,
                         recDeclsMap.clone(),
                     )?;

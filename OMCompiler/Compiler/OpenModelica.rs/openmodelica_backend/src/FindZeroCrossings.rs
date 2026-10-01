@@ -1491,7 +1491,7 @@ fn replaceZCExpinFullJacobian(
     let mut eqn: metamodelica::Ref<BackendDAE::Equation>;
     let mut element: (i32, i32, metamodelica::Ref<BackendDAE::Equation>) =
         (0, 0, metamodelica::Ref::new(BackendDAE::Equation::DUMMY_EQUATION));
-    jac = Util::getOption(fullJac)?;
+    jac = fullJac.ok_or("pattern mismatch")?;
     for mut element in &*jac {
         let mut element = element.clone();
         (i, j, eqn) = element;
@@ -2234,7 +2234,7 @@ fn collectZCAlgsFor(
             if Flags::isSet(Flags::RELIDX.clone())? {
                 metamodelica::print({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(" number of relations: ")); __mm_s.push_str(&*intString(ZeroCrossings::count(metamodelica::AsArg::as_arg(&relations)))); __mm_s.push_str(&*literal!("\n")); ArcStr::from(__mm_s) });
             }
-            stepvalue = Util::getOptionOrDefault(stepvalueopt.clone(), metamodelica::Ref::new(DAE::Exp::ICONST { integer: 1 }));
+            stepvalue = stepvalueopt.clone().unwrap_or(metamodelica::Ref::new(DAE::Exp::ICONST { integer: 1 }));
             istart = BackendDAEUtil::expInt(startvalue.clone(), metamodelica::AsArg::as_arg(&globalKnownVars))?;
             istep = BackendDAEUtil::expInt(stepvalue, metamodelica::AsArg::as_arg(&globalKnownVars))?;
             eres = metamodelica::Ref::new(DAE::Exp::RELATION { exp1: e1.clone(), operator: op.clone(), exp2: e2.clone(), index: ZeroCrossings::count(metamodelica::AsArg::as_arg(&relations)), optionExpisASUB: Some((iterator.clone(), istart, istep)) });
@@ -2894,7 +2894,7 @@ fn createIterator(mut red_iter: &metamodelica::Ref<DAE::ReductionIterator>) -> R
             let mut ty: metamodelica::Ref<DAE::Type>;
             let mut non_resizable_size: i32;
             ty = Expression::r#typeof(var_field!((**exp).start, DAE::Exp::RANGE).clone())?;
-            step = Util::getOptionOrDefault(var_field!((**exp).step, DAE::Exp::RANGE).clone(), metamodelica::Ref::new(DAE::Exp::ICONST { integer: 1 }));
+            step = var_field!((**exp).step, DAE::Exp::RANGE).clone().unwrap_or(metamodelica::Ref::new(DAE::Exp::ICONST { integer: 1 }));
             size = metamodelica::Ref::new(DAE::Exp::BINARY { exp1: var_field!((**exp).stop, DAE::Exp::RANGE).clone(), operator: DAE::Operator::SUB { ty: ty.clone() }, exp2: var_field!((**exp).start, DAE::Exp::RANGE).clone() });
             size = metamodelica::Ref::new(DAE::Exp::BINARY { exp1: size, operator: DAE::Operator::DIV { ty: ty.clone() }, exp2: step.clone() });
             size = metamodelica::Ref::new(DAE::Exp::BINARY { exp1: size, operator: DAE::Operator::ADD { ty: ty }, exp2: metamodelica::Ref::new(DAE::Exp::ICONST { integer: 1 }) });

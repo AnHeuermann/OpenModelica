@@ -1561,7 +1561,7 @@ fn cevalWork2(
                     (cache, valMatrix, names, dims, tys) = cevalReductionIterators(cache.clone(), env.clone(), metamodelica::AsArg::as_arg(&iterators), r#impl.clone(), msg.clone(), numIter + 1)?;
                     valMatrix = makeReductionAllCombinations(valMatrix.clone(), iterType.clone())?;
                     (cache, ov) = cevalReduction(cache.clone(), env.clone(), metamodelica::AsArg::as_arg(&path), ov.clone(), metamodelica::AsArg::as_arg(&daeExp), metamodelica::AsArg::as_arg(&ty), metamodelica::AsArg::as_arg(&foldName), metamodelica::AsArg::as_arg(&resultName), foldExp.clone(), &names, valMatrix.clone().reverse(), &tys, r#impl.clone(), metamodelica::AsArg::as_arg(&msg), numIter + 1)?;
-                    value = Util::getOptionOrDefault(ov.clone(), openmodelica_frontend_types::Values::Value::interned_META_FAIL());
+                    value = ov.clone().unwrap_or(openmodelica_frontend_types::Values::Value::interned_META_FAIL());
                     value = backpatchArrayReduction(metamodelica::AsArg::as_arg(&path), iterType.clone(), value.clone(), dims.clone())?;
                     Ok((cache.clone(), value.clone()))
                 }
@@ -2190,7 +2190,7 @@ pub fn cevalKnownExternalFuncs(
         _ => return Err("pattern mismatch"),
     } };
     oid = metamodelica::Own::own(__pa4);
-    id = Util::getOptionOrDefault(oid, fid);
+    id = oid.unwrap_or(fid);
     isKnownExternalFunc(&id)?;
     res = cevalKnownExternalFuncs2(&id, vals, msg)?;
     Ok((outCache, res))
@@ -6232,7 +6232,7 @@ fn cevalRange(
     }),
         (Deref @ Values::Value::INTEGER { .. }, Deref @ Values::Value::INTEGER { .. }) => {
             if (step).is_some() {
-                let (__pa0, __pa1) = ::match_deref::match_deref! { match &(ceval(outCache, env, Util::getOption(step)?, r#impl, msg, numIter + 1)?) {
+                let (__pa0, __pa1) = ::match_deref::match_deref! { match &(ceval(outCache, env, step.ok_or("pattern mismatch")?, r#impl, msg, numIter + 1)?) {
                     (__pa0, Deref @ Values::Value::INTEGER { integer: __pa1 }) => (__pa0.clone(), __pa1.clone()),
                     _ => return Err("pattern mismatch"),
                 } };
@@ -6253,7 +6253,7 @@ fn cevalRange(
         (Deref @ Values::Value::ENUM_LITERAL { .. }, Deref @ Values::Value::ENUM_LITERAL { .. }) => cevalRangeEnum(var_field!((*vstart).index, Values::Value::ENUM_LITERAL).clone(), var_field!((*vstop).index, Values::Value::ENUM_LITERAL).clone(), &(Types::arrayElementType(&range_ty)))?,
         (Deref @ Values::Value::REAL { .. }, Deref @ Values::Value::REAL { .. }) => {
             if (step).is_some() {
-                let (__pa0, __pa1) = ::match_deref::match_deref! { match &(ceval(outCache, env, Util::getOption(step)?, r#impl, msg, numIter + 1)?) {
+                let (__pa0, __pa1) = ::match_deref::match_deref! { match &(ceval(outCache, env, step.ok_or("pattern mismatch")?, r#impl, msg, numIter + 1)?) {
                     (__pa0, Deref @ Values::Value::REAL { real: __pa1 }) => (__pa0.clone(), __pa1.clone()),
                     _ => return Err("pattern mismatch"),
                 } };

@@ -673,7 +673,7 @@ fn checkDuplicateTopLevelClasses(mut program: &Absyn::Program) -> Result<bool> {
                 if !(skip) {
                     optClassInfo = UnorderedMap::get(cl.name.clone(), classInfoMap.clone())?;
                     if (optClassInfo).is_some() {
-                        infos = list![Util::getOption(optClassInfo)?, cl.info.clone()];
+                        infos = list![optClassInfo.ok_or("pattern mismatch")?, cl.info.clone()];
                         Error::addMultiSourceMessage(
                             &(Error::DOUBLE_DECLARATION_OF_ELEMENTS.clone()),
                             &(list![cl.name.clone()]),
@@ -837,7 +837,7 @@ fn loadModel1(
                 dir = System::dirname(pathToFile.clone());
                 cl = unwrap_break_err!(ClassLoader::loadClassFromMp(AbsynUtil::pathFirstIdent(&path), System::dirname(dir.clone()), System::basename(dir.clone()), true, None, encrypted), '__try1);
                 if (cl).is_some() {
-                    pnew = Absyn::Program { classes: list![unwrap_break_err!(Util::getOption(cl.clone()), '__try1)], within_: openmodelica_ast::Absyn::Within::TOP };
+                    pnew = Absyn::Program { classes: list![unwrap_break_err!(cl.clone().ok_or("pattern mismatch"), '__try1)], within_: openmodelica_ast::Absyn::Within::TOP };
                 } else {
                     pnew = Absyn::Program { classes: metamodelica::nil(), within_: openmodelica_ast::Absyn::Within::TOP };
                 }
@@ -948,7 +948,7 @@ fn checkValidVersion(
     let mut actualVersionStr: ArcStr;
     let mut pathStr: ArcStr;
     semverWanted = SemanticVersion::parse(version.clone(), false)?;
-    actualVersionStr = Util::getOptionOrDefault(actualVersion, literal!(""));
+    actualVersionStr = actualVersion.unwrap_or(literal!(""));
     pathStr = AbsynUtil::pathString(path, literal!("."), true, false)?;
     semverActual = SemanticVersion::parse(actualVersionStr.clone(), false)?;
     if 0 == SemanticVersion::compare(&semverWanted, &semverActual, false, false)? {

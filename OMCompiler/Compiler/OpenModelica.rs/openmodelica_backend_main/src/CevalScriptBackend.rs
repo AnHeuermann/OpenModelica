@@ -602,10 +602,10 @@ pub(crate) fn buildSimulationOptionsFromModelExperimentAnnotation(
             let mut named: metamodelica::List<metamodelica::Ref<Absyn::NamedArg>>;
             let mut experiment_ann: Option<metamodelica::Ref<Absyn::Modification>>;
             loadProgram(&inModelPath)?;
-            defaults = Util::getOptionOrDefault(
-                defaultOption.clone(),
-                setFileNamePrefixInSimulationOptions(defaultSimulationOptions().clone(), inFileNamePrefix.clone())?,
-            );
+            defaults = defaultOption.clone().unwrap_or(setFileNamePrefixInSimulationOptions(
+                defaultSimulationOptions().clone(),
+                inFileNamePrefix.clone(),
+            )?);
             experiment_ann = InteractiveUtil::getInheritedAnnotation(
                 inModelPath.clone(),
                 literal!("experiment"),
@@ -861,7 +861,7 @@ fn populateSimulationOptions(
         } });
     }
     if (interval).is_some() {
-        options = setSimulationOptionsInterval(options, Expression::toReal(&(Util::getOption(interval)?))?)?;
+        options = setSimulationOptionsInterval(options, Expression::toReal(&(interval.ok_or("pattern mismatch")?))?)?;
     } else {
         options.stepSize = metamodelica::Ref::new(DAE::Exp::RCONST {
             real: metamodelica::real_div_checked(
@@ -9131,9 +9131,9 @@ fn moveClassInClassParts(
     is_empty = AbsynUtil::isEmptyClassPart(&part);
     parts = if (offset > 0) { rest.clone() } else { acc.clone() };
     if (parts).is_empty() && offset != 0 {
-        parts = moveClassInClassParts3(Util::getOption(cls)?, offset < 0, is_public, part, parts)?;
+        parts = moveClassInClassParts3(cls.ok_or("pattern mismatch")?, offset < 0, is_public, part, parts)?;
     } else {
-        parts = moveClassInClassParts2(Util::getOption(cls)?, offset, is_public, parts)?;
+        parts = moveClassInClassParts2(cls.ok_or("pattern mismatch")?, offset, is_public, parts)?;
         if !(is_empty) {
             parts = metamodelica::cons(part, parts);
         }
@@ -9314,7 +9314,7 @@ fn moveClassInClassPart2(
     }
     (acc, elements, outRemainingOffset, _) = moveClassInSplitClassPart(inOffset, acc, elements)?;
     if outRemainingOffset == 0 {
-        elements = metamodelica::cons(Util::getOption(outClass.clone())?, elements);
+        elements = metamodelica::cons(outClass.clone().ok_or("pattern mismatch")?, elements);
     }
     outElements = List::append_reverse(&acc, elements);
     Ok((outElements, outClass, outRemainingOffset))
@@ -13260,7 +13260,7 @@ fn saveTotalModelDebug(
         &(InteractiveUtil::getPathedSCodeElementInProgram(cls_path.clone(), prog.clone())?),
     );
     cmt = if ((ocmt).is_some()) {
-        Util::getOption(ocmt)?
+        ocmt.ok_or("pattern mismatch")?
     } else {
         SCode::noComment.clone()
     };
@@ -14481,7 +14481,7 @@ fn axisValue(mut oexp: Option<metamodelica::Ref<Absyn::Exp>>) -> Result<metamode
     let mut value: metamodelica::Ref<Values::Value>;
     let mut args: metamodelica::List<(ArcStr, metamodelica::Ref<Absyn::Exp>)>;
     args = (::match_deref::match_deref! { match &(oexp.clone()) {
-        Some(_) => figureArgs(&(Util::getOption(oexp)?), list![literal!("min"), literal!("max"), literal!("unit"), literal!("label"), literal!("scale")])?,
+        Some(_) => figureArgs(&(oexp.ok_or("pattern mismatch")?), list![literal!("min"), literal!("max"), literal!("unit"), literal!("label"), literal!("scale")])?,
         _ => metamodelica::nil(),
         _ => unreachable!("match_deref! exhaustiveness placeholder"),
     } });
@@ -14942,7 +14942,7 @@ fn instantiateModel(
                         ArcStr::from(__mm_s)
                     };
                 } else {
-                    r#str = unwrap_break_err!(DAEDump::dumpStr(unwrap_break_err!(Util::getOption(odae.clone()), '__try0), &(FCore::getFunctionTree(&cache))), '__try0);
+                    r#str = unwrap_break_err!(DAEDump::dumpStr(unwrap_break_err!(odae.clone().ok_or("pattern mismatch"), '__try0), &(FCore::getFunctionTree(&cache))), '__try0);
                     unwrap_break_err!(ExecStat::execStat(&(literal!("DAEDump.dumpStr"))), '__try0);
                 }
                 FlagsUtil::saveFlags(flags.clone());
@@ -15080,7 +15080,7 @@ fn convertPackageToLibrary(
         cls = unwrap_break_err!(ProgramUtil::getPathedClassInProgram(clsPath.clone(), &p, false, true), '__try0);
         uses_version = unwrap_break_err!(Interactive::getUsedVersion(cls.clone(), &libPath), '__try0);
         if (uses_version).is_some() {
-            lib_version_used = unwrap_break_err!(SemanticVersion::parse(unwrap_break_err!(Util::getOption(uses_version.clone()), '__try0), true), '__try0);
+            lib_version_used = unwrap_break_err!(SemanticVersion::parse(unwrap_break_err!(uses_version.clone().ok_or("pattern mismatch"), '__try0), true), '__try0);
         } else {
             unwrap_break_err!(Error::addMessage(Error::CONVERSION_MISSING_USES.clone(), list![unwrap_break_err!(AbsynUtil::pathString(clsPath.clone(), literal!("."), true, false), '__try0), unwrap_break_err!(AbsynUtil::pathString(libPath.clone(), literal!("."), true, false), '__try0)]), '__try0);
             break '__try0 Err::<_, _>("fail");
@@ -15181,12 +15181,12 @@ fn findConversionPath(
     from_version = SemanticVersion::parse(from, true)?;
     if SemanticVersion::compare(libVersionUsed, &from_version, true, false)? == 0 {
         if (to).is_some() {
-            to_version = SemanticVersion::parse(Util::getOption(to)?, true)?;
+            to_version = SemanticVersion::parse(to.ok_or("pattern mismatch")?, true)?;
             if SemanticVersion::compare(libVersion, &to_version, true, false)? != 0 {
                 scripts = findConversionPaths(conversions, libVersion, &to_version, depth + 1)?;
             }
         }
-        scripts = metamodelica::cons(Util::getOption(script)?, scripts);
+        scripts = metamodelica::cons(script.ok_or("pattern mismatch")?, scripts);
     }
     Ok(scripts)
 }

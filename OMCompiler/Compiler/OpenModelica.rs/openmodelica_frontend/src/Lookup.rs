@@ -734,7 +734,7 @@ fn lookupClass1(
                     AbsynUtil::pathString(inPath.clone(), literal!("."), true, false)?,
                     FGraph::printGraphPathStr(&inEnv)
                 ],
-                &(Util::getOption(inInfo.clone())?),
+                &(inInfo.clone().ok_or("pattern mismatch")?),
             )?;
         }
         return Err("fail");

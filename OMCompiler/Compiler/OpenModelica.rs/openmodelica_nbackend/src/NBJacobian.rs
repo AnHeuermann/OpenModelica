@@ -174,7 +174,7 @@ pub(crate) fn main(
         },
         Partition::Kind::DAE => {
             name = literal!("DAE_JAC");
-            assign_variant_field!(bdae => Jacobian::NBackendDAE::MAIN; dae = Some((applyToPartitions(Util::getOption(var_field!((*bdae).dae, Jacobian::NBackendDAE::MAIN).clone())?, var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), metamodelica::AsArg::as_arg(&knowns), name.clone(), &*(func.clone()), true)?).0));
+            assign_variant_field!(bdae => Jacobian::NBackendDAE::MAIN; dae = Some((applyToPartitions(var_field!((*bdae).dae, Jacobian::NBackendDAE::MAIN).clone().ok_or("pattern mismatch")?, var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), metamodelica::AsArg::as_arg(&knowns), name.clone(), &*(func.clone()), true)?).0));
             name
         },
         _ => {
@@ -189,7 +189,7 @@ pub(crate) fn main(
                 init = applyToPartitions(var_field!((*bdae).init, Jacobian::NBackendDAE::MAIN).clone(), var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), metamodelica::AsArg::as_arg(&knowns), name.clone(), &*(func.clone()), true)?.0
             );
             if (var_field!((*bdae).init_0, Jacobian::NBackendDAE::MAIN)).is_some() {
-                assign_variant_field!(bdae => Jacobian::NBackendDAE::MAIN; init_0 = Some((applyToPartitions(Util::getOption(var_field!((*bdae).init_0, Jacobian::NBackendDAE::MAIN).clone())?, var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), metamodelica::AsArg::as_arg(&knowns), name, &*(func.clone()), true)?).0));
+                assign_variant_field!(bdae => Jacobian::NBackendDAE::MAIN; init_0 = Some((applyToPartitions(var_field!((*bdae).init_0, Jacobian::NBackendDAE::MAIN).clone().ok_or("pattern mismatch")?, var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), metamodelica::AsArg::as_arg(&knowns), name, &*(func.clone()), true)?).0));
             }
             bdae
         },
@@ -509,7 +509,7 @@ fn getSeedCandidatesDynamicOptimization(
     unknown_states = ({
         let mut __acc: metamodelica::List<_> = metamodelica::nil();
         for mut var in (derivative_vars).into_iter().cloned() {
-            let __x = Util::getOption((NBVariable::getVarState(var.clone())?).0)?;
+            let __x = ((NBVariable::getVarState(var.clone())?).0).ok_or("pattern mismatch")?;
             __acc = cons(__x, __acc);
         }
         __acc.reverse()
@@ -770,7 +770,7 @@ fn partJacobian(
     if simJacobian && Partition::Partition::isODEorDAE(&part) {
         partialCandidates = part.unknowns.clone();
         unknowns = if (Partition::Partition::getKind(&part) == Partition::Kind::DAE.clone()) {
-            Util::getOption(part.daeUnknowns.clone())?
+            part.daeUnknowns.clone().ok_or("pattern mismatch")?
         } else {
             part.unknowns.clone()
         };
@@ -794,7 +794,7 @@ fn partJacobian(
         state_vars = ({
             let mut __acc: metamodelica::List<_> = metamodelica::nil();
             for mut var in (derivative_vars).into_iter().cloned() {
-                let __x = Util::getOption((NBVariable::getVarState(var.clone())?).0)?;
+                let __x = ((NBVariable::getVarState(var.clone())?).0).ok_or("pattern mismatch")?;
                 __acc = cons(__x, __acc);
             }
             __acc.reverse()
@@ -819,7 +819,7 @@ fn partJacobian(
             &(Flags::getConfigString(Flags::GENERATE_DYNAMIC_JACOBIAN.clone())?),
             &(literal!("bidirectional")),
         ) && (jacobian).is_some()
-            && !(Jacobian::getIsAdjoint(&(Util::getOption(jacobian.clone())?))?)
+            && !(Jacobian::getIsAdjoint(&(jacobian.clone().ok_or("pattern mismatch")?))?)
         {
             adjointJac = jacobianSymbolicAdjoint(
                 name,
@@ -843,7 +843,7 @@ fn partJacobian(
                 })
             );
         } else if (jacobian).is_some() {
-            if Jacobian::getIsAdjoint(&(Util::getOption(jacobian.clone())?))? {
+            if Jacobian::getIsAdjoint(&(jacobian.clone().ok_or("pattern mismatch")?))? {
                 assign_field!(
                     part.association = metamodelica::Ref::new(Partition::Association::Association::CONTINUOUS {
                         kind: kind,
@@ -1209,7 +1209,7 @@ fn jacobianSymbolic(
         comps = ({
             let mut __acc: metamodelica::List<metamodelica::Ref<StrongComponent::NBStrongComponent>> =
                 metamodelica::nil();
-            for mut comp in (Util::getOption(strongComponents)?).borrow().iter() {
+            for mut comp in (strongComponents.ok_or("pattern mismatch")?).borrow().iter() {
                 if !(!(StrongComponent::isDiscrete(&(comp.clone()))?)) {
                     continue;
                 }
@@ -1618,7 +1618,7 @@ fn addEntryToLPAMap(
     mappedSeed = UnorderedMap::get(NBVariable::getVarName(vptr), diff_map)?;
     if (mappedSeed).is_some() {
         UnorderedMap::tryAdd(
-            Util::getOption(mappedSeed)?,
+            mappedSeed.ok_or("pattern mismatch")?,
             metamodelica::nil(),
             loop_product_adjoint_map,
         )?;
@@ -1669,7 +1669,7 @@ fn getBaseTmpVarCandidates(
     for mut v in &**partialVars {
         baseCref = NBVariable::getVarName(v.clone());
         o_mapped = UnorderedMap::get(baseCref, diff_map.clone())?;
-        if (o_mapped).is_some() && UnorderedSet::contains(Util::getOption(o_mapped)?, tmpPDerSet.clone())? {
+        if (o_mapped).is_some() && UnorderedSet::contains(o_mapped.ok_or("pattern mismatch")?, tmpPDerSet.clone())? {
             baseTmpVars = metamodelica::cons(v.clone(), baseTmpVars);
         }
     }
@@ -1729,7 +1729,7 @@ fn populateDiffMap(
         baseCref = NBVariable::getVarName(vp.clone());
         o_mappedCref = UnorderedMap::get(baseCref.clone(), globalDiffMap.clone())?;
         if (o_mappedCref).is_some() {
-            UnorderedMap::add(baseCref, Util::getOption(o_mappedCref)?, outMap.clone())?;
+            UnorderedMap::add(baseCref, o_mappedCref.ok_or("pattern mismatch")?, outMap.clone())?;
         }
     }
     Ok(outMap)
@@ -1951,14 +1951,14 @@ fn generateAdjointComponent(
                         scalarized,
                         loop_product_adjoint_map,
                     )?;
-                    loop_product_adjoint_map = Util::getOption(diffArgs.adjoint_map.clone())?;
+                    loop_product_adjoint_map = diffArgs.adjoint_map.clone().ok_or("pattern mismatch")?;
                     iRes = iRes + 1;
                 }
                 linResEqnPtrs = metamodelica::nil();
                 for mut vp in &*itVarPtrs {
                     o_ySeedCref = UnorderedMap::get(NBVariable::getVarName(vp.clone()), diff_map_y.clone())?;
                     if (o_ySeedCref).is_some() {
-                        ySeedCref = Util::getOption(o_ySeedCref)?;
+                        ySeedCref = o_ySeedCref.ok_or("pattern mismatch")?;
                         terms_j = UnorderedMap::getOrDefault(
                             ySeedCref.clone(),
                             loop_product_adjoint_map.clone(),
@@ -1990,7 +1990,7 @@ fn generateAdjointComponent(
                     baseX = NBVariable::getVarName(seedVarPtrX.clone());
                     o_pDerX = UnorderedMap::get(baseX, diff_map_x.clone())?;
                     if (o_pDerX).is_some() {
-                        pDerX = Util::getOption(o_pDerX)?;
+                        pDerX = o_pDerX.ok_or("pattern mismatch")?;
                         terms_x = UnorderedMap::getOrDefault(
                             pDerX.clone(),
                             loop_product_adjoint_map.clone(),
@@ -2597,7 +2597,7 @@ fn jacobianSymbolicAdjoint(
         comps = ({
             let mut __acc: metamodelica::List<metamodelica::Ref<StrongComponent::NBStrongComponent>> =
                 metamodelica::nil();
-            for mut comp in (Util::getOption(strongComponents)?).borrow().iter() {
+            for mut comp in (strongComponents.ok_or("pattern mismatch")?).borrow().iter() {
                 if !(!(StrongComponent::isDiscrete(&(comp.clone()))?)) {
                     continue;
                 }
@@ -3073,7 +3073,9 @@ fn jacobianNumeric(
                         let mut __acc: metamodelica::List<
                             metamodelica::List<Pointer::Pointer<metamodelica::Ref<Equation::Equation>>>,
                         > = metamodelica::nil();
-                        for mut comp in (Util::getOption(strongComponents.clone())?
+                        for mut comp in (strongComponents
+                            .clone()
+                            .ok_or("pattern mismatch")?
                             .borrow()
                             .iter()
                             .cloned()
@@ -3092,7 +3094,8 @@ fn jacobianNumeric(
         )?;
         sparsity = Adjacency::Matrix::fullToSparsity(
             &fullLocal,
-            &(Util::getOption(strongComponents)?
+            &(strongComponents
+                .ok_or("pattern mismatch")?
                 .borrow()
                 .iter()
                 .cloned()

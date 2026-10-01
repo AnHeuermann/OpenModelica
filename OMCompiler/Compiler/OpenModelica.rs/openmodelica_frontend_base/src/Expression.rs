@@ -14793,7 +14793,7 @@ pub fn expandRange(
     stop_exp = metamodelica::Own::own(__pa2);
     outValues = (::match_deref::match_deref! { match &((start_exp.clone(), stop_exp.clone())) {
         (Deref @ DAE::Exp::ICONST { .. }, Deref @ DAE::Exp::ICONST { .. }) => {
-            let __pa0 = ::match_deref::match_deref! { match &(Util::getOptionOrDefault(ostep_exp, metamodelica::Ref::new(DAE::Exp::ICONST { integer: 1 }))) {
+            let __pa0 = ::match_deref::match_deref! { match &(ostep_exp.unwrap_or(metamodelica::Ref::new(DAE::Exp::ICONST { integer: 1 }))) {
                 Deref @ DAE::Exp::ICONST { integer: __pa0 } => __pa0.clone(),
                 _ => return Err("pattern mismatch"),
             } };
@@ -14808,7 +14808,7 @@ pub fn expandRange(
     })
         },
         (Deref @ DAE::Exp::RCONST { .. }, Deref @ DAE::Exp::RCONST { .. }) => {
-            let __pa0 = ::match_deref::match_deref! { match &(Util::getOptionOrDefault(ostep_exp, metamodelica::Ref::new(DAE::Exp::RCONST { real: metamodelica::OrderedFloat(1.0_f64) }))) {
+            let __pa0 = ::match_deref::match_deref! { match &(ostep_exp.unwrap_or(metamodelica::Ref::new(DAE::Exp::RCONST { real: metamodelica::OrderedFloat(1.0_f64) }))) {
                 Deref @ DAE::Exp::RCONST { real: __pa0 } => __pa0.clone(),
                 _ => return Err("pattern mismatch"),
             } };

@@ -406,7 +406,7 @@ pub fn toString(mut bdae: &metamodelica::Ref<NBackendDAE>, mut r#str: ArcStr) ->
                             let mut __mm_s = String::new();
                             __mm_s.push_str(&*tmp);
                             __mm_s.push_str(&*NBPartition::Partition::toStringList(
-                                &(Util::getOption(__bdae_init_0.clone())?),
+                                &(__bdae_init_0.clone().ok_or("pattern mismatch")?),
                                 &({
                                     let mut __mm_s = String::new();
                                     __mm_s.push_str(&*literal!("[INI_0] Initialization Lambda=0: "));
@@ -422,7 +422,7 @@ pub fn toString(mut bdae: &metamodelica::Ref<NBackendDAE>, mut r#str: ArcStr) ->
                             let mut __mm_s = String::new();
                             __mm_s.push_str(&*tmp);
                             __mm_s.push_str(&*NBPartition::Partition::toStringList(
-                                &(Util::getOption(__bdae_dae.clone())?),
+                                &(__bdae_dae.clone().ok_or("pattern mismatch")?),
                                 &({
                                     let mut __mm_s = String::new();
                                     __mm_s.push_str(&*literal!("[DAE] DAEMode: "));
@@ -2179,7 +2179,7 @@ fn collectVariableBindingIterators(
     exp_opt = Binding::typedExp(&var.binding);
     if (exp_opt).is_some() {
         Expression::map(
-            Util::getOption(exp_opt)?,
+            exp_opt.ok_or("pattern mismatch")?,
             (std::sync::Arc::new({
                 let __pe_b1 = variables.clone();
                 let __pe_b2 = set;
@@ -3474,7 +3474,7 @@ pub(crate) fn backenddaeinfo(mut bdae: &metamodelica::Ref<NBackendDAE>) -> Resul
                 p_alg_e = intString(((__bdae_alg_event).len() as i32));
                 p_clk = literal!("0");
                 p_ini = intString(((__bdae_init).len() as i32));
-                p_ini_0 = if ((__bdae_init_0).is_some()) {intString((((Util::getOption(__bdae_init_0.clone())?)).len() as i32))} else {literal!("0")};
+                p_ini_0 = if ((__bdae_init_0).is_some()) {intString((((__bdae_init_0.clone().ok_or("pattern mismatch")?)).len() as i32))} else {literal!("0")};
                 states = { let mut __mm_s = String::new(); __mm_s.push_str(&*intString(BVariable::VariablePointers::scalarSize(var_field!((**varData).states, VarData::VarData::VAR_DATA_SIM), false)?)); __mm_s.push_str(&*literal!(" (")); __mm_s.push_str(&*intString(BVariable::VariablePointers::size(var_field!((**varData).states, VarData::VarData::VAR_DATA_SIM)))); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) };
                 discretes = { let mut __mm_s = String::new(); __mm_s.push_str(&*intString(BVariable::VariablePointers::scalarSize(var_field!((**varData).discretes, VarData::VarData::VAR_DATA_SIM), false)?)); __mm_s.push_str(&*literal!(" (")); __mm_s.push_str(&*intString(BVariable::VariablePointers::size(var_field!((**varData).discretes, VarData::VarData::VAR_DATA_SIM)))); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) };
                 discrete_states = { let mut __mm_s = String::new(); __mm_s.push_str(&*intString(BVariable::VariablePointers::scalarSize(var_field!((**varData).discrete_states, VarData::VarData::VAR_DATA_SIM), false)?)); __mm_s.push_str(&*literal!(" (")); __mm_s.push_str(&*intString(BVariable::VariablePointers::size(var_field!((**varData).discrete_states, VarData::VarData::VAR_DATA_SIM)))); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) };
@@ -3507,7 +3507,7 @@ pub(crate) fn backenddaeinfo(mut bdae: &metamodelica::Ref<NBackendDAE>) -> Resul
                 strongcomponentinfo(&(literal!("Simulation")), &(list![__bdae_ode.clone(), __bdae_algebraic.clone(), __bdae_ode_event.clone(), __bdae_alg_event.clone()]))?;
                 strongcomponentinfo(&(literal!("Initialization")), &(list![__bdae_init.clone()]))?;
                 if (__bdae_init_0).is_some() {
-                    strongcomponentinfo(&(literal!("Initialization (lambda=0)")), &(list![Util::getOption(__bdae_init_0.clone())?]))?;
+                    strongcomponentinfo(&(literal!("Initialization (lambda=0)")), &(list![__bdae_init_0.clone().ok_or("pattern mismatch")?]))?;
                 }
                 ()
             },

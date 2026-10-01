@@ -300,7 +300,7 @@ pub(crate) fn isUniformArrays(
         for mut e in __range0 {
             if (first).is_none() {
                 first = Some(e);
-            } else if !(referenceEq(&*(&*e), &*(Util::getOption(first.clone())?))) {
+            } else if !(referenceEq(&*(&*e), &*(first.clone().ok_or("pattern mismatch")?))) {
                 uniform = false;
                 return Ok(uniform);
             }

@@ -3895,7 +3895,9 @@ pub(crate) fn varString(mut inVar: &metamodelica::Ref<BackendDAE::Var>) -> Resul
             {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*literal!(" in "));
-                __mm_s.push_str(&*ExpressionBasics::printExpStr(Util::getOption(inVar.tplExp.clone())?)?);
+                __mm_s.push_str(&*ExpressionBasics::printExpStr(
+                    inVar.tplExp.clone().ok_or("pattern mismatch")?,
+                )?);
                 ArcStr::from(__mm_s)
             }
         } else {
@@ -6457,7 +6459,7 @@ fn printCompInfo(mut compInfo: &metamodelica::Ref<BackendDAE::CompInfo>) -> ArcS
 pub(crate) fn dumpEqSystemMatrixHTML(mut sys: metamodelica::Ref<BackendDAE::EqSystem>) -> Result<()> {
     let mut m: metamodelica::Array<metamodelica::List<i32>>;
     if (sys.m).is_some() {
-        m = Util::getOption(sys.m.clone())?;
+        m = sys.m.clone().ok_or("pattern mismatch")?;
     } else {
         (_, m, _) = BackendDAEUtil::getAdjacencyMatrix(
             sys.clone(),
@@ -6668,7 +6670,7 @@ pub(crate) fn dumpBipartiteGraphEqSystem(
         dumpBipartiteGraphStrongComponent2(
             vars,
             eqs,
-            Util::getOption(mO)?,
+            mO.ok_or("pattern mismatch")?,
             varAtts,
             &eqAtts,
             &({

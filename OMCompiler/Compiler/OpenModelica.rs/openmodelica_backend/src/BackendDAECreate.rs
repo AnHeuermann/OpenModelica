@@ -4603,7 +4603,7 @@ fn lowerWhenEqn2(
                     vars = BackendVariable::listVar(outVar_lst.clone())?;
                     var_opt = BackendVariable::getVarTryHard(cr.clone(), &vars);
                     if (var_opt).is_some() {
-                        for mut var in &*Util::getOption(var_opt.clone())? {
+                        for mut var in &*var_opt.clone().ok_or("pattern mismatch")? {
                             let mut var = var.clone();
                             var = BackendVariable::setVarStateSelect(var.clone(), openmodelica_frontend_types::DAE::StateSelect::ALWAYS)?;
                             vars = BackendVariable::addVar(var.clone(), vars.clone())?;

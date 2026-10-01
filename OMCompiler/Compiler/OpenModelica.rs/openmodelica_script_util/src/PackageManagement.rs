@@ -3225,7 +3225,7 @@ fn installPackageWork(
         }
     }
     if !(indexHasPkg) {
-        packagesToInstall = metamodelica::cons(Util::getOption(packageToInstall)?, packagesToInstall);
+        packagesToInstall = metamodelica::cons(packageToInstall.ok_or("pattern mismatch")?, packagesToInstall);
         return Ok((success, packagesToInstall));
     }
     versionsObj = JSON::get(
@@ -3233,7 +3233,7 @@ fn installPackageWork(
         literal!("versions"),
     )?;
     if success && !(JSON::hasKey(&versionsObj, versionToInstall.clone())?) {
-        packagesToInstall = metamodelica::cons(Util::getOption(packageToInstall)?, packagesToInstall);
+        packagesToInstall = metamodelica::cons(packageToInstall.ok_or("pattern mismatch")?, packagesToInstall);
         return Ok((success, packagesToInstall));
     }
     versionObj = JSON::get(&versionsObj, versionToInstall)?;
@@ -3260,7 +3260,7 @@ fn installPackageWork(
         });
     }
     usesObj = JSON::getOrDefault(&versionObj, literal!("uses"), JSON::emptyObject())?;
-    packagesToInstall = metamodelica::cons(Util::getOption(packageToInstall)?, packagesToInstall);
+    packagesToInstall = metamodelica::cons(packageToInstall.ok_or("pattern mismatch")?, packagesToInstall);
     for mut usesPackage in &*JSON::getKeys(&usesObj)? {
         let __pa1 = ::match_deref::match_deref! { match &(JSON::get(&usesObj, usesPackage.clone())?) {
             Deref @ JSON::STRING { r#str: __pa1 } => __pa1.clone(),

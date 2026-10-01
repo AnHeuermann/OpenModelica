@@ -4131,7 +4131,7 @@ pub(crate) fn statementsFromMapExp(
                     } };
                     oftype = metamodelica::Own::own(__pa0);
                     ofbindEnc = typeCheckMatchingExp(ofbind.clone(), oftype.clone(), astDefs.clone())?;
-                    idxName = Util::getOptionOrDefault(hasIndexIdentOpt.clone(), arcstr::literal!(impossibleIdent));
+                    idxName = hasIndexIdentOpt.clone().unwrap_or(arcstr::literal!(impossibleIdent));
                     freshIdxName = { let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(indexNamePrefix)); __mm_s.push_str(&*idxName); ArcStr::from(__mm_s) };
                     (mapstmts, maplocals, scEnv, accMMDecls, _) = statementsFromExp(&(mapexp.clone()), metamodelica::nil(), metamodelica::nil(), arcstr::literal!(imlicitTxt), arcstr::literal!(imlicitTxt), metamodelica::nil(), metamodelica::cons(Scope::LET_SCOPE { ident: idxName.clone(), idType: crate::TplAbsyn::TypeSignature::interned_INTEGER_TYPE(), freshIdent: freshIdxName.clone(), isUsed: false }, metamodelica::cons(Scope::CASE_SCOPE { mExp: ofbindEnc.clone(), mType: oftype.clone(), localNames: metamodelica::nil(), accLocals: metamodelica::nil(), extArgs: metamodelica::nil(), matchArgName: arcstr::literal!(impossibleIdent), hasImplicitScope: true }, metamodelica::cons(Scope::FUN_SCOPE { args: metamodelica::nil(), localArgs: metamodelica::nil() }, scEnv.clone()))), tplPackage.clone(), accMMDecls.clone())?;
                     let (__pa1, __pa2, __pa3, __pa4, __pa5, __pa6, __pa7) = ::match_deref::match_deref! { match &(scEnv.clone()) {
@@ -4211,7 +4211,7 @@ pub(crate) fn statementsFromMapExp(
                             } };
                             oftype = metamodelica::Own::own(__pa0);
                             ofbindEnc = typeCheckMatchingExp(ofbind.clone(), oftype.clone(), astDefs.clone())?;
-                            idxName = Util::getOptionOrDefault(hasIndexIdentOpt.clone(), arcstr::literal!(impossibleIdent));
+                            idxName = hasIndexIdentOpt.clone().unwrap_or(arcstr::literal!(impossibleIdent));
                             freshIdxName = { let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(indexNamePrefix)); __mm_s.push_str(&*idxName); ArcStr::from(__mm_s) };
                             (mapstmts, maplocals, scEnv, accMMDecls, _) = statementsFromExp(&(mapexp.clone()), metamodelica::nil(), metamodelica::nil(), arcstr::literal!(imlicitTxt), arcstr::literal!(imlicitTxt), metamodelica::nil(), metamodelica::cons(Scope::LET_SCOPE { ident: idxName.clone(), idType: crate::TplAbsyn::TypeSignature::interned_INTEGER_TYPE(), freshIdent: freshIdxName.clone(), isUsed: false }, metamodelica::cons(Scope::CASE_SCOPE { mExp: ofbindEnc.clone(), mType: oftype.clone(), localNames: metamodelica::nil(), accLocals: metamodelica::nil(), extArgs: metamodelica::nil(), matchArgName: arcstr::literal!(impossibleIdent), hasImplicitScope: true }, metamodelica::cons(Scope::FUN_SCOPE { args: metamodelica::nil(), localArgs: metamodelica::nil() }, scEnv.clone()))), tplPackage.clone(), accMMDecls.clone())?;
                             let (__pa1, __pa2, __pa3, __pa4, __pa5, __pa6, __pa7) = ::match_deref::match_deref! { match &(scEnv.clone()) {
@@ -4305,7 +4305,7 @@ pub(crate) fn statementsFromMapExp(
                         Ok::<(), &'static str>(())
                     }.is_ok() { return Err("failure(): body succeeded") }
                     ofbindEnc = typeCheckMatchingExp(ofbind.clone(), argtype.clone(), astDefs.clone())?;
-                    idxName = Util::getOptionOrDefault(hasIndexIdentOpt.clone(), arcstr::literal!(impossibleIdent));
+                    idxName = hasIndexIdentOpt.clone().unwrap_or(arcstr::literal!(impossibleIdent));
                     freshIdxName = { let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(indexNamePrefix)); __mm_s.push_str(&*idxName); ArcStr::from(__mm_s) };
                     (mapstmts, maplocals, scEnv, accMMDecls, _) = statementsFromExp(&(mapexp.clone()), metamodelica::nil(), metamodelica::nil(), arcstr::literal!(imlicitTxt), arcstr::literal!(imlicitTxt), metamodelica::nil(), metamodelica::cons(Scope::LET_SCOPE { ident: idxName.clone(), idType: crate::TplAbsyn::TypeSignature::interned_INTEGER_TYPE(), freshIdent: freshIdxName.clone(), isUsed: false }, metamodelica::cons(Scope::CASE_SCOPE { mExp: ofbindEnc.clone(), mType: argtype.clone(), localNames: metamodelica::nil(), accLocals: metamodelica::nil(), extArgs: metamodelica::nil(), matchArgName: arcstr::literal!(impossibleIdent), hasImplicitScope: true }, metamodelica::cons(Scope::FUN_SCOPE { args: metamodelica::nil(), localArgs: metamodelica::nil() }, scEnv.clone()))), tplPackage.clone(), accMMDecls.clone())?;
                     let (__pa2, __pa3, __pa4, __pa5, __pa6, __pa7, __pa8) = ::match_deref::match_deref! { match &(scEnv.clone()) {

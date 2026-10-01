@@ -4618,7 +4618,7 @@ fn simplifyAddJoinTerms(
     ) -> Result<metamodelica::Real> {
         let mut coeff: metamodelica::Real;
         coeff = if ((oldCoeff).is_some()) {
-            Util::getOption(oldCoeff)? + newCoeff
+            oldCoeff.ok_or("pattern mismatch")? + newCoeff
         } else {
             newCoeff
         };

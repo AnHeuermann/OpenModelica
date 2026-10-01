@@ -2723,14 +2723,14 @@ fn convertTypeSpec(
     let () = (match &*ty {
         Absyn::TypeSpec::TPATH { .. } => {
             if (ty_rule).is_some() {
-                assign_variant_field!(ty => Absyn::TypeSpec::TPATH; path = convertTypePath(ty_path, &(Util::getOption(ty_rule)?), import_path, info)?);
+                assign_variant_field!(ty => Absyn::TypeSpec::TPATH; path = convertTypePath(ty_path, &(ty_rule.ok_or("pattern mismatch")?), import_path, info)?);
             }
             assign_variant_field!(ty => Absyn::TypeSpec::TPATH; arrayDim = convertOption(var_field!((*ty).arrayDim, Absyn::TypeSpec::TPATH).clone(), &({ let __pe_b1 = localRules.clone(); move |__pe_a0, __pe_a2, __pe_a3, __pe_a4| convertSubscripts(__pe_a0, __pe_b1.clone(), &__pe_a2, &__pe_a3, &__pe_a4) }), rules, env.clone(), info.clone())?);
             ()
         }
         Absyn::TypeSpec::TCOMPLEX { .. } => {
             if (ty_rule).is_some() {
-                assign_variant_field!(ty => Absyn::TypeSpec::TCOMPLEX; path = convertTypePath(ty_path, &(Util::getOption(ty_rule)?), import_path, info)?);
+                assign_variant_field!(ty => Absyn::TypeSpec::TCOMPLEX; path = convertTypePath(ty_path, &(ty_rule.ok_or("pattern mismatch")?), import_path, info)?);
             }
             assign_variant_field!(ty => Absyn::TypeSpec::TCOMPLEX;
                         typeSpecs = ({
@@ -3711,7 +3711,9 @@ fn convertCrefFromType(
     id = AbsynUtil::crefFirstIdent(&cref)?;
     opt_ty = UnorderedMap::get(id, env.components.clone())?;
     if (opt_ty).is_some() {
-        cref_rules = (lookupRules(&(Util::getOption(opt_ty)?), rules)?).head().cloned()?;
+        cref_rules = (lookupRules(&(opt_ty.ok_or("pattern mismatch")?), rules)?)
+            .head()
+            .cloned()?;
     } else {
         cref_rules = metamodelica::nil();
     }
@@ -3969,7 +3971,7 @@ fn getExtendsRules(
     for mut ext in &*getExtendsPathsInParts(parts) {
         onode = lookupRuleNode(metamodelica::AsArg::as_arg(&ext), rules.clone())?;
         if (onode).is_some() {
-            extendsRules = metamodelica::cons(Util::getOption(onode)?, extendsRules);
+            extendsRules = metamodelica::cons(onode.ok_or("pattern mismatch")?, extendsRules);
         }
     }
     Ok(extendsRules)

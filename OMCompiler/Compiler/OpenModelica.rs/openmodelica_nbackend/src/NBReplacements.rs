@@ -519,7 +519,7 @@ pub(crate) fn replaceVarPtr(
     cref = UnorderedMap::get(BVariable::getVarName(var_ptr.clone()), replacements)?;
     if (cref).is_some() {
         var_ptr = BVariable::getVarPointer(
-            &(Util::getOption(cref)?),
+            &(cref.ok_or("pattern mismatch")?),
             metamodelica::sourceInfo!("NBackEnd/Util/NBReplacements.mo"),
         )?;
     }
@@ -709,7 +709,7 @@ pub(crate) fn applyFuncExp(
                 local_cref = ComponentRef::fromNode(local_node.clone(), InstNode::getType(local_node.clone())?, metamodelica::nil(), ComponentRef::Origin::CREF.clone())?;
                 binding_exp_opt = InstNode::getBindingExpOpt(metamodelica::AsArg::as_arg(&local_node))?;
                 if (binding_exp_opt).is_some() {
-                    binding_exp = Expression::map(Util::getOption(binding_exp_opt)?, (std::sync::Arc::new({ let __pe_b1 = local_replacements.clone(); move |__pe_a0| applySimpleExp(__pe_a0, __pe_b1.clone()) }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<Expression::NFExpression>) -> Result<metamodelica::Ref<Expression::NFExpression>> + 'static>))?;
+                    binding_exp = Expression::map(binding_exp_opt.ok_or("pattern mismatch")?, (std::sync::Arc::new({ let __pe_b1 = local_replacements.clone(); move |__pe_a0| applySimpleExp(__pe_a0, __pe_b1.clone()) }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<Expression::NFExpression>) -> Result<metamodelica::Ref<Expression::NFExpression>> + 'static>))?;
                 } else {
                     binding_exp = metamodelica::Ref::new(Expression::NFExpression::CREF { ty: openmodelica_nf_frontend::NFType::interned_UNKNOWN(), cref: openmodelica_nf_frontend::NFComponentRef::interned_WILD() });
                 }
@@ -823,8 +823,8 @@ pub(crate) fn recordChildArg(
         if BVariable::isConst(var_ptr.clone()) {
             var = Pointer::access(var_ptr);
             binding = Binding::typedExp(&var.binding);
-            if (binding).is_some() && Expression::isLiteral(&(Util::getOption(binding.clone())?))? {
-                exp = Util::getOption(binding)?;
+            if (binding).is_some() && Expression::isLiteral(&(binding.clone().ok_or("pattern mismatch")?))? {
+                exp = binding.ok_or("pattern mismatch")?;
             }
         }
     }

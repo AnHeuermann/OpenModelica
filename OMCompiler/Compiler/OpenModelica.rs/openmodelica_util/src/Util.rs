@@ -822,7 +822,10 @@ pub(crate) fn applyOption_2<T: Clone + 'static + metamodelica::gc::MMTrace>(
     outValue = (match (inValue1.clone(), inValue2.clone()) {
         (None, _) => inValue2,
         (_, None) => inValue1,
-        _ => Some(inFunc(getOption(inValue1)?, getOption(inValue2)?)?),
+        _ => Some(inFunc(
+            inValue1.ok_or("pattern mismatch")?,
+            inValue2.ok_or("pattern mismatch")?,
+        )?),
     });
     Ok(outValue)
 }
@@ -838,28 +841,6 @@ pub(crate) fn makeOptionOnTrue<T: Clone + 'static + metamodelica::gc::MMTrace>(
 ) -> Option<T> {
     let mut outOption: Option<T> = if (inCondition) { Some(inValue.clone()) } else { None };
     outOption
-}
-
-pub fn getOption<T: Clone + 'static + metamodelica::gc::MMTrace>(mut inOption: Option<T>) -> Result<T> {
-    let mut outValue: T;
-    let __pa0 = ::match_deref::match_deref! { match &(inOption) {
-        Some(__pa0) => __pa0.clone(),
-        _ => return Err("pattern mismatch"),
-    } };
-    outValue = metamodelica::Own::own(__pa0);
-    Ok(outValue)
-}
-
-pub fn getOptionOrDefault<T: Clone + 'static + metamodelica::gc::MMTrace>(
-    mut inOption: Option<T>,
-    mut inDefault: T,
-) -> T {
-    let mut outValue: T;
-    outValue = (match inOption {
-        Some(mut value) => value,
-        _ => inDefault,
-    });
-    outValue
 }
 
 pub(crate) fn intGreaterZero(mut v: i32) -> bool {

@@ -364,7 +364,7 @@ pub mod BClock {
             (clock, baseClock) = unwrap_break_err!(fromExp(exp), '__try0);
             if (baseClock).is_some() {
                 unwrap_break_err!(UnorderedMap::add(clock_name.clone(), clock.clone(), info.subClocks.clone()), '__try0);
-                unwrap_break_err!(UnorderedMap::add(clock_name.clone(), unwrap_break_err!(Util::getOption(baseClock.clone()), '__try0), info.subToBase.clone()), '__try0);
+                unwrap_break_err!(UnorderedMap::add(clock_name.clone(), unwrap_break_err!(baseClock.clone().ok_or("pattern mismatch"), '__try0), info.subToBase.clone()), '__try0);
             } else {
                 unwrap_break_err!(UnorderedMap::add(clock_name.clone(), clock.clone(), info.baseClocks.clone()), '__try0);
             }
@@ -1004,7 +1004,7 @@ pub(crate) fn extractClocksEqn(
     let mut eqn: metamodelica::Ref<Equation::Equation> = eqn;
     eqn = (match &*eqn {
         BEquation::Equation::WHEN_EQUATION { body: __eqn_body, .. } => {
-            assign_variant_field!(eqn => Equation::Equation::WHEN_EQUATION; body = Util::getOption(extractClocksWhenCond(Some(__eqn_body.clone()), clck_coll.clone(), infr_coll.clone(), new_clocks.clone(), new_infers.clone(), idx.clone())?)?);
+            assign_variant_field!(eqn => Equation::Equation::WHEN_EQUATION; body = (extractClocksWhenCond(Some(__eqn_body.clone()), clck_coll.clone(), infr_coll.clone(), new_clocks.clone(), new_infers.clone(), idx.clone())?).ok_or("pattern mismatch")?);
             eqn
         }
         _ => eqn,

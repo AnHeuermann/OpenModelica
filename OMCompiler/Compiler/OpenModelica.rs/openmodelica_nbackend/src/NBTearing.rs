@@ -319,7 +319,7 @@ pub(crate) fn toString(mut set: &metamodelica::Ref<NBTearing>, mut r#str: ArcStr
             __mm_s.push_str(&*r#str);
             __mm_s.push_str(&*literal!("\n"));
             __mm_s.push_str(&*BJacobian::toString(
-                &(Util::getOption(set.jac.clone())?),
+                &(set.jac.clone().ok_or("pattern mismatch")?),
                 literal!("NLS"),
             )?);
             ArcStr::from(__mm_s)
@@ -358,7 +358,7 @@ pub(crate) fn main(
             (_, Deref @ Jacobian::MAIN { eqData: Deref @ BEquation::EqData::EQ_DATA_SIM { uniqueIndex: eq_index, .. }, .. }) if (Partition::kindIsInitial(kind)) => {
                 assign_variant_field!(bdae => Jacobian::NBackendDAE::MAIN; init = tearingTraverser(&(var_field!((*bdae).init, Jacobian::NBackendDAE::MAIN).clone()), &funcs, var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), eq_index.clone(), kind)?);
                 if (var_field!((*bdae).init_0, Jacobian::NBackendDAE::MAIN)).is_some() {
-                    assign_variant_field!(bdae => Jacobian::NBackendDAE::MAIN; init_0 = Some(tearingTraverser(&(Util::getOption(var_field!((*bdae).init_0, Jacobian::NBackendDAE::MAIN).clone())?), &funcs, var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), eq_index.clone(), kind)?));
+                    assign_variant_field!(bdae => Jacobian::NBackendDAE::MAIN; init_0 = Some(tearingTraverser(&(var_field!((*bdae).init_0, Jacobian::NBackendDAE::MAIN).clone().ok_or("pattern mismatch")?), &funcs, var_field!((*bdae).funcMap, Jacobian::NBackendDAE::MAIN).clone(), eq_index.clone(), kind)?));
                 }
                 return Ok(bdae)
             },
@@ -2207,7 +2207,7 @@ fn cellierTearingSet(
         Adjacency::MatrixStrictness::SORTING.clone(),
         &(crate::NBEquation::Iterator::interned_EMPTY()),
     )?;
-    mapping = Util::getOption(Adjacency::Matrix::getMappingOpt(&adj))?;
+    mapping = Adjacency::Matrix::getMappingOpt(&adj).ok_or("pattern mismatch")?;
     eqn_slices = metamodelica::arrayFromVec(strict.residual_eqns.clone().into_iter().cloned().collect());
     eqn_rows = arrayCreate(ne, metamodelica::nil());
     for mut i in 1..=ne {

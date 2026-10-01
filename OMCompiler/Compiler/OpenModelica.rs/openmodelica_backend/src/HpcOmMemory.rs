@@ -1196,10 +1196,18 @@ pub(crate) fn createMemoryMap(
                     move |__pe_a1| metamodelica::arrayGet(__pe_b0.clone(), __pe_a1)
                 }),
             )?;
-            notOptimizedVarsFloat = List::map(notOptimizedVarsFloatOpt.clone(), &Util::getOption)?;
-            notOptimizedVarsInt = List::map(notOptimizedVarsIntOpt.clone(), &Util::getOption)?;
-            notOptimizedVarsBool = List::map(notOptimizedVarsBoolOpt.clone(), &Util::getOption)?;
-            notOptimizedVarsString = List::map(notOptimizedVarsStringOpt.clone(), &Util::getOption)?;
+            notOptimizedVarsFloat = List::map(notOptimizedVarsFloatOpt.clone(), &|o: Option<_>| {
+                o.ok_or("pattern mismatch")
+            })?;
+            notOptimizedVarsInt = List::map(notOptimizedVarsIntOpt.clone(), &|o: Option<_>| {
+                o.ok_or("pattern mismatch")
+            })?;
+            notOptimizedVarsBool = List::map(notOptimizedVarsBoolOpt.clone(), &|o: Option<_>| {
+                o.ok_or("pattern mismatch")
+            })?;
+            notOptimizedVarsString = List::map(notOptimizedVarsStringOpt.clone(), &|o: Option<_>| {
+                o.ok_or("pattern mismatch")
+            })?;
             graphInfo = GraphML::createGraphInfo();
             let (__pa18, (_, __pa19)) = GraphML::addGraph(literal!("TasksGroupGraph"), true, graphInfo.clone())?;
             graphInfo = metamodelica::Own::own(__pa18);
@@ -6851,7 +6859,7 @@ fn appendVariablesToGraph(
         description = literal!("unknown");
         threadText = literal!("Th -1");
         if (simVarOpt).is_some() {
-            simVar = Util::getOption(simVarOpt)?;
+            simVar = simVarOpt.ok_or("pattern mismatch")?;
             varCompRef = simVar.name.clone();
             description = ComponentReferenceBasics::printComponentRefStr(&varCompRef)?;
             isValidVar = BaseHashTable::hasKey(varCompRef.clone(), iVarNameSCVarIdxMapping)?;

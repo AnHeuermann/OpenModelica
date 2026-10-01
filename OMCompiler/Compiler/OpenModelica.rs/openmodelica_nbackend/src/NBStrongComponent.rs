@@ -677,7 +677,7 @@ pub(crate) fn toString(mut comp: &metamodelica::Ref<NBStrongComponent>, mut inde
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*r#str);
                     __mm_s.push_str(&*Tearing::toString(
-                        &(Util::getOption(__comp_casual.clone())?),
+                        &(__comp_casual.clone().ok_or("pattern mismatch")?),
                         literal!("Casual Tearing Set"),
                     )?);
                     ArcStr::from(__mm_s)
@@ -1713,7 +1713,10 @@ pub(crate) fn fromSolvedEquationSlice(
             }
             __acc.reverse()
         });
-        lhs_cref = ComponentRef::setSubscripts(subs, Expression::toCref(&(Util::getOption(Equation::getLHS(eqn)?)?))?)?;
+        lhs_cref = ComponentRef::setSubscripts(
+            subs,
+            Expression::toCref(&((Equation::getLHS(eqn)?).ok_or("pattern mismatch")?))?,
+        )?;
         comp = metamodelica::Ref::new(NBStrongComponent::SLICED_COMPONENT {
             var_cref: lhs_cref.clone(),
             var: metamodelica::Ref::new(Slice::NBSlice {
@@ -1736,7 +1739,7 @@ pub(crate) fn fromSolvedEquationSlice(
                 if IfEquationBody::isSplit(metamodelica::AsArg::as_arg(&body))? {
                     comp = metamodelica::Ref::new(NBStrongComponent::SINGLE_COMPONENT {
                         var: BVariable::getVarPointer(
-                            &(Expression::toCref(&(Util::getOption(Equation::getLHS(eqn)?)?))?),
+                            &(Expression::toCref(&((Equation::getLHS(eqn)?).ok_or("pattern mismatch")?))?),
                             metamodelica::sourceInfo!("NBackEnd/Classes/NBStrongComponent.mo"),
                         )?,
                         eqn: eqn_ptr,

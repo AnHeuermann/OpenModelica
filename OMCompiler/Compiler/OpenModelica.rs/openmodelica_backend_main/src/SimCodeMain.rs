@@ -2883,7 +2883,7 @@ fn translateModelCallBackendOB(
             if isFMI2 && metamodelica::stringEq(&fmuType, &(literal!("cs"))) {
                 strPreOptModules = Some(metamodelica::cons(
                     literal!("introduceOutputRealDerivatives"),
-                    Util::getOption(strPreOptModules)?,
+                    strPreOptModules.ok_or("pattern mismatch")?,
                 ));
             }
             (dlow, initDAE, initDAE_lambda0, inlineData, removedInitialEquationLst) =
@@ -3830,7 +3830,12 @@ fn generateModelCodeDAE(
         emptyBDAE = metamodelica::Ref::new(BackendDAE::BackendDAE {
             eqs: metamodelica::cons(
                 BackendDAEUtil::createEqSystem(
-                    Util::getOption(inBackendDAE.shared.daeModeData.modelVars.clone())?,
+                    inBackendDAE
+                        .shared
+                        .daeModeData
+                        .modelVars
+                        .clone()
+                        .ok_or("pattern mismatch")?,
                     BackendEquation::emptyEqns(),
                     metamodelica::nil(),
                     openmodelica_backend_types::BackendDAE::BaseClockPartitionKind::UNKNOWN_PARTITION,
@@ -3854,7 +3859,11 @@ fn generateModelCodeDAE(
                     setBVars: _,
                     symbolicJacobianH: __pa5,
                     ..
-                } = Util::getOption(inBackendDAE.shared.dataReconciliationData.clone())?;
+                } = inBackendDAE
+                    .shared
+                    .dataReconciliationData
+                    .clone()
+                    .ok_or("pattern mismatch")?;
                 jacH = metamodelica::Own::own(__pa5);
                 if (jacH).is_some() {
                     matrixnames = list![literal!("B"), literal!("C"), literal!("D"), literal!("ADJ")];
@@ -3912,7 +3921,7 @@ fn generateModelCodeDAE(
                 &matrixnames,
                 &(metamodelica::nil()),
             )?;
-            symJacs = metamodelica::cons(Util::getOption(daeModeSP.clone())?, symJacs.clone()).reverse();
+            symJacs = metamodelica::cons(daeModeSP.clone().ok_or("pattern mismatch")?, symJacs.clone()).reverse();
         } else {
             tmpB = FlagsUtil::set(Flags::NO_START_CALC.clone(), true)?;
             modelInfo = SimCodeUtil::createModelInfo(
@@ -3939,7 +3948,11 @@ fn generateModelCodeDAE(
                     setBVars: _,
                     symbolicJacobianH: __pa6,
                     ..
-                } = Util::getOption(inBackendDAE.shared.dataReconciliationData.clone())?;
+                } = inBackendDAE
+                    .shared
+                    .dataReconciliationData
+                    .clone()
+                    .ok_or("pattern mismatch")?;
                 jacH = metamodelica::Own::own(__pa6);
                 if (jacH).is_some() {
                     matrixnames = list![

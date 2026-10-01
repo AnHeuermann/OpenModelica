@@ -1140,7 +1140,7 @@ pub fn mergeSubscriptsMapped(
         if (iter_crefs).is_some() {
             new_subs = ({
                 let mut __acc: metamodelica::List<metamodelica::Ref<Subscript::NFSubscript>> = metamodelica::nil();
-                for mut iter_name in (Util::getOption(iter_crefs)?).into_iter().cloned() {
+                for mut iter_name in (iter_crefs.ok_or("pattern mismatch")?).into_iter().cloned() {
                     let __x = UnorderedMap::getSafe(
                         iter_name.clone(),
                         iter_map.clone(),
@@ -2117,7 +2117,9 @@ pub(crate) fn toJSON_context(
     let mut opt_context: Option<metamodelica::Ref<Absyn::Path>>;
     opt_context = NFInstNode::InstNode::rootClassContext(&(NFInstNode::InstNode::instanceParent(node)?));
     if (opt_context).is_some() {
-        for mut name in &*AbsynUtil::pathToStringListReverse(&(Util::getOption(opt_context)?), metamodelica::nil()) {
+        for mut name in
+            &*AbsynUtil::pathToStringListReverse(&(opt_context.ok_or("pattern mismatch")?), metamodelica::nil())
+        {
             accum = metamodelica::cons(
                 JSON::addPair(
                     &(literal!("name")),
@@ -2684,7 +2686,7 @@ pub(crate) fn sizes_local(
                 __acc.reverse()
             });
             if withComplex && (complex_size).is_some() {
-                s_lst = metamodelica::cons(Util::getOption(complex_size)?, s_lst);
+                s_lst = metamodelica::cons(complex_size.ok_or("pattern mismatch")?, s_lst);
             }
             s_lst = if ((s_lst).is_empty()) { list![1] } else { s_lst };
             s_lst
@@ -2715,7 +2717,7 @@ pub(crate) fn sizes_local_exp(
                 if (complex_size).is_some() {
                     s_lst = metamodelica::cons(
                         metamodelica::Ref::new(Expression::NFExpression::INTEGER {
-                            value: Util::getOption(complex_size)?,
+                            value: complex_size.ok_or("pattern mismatch")?,
                         }),
                         s_lst,
                     );

@@ -876,7 +876,7 @@ pub(crate) fn getPartnerCref(
         metamodelica::sourceInfo!("NBackEnd/Classes/NBVariable.mo"),
     )?)?;
     if (partner).is_some() {
-        partner_cref = getVarName(Util::getOption(partner)?);
+        partner_cref = getVarName(partner.ok_or("pattern mismatch")?);
         if !(scalarized) {
             partner_cref = ComponentRef::copySubscripts(cref, partner_cref)?;
         }
@@ -1947,12 +1947,12 @@ pub(crate) fn makeSeedVar(
                 ovar = None;
             } else {
                 (ovar, _) = getVarSeed(old_var_ptr.clone());
-                if (ovar).is_some() && !metamodelica::stringEq(&(ComponentRef::firstName(&(ComponentRef::last(&(getVarName(Util::getOption(ovar.clone())?)))), false)?), &({ let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(SEED_STR)); __mm_s.push_str(&*literal!("_")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) })) {
+                if (ovar).is_some() && !metamodelica::stringEq(&(ComponentRef::firstName(&(ComponentRef::last(&(getVarName(ovar.clone().ok_or("pattern mismatch")?)))), false)?), &({ let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(SEED_STR)); __mm_s.push_str(&*literal!("_")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) })) {
                     ovar = None;
                 }
             }
             if (ovar).is_some() {
-                var_ptr = Util::getOption(ovar)?;
+                var_ptr = ovar.ok_or("pattern mismatch")?;
                 cref = getVarName(var_ptr.clone());
             } else {
                 assign_variant_field!(qual => InstNode::InstNode::VAR_NODE; name = { let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(SEED_STR)); __mm_s.push_str(&*literal!("_")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) });
@@ -2003,11 +2003,11 @@ pub(crate) fn makePDerVar(
             let mut qual = (*qual).clone();
             res_ptr = getVarPointer(&cref, metamodelica::sourceInfo!("NBackEnd/Classes/NBVariable.mo"))?;
             (ovar, _) = getVarPDer(res_ptr.clone(), isTmp);
-            if (ovar).is_some() && !metamodelica::stringEq(&(ComponentRef::firstName(&(ComponentRef::last(&(getVarName(Util::getOption(ovar.clone())?)))), false)?), &({ let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(PARTIAL_DERIVATIVE_STR)); __mm_s.push_str(&*literal!("_")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) })) {
+            if (ovar).is_some() && !metamodelica::stringEq(&(ComponentRef::firstName(&(ComponentRef::last(&(getVarName(ovar.clone().ok_or("pattern mismatch")?)))), false)?), &({ let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(PARTIAL_DERIVATIVE_STR)); __mm_s.push_str(&*literal!("_")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) })) {
                 ovar = None;
             }
             if (ovar).is_some() {
-                var_ptr = Util::getOption(ovar)?;
+                var_ptr = ovar.ok_or("pattern mismatch")?;
                 cref = getVarName(var_ptr.clone());
             } else {
                 assign_variant_field!(qual => InstNode::InstNode::VAR_NODE; name = { let mut __mm_s = String::new(); __mm_s.push_str(&*arcstr::literal!(PARTIAL_DERIVATIVE_STR)); __mm_s.push_str(&*literal!("_")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) });
@@ -2341,7 +2341,7 @@ pub(crate) fn makeAuxStateVar(
         restCref: openmodelica_nf_frontend::NFComponentRef::interned_EMPTY(),
     });
     if (binding).is_some() {
-        bnd = Util::getOption(binding)?;
+        bnd = binding.ok_or("pattern mismatch")?;
         var = fromCref(
             cref.clone(),
             Attributes::DEFAULT_ATTR().clone(),
@@ -2849,7 +2849,7 @@ pub mod VariablePointers {
             metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect());
         if useMapping {
             length = 15;
-            mapping = Util::getOption(mapping_opt)?;
+            mapping = mapping_opt.ok_or("pattern mismatch")?;
         } else {
             length = 10;
         }
@@ -3241,7 +3241,7 @@ pub mod VariablePointers {
                             __mm_s.push_str(&*ComponentRef::toString(&cref)?);
                             ArcStr::from(__mm_s)
                         },
-                        Util::getOption(info)?,
+                        info.ok_or("pattern mismatch")?,
                     )?;
                 }
                 return Err("fail");

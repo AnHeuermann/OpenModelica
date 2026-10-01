@@ -748,7 +748,7 @@ pub(crate) fn openNewScope(
                 __mm_s.push_str(&*literal!("FGraph.openNewScope: failed to open new scope in scope: "));
                 __mm_s.push_str(&*getGraphNameStr(&inGraph));
                 __mm_s.push_str(&*literal!(" name: "));
-                __mm_s.push_str(&*Util::getOptionOrDefault(inName.clone(), literal!("")));
+                __mm_s.push_str(&*inName.clone().unwrap_or(literal!("")));
                 __mm_s.push_str(&*literal!("\n"));
                 ArcStr::from(__mm_s)
             })?;

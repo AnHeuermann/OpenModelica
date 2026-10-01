@@ -169,7 +169,7 @@ fn countVarEqnSize(
             } else {
                 if (__element_binding).is_some() {
                     eqnSize = eqnSize + size;
-                    elem = metamodelica::Ref::new(DAE::Element::EQUATION { exp: Expression::crefExp(var_field!((*element).componentRef, DAE::Element::VAR).clone())?, scalar: Util::getOption(__element_binding.clone())?, source: __element_source.clone() });
+                    elem = metamodelica::Ref::new(DAE::Element::EQUATION { exp: Expression::crefExp(var_field!((*element).componentRef, DAE::Element::VAR).clone())?, scalar: __element_binding.clone().ok_or("pattern mismatch")?, source: __element_source.clone() });
                     dumpEqn(&elem, size, debugDump);
                     eqns = metamodelica::cons(elem, eqns);
                 }

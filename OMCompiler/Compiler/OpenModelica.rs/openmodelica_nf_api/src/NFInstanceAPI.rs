@@ -1607,7 +1607,7 @@ pub(crate) fn dumpJSONBinding(
     if (originalBinding).is_some() && Binding::isEvaluated(&binding) {
         if '__try0: {
             context = NFInstContext::set(NFInstContext::RELAXED.clone(), NFInstContext::INSTANCE_API.clone());
-            bind = unwrap_break_err!(NFInst::instBinding(unwrap_break_err!(Util::getOption(originalBinding.clone()), '__try0), context), '__try0);
+            bind = unwrap_break_err!(NFInst::instBinding(unwrap_break_err!(originalBinding.clone().ok_or("pattern mismatch"), '__try0), context), '__try0);
             bind = unwrap_break_err!(Typing::typeBinding(bind.clone(), context), '__try0);
             Ok::<(), &'static str>(())
         }.is_err() {
@@ -1830,7 +1830,7 @@ pub(crate) fn dumpJSONCommentOpt(
     let mut json: metamodelica::Ref<JSON::JSON> = json;
     if (cmtOpt).is_some() {
         json = dumpJSONComment(
-            &(Util::getOption(cmtOpt)?),
+            &(cmtOpt.ok_or("pattern mismatch")?),
             scope,
             json,
             dumpComment,
@@ -1853,7 +1853,7 @@ pub(crate) fn dumpJSONComment(
     if (cmt.comment).is_some() && dumpComment {
         json = JSON::addPair(
             &(literal!("comment")),
-            &(JSON::makeString(Util::getOption(cmt.comment.clone())?)),
+            &(JSON::makeString(cmt.comment.clone().ok_or("pattern mismatch")?)),
             json,
         )?;
     }
@@ -2462,13 +2462,13 @@ pub(crate) fn dumpJSONSCodeMod_impl(
             if isChoices && (__mod_comment).is_some() {
                 json = JSON::addPair(
                     &(literal!("comment")),
-                    &(JSON::makeString(Util::getOption(__mod_comment.clone())?)),
+                    &(JSON::makeString(__mod_comment.clone().ok_or("pattern mismatch")?)),
                     json,
                 )?;
             }
             if (__mod_binding).is_some() {
                 binding_json = JSON::makeString(Dump::printExpStr(AbsynUtil::stripCommentExpressions(
-                    Util::getOption(__mod_binding.clone())?,
+                    __mod_binding.clone().ok_or("pattern mismatch")?,
                     true,
                 )?)?);
                 if JSON::isNull(&json) {
@@ -2604,7 +2604,7 @@ pub(crate) fn dumpJSONSCodeElement(
             if (__element_condition).is_some() {
                 json = JSON::addPair(
                     &(literal!("condition")),
-                    &(dumpJSONAbsynExpression(&(Util::getOption(__element_condition.clone())?))?),
+                    &(dumpJSONAbsynExpression(&(__element_condition.clone().ok_or("pattern mismatch")?))?),
                     json,
                 )?;
             }
@@ -2781,7 +2781,7 @@ pub(crate) fn dumpJSONSCodeClassDef(
                 json = JSON::addPair(&(literal!("baseClass")), &(dumpJSONPath(path.clone())?), json)?;
             }
             if (odims).is_some() {
-                json = JSON::addPairNotNull(&(literal!("dims")), &(dumpJSONDims(&(Util::getOption(odims.clone())?), &(metamodelica::nil()))?), json)?;
+                json = JSON::addPairNotNull(&(literal!("dims")), &(dumpJSONDims(&(odims.clone().ok_or("pattern mismatch")?), &(metamodelica::nil()))?), json)?;
             }
             json = dumpJSONSCodeMod(metamodelica::AsArg::as_arg(&__classDef_modifications), &scope, json)?;
             ()

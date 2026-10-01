@@ -1122,13 +1122,13 @@ pub(crate) fn tracebackZeroRows(
                 __mm_s.push_str(&*literal!("("));
                 __mm_s.push_str(&*intString(eq - 1));
                 __mm_s.push_str(&*literal!("): "));
-                __mm_s.push_str(&*Expression::toString(Util::getOption(Equation::getLHS(
-                    Pointer::access((eqns).get(eq)?),
-                )?)?)?);
+                __mm_s.push_str(&*Expression::toString(
+                    (Equation::getLHS(Pointer::access((eqns).get(eq)?))?).ok_or("pattern mismatch")?,
+                )?);
                 __mm_s.push_str(&*literal!(" = "));
-                __mm_s.push_str(&*Expression::toString(Util::getOption(Equation::getRHS(
-                    Pointer::access((eqns).get(eq)?),
-                )?)?)?);
+                __mm_s.push_str(&*Expression::toString(
+                    (Equation::getRHS(Pointer::access((eqns).get(eq)?))?).ok_or("pattern mismatch")?,
+                )?);
                 __mm_s.push_str(&*literal!("\n"));
                 ArcStr::from(__mm_s)
             };

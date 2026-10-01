@@ -9565,7 +9565,7 @@ fn getCommCostBetweenNodes(
             if !((c).is_some()) {
                 continue;
             }
-            let __x = Util::getOption(c.clone())?;
+            let __x = c.clone().ok_or("pattern mismatch")?;
             __acc = cons(__x, __acc);
         }
         __acc.reverse()

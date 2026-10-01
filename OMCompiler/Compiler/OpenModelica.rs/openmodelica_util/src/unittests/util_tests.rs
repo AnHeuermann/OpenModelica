@@ -474,26 +474,6 @@ fn test_make_option_on_true() {
     assert_eq!(U::makeOptionOnTrue(false, 42i32), None);
 }
 
-// ── getOption / getOptionOrDefault ───────────────────────────────────────────
-
-#[test]
-fn test_get_option_some() -> Result<()> {
-    assert_eq!(U::getOption(Some(42i32))?, 42);
-    Ok(())
-}
-
-#[test]
-fn test_get_option_none_errors() {
-    let result = U::getOption::<i32>(None);
-    assert!(result.is_err(), "getOption(None) should return an error");
-}
-
-#[test]
-fn test_get_option_or_default() {
-    assert_eq!(U::getOptionOrDefault(Some(42i32), 0), 42);
-    assert_eq!(U::getOptionOrDefault(None, 0i32), 0);
-}
-
 // ── optionEqual ───────────────────────────────────────────────────────────────
 
 #[test]

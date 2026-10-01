@@ -1081,7 +1081,7 @@ fn differentiateStatements(
                 let mut __acc: metamodelica::List<metamodelica::Ref<DAE::Statement>> = metamodelica::nil();
                 for mut s in (optDerivedStatements1.clone()).into_iter().cloned() {
                             if !((s).is_some()) { continue; }
-                            let __x = Util::getOption(s.clone())?;
+                            let __x = s.clone().ok_or("pattern mismatch")?;
                             __acc = cons(__x, __acc);
                 }
                 __acc.reverse()
@@ -1119,7 +1119,7 @@ fn differentiateStatements(
                 let mut __acc: metamodelica::List<metamodelica::Ref<DAE::Statement>> = metamodelica::nil();
                 for mut s in (optDerivedStatements1.clone()).into_iter().cloned() {
                             if !((s).is_some()) { continue; }
-                            let __x = Util::getOption(s.clone())?;
+                            let __x = s.clone().ok_or("pattern mismatch")?;
                             __acc = cons(__x, __acc);
                 }
                 __acc.reverse()
@@ -3184,13 +3184,13 @@ fn addFunctionConstantsAndParameters(
                 for mut element in &*body.clone() {
                     var_opt = BackendDAECreate::lowerKnownVarSingle(element.clone())?;
                     if (var_opt).is_some() {
-                        body_knowns = metamodelica::cons(Util::getOption(var_opt)?, body_knowns);
+                        body_knowns = metamodelica::cons(var_opt.ok_or("pattern mismatch")?, body_knowns);
                     }
                 }
                 if (body_knowns).is_empty() {
                     knownVars_opt = knownVars_opt;
                 } else if (knownVars_opt).is_some() {
-                    knownVars_opt = Some(BackendVariable::addVars(&body_knowns, Util::getOption(knownVars_opt)?)?);
+                    knownVars_opt = Some(BackendVariable::addVars(&body_knowns, knownVars_opt.ok_or("pattern mismatch")?)?);
                 } else {
                     knownVars_opt = Some(BackendVariable::listVar(body_knowns)?);
                 }
@@ -4465,7 +4465,10 @@ fn addDependentVars(
     let mut outDiffData: BackendDAE::DifferentiateInputData = inDiffData;
     let mut depVars: BackendDAE::Variables;
     if (outDiffData.dependenentVars).is_some() {
-        depVars = BackendVariable::addVars(&inVarsLst, Util::getOption(outDiffData.dependenentVars.clone())?)?;
+        depVars = BackendVariable::addVars(
+            &inVarsLst,
+            outDiffData.dependenentVars.clone().ok_or("pattern mismatch")?,
+        )?;
     } else {
         depVars = BackendVariable::listVar(inVarsLst)?;
     }
@@ -4480,7 +4483,7 @@ fn addAllVars(
     let mut outDiffData: BackendDAE::DifferentiateInputData = inDiffData;
     let mut allVars: BackendDAE::Variables;
     if (outDiffData.allVars).is_some() {
-        allVars = BackendVariable::addVars(&inVarsLst, Util::getOption(outDiffData.allVars.clone())?)?;
+        allVars = BackendVariable::addVars(&inVarsLst, outDiffData.allVars.clone().ok_or("pattern mismatch")?)?;
     } else {
         allVars = BackendVariable::listVar(inVarsLst)?;
     }
@@ -4495,7 +4498,7 @@ fn addGlobalVars(
     let mut outDiffData: BackendDAE::DifferentiateInputData = inDiffData;
     let mut glVars: BackendDAE::Variables;
     if (outDiffData.knownVars).is_some() {
-        glVars = BackendVariable::addVars(&inVarsLst, Util::getOption(outDiffData.knownVars.clone())?)?;
+        glVars = BackendVariable::addVars(&inVarsLst, outDiffData.knownVars.clone().ok_or("pattern mismatch")?)?;
     } else {
         glVars = BackendVariable::listVar(inVarsLst)?;
     }
@@ -4593,26 +4596,26 @@ fn dumpInputData(mut inDiffData: &BackendDAE::DifferentiateInputData) -> Result<
         metamodelica::print({
             let mut __mm_s = String::new();
             __mm_s.push_str(&*literal!("### for "));
-            __mm_s.push_str(&*Util::getOption(inDiffData.matrixName.clone())?);
+            __mm_s.push_str(&*inDiffData.matrixName.clone().ok_or("pattern mismatch")?);
             __mm_s.push_str(&*literal!(" ###\n"));
             ArcStr::from(__mm_s)
         });
     }
     if (inDiffData.independenentVars).is_some() {
         metamodelica::print(literal!("independentVars:\n"));
-        BackendDump::printVariables(&(Util::getOption(inDiffData.independenentVars.clone())?))?;
+        BackendDump::printVariables(&(inDiffData.independenentVars.clone().ok_or("pattern mismatch")?))?;
     }
     if (inDiffData.dependenentVars).is_some() {
         metamodelica::print(literal!("dependenentVars:\n"));
-        BackendDump::printVariables(&(Util::getOption(inDiffData.dependenentVars.clone())?))?;
+        BackendDump::printVariables(&(inDiffData.dependenentVars.clone().ok_or("pattern mismatch")?))?;
     }
     if (inDiffData.knownVars).is_some() {
         metamodelica::print(literal!("knownVars:\n"));
-        BackendDump::printVariables(&(Util::getOption(inDiffData.knownVars.clone())?))?;
+        BackendDump::printVariables(&(inDiffData.knownVars.clone().ok_or("pattern mismatch")?))?;
     }
     if (inDiffData.allVars).is_some() {
         metamodelica::print(literal!("allVars:\n"));
-        BackendDump::printVariables(&(Util::getOption(inDiffData.allVars.clone())?))?;
+        BackendDump::printVariables(&(inDiffData.allVars.clone().ok_or("pattern mismatch")?))?;
     }
     if !((inDiffData.controlVars).is_empty()) {
         metamodelica::print(literal!("controlVars:\n"));
@@ -4646,7 +4649,7 @@ fn isParamOrConstant(
             let mut var: metamodelica::Ref<BackendDAE::Var>;
             var_lst = BackendVariable::getVarTryHard(cref, metamodelica::AsArg::as_arg(&knownVars));
             if (var_lst).is_some() {
-                let __pa0 = ::match_deref::match_deref! { match &(Util::getOption(var_lst)?) {
+                let __pa0 = ::match_deref::match_deref! { match &(var_lst.ok_or("pattern mismatch")?) {
                     Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: _ } => __pa0.clone(),
                     _ => return Err("pattern mismatch"),
                 } };

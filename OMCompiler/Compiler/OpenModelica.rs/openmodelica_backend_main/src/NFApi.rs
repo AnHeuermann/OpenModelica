@@ -1487,7 +1487,7 @@ pub(crate) fn updateMovedElement(
         } => {
             assign_variant_field!(element => Absyn::Element::ELEMENT; specification = updateMovedElementSpec(__element_specification.clone(), env.clone())?);
             if (var_field!((*element).constrainClass, Absyn::Element::ELEMENT)).is_some() {
-                assign_variant_field!(element => Absyn::Element::ELEMENT; constrainClass = Some(updateMovedConstrainClass(Util::getOption(var_field!((*element).constrainClass, Absyn::Element::ELEMENT).clone())?, env)?));
+                assign_variant_field!(element => Absyn::Element::ELEMENT; constrainClass = Some(updateMovedConstrainClass(var_field!((*element).constrainClass, Absyn::Element::ELEMENT).clone().ok_or("pattern mismatch")?, env)?));
             }
             ()
         }
@@ -1584,7 +1584,7 @@ pub(crate) fn updateMovedElementArg(
     let () = (match &*arg {
         Absyn::ElementArg::MODIFICATION { .. } => {
             if (var_field!((*arg).modification, Absyn::ElementArg::MODIFICATION)).is_some() {
-                assign_variant_field!(arg => Absyn::ElementArg::MODIFICATION; modification = Some(updateMovedModification(Util::getOption(var_field!((*arg).modification, Absyn::ElementArg::MODIFICATION).clone())?, env)?));
+                assign_variant_field!(arg => Absyn::ElementArg::MODIFICATION; modification = Some(updateMovedModification(var_field!((*arg).modification, Absyn::ElementArg::MODIFICATION).clone().ok_or("pattern mismatch")?, env)?));
             }
             ()
         }
@@ -1594,7 +1594,7 @@ pub(crate) fn updateMovedElementArg(
         } => {
             assign_variant_field!(arg => Absyn::ElementArg::REDECLARATION; elementSpec = updateMovedElementSpec(__arg_elementSpec.clone(), env.clone())?);
             if (var_field!((*arg).constrainClass, Absyn::ElementArg::REDECLARATION)).is_some() {
-                assign_variant_field!(arg => Absyn::ElementArg::REDECLARATION; constrainClass = Some(updateMovedConstrainClass(Util::getOption(var_field!((*arg).constrainClass, Absyn::ElementArg::REDECLARATION).clone())?, env)?));
+                assign_variant_field!(arg => Absyn::ElementArg::REDECLARATION; constrainClass = Some(updateMovedConstrainClass(var_field!((*arg).constrainClass, Absyn::ElementArg::REDECLARATION).clone().ok_or("pattern mismatch")?, env)?));
             }
             ()
         }
@@ -1638,7 +1638,7 @@ pub(crate) fn updateMovedComponentItem(
     let mut item: metamodelica::Ref<Absyn::ComponentItem> = item;
     assign_field!(item.component = updateMovedComponent(item.component.clone(), env.clone())?);
     if (item.condition).is_some() {
-        assign_field!(item.condition = Some(updateMovedExp(Util::getOption(item.condition.clone())?, env)?));
+        assign_field!(item.condition = Some(updateMovedExp(item.condition.clone().ok_or("pattern mismatch")?, env)?));
     }
     Ok(item)
 }
@@ -1657,7 +1657,7 @@ pub(crate) fn updateMovedComponent(mut component: Absyn::Component, mut env: Mov
     }
     if (component.modification).is_some() {
         component.modification = Some(updateMovedModification(
-            Util::getOption(component.modification.clone())?,
+            component.modification.clone().ok_or("pattern mismatch")?,
             env,
         )?);
     }
@@ -1717,7 +1717,7 @@ pub(crate) fn updateMovedTypeSpec(
             if (var_field!((*ty).arrayDim, Absyn::TypeSpec::TPATH)).is_some() {
                 assign_variant_field!(ty => Absyn::TypeSpec::TPATH; arrayDim = Some(({
                     let mut __acc: metamodelica::List<metamodelica::Ref<Absyn::Subscript>> = metamodelica::nil();
-                    for mut s in (Util::getOption(var_field!((*ty).arrayDim, Absyn::TypeSpec::TPATH).clone())?).into_iter().cloned() {
+                    for mut s in (var_field!((*ty).arrayDim, Absyn::TypeSpec::TPATH).clone().ok_or("pattern mismatch")?).into_iter().cloned() {
                         let __x = updateMovedSubscript(s.clone(), env.clone())?;
                         __acc = cons(__x, __acc);
                     }
@@ -1731,7 +1731,7 @@ pub(crate) fn updateMovedTypeSpec(
             if (var_field!((*ty).arrayDim, Absyn::TypeSpec::TCOMPLEX)).is_some() {
                 assign_variant_field!(ty => Absyn::TypeSpec::TCOMPLEX; arrayDim = Some(({
                     let mut __acc: metamodelica::List<metamodelica::Ref<Absyn::Subscript>> = metamodelica::nil();
-                    for mut s in (Util::getOption(var_field!((*ty).arrayDim, Absyn::TypeSpec::TCOMPLEX).clone())?).into_iter().cloned() {
+                    for mut s in (var_field!((*ty).arrayDim, Absyn::TypeSpec::TCOMPLEX).clone().ok_or("pattern mismatch")?).into_iter().cloned() {
                         let __x = updateMovedSubscript(s.clone(), env.clone())?;
                         __acc = cons(__x, __acc);
                     }
@@ -1797,7 +1797,7 @@ pub(crate) fn updateMovedCommentOpt(
 ) -> Result<Option<metamodelica::Ref<Absyn::Comment>>> {
     let mut cmt: Option<metamodelica::Ref<Absyn::Comment>> = cmt;
     if (cmt).is_some() {
-        cmt = Some(updateMovedComment(Util::getOption(cmt)?, env)?);
+        cmt = Some(updateMovedComment(cmt.ok_or("pattern mismatch")?, env)?);
     }
     Ok(cmt)
 }
@@ -1817,7 +1817,7 @@ pub(crate) fn updateMovedAnnotationOpt(
 ) -> Result<Option<metamodelica::Ref<Absyn::Annotation>>> {
     let mut ann: Option<metamodelica::Ref<Absyn::Annotation>> = ann;
     if (ann).is_some() {
-        ann = Some(updateMovedAnnotation(Util::getOption(ann)?, env)?);
+        ann = Some(updateMovedAnnotation(ann.ok_or("pattern mismatch")?, env)?);
     }
     Ok(ann)
 }

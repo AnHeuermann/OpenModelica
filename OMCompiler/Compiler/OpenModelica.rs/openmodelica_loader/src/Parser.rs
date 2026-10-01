@@ -443,7 +443,7 @@ fn getLicenseAnnotation(mut className: &metamodelica::Ref<Absyn::Class>) -> (Arc
         })),
         &getLicenseAnnotationWork1,
     );
-    license = Util::getOptionOrDefault(opt_license, (literal!(""), literal!("")));
+    license = opt_license.unwrap_or((literal!(""), literal!("")));
     license
 }
 
@@ -549,7 +549,7 @@ fn getFeaturesAnnotation(mut className: &metamodelica::Ref<Absyn::Class>) -> met
         })),
         &getFeaturesAnnotationList,
     );
-    features = Util::getOptionOrDefault(opt_featuresList, metamodelica::nil());
+    features = opt_featuresList.unwrap_or(metamodelica::nil());
     features
 }
 

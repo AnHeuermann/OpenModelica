@@ -1741,7 +1741,7 @@ fn convertUnitStringToUnit(
     unit_binding = Variable::lookupTypeAttribute(&(literal!("unit")), var);
     unit_exp = Binding::typedExp(&unit_binding);
     unit_string = if ((unit_exp).is_some()) {
-        getUnitStringFromExp(Util::getOption(unit_exp)?)?
+        getUnitStringFromExp(unit_exp.ok_or("pattern mismatch")?)?
     } else {
         literal!("")
     };

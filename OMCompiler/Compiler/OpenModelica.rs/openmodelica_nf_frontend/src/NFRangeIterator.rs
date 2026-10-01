@@ -232,7 +232,7 @@ pub(crate) fn fromDim(
             fromExp(__dim_exp.clone())?
         },
         Deref @ Dimension::RESIZABLE { opt_size: __dim_opt_size, size: __dim_size, .. } => {
-            metamodelica::Ref::new(NFRangeIterator::INT_RANGE { current: 1, last: if (resizable) {Util::getOptionOrDefault(__dim_opt_size.clone(), __dim_size.clone())} else {__dim_size.clone()} })
+            metamodelica::Ref::new(NFRangeIterator::INT_RANGE { current: 1, last: if (resizable) {__dim_opt_size.clone().unwrap_or(__dim_size.clone())} else {__dim_size.clone()} })
         },
         _ => {
             Error::terminate({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("NFRangeIterator.fromDim")); __mm_s.push_str(&*literal!(" got unknown dim")); ArcStr::from(__mm_s) }, &(metamodelica::sourceInfo!("NFFrontEnd/NFRangeIterator.mo")))?;

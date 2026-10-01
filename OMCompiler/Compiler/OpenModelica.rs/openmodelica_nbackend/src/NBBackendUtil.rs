@@ -177,7 +177,7 @@ pub(crate) fn noNameHashExp(mut exp: &metamodelica::Ref<Expression::NFExpression
             ..
         } => {
             if (__exp_step).is_some() {
-                hash = noNameHashExp(&(Util::getOption(__exp_step.clone())?), r#mod)?;
+                hash = noNameHashExp(&(__exp_step.clone().ok_or("pattern mismatch")?), r#mod)?;
             }
             hash + noNameHashExp(metamodelica::AsArg::as_arg(&__exp_start), r#mod)?
                 + noNameHashExp(metamodelica::AsArg::as_arg(&__exp_stop), r#mod)?
@@ -206,7 +206,7 @@ pub(crate) fn noNameHashExp(mut exp: &metamodelica::Ref<Expression::NFExpression
             exp: __exp_exp,
         } => {
             if (__exp_dimIndex).is_some() {
-                hash = noNameHashExp(&(Util::getOption(__exp_dimIndex.clone())?), r#mod)?;
+                hash = noNameHashExp(&(__exp_dimIndex.clone().ok_or("pattern mismatch")?), r#mod)?;
             }
             hash + noNameHashExp(metamodelica::AsArg::as_arg(&__exp_exp), r#mod)?
         }
@@ -445,7 +445,7 @@ pub(crate) fn containsContinuousVarFold(
 pub(crate) fn makeFDerString(mut r#str: ArcStr, mut i_opt: Option<i32>) -> Result<ArcStr> {
     let mut r#str: ArcStr = r#str;
     let mut i: ArcStr = if ((i_opt).is_some()) {
-        intString(Util::getOption(i_opt.clone())?)
+        intString(i_opt.clone().ok_or("pattern mismatch")?)
     } else {
         literal!("")
     };

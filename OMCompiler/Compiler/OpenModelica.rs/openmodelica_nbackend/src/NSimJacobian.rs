@@ -1145,11 +1145,11 @@ pub mod SimJacobian {
         for mut partition in &**partitions {
             jacobian = Partition::Partition::getJacobian(metamodelica::AsArg::as_arg(&partition));
             if (jacobian).is_some() {
-                jacobians = metamodelica::cons(Util::getOption(jacobian)?, jacobians);
+                jacobians = metamodelica::cons(jacobian.ok_or("pattern mismatch")?, jacobians);
             }
             jacobianAdjoint = Partition::Partition::getJacobianAdjoint(metamodelica::AsArg::as_arg(&partition));
             if (jacobianAdjoint).is_some() {
-                jacobiansAdjoint = metamodelica::cons(Util::getOption(jacobianAdjoint)?, jacobiansAdjoint);
+                jacobiansAdjoint = metamodelica::cons(jacobianAdjoint.ok_or("pattern mismatch")?, jacobiansAdjoint);
             }
         }
         if (jacobians).is_empty() {
@@ -1158,7 +1158,7 @@ pub mod SimJacobian {
             simJacobian = Jacobian::combine(&jacobians, literal!("A"))?;
             (simJac_opt, simCodeIndices) = create(&simJacobian, simCodeIndices, simcode_map.clone())?;
             if (simJac_opt).is_some() {
-                simJac = Util::getOption(simJac_opt)?;
+                simJac = simJac_opt.ok_or("pattern mismatch")?;
             } else {
                 (simJac, simCodeIndices) = empty(literal!("A"), simCodeIndices)?;
             }
@@ -1169,7 +1169,7 @@ pub mod SimJacobian {
             simJacobianAdjoint = Jacobian::combine(&jacobiansAdjoint, literal!("ADJ"))?;
             (simJacAdj_opt, simCodeIndices) = create(&simJacobianAdjoint, simCodeIndices, simcode_map)?;
             if (simJacAdj_opt).is_some() {
-                simJacAdjoint = Util::getOption(simJacAdj_opt)?;
+                simJacAdjoint = simJacAdj_opt.ok_or("pattern mismatch")?;
             } else {
                 (simJacAdjoint, simCodeIndices) = empty(literal!("ADJ"), simCodeIndices)?;
             }
@@ -1235,15 +1235,15 @@ pub mod SimJacobian {
         for mut partition in &**partitions {
             jacobianLfg = Partition::Partition::getJacobianLfg(metamodelica::AsArg::as_arg(&partition));
             if (jacobianLfg).is_some() {
-                jacobiansLfg = metamodelica::cons(Util::getOption(jacobianLfg)?, jacobiansLfg);
+                jacobiansLfg = metamodelica::cons(jacobianLfg.ok_or("pattern mismatch")?, jacobiansLfg);
             }
             jacobianMrf = Partition::Partition::getJacobianMrf(metamodelica::AsArg::as_arg(&partition));
             if (jacobianMrf).is_some() {
-                jacobiansMrf = metamodelica::cons(Util::getOption(jacobianMrf)?, jacobiansMrf);
+                jacobiansMrf = metamodelica::cons(jacobianMrf.ok_or("pattern mismatch")?, jacobiansMrf);
             }
             jacobianR0 = Partition::Partition::getJacobianR0(metamodelica::AsArg::as_arg(&partition));
             if (jacobianR0).is_some() {
-                jacobiansR0 = metamodelica::cons(Util::getOption(jacobianR0)?, jacobiansR0);
+                jacobiansR0 = metamodelica::cons(jacobianR0.ok_or("pattern mismatch")?, jacobiansR0);
             }
         }
         if (jacobiansLfg).is_empty() {
@@ -1252,7 +1252,7 @@ pub mod SimJacobian {
             simJacobianLfg = Jacobian::combine(&jacobiansLfg, literal!("OPT_LFG"))?;
             (simJacLfg_opt, simCodeIndices) = create(&simJacobianLfg, simCodeIndices, simcode_map.clone())?;
             if (simJacLfg_opt).is_some() {
-                simJacLfg = Util::getOption(simJacLfg_opt)?;
+                simJacLfg = simJacLfg_opt.ok_or("pattern mismatch")?;
             } else {
                 (simJacLfg, simCodeIndices) = empty(literal!("OPT_LFG"), simCodeIndices)?;
             }
@@ -1263,7 +1263,7 @@ pub mod SimJacobian {
             simJacobianMrf = Jacobian::combine(&jacobiansMrf, literal!("OPT_MRF"))?;
             (simJacMrf_opt, simCodeIndices) = create(&simJacobianMrf, simCodeIndices, simcode_map.clone())?;
             if (simJacMrf_opt).is_some() {
-                simJacMrf = Util::getOption(simJacMrf_opt)?;
+                simJacMrf = simJacMrf_opt.ok_or("pattern mismatch")?;
             } else {
                 (simJacMrf, simCodeIndices) = empty(literal!("OPT_MRF"), simCodeIndices)?;
             }
@@ -1274,7 +1274,7 @@ pub mod SimJacobian {
             simJacobianR0 = Jacobian::combine(&jacobiansR0, literal!("OPT_R0"))?;
             (simJacR0_opt, simCodeIndices) = create(&simJacobianR0, simCodeIndices, simcode_map)?;
             if (simJacR0_opt).is_some() {
-                simJacR0 = Util::getOption(simJacR0_opt)?;
+                simJacR0 = simJacR0_opt.ok_or("pattern mismatch")?;
             } else {
                 (simJacR0, simCodeIndices) = empty(literal!("OPT_R0"), simCodeIndices)?;
             }

@@ -2494,7 +2494,7 @@ fn combineBinariesExp(
                     stop = combineBinariesExp(var_field!((*exp).stop, Expression::NFExpression::RANGE).clone(), None, metamodelica::Ref::new(Expression::NFExpression::EMPTY { ty: Expression::typeOf(var_field!((*exp).stop, Expression::NFExpression::RANGE).clone()) }), false)?
                 );
                 if (var_field!((*exp).step, Expression::NFExpression::RANGE)).is_some() {
-                    assign_variant_field!(exp => Expression::NFExpression::RANGE; step = Some(combineBinariesExp(Util::getOption(var_field!((*exp).step, Expression::NFExpression::RANGE).clone())?, None, metamodelica::Ref::new(Expression::NFExpression::EMPTY { ty: Expression::typeOf(Util::getOption(var_field!((*exp).step, Expression::NFExpression::RANGE).clone())?) }), false)?));
+                    assign_variant_field!(exp => Expression::NFExpression::RANGE; step = Some(combineBinariesExp(var_field!((*exp).step, Expression::NFExpression::RANGE).clone().ok_or("pattern mismatch")?, None, metamodelica::Ref::new(Expression::NFExpression::EMPTY { ty: Expression::typeOf(var_field!((*exp).step, Expression::NFExpression::RANGE).clone().ok_or("pattern mismatch")?) }), false)?));
                 }
                 return Ok(addArgument(result, exp.clone(), inverse)?)
             },
@@ -2536,7 +2536,7 @@ fn combineBinariesExp(
             (_, Deref @ Expression::SIZE { .. }) => {
                 assign_variant_field!(exp => Expression::NFExpression::SIZE; exp = combineBinariesExp(var_field!((*exp).exp, Expression::NFExpression::SIZE).clone(), None, metamodelica::Ref::new(Expression::NFExpression::EMPTY { ty: Expression::typeOf(var_field!((*exp).exp, Expression::NFExpression::SIZE).clone()) }), false)?);
                 if (var_field!((*exp).dimIndex, Expression::NFExpression::SIZE)).is_some() {
-                    assign_variant_field!(exp => Expression::NFExpression::SIZE; dimIndex = Some(combineBinariesExp(Util::getOption(var_field!((*exp).dimIndex, Expression::NFExpression::SIZE).clone())?, None, metamodelica::Ref::new(Expression::NFExpression::EMPTY { ty: Expression::typeOf(Util::getOption(var_field!((*exp).dimIndex, Expression::NFExpression::SIZE).clone())?) }), false)?));
+                    assign_variant_field!(exp => Expression::NFExpression::SIZE; dimIndex = Some(combineBinariesExp(var_field!((*exp).dimIndex, Expression::NFExpression::SIZE).clone().ok_or("pattern mismatch")?, None, metamodelica::Ref::new(Expression::NFExpression::EMPTY { ty: Expression::typeOf(var_field!((*exp).dimIndex, Expression::NFExpression::SIZE).clone().ok_or("pattern mismatch")?) }), false)?));
                 }
                 return Ok(addArgument(result, exp.clone(), inverse)?)
             },

@@ -938,7 +938,7 @@ pub(crate) fn getElementModifierValue(
                         name = metamodelica::Own::own(__pa0);
                         optMod = metamodelica::Own::own(__pa1);
                         if stringEq(&name, &elName) {
-                            let __arc4 = Util::getOptionOrDefault(optMod.clone(), metamodelica::Ref::new(Absyn::Modification { elementArgLst: metamodelica::nil(), eqMod: openmodelica_ast::Absyn::EqMod::interned_NOMOD() }));
+                            let __arc4 = optMod.clone().unwrap_or(metamodelica::Ref::new(Absyn::Modification { elementArgLst: metamodelica::nil(), eqMod: openmodelica_ast::Absyn::EqMod::interned_NOMOD() }));
                             let Absyn::CLASSMOD { elementArgLst: __pa3, .. } = &*__arc4;
                             args = metamodelica::Own::own(__pa3);
                             found = true;
@@ -1156,7 +1156,7 @@ pub(crate) fn getElementModifierNames(
                                 name = metamodelica::Own::own(__pa0);
                                 optMod = metamodelica::Own::own(__pa1);
                                 if stringEq(&name, &inElementName) {
-                                    let __arc4 = Util::getOptionOrDefault(optMod.clone(), metamodelica::Ref::new(Absyn::Modification { elementArgLst: metamodelica::nil(), eqMod: openmodelica_ast::Absyn::EqMod::interned_NOMOD() }));
+                                    let __arc4 = optMod.clone().unwrap_or(metamodelica::Ref::new(Absyn::Modification { elementArgLst: metamodelica::nil(), eqMod: openmodelica_ast::Absyn::EqMod::interned_NOMOD() }));
                                     let Absyn::CLASSMOD { elementArgLst: __pa3, .. } = &*__arc4;
                                     r#mod = metamodelica::Own::own(__pa3);
                                     found = true;
@@ -1625,7 +1625,7 @@ pub(crate) fn createEnvironment(
             env: FGraph::emptyGraph().clone(),
         };
     } else {
-        s = Util::getOptionOrDefault(os, AbsynToSCode::translateAbsyn2SCode(p)?);
+        s = os.unwrap_or(AbsynToSCode::translateAbsyn2SCode(p)?);
         (cache, env) = Inst::makeEnvFromProgram(&s)?;
         let (__pa0, __pa4, __pa1, __pa2, __pa3, __pa5) = ::match_deref::match_deref! { match &(Lookup::lookupClass(&cache, &env, &modelPath, None)?) {
             (__pa0, __pa4 @ Deref @ SCode::Element::CLASS { name: __pa1, encapsulatedPrefix: __pa2, restriction: __pa3, .. }, __pa5) => (__pa0.clone(), __pa4.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa5.clone()),
@@ -2544,7 +2544,7 @@ fn getElementInfo(
             if stringEmpty(&cmt) {
                 cmt = getClassCommentInCommentOpt(opt_cmt.clone());
             }
-            dims = if ((opt_adim).is_some()) {dimensionListValues(Util::getOption(opt_adim.clone())?)?} else {metamodelica::nil()};
+            dims = if ((opt_adim).is_some()) {dimensionListValues(opt_adim.clone().ok_or("pattern mismatch")?)?} else {metamodelica::nil()};
             dims = listAppend(dimensionListValues(attr.arrayDim.clone())?, dims);
             dims_val = ValuesMake::makeArray(dims);
             if quoteNames {
@@ -3511,7 +3511,7 @@ pub(crate) fn getAllSubtypeOf2(
             if isSubtypeOf(entry.path.clone(), base_class.clone(), program.clone())? {
                 opt_path = AbsynUtil::removePrefixOpt(&parent, &entry.path);
                 if (opt_path).is_some() {
-                    assign_field!(entry.path = Util::getOption(opt_path)?);
+                    assign_field!(entry.path = opt_path.ok_or("pattern mismatch")?);
                     locals = metamodelica::cons(entry, locals);
                 } else {
                     entries = metamodelica::cons(entry, entries);
@@ -4699,7 +4699,7 @@ pub(crate) fn setElementAnnotation(
         name = AbsynUtil::pathLastIdent(elementPath);
         (program, elem_opt, success) = unwrap_break_err!(transformPathedElementInProgram(elementPath, (std::sync::Arc::new({ let __pe_b1 = name.clone(); let __pe_b2 = ann.clone(); move |__pe_a0| AbsynUtil::setElementAnnotation(__pe_a0, &__pe_b1, __pe_b2.clone()) }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<Absyn::Element>) -> Result<metamodelica::Ref<Absyn::Element>> + 'static>), program.clone()), '__try0);
         if success {
-            unwrap_break_err!(SymbolTable::setAbsynElement(program.clone(), &(unwrap_break_err!(Util::getOption(elem_opt.clone()), '__try0)), elementPath), '__try0);
+            unwrap_break_err!(SymbolTable::setAbsynElement(program.clone(), &(unwrap_break_err!(elem_opt.clone().ok_or("pattern mismatch"), '__try0)), elementPath), '__try0);
         }
         Ok::<_, &'static str>((success.clone(),))
     } {
@@ -5487,7 +5487,7 @@ fn renameElementsInIterator(
         assign_field!(
             iter.range = Some(
                 (AbsynUtil::traverseExp(
-                    Util::getOption(iter.range.clone())?,
+                    iter.range.clone().ok_or("pattern mismatch")?,
                     (std::sync::Arc::new(renameElementsInExp)
                         as std::sync::Arc<
                             dyn ::std::ops::Fn(
@@ -6140,10 +6140,10 @@ pub(crate) fn getInheritedAnnotation(
     });
     while !((extends_oannl).is_empty()) {
         if ((extends_oannl).head().cloned()?).is_some() {
-            extends_ann = Util::getOption((extends_oannl).head().cloned()?)?;
+            extends_ann = ((extends_oannl).head().cloned()?).ok_or("pattern mismatch")?;
             if (outAnnotation).is_some() {
                 outAnnotation = Some(AbsynUtil::mergeModifiers(
-                    &(Util::getOption(outAnnotation)?),
+                    &(outAnnotation.ok_or("pattern mismatch")?),
                     &extends_ann,
                 )?);
             } else {
@@ -6207,7 +6207,7 @@ pub(crate) fn setElementType(
         ty = unwrap_break_err!(AbsynUtil::crefToTypeSpec(className.clone()), '__try0);
         (program, elem_opt, success) = unwrap_break_err!(transformPathedElementInProgram(elementPath, (std::sync::Arc::new({ let __pe_b1 = ty.clone(); let __pe_b2 = false; move |__pe_a0| AbsynUtil::setElementType(__pe_a0, __pe_b1.clone(), __pe_b2.clone()) }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<Absyn::Element>) -> Result<metamodelica::Ref<Absyn::Element>> + 'static>), program.clone()), '__try0);
         if success {
-            unwrap_break_err!(SymbolTable::setAbsynElement(program.clone(), &(unwrap_break_err!(Util::getOption(elem_opt.clone()), '__try0)), elementPath), '__try0);
+            unwrap_break_err!(SymbolTable::setAbsynElement(program.clone(), &(unwrap_break_err!(elem_opt.clone().ok_or("pattern mismatch"), '__try0)), elementPath), '__try0);
         }
         Ok::<_, &'static str>((success.clone(),))
     } {
@@ -6618,7 +6618,7 @@ pub(crate) fn offsetAnnotationsInComponentItem(
     let mut ann: metamodelica::Ref<Absyn::Annotation>;
     oann = AbsynUtil::getCommentOptAnnotation(item.comment.clone())?;
     ann = if ((oann).is_some()) {
-        Util::getOption(oann)?
+        oann.ok_or("pattern mismatch")?
     } else {
         metamodelica::Ref::new(Absyn::Annotation {
             elementArgs: metamodelica::nil(),

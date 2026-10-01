@@ -1221,7 +1221,7 @@ pub(crate) fn simplifySlice(
             step: __exp_step,
             stop: __exp_stop,
             ..
-        } if (((__exp_step).is_none() || Expression::isOne(&(Util::getOption(__exp_step.clone())?))?)
+        } if (((__exp_step).is_none() || Expression::isOne(&(__exp_step.clone().ok_or("pattern mismatch")?))?)
             && Dimension::expIsLowerBound(metamodelica::AsArg::as_arg(&__exp_start))
             && Dimension::expIsUpperBound(metamodelica::AsArg::as_arg(&__exp_stop), dimension)) =>
         {

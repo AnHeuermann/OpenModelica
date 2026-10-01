@@ -1558,7 +1558,7 @@ pub(crate) fn differentiateIfEquationBody(
     )?;
     if (body.else_if).is_some() {
         (else_if, diffArguments_ptr) =
-            differentiateIfEquationBody(Util::getOption(body.else_if.clone())?, diffArguments_ptr)?;
+            differentiateIfEquationBody(body.else_if.clone().ok_or("pattern mismatch")?, diffArguments_ptr)?;
         body = metamodelica::Ref::new(IfEquationBody::IfEquationBody {
             condition: body.condition.clone(),
             then_eqns: then_eqns,
@@ -1592,7 +1592,7 @@ pub(crate) fn differentiateWhenEquationBody(
     )?;
     if (body.else_when).is_some() {
         (else_when, diffArguments) =
-            differentiateWhenEquationBody(Util::getOption(body.else_when.clone())?, diffArguments)?;
+            differentiateWhenEquationBody(body.else_when.clone().ok_or("pattern mismatch")?, diffArguments)?;
         body = metamodelica::Ref::new(WhenEquationBody::WhenEquationBody {
             condition: body.condition.clone(),
             when_stmts: when_stmts,
@@ -2150,7 +2150,7 @@ pub(crate) fn differentiateComponentRef(
             } else if UnorderedMap::contains(var_field!((*exp).cref, Expression::NFExpression::CREF).clone(), diff_map.clone())? {
                 res = Expression::fromCref(UnorderedMap::getOrFail(var_field!((*exp).cref, Expression::NFExpression::CREF).clone(), diff_map.clone())?, false)?;
                 if diffArguments.collectAdjoints.clone() {
-                    UnorderedMap::tryAddUpdate(var_field!((*exp).cref, Expression::NFExpression::CREF).clone(), &({ let __pe_b1 = diffArguments.current_grad.clone(); move |__pe_a0| Ok(updateAdjointList(__pe_a0, __pe_b1.clone())) }), Util::getOption(diffArguments.adjoint_map.clone())?)?;
+                    UnorderedMap::tryAddUpdate(var_field!((*exp).cref, Expression::NFExpression::CREF).clone(), &({ let __pe_b1 = diffArguments.current_grad.clone(); move |__pe_a0| Ok(updateAdjointList(__pe_a0, __pe_b1.clone())) }), diffArguments.adjoint_map.clone().ok_or("pattern mismatch")?)?;
                 }
             } else {
                 hasSetSub = false;
@@ -2197,10 +2197,10 @@ pub(crate) fn differentiateComponentRef(
                 dbg(&({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("[dCREF:JAC] exact match -> ")); __mm_s.push_str(&*ComponentRef::toString(&derCref)?); ArcStr::from(__mm_s) }))?;
                 res = Expression::fromCref(derCref.clone(), false)?;
                 if diffArguments.collectAdjoints.clone() {
-                    if !(UnorderedMap::contains(derCref.clone(), Util::getOption(diffArguments.adjoint_map.clone())?)?) {
-                        UnorderedMap::tryAdd(derCref.clone(), metamodelica::nil(), Util::getOption(diffArguments.adjoint_map.clone())?)?;
+                    if !(UnorderedMap::contains(derCref.clone(), diffArguments.adjoint_map.clone().ok_or("pattern mismatch")?)?) {
+                        UnorderedMap::tryAdd(derCref.clone(), metamodelica::nil(), diffArguments.adjoint_map.clone().ok_or("pattern mismatch")?)?;
                     }
-                    UnorderedMap::tryAddUpdate(derCref, &({ let __pe_b1 = diffArguments.current_grad.clone(); move |__pe_a0| Ok(updateAdjointList(__pe_a0, __pe_b1.clone())) }), Util::getOption(diffArguments.adjoint_map.clone())?)?;
+                    UnorderedMap::tryAddUpdate(derCref, &({ let __pe_b1 = diffArguments.current_grad.clone(); move |__pe_a0| Ok(updateAdjointList(__pe_a0, __pe_b1.clone())) }), diffArguments.adjoint_map.clone().ok_or("pattern mismatch")?)?;
                 }
             } else if UnorderedMap::contains(strippedCref.clone(), diff_map.clone())? {
                 derCref = UnorderedMap::getOrFail(strippedCref, diff_map.clone())?;
@@ -2209,10 +2209,10 @@ pub(crate) fn differentiateComponentRef(
                 dbg(&({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("[dCREF:JAC] get variable for derivative cref: ")); __mm_s.push_str(&*BVariable::pointerToString(BVariable::getVarPointer(&derCref, metamodelica::sourceInfo!("NBackEnd/Util/NBDifferentiate.mo"))?)?); ArcStr::from(__mm_s) }))?;
                 if diffArguments.collectAdjoints.clone() {
                     adjointKey = ComponentRef::copySubscripts(var_field!((*exp).cref, Expression::NFExpression::CREF), ComponentRef::stripSubscriptsAll(&derCref))?;
-                    if !(UnorderedMap::contains(adjointKey.clone(), Util::getOption(diffArguments.adjoint_map.clone())?)?) {
-                        UnorderedMap::tryAdd(adjointKey.clone(), metamodelica::nil(), Util::getOption(diffArguments.adjoint_map.clone())?)?;
+                    if !(UnorderedMap::contains(adjointKey.clone(), diffArguments.adjoint_map.clone().ok_or("pattern mismatch")?)?) {
+                        UnorderedMap::tryAdd(adjointKey.clone(), metamodelica::nil(), diffArguments.adjoint_map.clone().ok_or("pattern mismatch")?)?;
                     }
-                    UnorderedMap::tryAddUpdate(adjointKey, &({ let __pe_b1 = diffArguments.current_grad.clone(); move |__pe_a0| Ok(updateAdjointList(__pe_a0, __pe_b1.clone())) }), Util::getOption(diffArguments.adjoint_map.clone())?)?;
+                    UnorderedMap::tryAddUpdate(adjointKey, &({ let __pe_b1 = diffArguments.current_grad.clone(); move |__pe_a0| Ok(updateAdjointList(__pe_a0, __pe_b1.clone())) }), diffArguments.adjoint_map.clone().ok_or("pattern mismatch")?)?;
                 } else {
                     dbg(&(literal!("[dCREF:JAC] collectAdjoints=false, skip append")))?;
                 }
@@ -2362,7 +2362,7 @@ pub(crate) fn isMixedRecordDerivative(
             metamodelica::sourceInfo!("NBackEnd/Util/NBDifferentiate.mo"),
         )?
     {
-        root = crefRoot(&(Util::getOption(der_opt)?))?;
+        root = crefRoot(&(der_opt.ok_or("pattern mismatch")?))?;
         for mut child in &*BVariable::getRecordChildrenCref(&cref)? {
             b = (::match_deref::match_deref! { match &(UnorderedMap::get(ComponentRef::stripSubscriptsAll(metamodelica::AsArg::as_arg(&child)), diff_map.clone())?) {
                 Some(child_der) => {
@@ -4645,7 +4645,7 @@ pub(crate) fn reverseEquationIterator(
     (names, ranges, maps) = NBEquation::Iterator::getFrames(iterIn);
     for mut range in &*ranges {
         o_range = reverseForRange(Some(range.clone()))?;
-        revRanges = metamodelica::cons(Util::getOption(o_range)?, revRanges);
+        revRanges = metamodelica::cons(o_range.ok_or("pattern mismatch")?, revRanges);
     }
     iterOut = NBEquation::Iterator::fromFrames(List::zip3(names, revRanges.reverse(), maps));
     Ok(iterOut)
@@ -5555,7 +5555,7 @@ pub(crate) fn differentiateBinding(
     let mut exp: metamodelica::Ref<Expression::NFExpression>;
     opt_exp = Binding::getExpOpt(&binding);
     if (opt_exp).is_some() {
-        (exp, diffArgs) = differentiateExpression(Util::getOption(opt_exp)?, diffArgs)?;
+        (exp, diffArgs) = differentiateExpression(opt_exp.ok_or("pattern mismatch")?, diffArgs)?;
         binding = Binding::setExp(exp, binding)?;
     }
     Ok((binding, diffArgs))

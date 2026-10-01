@@ -2833,12 +2833,11 @@ fn vararrayList(
         .is_some()
         {
             outVars = metamodelica::cons(
-                Util::getOption(
-                    ({
-                        let __elt = (*metamodelica::index_checked(&varOptArr.borrow(), i)?).clone();
-                        __elt
-                    }),
-                )?,
+                ({
+                    let __elt = (*metamodelica::index_checked(&varOptArr.borrow(), i)?).clone();
+                    __elt
+                })
+                .ok_or("pattern mismatch")?,
                 outVars,
             );
         }
@@ -4195,7 +4194,7 @@ fn isElementOf(
         if (fty).is_none() {
             return Ok(b);
         }
-        (t, dims) = TypesDump::flattenArrayType(&(Util::getOption(fty)?));
+        (t, dims) = TypesDump::flattenArrayType(&(fty.ok_or("pattern mismatch")?));
         n = ((dims).len() as i32);
     }
     Ok(b)

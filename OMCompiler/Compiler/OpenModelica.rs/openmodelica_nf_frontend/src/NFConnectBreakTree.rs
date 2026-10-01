@@ -1237,7 +1237,7 @@ pub(crate) fn isConnectBroken(
     let mut entry: Entry;
     opt_entry_tree = getOpt(connectBreaks, lhs.clone())?;
     if (opt_entry_tree).is_some() {
-        opt_entry_ptr = EntryTree::getOpt(&(Util::getOption(opt_entry_tree)?), rhs.clone())?;
+        opt_entry_ptr = EntryTree::getOpt(&(opt_entry_tree.ok_or("pattern mismatch")?), rhs.clone())?;
         if (opt_entry_ptr).is_some() && !(is_broken(&lhs, scope.clone())) && !(is_broken(&rhs, scope)) {
             let __pa0 = ::match_deref::match_deref! { match &(opt_entry_ptr) {
                 Some(__pa0) => __pa0.clone(),

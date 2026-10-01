@@ -799,7 +799,7 @@ pub(crate) fn collectEquationFlatTypes(
             ..
         } => {
             if (__eq_range).is_some() {
-                collectExpFlatTypes(Util::getOption(__eq_range.clone())?, types.clone())?;
+                collectExpFlatTypes(__eq_range.clone().ok_or("pattern mismatch")?, types.clone())?;
             }
             List::map1_0(
                 metamodelica::AsArg::as_arg(&__eq_body),
@@ -938,7 +938,7 @@ pub(crate) fn collectStatementFlatTypes(
             ..
         } => {
             collectStatementsFlatTypes(metamodelica::AsArg::as_arg(&__stmt_body), types.clone())?;
-            collectExpFlatTypes(Util::getOption(__stmt_range.clone())?, types)?;
+            collectExpFlatTypes(__stmt_range.clone().ok_or("pattern mismatch")?, types)?;
             ()
         }
         Statement::IF {
@@ -1317,7 +1317,7 @@ pub(crate) fn obfuscateCref(
             if !(insideRecord) {
                 name = UnorderedMap::get(ComponentRef::node(&cref)?, obfuscationMap.clone())?;
                 if (name).is_some() {
-                    assign_variant_field!(cref => ComponentRef::NFComponentRef::CREF; node = ComponentRef::storeNode(InstNode::rename(Util::getOption(name)?, ComponentRef::node(&cref)?)?, false)?);
+                    assign_variant_field!(cref => ComponentRef::NFComponentRef::CREF; node = ComponentRef::storeNode(InstNode::rename(name.ok_or("pattern mismatch")?, ComponentRef::node(&cref)?)?, false)?);
                 }
             }
             insideRecord = InstNode::isRecord(ComponentRef::node(&cref)?)?;
@@ -1363,7 +1363,7 @@ pub(crate) fn obfuscateExpOpt(
 ) -> Result<Option<metamodelica::Ref<Expression::NFExpression>>> {
     let mut exp: Option<metamodelica::Ref<Expression::NFExpression>> = exp;
     if (exp).is_some() {
-        exp = Some(obfuscateExp(Util::getOption(exp)?, obfuscationMap)?);
+        exp = Some(obfuscateExp(exp.ok_or("pattern mismatch")?, obfuscationMap)?);
     }
     Ok(exp)
 }

@@ -1367,7 +1367,7 @@ fn printNode(mut node: Node) -> Result<()> {
         __mm_s.push_str(&*literal!("node: "));
         __mm_s.push_str(&*id);
         __mm_s.push_str(&*literal!(" desc: "));
-        __mm_s.push_str(&*Util::getOption(optDesc)?);
+        __mm_s.push_str(&*optDesc.ok_or("pattern mismatch")?);
         __mm_s.push_str(&*literal!("\n\tatts: "));
         __mm_s.push_str(&*atts);
         __mm_s.push_str(&*literal!("\n"));

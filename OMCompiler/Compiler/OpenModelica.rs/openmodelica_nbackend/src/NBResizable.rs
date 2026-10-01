@@ -1242,9 +1242,12 @@ fn getVarReplacements(
                 stop: __range_stop,
                 ..
             } => {
-                if (__range_step).is_some() && Expression::isNegative(&(Util::getOption(__range_step.clone())?))? {
+                if (__range_step).is_some()
+                    && Expression::isNegative(&(__range_step.clone().ok_or("pattern mismatch")?))?
+                {
                     UnorderedMap::add(name, __range_start.clone(), replacements.clone())?;
-                } else if (__range_step).is_none() || Expression::isPositive(&(Util::getOption(__range_step.clone())?))?
+                } else if (__range_step).is_none()
+                    || Expression::isPositive(&(__range_step.clone().ok_or("pattern mismatch")?))?
                 {
                     UnorderedMap::add(name, __range_stop.clone(), replacements.clone())?;
                 } else {
@@ -1654,10 +1657,7 @@ fn getRangeConstraint(
     let mut step: metamodelica::Ref<Expression::NFExpression>;
     let mut target: metamodelica::Ref<Expression::NFExpression>;
     let mut distance_const: metamodelica::Ref<Expression::NFExpression>;
-    step = Util::getOptionOrDefault(
-        step_opt,
-        metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }),
-    );
+    step = step_opt.unwrap_or(metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }));
     target = metamodelica::Ref::new(Expression::NFExpression::MULTARY {
         arguments: list![stop],
         inv_arguments: list![start],
@@ -1700,7 +1700,7 @@ fn getFactor(
     (diff, _) = Differentiate::differentiateExpression(exp, args)?;
     diff = SimplifyExp::simplify(diff, false)?;
     factor = Expression::integerValueOrDefault(&diff, 0);
-    if (opt_factor).is_some() && factor != Util::getOption(opt_factor)? {
+    if (opt_factor).is_some() && factor != opt_factor.ok_or("pattern mismatch")? {
         factor = 0;
     }
     Ok(factor)
@@ -1737,7 +1737,7 @@ fn getDistance(
     let mut shift: metamodelica::Ref<Expression::NFExpression>;
     let mut factor: i32;
     let mut distance: i32;
-    if (opt_factor).is_none() || Util::getOption(opt_factor.clone())? != 0 {
+    if (opt_factor).is_none() || opt_factor.clone().ok_or("pattern mismatch")? != 0 {
         factor = getFactor(exp.clone(), args, opt_factor.clone())?;
         if factor != 0 {
             shift = getShift(exp, cref)?;
@@ -1943,7 +1943,7 @@ fn addConstraint(
         r#const = Expression::map(
             old_const.clone(),
             (std::sync::Arc::new({
-                let __pe_b1 = Util::getOption(replacements.clone())?;
+                let __pe_b1 = replacements.clone().ok_or("pattern mismatch")?;
                 move |__pe_a0| Replacements::applySimpleExp(__pe_a0, __pe_b1.clone())
             })
                 as std::sync::Arc<
@@ -2268,12 +2268,12 @@ fn setInitialValues(
                 attributes = (*__esc_attributes).clone();
                 if UnorderedSet::contains(cref.clone(), min_parameters)? {
                     if (var_field!((*attributes).min, VariableAttributes::VariableAttributes::VAR_ATTR_INT)).is_some() {
-                        value = Binding::getTypedExp(&(Util::getOption(var_field!((*attributes).min, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone())?))?;
+                        value = Binding::getTypedExp(&(var_field!((*attributes).min, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone().ok_or("pattern mismatch")?))?;
                     } else {
                         value = metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 0 });
                     }
                 } else if (var_field!((*attributes).max, VariableAttributes::VariableAttributes::VAR_ATTR_INT)).is_some() {
-                    value = Binding::getTypedExp(&(Util::getOption(var_field!((*attributes).max, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone())?))?;
+                    value = Binding::getTypedExp(&(var_field!((*attributes).max, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone().ok_or("pattern mismatch")?))?;
                 } else {
                     value = metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 0 });
                 }
@@ -2551,7 +2551,7 @@ fn fixConstraints(
                     )?;
                     if status == Solve::Status::EXPLICIT.clone() {
                         let () = (match checkConstraint(
-                            Util::getOption(Equation::getRHS(solved_eqn)?)?,
+                            (Equation::getRHS(solved_eqn)?).ok_or("pattern mismatch")?,
                             optimal_values.clone(),
                         )? {
                             Some(mut __esc_value) => {
@@ -2572,10 +2572,9 @@ fn fixConstraints(
                                     metamodelica::sourceInfo!("NBackEnd/Util/NBResizable.mo"),
                                 )? {
                                     if UnorderedSet::contains(constraint.clone(), parsed_constraints.clone())?
-                                        && !(func(Util::getOptionOrDefault(
-                                            checkConstraint(cons.clone(), optimal_values.clone())?,
-                                            1,
-                                        ))?)
+                                        && !(func(
+                                            (checkConstraint(cons.clone(), optimal_values.clone())?).unwrap_or(1),
+                                        )?)
                                     {
                                         failed = true;
                                         break;

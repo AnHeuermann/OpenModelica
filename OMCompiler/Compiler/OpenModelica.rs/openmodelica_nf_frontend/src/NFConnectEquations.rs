@@ -1158,7 +1158,7 @@ fn hasFlow(
     }
     oexp = lookupAttrInVar(&(if (is_inside) { literal!("max") } else { literal!("min") }), &v);
     if (oexp).is_some() {
-        exp = evaluateAttribute(Util::getOption(oexp)?)?;
+        exp = evaluateAttribute(oexp.ok_or("pattern mismatch")?)?;
         if is_inside {
             positiveFlow = Expression::isNegative(&exp)?;
             nonNegativeFlow = Expression::isNonPositive(&exp)?;
@@ -1659,7 +1659,7 @@ fn evaluateInStream(
         Flags::getConfigReal(Flags::FLOW_THRESHOLD.clone())?,
     )?;
     if (replacements).is_some() {
-        exp = StreamFlowAlias::applyReplacementsInExp(Util::getOption(replacements)?, exp)?;
+        exp = StreamFlowAlias::applyReplacementsInExp(replacements.ok_or("pattern mismatch")?, exp)?;
     }
     Ok(exp)
 }
@@ -1837,7 +1837,7 @@ fn isNoFlow(
     }
     attr_oexp = lookupAttrInVar(&(if (is_inside) { literal!("min") } else { literal!("max") }), &v);
     if (attr_oexp).is_some() {
-        attr_exp = evaluateAttribute(Util::getOption(attr_oexp)?)?;
+        attr_exp = evaluateAttribute(attr_oexp.ok_or("pattern mismatch")?)?;
         noFlow = if (is_inside) {
             Expression::isNonNegative(&attr_exp)?
         } else {
@@ -1941,7 +1941,7 @@ fn evaluateActualStream(
         });
     }
     if (replacements).is_some() {
-        exp = StreamFlowAlias::applyReplacementsInExp(Util::getOption(replacements)?, exp)?;
+        exp = StreamFlowAlias::applyReplacementsInExp(replacements.ok_or("pattern mismatch")?, exp)?;
     }
     Ok((exp, flowCref))
 }
@@ -2206,7 +2206,7 @@ fn lookupFlowVarInConnector(
     let mut flow_name: metamodelica::Ref<ComponentRef::NFComponentRef>;
     flow_exp = flowExp(conn)?;
     if (replacements).is_some() {
-        flow_exp = StreamFlowAlias::applyReplacementsInExp(Util::getOption(replacements)?, flow_exp)?;
+        flow_exp = StreamFlowAlias::applyReplacementsInExp(replacements.ok_or("pattern mismatch")?, flow_exp)?;
     }
     (flow_name, negated) = expFlowName(&flow_exp)?;
     var = lookupVar(flow_name, variables)?;

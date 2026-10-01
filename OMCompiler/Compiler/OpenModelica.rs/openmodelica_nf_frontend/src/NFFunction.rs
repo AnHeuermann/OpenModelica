@@ -1407,8 +1407,7 @@ pub mod Function {
             )?;
             s = IOStream::append(s, literal!(")"))?;
         } else {
-            cmt = Util::getOptionOrDefault(
-                SCodeUtil::getElementComment(&(InstNode::definition(InstNode::fromHandle(&r#fn.node)?)?)),
+            cmt = SCodeUtil::getElementComment(&(InstNode::definition(InstNode::fromHandle(&r#fn.node)?)?)).unwrap_or(
                 metamodelica::Ref::new(SCode::Comment {
                     annotation_: None,
                     comment: None,
@@ -1796,7 +1795,7 @@ pub mod Function {
     ) -> Result<metamodelica::Ref<TypedArg>> {
         let mut outArg: metamodelica::Ref<TypedArg>;
         outArg = (match slot.evalStatus.clone() {
-            SlotEvalStatus::EVALUATED => Util::getOption(slot.arg.clone())?,
+            SlotEvalStatus::EVALUATED => slot.arg.clone().ok_or("pattern mismatch")?,
             SlotEvalStatus::EVALUATING => {
                 Error::addSourceMessage(&(Error::CYCLIC_DEFAULT_VALUE.clone()), list![Slot::name(&slot)?], info)?;
                 return Err("fail");
@@ -1808,7 +1807,12 @@ pub mod Function {
                 let mut pur: Prefixes::Purity;
                 assign_field!(slot.evalStatus = SlotEvalStatus::EVALUATING.clone());
                 metamodelica::arrayUpdate(slots.clone(), slot.index.clone(), slot.clone())?;
-                exp = evaluateSlotExp(Util::getOption(slot.default.clone())?, slots.clone(), context, info)?;
+                exp = evaluateSlotExp(
+                    slot.default.clone().ok_or("pattern mismatch")?,
+                    slots.clone(),
+                    context,
+                    info,
+                )?;
                 (exp, ty, var, pur) = Typing::typeExp(exp, context, info, false)?;
                 outArg = metamodelica::Ref::new(TypedArg {
                     name: None,
@@ -1898,7 +1902,7 @@ pub mod Function {
         cref_node = ComponentRef::node(&cref)?;
         slot = lookupSlotInArray(cref_node, slots.clone());
         if (slot).is_some() {
-            arg = fillDefaultSlot(Util::getOption(slot)?, slots.clone(), context, info)?;
+            arg = fillDefaultSlot(slot.ok_or("pattern mismatch")?, slots.clone(), context, info)?;
             crefExp = arg.value.clone();
             crefExp = applyCrefSubs(&cref, crefExp)?;
             for mut cr in &*cref_parts {
@@ -2577,7 +2581,7 @@ pub mod Function {
                         &(Error::NAMED_ARG_TYPE_MISMATCH.clone()),
                         list![
                             AbsynUtil::pathString(name(&r#fn), literal!("."), true, false)?,
-                            Util::getOption(ty_arg.name.clone())?,
+                            ty_arg.name.clone().ok_or("pattern mismatch")?,
                             Expression::toString(ty_arg.value.clone())?,
                             Type::toString(&ty_arg.ty)?,
                             Type::toString(&(InstNode::getType(slot.node.clone())?))?
@@ -2587,7 +2591,7 @@ pub mod Function {
                     return Err("fail");
                 }
                 args = metamodelica::cons(Expression::r#box(&arg), args);
-                arg_names = metamodelica::cons(Util::getOption(ty_arg.name.clone())?, arg_names);
+                arg_names = metamodelica::cons(ty_arg.name.clone().ok_or("pattern mismatch")?, arg_names);
             } else {
                 inputs = metamodelica::cons(slot.node.clone(), inputs);
                 slots = metamodelica::cons(slot, slots);
@@ -4267,7 +4271,7 @@ pub mod Function {
                     if (__stmt_range).is_some() {
                         checkUseBeforeAssignExp(
                             unassigned.clone(),
-                            Util::getOption(__stmt_range.clone())?,
+                            __stmt_range.clone().ok_or("pattern mismatch")?,
                             &info,
                             generatedName.clone(),
                         )?;
@@ -4294,7 +4298,7 @@ pub mod Function {
                         generatedName.clone(),
                     )?;
                     if (shadowed).is_some() {
-                        Vector::push(unassigned.clone(), Util::getOption(shadowed)?);
+                        Vector::push(unassigned.clone(), shadowed.ok_or("pattern mismatch")?);
                     }
                     ()
                 }

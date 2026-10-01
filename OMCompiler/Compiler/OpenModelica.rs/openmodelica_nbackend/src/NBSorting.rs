@@ -279,7 +279,7 @@ pub mod PseudoBucket {
                 }),
             )?;
             if (mode_opt).is_some() {
-                mode = Util::getOption(mode_opt)?;
+                mode = mode_opt.ok_or("pattern mismatch")?;
                 eqn_arr_idx = ({
                     let __elt = (*metamodelica::index_checked(&mapping.eqn_StA.borrow(), eqn_scal_idx)?).clone();
                     __elt

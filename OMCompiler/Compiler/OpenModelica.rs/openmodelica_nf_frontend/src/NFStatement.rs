@@ -798,7 +798,7 @@ pub(crate) fn applyExp(
         } => {
             applyExpList(metamodelica::AsArg::as_arg(&__stmt_body), func)?;
             if (__stmt_range).is_some() {
-                func(Util::getOption(__stmt_range.clone())?)?;
+                func(__stmt_range.clone().ok_or("pattern mismatch")?)?;
             }
             ()
         }
@@ -1252,7 +1252,7 @@ pub(crate) fn foldExp<ArgT: Clone + 'static + metamodelica::gc::MMTrace>(
         } => {
             arg = foldExpList(metamodelica::AsArg::as_arg(&__stmt_body), func, arg)?;
             if (__stmt_range).is_some() {
-                arg = func(Util::getOption(__stmt_range.clone())?, arg)?;
+                arg = func(__stmt_range.clone().ok_or("pattern mismatch")?, arg)?;
             }
             ()
         }
@@ -1467,7 +1467,10 @@ pub(crate) fn toStream(
             s = IOStream::append(s, InstNode::name(metamodelica::AsArg::as_arg(&__stmt_iterator))?)?;
             if (__stmt_range).is_some() {
                 s = IOStream::append(s, literal!(" in "))?;
-                s = IOStream::append(s, Expression::toString(Util::getOption(__stmt_range.clone())?)?)?;
+                s = IOStream::append(
+                    s,
+                    Expression::toString(__stmt_range.clone().ok_or("pattern mismatch")?)?,
+                )?;
             }
             s = IOStream::append(s, literal!(" loop\n"))?;
             s = toStreamList(
@@ -1689,7 +1692,7 @@ pub(crate) fn toFlatStream(
                 s = IOStream::append(s, literal!(" in "))?;
                 s = IOStream::append(
                     s,
-                    Expression::toFlatString(Util::getOption(__stmt_range.clone())?, format)?,
+                    Expression::toFlatString(__stmt_range.clone().ok_or("pattern mismatch")?, format)?,
                 )?;
             }
             s = IOStream::append(s, literal!(" loop\n"))?;

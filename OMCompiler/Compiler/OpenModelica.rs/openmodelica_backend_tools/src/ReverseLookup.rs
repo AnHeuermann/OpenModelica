@@ -1213,7 +1213,7 @@ pub fn lookup(
         matches = lookupInProgram(program, paths, exactMatch)?;
     } else {
         opt_path = AbsynUtil::pathStripSamePrefix(path.clone(), scope.clone())?;
-        relative_path = Util::getOptionOrDefault(opt_path, path.clone());
+        relative_path = opt_path.unwrap_or(path.clone());
         tree = addPath(&relative_path, PathTree::new())?;
         paths = metamodelica::Ref::new(Paths::Paths {
             tree: tree,
@@ -1275,7 +1275,7 @@ fn addPath<'__b>(
             Absyn::Path::QUALIFIED { .. } => {
                 opt_entry = PathTree::getOpt(&tree, var_field!((**path).name, Absyn::Path::QUALIFIED).clone());
                 if (opt_entry).is_some() {
-                    entry = Util::getOption(opt_entry)?;
+                    entry = opt_entry.ok_or("pattern mismatch")?;
                     assign_field!(
                         entry.tree = addPath(var_field!((**path).path, Absyn::Path::QUALIFIED), entry.tree.clone())?
                     );
@@ -1791,7 +1791,7 @@ fn lookupInClassPart(
             )?;
             if (__part_annotation_).is_some() {
                 matches = lookupInAnnotation(
-                    &(Util::getOption(__part_annotation_.clone())?),
+                    &(__part_annotation_.clone().ok_or("pattern mismatch")?),
                     paths,
                     exactMatch,
                     matches,
@@ -1833,7 +1833,7 @@ fn lookupInCommentOpt(
 ) -> Result<Matches> {
     let mut matches: Matches = matches;
     if (cmt).is_some() {
-        matches = lookupInComment(&(Util::getOption(cmt)?), paths, exactMatch, matches)?;
+        matches = lookupInComment(&(cmt.ok_or("pattern mismatch")?), paths, exactMatch, matches)?;
     }
     Ok(matches)
 }
@@ -1846,7 +1846,12 @@ fn lookupInComment(
 ) -> Result<Matches> {
     let mut matches: Matches = matches;
     if (cmt.annotation_).is_some() {
-        matches = lookupInAnnotation(&(Util::getOption(cmt.annotation_.clone())?), paths, exactMatch, matches)?;
+        matches = lookupInAnnotation(
+            &(cmt.annotation_.clone().ok_or("pattern mismatch")?),
+            paths,
+            exactMatch,
+            matches,
+        )?;
     }
     Ok(matches)
 }
@@ -1878,7 +1883,7 @@ fn lookupInElementArg(
         } => {
             if (__arg_modification).is_some() {
                 matches = lookupInModification(
-                    &(Util::getOption(__arg_modification.clone())?),
+                    &(__arg_modification.clone().ok_or("pattern mismatch")?),
                     paths,
                     exactMatch,
                     matches,
@@ -1901,7 +1906,7 @@ fn lookupInElementArg(
             )?;
             if (__arg_constrainClass).is_some() {
                 matches = lookupInConstrainClass(
-                    &(Util::getOption(__arg_constrainClass.clone())?),
+                    &(__arg_constrainClass.clone().ok_or("pattern mismatch")?),
                     paths,
                     exactMatch,
                     __arg_info.clone(),
@@ -2067,7 +2072,13 @@ fn lookupInExp<'__b>(
             } => {
                 matches = lookupInExp(__exp_start.clone(), paths, exactMatch, info, matches)?;
                 if (__exp_step).is_some() {
-                    matches = lookupInExp(Util::getOption(__exp_step.clone())?, paths, exactMatch, info, matches)?;
+                    matches = lookupInExp(
+                        __exp_step.clone().ok_or("pattern mismatch")?,
+                        paths,
+                        exactMatch,
+                        info,
+                        matches,
+                    )?;
                 }
                 {
                     (exp, paths, exactMatch, info, matches) = (__exp_stop.clone(), paths, exactMatch, info, matches);
@@ -2250,7 +2261,13 @@ fn lookupInForIterators(
     let mut matches: Matches = matches;
     for mut i in &**iterators {
         if (i.range).is_some() {
-            matches = lookupInExp(Util::getOption(i.range.clone())?, paths, exactMatch, info, matches)?;
+            matches = lookupInExp(
+                i.range.clone().ok_or("pattern mismatch")?,
+                paths,
+                exactMatch,
+                info,
+                matches,
+            )?;
         }
     }
     Ok(matches)
@@ -2295,7 +2312,7 @@ fn lookupInElement(
             )?;
             if (__element_constrainClass).is_some() {
                 matches = lookupInConstrainClass(
-                    &(Util::getOption(__element_constrainClass.clone())?),
+                    &(__element_constrainClass.clone().ok_or("pattern mismatch")?),
                     paths,
                     exactMatch,
                     __element_info.clone(),
@@ -2338,7 +2355,7 @@ fn lookupInElementSpec(
             }
             if (__spec_annotationOpt).is_some() {
                 matches = lookupInAnnotation(
-                    &(Util::getOption(__spec_annotationOpt.clone())?),
+                    &(__spec_annotationOpt.clone().ok_or("pattern mismatch")?),
                     paths,
                     exactMatch,
                     matches,
@@ -2450,7 +2467,7 @@ fn lookupInComponentItem(
     matches = lookupInComponent(&item.component, paths.clone(), exactMatch, info, matches)?;
     if (item.condition).is_some() {
         matches = lookupInExp(
-            Util::getOption(item.condition.clone())?,
+            item.condition.clone().ok_or("pattern mismatch")?,
             &paths,
             exactMatch,
             info,
@@ -2471,7 +2488,7 @@ fn lookupInComponent(
     matches = lookupInSubscripts(&component.arrayDim, &paths, exactMatch, info, matches)?;
     if (component.modification).is_some() {
         matches = lookupInModification(
-            &(Util::getOption(component.modification.clone())?),
+            &(component.modification.clone().ok_or("pattern mismatch")?),
             paths,
             exactMatch,
             matches,
@@ -2502,7 +2519,7 @@ fn lookupInTypeSpec(
             );
             if (__typeSpec_arrayDim).is_some() {
                 matches = lookupInSubscripts(
-                    &(Util::getOption(__typeSpec_arrayDim.clone())?),
+                    &(__typeSpec_arrayDim.clone().ok_or("pattern mismatch")?),
                     paths,
                     exactMatch,
                     &info,
@@ -2850,7 +2867,7 @@ fn lookupInExternalDecl(
     }
     if (extDecl.annotation_).is_some() {
         matches = lookupInAnnotation(
-            &(Util::getOption(extDecl.annotation_.clone())?),
+            &(extDecl.annotation_.clone().ok_or("pattern mismatch")?),
             paths,
             exactMatch,
             matches,

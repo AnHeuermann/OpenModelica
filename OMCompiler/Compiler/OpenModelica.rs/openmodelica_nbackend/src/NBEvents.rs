@@ -601,7 +601,7 @@ pub mod EventInfo {
         let mut cond: metamodelica::Ref<Condition::Condition>;
         let mut aux: metamodelica::Ref<ComponentRef::NFComponentRef>;
         if (bucket.aux_stmts).is_some() {
-            for mut tpl in &*Util::getOption(bucket.aux_stmts.clone())? {
+            for mut tpl in &*bucket.aux_stmts.clone().ok_or("pattern mismatch")? {
                 (cond, aux) = tpl.clone();
                 aux = ComponentRef::mapSubscripts(
                     aux,
@@ -1590,7 +1590,7 @@ pub mod StateEvent {
             assign_field!(
                 bucket.aux_stmts = Some(metamodelica::cons(
                     (condition, aux_cref),
-                    Util::getOptionOrDefault(bucket.aux_stmts.clone(), metamodelica::nil())
+                    bucket.aux_stmts.clone().unwrap_or(metamodelica::nil())
                 ))
             );
         }
@@ -1897,7 +1897,7 @@ pub mod CompositeEvent {
             assign_field!(
                 bucket.aux_stmts = Some(metamodelica::cons(
                     (condition, aux_cref),
-                    Util::getOptionOrDefault(bucket.aux_stmts.clone(), metamodelica::nil())
+                    bucket.aux_stmts.clone().unwrap_or(metamodelica::nil())
                 ))
             );
         }
@@ -2237,7 +2237,10 @@ pub mod SpatialDistribution {
             initVals: Expression::toDAE(sd.initVals.clone(), false)?,
             initSize: sd.initSize.clone(),
             condition: if ((sd.condition).is_some()) {
-                Some(Expression::toDAE(Util::getOption(sd.condition.clone())?, false)?)
+                Some(Expression::toDAE(
+                    sd.condition.clone().ok_or("pattern mismatch")?,
+                    false,
+                )?)
             } else {
                 None
             },

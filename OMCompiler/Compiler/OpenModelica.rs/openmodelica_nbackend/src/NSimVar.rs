@@ -256,7 +256,7 @@ pub mod SimVar {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*r#str);
                 __mm_s.push_str(&*literal!(" = "));
-                __mm_s.push_str(&*Expression::toString(Util::getOption(var.start.clone())?)?);
+                __mm_s.push_str(&*Expression::toString(var.start.clone().ok_or("pattern mismatch")?)?);
                 ArcStr::from(__mm_s)
             };
         }
@@ -852,7 +852,7 @@ pub mod SimVar {
         let mut var: metamodelica::Ref<SimVar> = var;
         assign_field!(var.index = var.index.clone() + shift);
         if (var.fmi_index).is_some() {
-            assign_field!(var.fmi_index = Some(Util::getOption(var.fmi_index.clone())? + shift));
+            assign_field!(var.fmi_index = Some(var.fmi_index.clone().ok_or("pattern mismatch")? + shift));
         }
         Ok(var)
     }
@@ -1160,7 +1160,7 @@ pub mod SimVar {
             VariableKind::START { .. } => true,
             _ => false,
         });
-                isProtected = Util::getOptionOrDefault(var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone(), false);
+                isProtected = var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone().unwrap_or(false);
                 ()
             },
             Deref @ BackendInfo::BACKEND_INFO { varKind: __esc_varKind, attributes: varAttr @ Deref @ VariableAttributes::VAR_ATTR_INT { .. }, .. } => {
@@ -1170,7 +1170,7 @@ pub mod SimVar {
                 start = Util::applyOption(var_field!((**varAttr).start, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?;
                 isFixed = Util::applyOptionOrDefault(Util::applyOption(var_field!((**varAttr).fixed, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?, &Expression::isAllTrue, false)?;
                 isDiscrete = true;
-                isProtected = Util::getOptionOrDefault(var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone(), false);
+                isProtected = var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_INT).clone().unwrap_or(false);
                 ()
             },
             Deref @ BackendInfo::BACKEND_INFO { varKind: __esc_varKind, attributes: varAttr @ Deref @ VariableAttributes::VAR_ATTR_BOOL { .. }, .. } => {
@@ -1178,13 +1178,13 @@ pub mod SimVar {
                 start = Util::applyOption(var_field!((**varAttr).start, VariableAttributes::VariableAttributes::VAR_ATTR_BOOL).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?;
                 isFixed = Util::applyOptionOrDefault(Util::applyOption(var_field!((**varAttr).fixed, VariableAttributes::VariableAttributes::VAR_ATTR_BOOL).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?, &Expression::isAllTrue, false)?;
                 isDiscrete = true;
-                isProtected = Util::getOptionOrDefault(var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_BOOL).clone(), false);
+                isProtected = var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_BOOL).clone().unwrap_or(false);
                 ()
             },
             Deref @ BackendInfo::BACKEND_INFO { varKind: __esc_varKind, attributes: varAttr @ Deref @ VariableAttributes::VAR_ATTR_CLOCK { .. }, .. } => {
                 varKind = (*__esc_varKind).clone();
                 isDiscrete = true;
-                isProtected = Util::getOptionOrDefault(var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_CLOCK).clone(), false);
+                isProtected = var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_CLOCK).clone().unwrap_or(false);
                 ()
             },
             Deref @ BackendInfo::BACKEND_INFO { varKind: __esc_varKind, attributes: varAttr @ Deref @ VariableAttributes::VAR_ATTR_STRING { .. }, .. } => {
@@ -1192,7 +1192,7 @@ pub mod SimVar {
                 start = Util::applyOption(var_field!((**varAttr).start, VariableAttributes::VariableAttributes::VAR_ATTR_STRING).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?;
                 isFixed = Util::applyOptionOrDefault(Util::applyOption(var_field!((**varAttr).fixed, VariableAttributes::VariableAttributes::VAR_ATTR_STRING).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?, &Expression::isAllTrue, false)?;
                 isDiscrete = true;
-                isProtected = Util::getOptionOrDefault(var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_STRING).clone(), false);
+                isProtected = var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_STRING).clone().unwrap_or(false);
                 ()
             },
             Deref @ BackendInfo::BACKEND_INFO { varKind: __esc_varKind, attributes: varAttr @ Deref @ VariableAttributes::VAR_ATTR_ENUMERATION { .. }, .. } => {
@@ -1202,7 +1202,7 @@ pub mod SimVar {
                 start = Util::applyOption(var_field!((**varAttr).start, VariableAttributes::VariableAttributes::VAR_ATTR_ENUMERATION).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?;
                 isFixed = Util::applyOptionOrDefault(Util::applyOption(var_field!((**varAttr).fixed, VariableAttributes::VariableAttributes::VAR_ATTR_ENUMERATION).clone(), &move |__a0: metamodelica::Ref<Binding::NFBinding>| Binding::getTypedExp(&__a0))?, &Expression::isAllTrue, false)?;
                 isDiscrete = true;
-                isProtected = Util::getOptionOrDefault(var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_ENUMERATION).clone(), false);
+                isProtected = var_field!((**varAttr).isProtected, VariableAttributes::VariableAttributes::VAR_ATTR_ENUMERATION).clone().unwrap_or(false);
                 ()
             },
             _ => {
@@ -1283,7 +1283,9 @@ pub mod SimVar {
                 let mut var: metamodelica::Ref<Variable::NFVariable>;
                 let mut oldCrefOpt: Option<metamodelica::Ref<DAE::ComponentRef>>;
                 if (__varKind_derivative).is_some() {
-                    var = Pointer::access(PointerWeak::upgrade(Util::getOption(__varKind_derivative.clone())?)?);
+                    var = Pointer::access(PointerWeak::upgrade(
+                        __varKind_derivative.clone().ok_or("pattern mismatch")?,
+                    )?);
                     oldCrefOpt = Some(ComponentRef::toDAE(&var.name)?);
                 } else {
                     oldCrefOpt = None;

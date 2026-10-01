@@ -5525,7 +5525,7 @@ fn makeCallFillRestDefaults(
             &move |__a0: metamodelica::Ref<DAE::FuncArg>| -> metamodelica::Result<_> {
                 ::std::result::Result::Ok(Types::funcArgDefaultBinding(&__a0))
             },
-            &Util::getOption,
+            &|o: Option<_>| o.ok_or("pattern mismatch"),
         )?,
     );
     exp = metamodelica::Ref::new(DAE::Exp::CALL {

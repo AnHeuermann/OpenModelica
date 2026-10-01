@@ -242,7 +242,7 @@ pub(crate) fn main(
                     initialVars = unwrap_break_err!(BVariable::VariablePointers::removeList(&(({
                 let mut __acc: metamodelica::List<Pointer::Pointer<metamodelica::Ref<Variable::NFVariable>>> = metamodelica::nil();
                 for mut eqn_ptr in (primary_aux_eqs.clone()).into_iter().cloned() {
-                    let __x = unwrap_break_err!(BVariable::getVarPointer(&(unwrap_break_err!(Expression::toCref(&(unwrap_break_err!(Util::getOption(unwrap_break_err!(BEquation::Equation::getLHS(Pointer::access(eqn_ptr.clone())), '__try0)), '__try0))), '__try0)), metamodelica::sourceInfo!("NBackEnd/Modules/1_Main/NBInitialization.mo")), '__try0);
+                    let __x = unwrap_break_err!(BVariable::getVarPointer(&(unwrap_break_err!(Expression::toCref(&(unwrap_break_err!(unwrap_break_err!(BEquation::Equation::getLHS(Pointer::access(eqn_ptr.clone())), '__try0).ok_or("pattern mismatch"), '__try0))), '__try0)), metamodelica::sourceInfo!("NBackEnd/Modules/1_Main/NBInitialization.mo")), '__try0);
                     __acc = cons(__x, __acc);
                 }
                 __acc.reverse()
@@ -724,7 +724,7 @@ pub(crate) fn createWhenReplacementEquation(
     )?;
     (var_pre, _) = BVariable::getVarPre(var_ptr.clone());
     if (var_pre).is_some() {
-        pre = BVariable::getVarName(Util::getOption(var_pre)?);
+        pre = BVariable::getVarName(var_pre.ok_or("pattern mismatch")?);
         pre = ComponentRef::copySubscripts(&cref, pre)?;
         kind = if (BVariable::isContinuous(var_ptr, true)?) {
             EquationKind::CONTINUOUS.clone()
@@ -780,11 +780,11 @@ pub(crate) fn createStartVar(
     ) = BVariable::getVarPre(var_ptr.clone());
     let mut merged_name: metamodelica::Ref<ComponentRef::NFComponentRef>;
     if BVariable::isPrevious(var_ptr.clone()) && (var_pre).is_some() {
-        merged_name = BVariable::getVarName(Util::getOption(var_pre)?);
+        merged_name = BVariable::getVarName(var_pre.ok_or("pattern mismatch")?);
         merged_name = ComponentRef::mergeSubscripts(subscripts, merged_name, true, true, true)?;
     } else if (var_pre).is_some() {
         merged_name = ComponentRef::mergeSubscripts(subscripts.clone(), name, true, true, true)?;
-        var_ptr = Util::getOption(var_pre)?;
+        var_ptr = var_pre.ok_or("pattern mismatch")?;
         name = BVariable::getVarName(var_ptr.clone());
         name = ComponentRef::mergeSubscripts(subscripts, name, true, true, true)?;
     } else {
@@ -992,9 +992,9 @@ pub(crate) fn selectPrimaryParameters(
             } };
             name = metamodelica::Own::own(__pa0);
             ready = true;
-            for mut dep in &*UnorderedSet::toList(Expression::extractCrefs(Util::getOption(
-                BEquation::Equation::getRHS(Pointer::access(eqn_ptr.clone()))?,
-            )?)?) {
+            for mut dep in &*UnorderedSet::toList(Expression::extractCrefs(
+                (BEquation::Equation::getRHS(Pointer::access(eqn_ptr.clone()))?).ok_or("pattern mismatch")?,
+            )?) {
                 if !(isPrimaryCref(metamodelica::AsArg::as_arg(&dep), primary.clone(), unresolved.clone())?) {
                     ready = false;
                     break;
@@ -1445,9 +1445,9 @@ pub(crate) fn resolveStartCref(
             } else if Type::isReal(&(Type::arrayElementType(&(Variable::typeOf(&var)))))? && !(Type::isArray(&(Expression::typeOf(exp.clone())))) && BVariable::isContinuous(var_ptr.clone(), true)? {
                 start_opt = BVariable::getStartAttribute(var_ptr.clone())?;
                 existed = (((BVariable::getVarStart(var_ptr.clone())).0)).is_some();
-                if BVariable::isFixed(var_ptr.clone())? && (start_opt).is_some() && !(Expression::isLiteralXML(Util::getOption(start_opt.clone())?)?) {
+                if BVariable::isFixed(var_ptr.clone())? && (start_opt).is_some() && !(Expression::isLiteralXML(start_opt.clone().ok_or("pattern mismatch")?)?) {
                     if depth < 10 {
-                        res = Util::getOption(start_opt)?;
+                        res = start_opt.ok_or("pattern mismatch")?;
                         if ComponentRef::hasSubscripts(var_field!((*exp).cref, Expression::NFExpression::CREF))? && Type::isArray(&(Expression::typeOf(res.clone()))) {
                             res = Expression::applySubscripts(&(ComponentRef::subscriptsAllWithWholeFlat(var_field!((*exp).cref, Expression::NFExpression::CREF))?), res, true)?;
                         }
@@ -1460,7 +1460,7 @@ pub(crate) fn resolveStartCref(
                 } else {
                     (start_name, start_var) = BVariable::makeStartVar(var_field!((*exp).cref, Expression::NFExpression::CREF))?;
                     res = Expression::fromCref(start_name, false)?;
-                    if !(existed) && !(BVariable::isFixed(var_ptr)?) && ((start_opt).is_none() || Expression::isLiteralXML(Util::getOption(start_opt)?)?) {
+                    if !(existed) && !(BVariable::isFixed(var_ptr)?) && ((start_opt).is_none() || Expression::isLiteralXML(start_opt.ok_or("pattern mismatch")?)?) {
                         Pointer::update(ptr_start_vars.clone(), metamodelica::cons(start_var, Pointer::access(ptr_start_vars)));
                     }
                 }
@@ -1533,7 +1533,8 @@ pub(crate) fn createStartEquationSlice(
     }
     if (start_eq).is_some() {
         if !((var_slice.indices).is_empty()) {
-            (sliced_eqn, _) = BEquation::Equation::slice(Util::getOption(start_eq)?, var_slice.indices.clone())?;
+            (sliced_eqn, _) =
+                BEquation::Equation::slice(start_eq.ok_or("pattern mismatch")?, var_slice.indices.clone())?;
             Pointer::update(
                 ptr_start_eqs.clone(),
                 listAppend(Pointer::access(ptr_start_eqs), sliced_eqn),
@@ -1541,7 +1542,7 @@ pub(crate) fn createStartEquationSlice(
         } else {
             Pointer::update(
                 ptr_start_eqs.clone(),
-                metamodelica::cons(Util::getOption(start_eq)?, Pointer::access(ptr_start_eqs)),
+                metamodelica::cons(start_eq.ok_or("pattern mismatch")?, Pointer::access(ptr_start_eqs)),
             );
         }
     }
@@ -1733,7 +1734,7 @@ pub(crate) fn createPreEquation(
             };
             pre_eq = BEquation::Equation::makeAssignment(
                 Expression::fromCref(BVariable::getVarName(var_ptr), false)?,
-                Expression::fromCref(BVariable::getVarName(Util::getOption(pre)?), false)?,
+                Expression::fromCref(BVariable::getVarName(pre.ok_or("pattern mismatch")?), false)?,
                 idx,
                 &(arcstr::literal!(BEquation::PRE_STR)),
                 crate::NBEquation::Iterator::interned_EMPTY(),
@@ -1792,7 +1793,7 @@ pub(crate) fn createPreEquationSlice(
                 ranges.clone(),
                 List::fill(None, ((ranges).len() as i32)),
             );
-            pre_name = BVariable::getVarName(Util::getOption(pre)?);
+            pre_name = BVariable::getVarName(pre.ok_or("pattern mismatch")?);
             pre_name = ComponentRef::mergeSubscripts(subscripts.clone(), pre_name, true, true, false)?;
             name = ComponentRef::mergeSubscripts(subscripts, name, true, true, false)?;
             kind = if (BVariable::isContinuous(var_ptr, true)?) {
@@ -1870,7 +1871,7 @@ pub(crate) fn cleanup(
             if (var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN)).is_some() {
                 assign_variant_field!(bdae => BackendDAE::NBackendDAE::MAIN; dae = Some(({
                     let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
-                    for mut par in (Util::getOption(var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN).clone())?).into_iter().cloned() {
+                    for mut par in (var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN).clone().ok_or("pattern mismatch")?).into_iter().cloned() {
                         let __x = BPartition::Partition::mapEqn(par.clone(), &({ let __pe_b1 = BPartition::Partition::getKind(&(par.clone())); move |__pe_a0| cleanupInitialCall(__pe_a0, __pe_b1.clone()) }))?;
                         __acc = cons(__x, __acc);
                     }
@@ -1914,7 +1915,7 @@ pub(crate) fn cleanup(
             if (var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN)).is_some() {
                 assign_variant_field!(bdae => BackendDAE::NBackendDAE::MAIN; dae = Some(({
                     let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
-                    for mut par in (Util::getOption(var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN).clone())?).into_iter().cloned() {
+                    for mut par in (var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN).clone().ok_or("pattern mismatch")?).into_iter().cloned() {
                         let __x = BPartition::Partition::mapExp(par.clone(), (std::sync::Arc::new({ let __pe_b1 = BPartition::Partition::getKind(&(par.clone())); move |__pe_a0| cleanupHomotopy(__pe_a0, __pe_b1.clone()) }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<Expression::NFExpression>) -> Result<metamodelica::Ref<Expression::NFExpression>> + 'static>))?;
                         __acc = cons(__x, __acc);
                     }

@@ -801,7 +801,7 @@ fn readMeasurementsFromCSV(
         )?;
         return Err("fail");
     }
-    csvFileName = extractSxPath(Util::getOption(shared.info.simflags.clone())?)?;
+    csvFileName = extractSxPath(shared.info.simflags.clone().ok_or("pattern mismatch")?)?;
     if stringEmpty(&csvFileName) {
         Error::addMessage(
             Error::INTERNAL_ERROR.clone(),

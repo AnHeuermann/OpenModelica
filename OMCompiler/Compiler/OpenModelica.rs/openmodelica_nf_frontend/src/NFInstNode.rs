@@ -2346,7 +2346,7 @@ pub mod InstNode {
         while isComponent(&scope)? {
             ann = SCodeUtil::commentAnnotation(&(Component::comment(&(component(&scope)?))?));
             if (ann).is_some() {
-                r#mod = SCodeUtil::lookupAnnotation(&(Util::getOption(ann)?), name);
+                r#mod = SCodeUtil::lookupAnnotation(&(ann.ok_or("pattern mismatch")?), name);
                 if !(SCodeUtil::isEmptyMod(&r#mod)) {
                     scope = instanceParent(scope)?;
                     return Ok((r#mod, scope));
@@ -3880,7 +3880,7 @@ pub mod InstNode {
             access_mod = SCodeUtil::lookupModInMod(&(literal!("access")), &access_mod);
             access_exp = SCodeUtil::getModifierBinding(&access_mod);
             if (access_exp).is_some() {
-                access = Prefixes::accessLevelFromAbsyn(&(Util::getOption(access_exp)?));
+                access = Prefixes::accessLevelFromAbsyn(&(access_exp.ok_or("pattern mismatch")?));
                 if (access).is_some() {
                     return Ok(access);
                 }

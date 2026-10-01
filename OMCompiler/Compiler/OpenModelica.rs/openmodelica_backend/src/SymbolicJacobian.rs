@@ -5504,7 +5504,7 @@ fn calculateJacobianComponent(
                         (jacobian, shared) = calculateTearingSetJacobian(&inVars, inEqns.clone(), metamodelica::AsArg::as_arg(&strictTearingset), inShared.clone(), linear.clone())?;
                         strictTearingset.jac = jacobian.clone();
                         if (optCasualTearingSet).is_some() {
-                            casualTearingSet = Util::getOption(optCasualTearingSet.clone())?;
+                            casualTearingSet = optCasualTearingSet.clone().ok_or("pattern mismatch")?;
                             (jacobianCausal, shared) = calculateTearingSetJacobian(&inVars, inEqns.clone(), &casualTearingSet, shared.clone(), linear.clone())?;
                             casualTearingSet.jac = jacobianCausal.clone();
                             optCasualTearingSet = Some(casualTearingSet.clone());

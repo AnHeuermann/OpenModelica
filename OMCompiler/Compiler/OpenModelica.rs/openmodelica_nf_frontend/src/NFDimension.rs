@@ -399,7 +399,7 @@ pub fn size(mut dim: &metamodelica::Ref<NFDimension>, mut resize: bool) -> Resul
             __dim_size.clone()
         },
         Deref @ RESIZABLE { opt_size: __dim_opt_size, size: __dim_size, .. } => {
-            if (resize) {Util::getOptionOrDefault(__dim_opt_size.clone(), __dim_size.clone())} else {__dim_size.clone()}
+            if (resize) {__dim_opt_size.clone().unwrap_or(__dim_size.clone())} else {__dim_size.clone()}
         },
         Deref @ BOOLEAN { .. } => {
             2

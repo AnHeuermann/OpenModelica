@@ -921,14 +921,14 @@ pub(crate) fn expandClass2(
         SCode::ClassDef::PARTS { .. } => {
             (node, name_map) = expandClassParts(&def, node, context, &info)?;
             if (name_map).is_some() {
-                InstUtil::mergeScalarsComponentBindings(node.clone(), Util::getOption(name_map)?)?;
+                InstUtil::mergeScalarsComponentBindings(node.clone(), name_map.ok_or("pattern mismatch")?)?;
             }
             node
         }
         SCode::ClassDef::CLASS_EXTENDS { .. } => {
             (node, name_map) = expandClassParts(&def, node, context, &info)?;
             if (name_map).is_some() {
-                InstUtil::mergeScalarsComponentBindings(node.clone(), Util::getOption(name_map)?)?;
+                InstUtil::mergeScalarsComponentBindings(node.clone(), name_map.ok_or("pattern mismatch")?)?;
             }
             node
         }
@@ -2554,7 +2554,11 @@ pub(crate) fn instComponentDef(
             attr = Attributes::checkDeclaredComponentAttributes(attr, &parent_res, &node)?;
             attr = Attributes::mergeComponentAttributes(attributes, attr, &node, &parent_res)?;
             if (originalAttr).is_some() {
-                attr = Attributes::mergeRedeclaredComponentAttributes(Util::getOption(originalAttr)?, attr, &node)?;
+                attr = Attributes::mergeRedeclaredComponentAttributes(
+                    originalAttr.ok_or("pattern mismatch")?,
+                    attr,
+                    &node,
+                )?;
             }
             if !(attr.isFinal.clone()) && Modifier::isFinal(&r#mod) {
                 assign_field!(attr.isFinal = true);
@@ -4155,8 +4159,8 @@ pub(crate) fn instExternalDecl(
             let mut ret_cref: metamodelica::Ref<ComponentRef::NFComponentRef>;
             let mut info: SourceInfo;
             info = NFInstNode::InstNode::info(&scope);
-            name = Util::getOptionOrDefault(extDecl.funcName.clone(), NFInstNode::InstNode::name(&scope)?);
-            lang = Util::getOptionOrDefault(extDecl.lang.clone(), literal!("C"));
+            name = extDecl.funcName.clone().unwrap_or(NFInstNode::InstNode::name(&scope)?);
+            lang = extDecl.lang.clone().unwrap_or(literal!("C"));
             checkExternalDeclLanguage(lang.clone(), &info)?;
             args = ({
                 let mut __acc: metamodelica::List<metamodelica::Ref<Expression::NFExpression>> = metamodelica::nil();
@@ -4168,7 +4172,7 @@ pub(crate) fn instExternalDecl(
             });
             if (extDecl.output_).is_some() {
                 (ret_cref, _) = Lookup::lookupLocalComponent(
-                    Util::getOption(extDecl.output_.clone())?,
+                    extDecl.output_.clone().ok_or("pattern mismatch")?,
                     scope,
                     context,
                     info.clone(),
@@ -5287,7 +5291,7 @@ pub(crate) fn updateImplicitVariabilityComp(
             let mut opt_eval: Option<bool>;
             let mut eval: bool;
             opt_eval = Component::getEvaluateAnnotation(&c)?;
-            eval = Util::getOptionOrDefault(opt_eval.clone(), false);
+            eval = opt_eval.clone().unwrap_or(false);
             if (opt_eval).is_some() && !(eval) && __c_attributes.variability.clone() == Variability::PARAMETER.clone() {
                 NFInstNode::InstNode::updateComponent(
                     Component::setVariability(Variability::NON_STRUCTURAL_PARAMETER.clone(), c),

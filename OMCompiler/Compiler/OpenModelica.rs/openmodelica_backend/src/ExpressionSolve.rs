@@ -670,7 +670,7 @@ pub(crate) fn preprocessingSolve(
                 y,
                 inExp3.clone(),
                 optCond.clone(),
-                Util::getOption(uniqueEqIndex.clone())?,
+                uniqueEqIndex.clone().ok_or("pattern mismatch")?,
                 eqnForNewVars,
                 newVarsCrefs,
                 depth,

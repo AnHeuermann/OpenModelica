@@ -655,7 +655,7 @@ pub mod SimCode {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*r#str);
                 __mm_s.push_str(&*DaeModeData::toString(
-                    &(Util::getOption(simCode.daeModeData.clone())?),
+                    &(simCode.daeModeData.clone().ok_or("pattern mismatch")?),
                 )?);
                 __mm_s.push_str(&*literal!("\n"));
                 ArcStr::from(__mm_s)
@@ -790,7 +790,7 @@ pub mod SimCode {
                     algorithms = metamodelica::nil();
                     (init, simCodeIndices) = SimStrongComponent::Block::createInitialBlocks(metamodelica::AsArg::as_arg(&__bdae_init), simCodeIndices, simcode_map.clone(), equation_map.clone())?;
                     if (__bdae_init_0).is_some() {
-                        (init_0, simCodeIndices) = SimStrongComponent::Block::createInitialBlocks(&(Util::getOption(__bdae_init_0.clone())?), simCodeIndices, simcode_map.clone(), equation_map.clone())?;
+                        (init_0, simCodeIndices) = SimStrongComponent::Block::createInitialBlocks(&(__bdae_init_0.clone().ok_or("pattern mismatch")?), simCodeIndices, simcode_map.clone(), equation_map.clone())?;
                     } else {
                         init_0 = metamodelica::nil();
                     }
@@ -802,7 +802,7 @@ pub mod SimCode {
                     if (__bdae_dae).is_some() {
                         ode = metamodelica::nil();
                         algebraic = metamodelica::nil();
-                        (daeModeData, simCodeIndices) = DaeModeData::create(Util::getOption(__bdae_dae.clone())?, simCodeIndices, simcode_map.clone(), equation_map.clone())?;
+                        (daeModeData, simCodeIndices) = DaeModeData::create(__bdae_dae.clone().ok_or("pattern mismatch")?, simCodeIndices, simcode_map.clone(), equation_map.clone())?;
                     } else {
                         daeModeData = None;
                         (ode, allSim, simCodeIndices) = SimStrongComponent::Block::createBlocks(metamodelica::AsArg::as_arg(&__bdae_ode), allSim, simCodeIndices, simcode_map.clone(), equation_map.clone())?;
@@ -836,7 +836,7 @@ pub mod SimCode {
                     (param, simCodeIndices) = SimStrongComponent::Block::createParameterBlocks(metamodelica::AsArg::as_arg(&__bdae_parameters), simCodeIndices, simcode_map.clone(), equation_map.clone())?;
                     (linearLoops, nonlinearLoops, jacobians, simCodeIndices) = collectAlgebraicLoops(init.clone(), init_0.clone(), &ode, &algebraic, daeModeData.clone(), simCodeIndices, simcode_map.clone())?;
                     if (daeModeData).is_some() {
-                        (jacA, jacAdjoint, simCodeIndices) = SimJacobian::createSimulationJacobian(&(Util::getOption(__bdae_dae.clone())?), simCodeIndices, simcode_map.clone())?;
+                        (jacA, jacAdjoint, simCodeIndices) = SimJacobian::createSimulationJacobian(&(__bdae_dae.clone().ok_or("pattern mismatch")?), simCodeIndices, simcode_map.clone())?;
                         daeModeData = DaeModeData::addJacobian(daeModeData, jacA.clone());
                     } else {
                         (jacA, jacAdjoint, simCodeIndices) = SimJacobian::createSimulationJacobian(&(listAppend(__bdae_ode.clone(), __bdae_ode_event.clone())), simCodeIndices, simcode_map.clone())?;
@@ -850,7 +850,7 @@ pub mod SimCode {
                     jacobians = metamodelica::cons(jacR0.clone(), metamodelica::cons(jacMrf.clone(), metamodelica::cons(jacLfg.clone(), metamodelica::cons(jacAdjoint.clone(), metamodelica::cons(jacH.clone(), metamodelica::cons(jacF.clone(), metamodelica::cons(jacD.clone(), metamodelica::cons(jacC.clone(), metamodelica::cons(jacB.clone(), metamodelica::cons(jacA.clone(), jacobians)))))))))).reverse();
                     for mut jac in &*jacobians {
                         if (jac.jac_map).is_some() {
-                            vars = SimVars::addSeedAndJacobianVars(vars, &(UnorderedMap::toList(Util::getOption(jac.jac_map.clone())?)))?;
+                            vars = SimVars::addSeedAndJacobianVars(vars, &(UnorderedMap::toList(jac.jac_map.clone().ok_or("pattern mismatch")?)))?;
                         }
                     }
                     jac_blocks = SimJacobian::getJacobiansBlocks(&(list![jacA, jacB, jacC, jacD, jacF, jacH, jacAdjoint, jacLfg, jacMrf, jacR0]))?;
@@ -1081,7 +1081,9 @@ pub mod SimCode {
                 stateToActivators: metamodelica::nil(),
             },
             daeModeData: if ((simCode.daeModeData).is_some()) {
-                Some(DaeModeData::convert(&(Util::getOption(simCode.daeModeData.clone())?))?)
+                Some(DaeModeData::convert(
+                    &(simCode.daeModeData.clone().ok_or("pattern mismatch")?),
+                )?)
             } else {
                 None
             },
@@ -1449,7 +1451,7 @@ pub mod DaeModeData {
                 __mm_s.push_str(&*r#str);
                 __mm_s.push_str(&*literal!("\n"));
                 __mm_s.push_str(&*SimJacobian::toString(
-                    &(Util::getOption(data.sparsityPattern.clone())?),
+                    &(data.sparsityPattern.clone().ok_or("pattern mismatch")?),
                 )?);
                 ArcStr::from(__mm_s)
             };

@@ -253,7 +253,7 @@ fn addNestedExpandableConnectorsToSets(
             conns = metamodelica::cons(
                 metamodelica::Ref::new(Connection::NFConnection {
                     lhs: ec1.clone(),
-                    rhs: Util::getOption(oec)?,
+                    rhs: oec.ok_or("pattern mismatch")?,
                 }),
                 conns,
             );

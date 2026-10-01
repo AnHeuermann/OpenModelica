@@ -1320,7 +1320,7 @@ pub fn toString(mut call: &metamodelica::Ref<NFCall>) -> Result<ArcStr> {
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*arg_str);
                     __mm_s.push_str(&*c);
-                    __mm_s.push_str(&*Util::getOption(arg.name.clone())?);
+                    __mm_s.push_str(&*arg.name.clone().ok_or("pattern mismatch")?);
                     __mm_s.push_str(&*literal!(" = "));
                     __mm_s.push_str(&*Expression::toString(arg.value.clone())?);
                     ArcStr::from(__mm_s)
@@ -1763,7 +1763,7 @@ pub(crate) fn typedString(mut call: &metamodelica::Ref<NFCall>) -> Result<ArcStr
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*arg_str);
                     __mm_s.push_str(&*c);
-                    __mm_s.push_str(&*Util::getOption(arg.name.clone())?);
+                    __mm_s.push_str(&*arg.name.clone().ok_or("pattern mismatch")?);
                     __mm_s.push_str(&*literal!(" = /*"));
                     __mm_s.push_str(&*Type::toString(&arg.ty)?);
                     __mm_s.push_str(&*literal!("*/ "));
@@ -2059,7 +2059,7 @@ pub(crate) fn toAbsyn(mut call: &metamodelica::Ref<NFCall>) -> Result<metamodeli
                 let mut __acc: metamodelica::List<metamodelica::Ref<Absyn::NamedArg>> = metamodelica::nil();
                 for mut arg in (__call_named_args.clone()).into_iter().cloned() {
                     let __x = metamodelica::Ref::new(Absyn::NamedArg {
-                        argName: Util::getOption(arg.name.clone())?,
+                        argName: arg.name.clone().ok_or("pattern mismatch")?,
                         argValue: Expression::toAbsyn(arg.value.clone())?,
                     });
                     __acc = cons(__x, __acc);
@@ -4289,7 +4289,7 @@ fn instIterators(
     let mut ty: metamodelica::Ref<Type::NFType>;
     for mut i in &*inIters.reverse() {
         if (i.range).is_some() {
-            range = Inst::instExp(Util::getOption(i.range.clone())?, &outScope, context, &info)?;
+            range = Inst::instExp(i.range.clone().ok_or("pattern mismatch")?, &outScope, context, &info)?;
         } else {
             range = metamodelica::Ref::new(Expression::NFExpression::EMPTY {
                 ty: crate::NFType::interned_UNKNOWN(),

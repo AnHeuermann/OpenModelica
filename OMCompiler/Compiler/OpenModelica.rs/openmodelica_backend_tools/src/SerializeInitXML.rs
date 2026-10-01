@@ -531,7 +531,7 @@ fn scalarVariableTypeFixedAttribute(mut file: File::File, mut isFixed: bool) -> 
 fn scalarVariableTypeAttribute(mut file: File::File, mut attr: Option<metamodelica::Ref<Exp>>, mut name: ArcStr) -> () {
     let mut expStr: ArcStr;
     if '__try0: {
-        expStr = unwrap_break_err!(expString(&(unwrap_break_err!(Util::getOption(attr.clone()), '__try0))), '__try0);
+        expStr = unwrap_break_err!(expString(&(unwrap_break_err!(attr.clone().ok_or("pattern mismatch"), '__try0))), '__try0);
         File::write(file.clone(), literal!(" "));
         File::write(file.clone(), name.clone());
         File::write(file.clone(), literal!("=\""));

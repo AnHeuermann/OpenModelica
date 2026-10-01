@@ -360,8 +360,8 @@ pub(crate) fn fromSeed(
     if (seed.matching).is_none() || (seed.adjacencyMatrix).is_none() {
         return Ok(matching);
     }
-    seed_matching = Util::getOption(seed.matching.clone())?;
-    let () = (::match_deref::match_deref! { match &((Adjacency::Matrix::getMappingOpt(&(Util::getOption(seed.adjacencyMatrix.clone())?)), &**adj)) {
+    seed_matching = seed.matching.clone().ok_or("pattern mismatch")?;
+    let () = (::match_deref::match_deref! { match &((Adjacency::Matrix::getMappingOpt(&(seed.adjacencyMatrix.clone().ok_or("pattern mismatch")?)), &**adj)) {
         (Some(__esc_seed_map), Deref @ Adjacency::Matrix::FINAL { mapping: __esc_map, .. }) => {
             seed_map = (*__esc_seed_map).clone();
             map = (*__esc_map).clone();
@@ -574,7 +574,7 @@ pub(crate) fn getMatches(
     let mut arr_eqn: Pointer::Pointer<metamodelica::Ref<Equation::Equation>>;
     let mut start_idx: i32;
     if (mapping_opt).is_some() {
-        mapping = Util::getOption(mapping_opt)?;
+        mapping = mapping_opt.ok_or("pattern mismatch")?;
         var_map_matched = UnorderedMap::new(
             (std::sync::Arc::new(BVariable::hash)
                 as std::sync::Arc<

@@ -1412,7 +1412,7 @@ fn getArrayVarCrefs(
                     let true = (ComponentReference::isArrayElement(metamodelica::AsArg::as_arg(&cref))) else { return Err("pattern mismatch") };
                     (crefHead, idx, crefTailOpt) = ComponentReference::stripArrayCref(metamodelica::AsArg::as_arg(&cref))?;
                     if (crefTailOpt).is_some() {
-                        crefLst = list![Util::getOption(crefTailOpt.clone())?];
+                        crefLst = list![crefTailOpt.clone().ok_or("pattern mismatch")?];
                     } else {
                         crefLst = metamodelica::nil();
                     }

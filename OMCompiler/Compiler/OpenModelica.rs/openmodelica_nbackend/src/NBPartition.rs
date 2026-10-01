@@ -221,7 +221,7 @@ pub mod Association {
             } => {
                 if (__association_jacobian).is_some() {
                     r#str = BJacobian::toString(
-                        &(Util::getOption(__association_jacobian.clone())?),
+                        &(__association_jacobian.clone().ok_or("pattern mismatch")?),
                         Partition::kindToString(__association_kind.clone())?,
                     )?;
                     if Flags::getConfigBool(Flags::MOO_DYNAMIC_OPTIMIZATION.clone())? {
@@ -230,7 +230,7 @@ pub mod Association {
                             __mm_s.push_str(&*literal!("\n"));
                             __mm_s.push_str(&*r#str);
                             __mm_s.push_str(&*BJacobian::toString(
-                                &(Util::getOption(__association_LFG_jacobian.clone())?),
+                                &(__association_LFG_jacobian.clone().ok_or("pattern mismatch")?),
                                 Partition::kindToString(__association_kind.clone())?,
                             )?);
                             ArcStr::from(__mm_s)
@@ -240,7 +240,7 @@ pub mod Association {
                             __mm_s.push_str(&*literal!("\n"));
                             __mm_s.push_str(&*r#str);
                             __mm_s.push_str(&*BJacobian::toString(
-                                &(Util::getOption(__association_MRF_jacobian.clone())?),
+                                &(__association_MRF_jacobian.clone().ok_or("pattern mismatch")?),
                                 Partition::kindToString(__association_kind.clone())?,
                             )?);
                             ArcStr::from(__mm_s)
@@ -250,7 +250,7 @@ pub mod Association {
                             __mm_s.push_str(&*literal!("\n"));
                             __mm_s.push_str(&*r#str);
                             __mm_s.push_str(&*BJacobian::toString(
-                                &(Util::getOption(__association_R0_jacobian.clone())?),
+                                &(__association_R0_jacobian.clone().ok_or("pattern mismatch")?),
                                 Partition::kindToString(__association_kind.clone())?,
                             )?);
                             ArcStr::from(__mm_s)
@@ -263,7 +263,7 @@ pub mod Association {
                     r#str = {
                         let mut __mm_s = String::new();
                         __mm_s.push_str(&*BJacobian::toString(
-                            &(Util::getOption(__association_jacobianAdjoint.clone())?),
+                            &(__association_jacobianAdjoint.clone().ok_or("pattern mismatch")?),
                             {
                                 let mut __mm_s = String::new();
                                 __mm_s.push_str(&*Partition::kindToString(__association_kind.clone())?);
@@ -291,7 +291,7 @@ pub mod Association {
                             __mm_s.push_str(&*r#str);
                             __mm_s.push_str(&*literal!(" of base clock "));
                             __mm_s.push_str(&*BClock::toString(
-                                &(Util::getOption(__association_baseClock.clone())?),
+                                &(__association_baseClock.clone().ok_or("pattern mismatch")?),
                             )?);
                             ArcStr::from(__mm_s)
                         }),
@@ -483,7 +483,7 @@ pub mod Association {
                         UnorderedMap::add(name, clock.clone(), info.baseClocks.clone())?;
                     } else {
                         clock = metamodelica::Ref::new(BClock::BClock::INFERRED_CLOCK {
-                            base_ref: Util::getOption(infer)?,
+                            base_ref: infer.ok_or("pattern mismatch")?,
                         });
                     }
                 }
@@ -831,7 +831,7 @@ pub mod Partition {
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*r#str);
                     __mm_s.push_str(&*Adjacency::Matrix::toString(
-                        &(Util::getOption(partition.adjacencyMatrix.clone())?),
+                        &(partition.adjacencyMatrix.clone().ok_or("pattern mismatch")?),
                         literal!(""),
                     )?);
                     __mm_s.push_str(&*literal!("\n"));
@@ -843,7 +843,7 @@ pub mod Partition {
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*r#str);
                     __mm_s.push_str(&*Matching::toString(
-                        &(Util::getOption(partition.matching.clone())?),
+                        &(partition.matching.clone().ok_or("pattern mismatch")?),
                         literal!(""),
                     )?);
                     __mm_s.push_str(&*literal!("\n"));
@@ -1263,7 +1263,10 @@ pub mod Partition {
         let mut residuals: metamodelica::List<Pointer::Pointer<metamodelica::Ref<Variable::NFVariable>>> =
             metamodelica::nil();
         if (part.strongComponents).is_some() {
-            let __range0 = Util::getOption(part.strongComponents.clone())?
+            let __range0 = part
+                .strongComponents
+                .clone()
+                .ok_or("pattern mismatch")?
                 .borrow()
                 .iter()
                 .cloned()
@@ -1458,7 +1461,7 @@ pub mod Partition {
         let mut par: metamodelica::Ref<Partition> = par;
         let mut comps: metamodelica::Array<metamodelica::Ref<StrongComponent::NBStrongComponent>>;
         if (par.strongComponents).is_some() {
-            comps = Util::getOption(par.strongComponents.clone())?;
+            comps = par.strongComponents.clone().ok_or("pattern mismatch")?;
             for mut i in 1..=metamodelica::arrayLength(comps.clone()) {
                 {
                     let __cell0 = StrongComponent::removeAlias(

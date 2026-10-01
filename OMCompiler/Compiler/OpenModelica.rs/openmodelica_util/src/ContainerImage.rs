@@ -541,7 +541,7 @@ pub fn toString(mut image: &metamodelica::Ref<ContainerImage>, mut useDigest: bo
             let mut __mm_s = String::new();
             __mm_s.push_str(&*imageString);
             __mm_s.push_str(&*literal!("@"));
-            __mm_s.push_str(&*Util::getOption(image.digest.clone())?);
+            __mm_s.push_str(&*image.digest.clone().ok_or("pattern mismatch")?);
             ArcStr::from(__mm_s)
         };
     } else if (image.tag).is_some() {
@@ -549,7 +549,7 @@ pub fn toString(mut image: &metamodelica::Ref<ContainerImage>, mut useDigest: bo
             let mut __mm_s = String::new();
             __mm_s.push_str(&*imageString);
             __mm_s.push_str(&*literal!(":"));
-            __mm_s.push_str(&*Util::getOption(image.tag.clone())?);
+            __mm_s.push_str(&*image.tag.clone().ok_or("pattern mismatch")?);
             ArcStr::from(__mm_s)
         };
     }

@@ -388,7 +388,7 @@ pub(crate) fn expandNonLiteralRange(
     } };
     start_exp = metamodelica::Own::own(__pa0);
     ostep_exp = metamodelica::Own::own(__pa1);
-    step_exp = Util::getOptionOrDefault(ostep_exp, Expression::makeOne(&ety)?);
+    step_exp = ostep_exp.unwrap_or(Expression::makeOne(&ety)?);
     sz = Dimension::size(&(Type::nthDimension(ty.clone(), 1)?), false)?;
     for mut i in ({
         let __s = sz;

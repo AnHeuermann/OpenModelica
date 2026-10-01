@@ -1475,10 +1475,9 @@ pub mod Iterator {
                 step: __range_step,
                 ..
             } => {
-                step = Util::getOptionOrDefault(
-                    __range_step.clone(),
-                    metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }),
-                );
+                step = __range_step
+                    .clone()
+                    .unwrap_or(metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }));
                 sub_exp = Expression::fromCref(iter_name.clone(), false)?;
                 if !(Expression::isOne(metamodelica::AsArg::as_arg(&__range_start))?) {
                     sub_exp = metamodelica::Ref::new(Expression::NFExpression::MULTARY {
@@ -1709,11 +1708,11 @@ pub mod Iterator {
                         match '__try0: {
                             (range, status) = (match &*range {
                                 Expression::RANGE { .. } => (
-                                    unwrap_break_err!(adaptRange(unwrap_break_err!(UnorderedMap::getSafe(cref.clone(), iter_map.clone(), metamodelica::sourceInfo!("NBackEnd/Classes/NBEquation.mo")), '__try0), &(unwrap_break_err!(Util::getOption(unwrap_break_err!(Equation::getRHS(tmpEqn.clone()), '__try0)), '__try0)), &operator), '__try0),
+                                    unwrap_break_err!(adaptRange(unwrap_break_err!(UnorderedMap::getSafe(cref.clone(), iter_map.clone(), metamodelica::sourceInfo!("NBackEnd/Classes/NBEquation.mo")), '__try0), &(unwrap_break_err!(unwrap_break_err!(Equation::getRHS(tmpEqn.clone()), '__try0).ok_or("pattern mismatch"), '__try0)), &operator), '__try0),
                                     status,
                                 ),
                                 Expression::ARRAY { .. } => (
-                                    unwrap_break_err!(adaptArray(unwrap_break_err!(UnorderedMap::getSafe(cref.clone(), iter_map.clone(), metamodelica::sourceInfo!("NBackEnd/Classes/NBEquation.mo")), '__try0), &(unwrap_break_err!(Util::getOption(unwrap_break_err!(Equation::getRHS(tmpEqn.clone()), '__try0)), '__try0)), &operator), '__try0),
+                                    unwrap_break_err!(adaptArray(unwrap_break_err!(UnorderedMap::getSafe(cref.clone(), iter_map.clone(), metamodelica::sourceInfo!("NBackEnd/Classes/NBEquation.mo")), '__try0), &(unwrap_break_err!(unwrap_break_err!(Equation::getRHS(tmpEqn.clone()), '__try0).ok_or("pattern mismatch"), '__try0)), &operator), '__try0),
                                     status,
                                 ),
                                 _ => (range.clone(), Solve::Status::UNSOLVABLE.clone()),
@@ -2152,10 +2151,9 @@ pub mod Iterator {
             let mut elements: metamodelica::List<i32>;
             range = (match &*range {
                 Expression::RANGE { step: __range_step, .. } => {
-                    step = Util::getOptionOrDefault(
-                        __range_step.clone(),
-                        metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }),
-                    );
+                    step = __range_step
+                        .clone()
+                        .unwrap_or(metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }));
                     if Expression::isNegative(&step)? && eo == EvalOrder::FORWARD.clone()
                         || Expression::isPositive(&step)? && eo == EvalOrder::BACKWARD.clone()
                     {
@@ -2287,7 +2285,7 @@ pub mod Iterator {
             };
             let mut names: metamodelica::List<metamodelica::Ref<ComponentRef::NFComponentRef>>;
             if (map).is_some() {
-                (names, _, _) = getFrames(&(Util::getOption(map)?));
+                (names, _, _) = getFrames(&(map.ok_or("pattern mismatch")?));
                 r#str = {
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*r#str);
@@ -2404,7 +2402,7 @@ pub mod Iterator {
         iter = (match &*iter {
             SINGLE { .. } => {
                 if (funcCrefOpt).is_some() {
-                    funcCref = Util::getOption(funcCrefOpt)?;
+                    funcCref = funcCrefOpt.ok_or("pattern mismatch")?;
                     assign_variant_field!(iter => Iterator::SINGLE; name = funcCref(var_field!((*iter).name, Iterator::SINGLE).clone())?);
                 }
                 assign_variant_field!(iter => Iterator::SINGLE; range = mapFunc(var_field!((*iter).range, Iterator::SINGLE).clone(), funcExp.clone())?);
@@ -2412,7 +2410,7 @@ pub mod Iterator {
             }
             NESTED { .. } => {
                 if (funcCrefOpt).is_some() {
-                    funcCref = Util::getOption(funcCrefOpt)?;
+                    funcCref = funcCrefOpt.ok_or("pattern mismatch")?;
                     for mut i in 1..=metamodelica::arrayLength(var_field!((*iter).names, Iterator::NESTED).clone()) {
                         {
                             let __cell0 = funcCref(
@@ -6421,7 +6419,7 @@ pub mod IfEquationBody {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*r#str);
                 __mm_s.push_str(&*toString(
-                    &(Util::getOption(body.else_if.clone())?),
+                    &(body.else_if.clone().ok_or("pattern mismatch")?),
                     indent,
                     {
                         let mut __mm_s = String::new();
@@ -6590,7 +6588,7 @@ pub mod IfEquationBody {
         }
         assign_field!(ifBody.then_eqns = List::map(ifBody.then_eqns.clone(), func)?);
         if (ifBody.else_if).is_some() {
-            old_else_if = Util::getOption(ifBody.else_if.clone())?;
+            old_else_if = ifBody.else_if.clone().ok_or("pattern mismatch")?;
             else_if = mapEqnExpCref(old_else_if.clone(), func, funcExp.clone(), funcCrefOpt, mapFunc)?;
             if !(referenceEq(&*(&*else_if), &*(old_else_if))) {
                 assign_field!(ifBody.else_if = Some(else_if));
@@ -6655,7 +6653,7 @@ pub mod IfEquationBody {
             Equation::createName(eqn.clone(), idx.clone(), context)?;
         }
         if (body.else_if).is_some() {
-            createNames(&(Util::getOption(body.else_if.clone())?), idx, context)?;
+            createNames(&(body.else_if.clone().ok_or("pattern mismatch")?), idx, context)?;
         }
         Ok(())
     }
@@ -6696,7 +6694,7 @@ pub mod IfEquationBody {
             )?,
         );
         if (body.else_if).is_some() {
-            stmts = metamodelica::cons(stmt, toStatement(&(Util::getOption(body.else_if.clone())?))?);
+            stmts = metamodelica::cons(stmt, toStatement(&(body.else_if.clone().ok_or("pattern mismatch")?))?);
         } else {
             stmts = list![stmt];
         }
@@ -6779,7 +6777,7 @@ pub mod IfEquationBody {
                 new_exp = metamodelica::Own::own(__pa0);
                 if Expression::isEnd(&exp) || Expression::isEqual(exp, new_exp.clone())? {
                     if (body.else_if).is_some() {
-                        (new_exp, success) = getLHS(&(Util::getOption(body.else_if.clone())?), new_exp)?;
+                        (new_exp, success) = getLHS(&(body.else_if.clone().ok_or("pattern mismatch")?), new_exp)?;
                     }
                 } else {
                     if Flags::isSet(Flags::FAILTRACE.clone())? {
@@ -6819,7 +6817,7 @@ pub mod IfEquationBody {
                 } };
                 new_exp = metamodelica::Own::own(__pa0);
                 if (body.else_if).is_some() {
-                    (new_exp2, success) = getRHS(&(Util::getOption(body.else_if.clone())?))?;
+                    (new_exp2, success) = getRHS(&(body.else_if.clone().ok_or("pattern mismatch")?))?;
                     if success {
                         new_exp = metamodelica::Ref::new(Expression::NFExpression::IF { ty: Expression::typeOf(new_exp.clone()), condition: body.condition.clone(), trueBranch: new_exp, falseBranch: new_exp2 });
                     } else {
@@ -6874,7 +6872,7 @@ pub mod IfEquationBody {
                         else_if: tmp,
                     }));
                 }
-                bodies = metamodelica::cons(Util::getOption(tmp)?, bodies);
+                bodies = metamodelica::cons(tmp.ok_or("pattern mismatch")?, bodies);
             }
         } else {
             bodies = list![body];
@@ -6977,8 +6975,8 @@ pub mod IfEquationBody {
             mut eqn2: Pointer::Pointer<metamodelica::Ref<Equation::Equation>>,
         ) -> Result<bool> {
             let mut b: bool = 0 < Expression::compare(
-                Util::getOption(Equation::getLHS(Pointer::access(eqn1.clone()))?)?,
-                Util::getOption(Equation::getLHS(Pointer::access(eqn2.clone()))?)?,
+                (Equation::getLHS(Pointer::access(eqn1.clone()))?).ok_or("pattern mismatch")?,
+                (Equation::getLHS(Pointer::access(eqn2.clone()))?).ok_or("pattern mismatch")?,
             )?;
             Ok(b)
         }
@@ -7051,8 +7049,11 @@ pub mod IfEquationBody {
             i = i + 1;
         }
         if (body.else_if).is_some() {
-            (conditions, then_eqns) =
-                splitCollect(Util::getOption(body.else_if.clone())?, conditions, then_eqns.clone())?;
+            (conditions, then_eqns) = splitCollect(
+                body.else_if.clone().ok_or("pattern mismatch")?,
+                conditions,
+                then_eqns.clone(),
+            )?;
         }
         Ok((conditions, then_eqns))
     }
@@ -7154,7 +7155,7 @@ pub mod WhenEquationBody {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*r#str);
                 __mm_s.push_str(&*toString(
-                    &(Util::getOption(body.else_when.clone())?),
+                    &(body.else_when.clone().ok_or("pattern mismatch")?),
                     indent,
                     {
                         let mut __mm_s = String::new();
@@ -7341,7 +7342,7 @@ pub mod WhenEquationBody {
             }),
         );
         if (body.else_when).is_some() {
-            stmts = metamodelica::cons(stmt, toStatement(&(Util::getOption(body.else_when.clone())?))?);
+            stmts = metamodelica::cons(stmt, toStatement(&(body.else_when.clone().ok_or("pattern mismatch")?))?);
         } else {
             stmts = list![stmt];
         }
@@ -7579,7 +7580,7 @@ pub mod WhenEquationBody {
                 }
                 new_body = fromFlatList(&flat_new, None);
                 if (new_body).is_some() {
-                    bodies = metamodelica::cons(Util::getOption(new_body)?, bodies);
+                    bodies = metamodelica::cons(new_body.ok_or("pattern mismatch")?, bodies);
                 } else {
                     Error::addMessage(
                         Error::INTERNAL_ERROR.clone(),
@@ -7605,14 +7606,14 @@ pub mod WhenEquationBody {
                     acc_condition = metamodelica::Ref::new(Expression::NFExpression::EMPTY {
                         ty: openmodelica_nf_frontend::NFType::interned_INTEGER(),
                     });
-                    flat_new = metamodelica::cons((condition, list![Util::getOption(stmt)?]), flat_new);
+                    flat_new = metamodelica::cons((condition, list![stmt.ok_or("pattern mismatch")?]), flat_new);
                 } else {
                     acc_condition = combineConditions(acc_condition, condition, true);
                 }
             }
             new_body = fromFlatList(&flat_new, None);
             if (new_body).is_some() {
-                bodies = metamodelica::cons(Util::getOption(new_body)?, bodies);
+                bodies = metamodelica::cons(new_body.ok_or("pattern mismatch")?, bodies);
             } else {
                 Error::addMessage(
                     Error::INTERNAL_ERROR.clone(),
@@ -7650,7 +7651,7 @@ pub mod WhenEquationBody {
                 flat_new = metamodelica::cons((condition, stmts), flat_new);
                 new_body = fromFlatList(&flat_new, None);
                 if (new_body).is_some() {
-                    bodies = metamodelica::cons(Util::getOption(new_body)?, bodies);
+                    bodies = metamodelica::cons(new_body.ok_or("pattern mismatch")?, bodies);
                 }
             } else {
                 acc_condition = combineConditions(acc_condition, condition, true);
@@ -7771,7 +7772,7 @@ pub mod WhenEquationBody {
         )>;
         let mut body: metamodelica::Ref<WhenEquationBody>;
         if (body_opt).is_some() {
-            body = Util::getOption(body_opt)?;
+            body = body_opt.ok_or("pattern mismatch")?;
             for mut stmt in &*body.when_stmts.clone() {
                 let () = (::match_deref::match_deref! { match &(stmt.clone()) {
                     Deref @ WhenStatement::ASSIGN { lhs: Deref @ Expression::CREF { cref, .. }, .. } => {
@@ -8709,7 +8710,7 @@ pub(crate) fn equationKindString(
             let mut __mm_s = String::new();
             __mm_s.push_str(&*r#str);
             __mm_s.push_str(&*literal!("("));
-            __mm_s.push_str(&*intString(Util::getOption(clock_idx)?));
+            __mm_s.push_str(&*intString(clock_idx.ok_or("pattern mismatch")?));
             __mm_s.push_str(&*literal!(")]"));
             ArcStr::from(__mm_s)
         };
@@ -8780,12 +8781,12 @@ pub mod EquationPointers {
         let mut eqn: Pointer::Pointer<metamodelica::Ref<Equation::Equation>>;
         if useMapping {
             length = 15;
-            mapping = Util::getOption(mapping_opt)?;
+            mapping = mapping_opt.ok_or("pattern mismatch")?;
         } else {
             length = 10;
         }
         if filterEqs {
-            filter = Util::getOption(filter_opt)?;
+            filter = filter_opt.ok_or("pattern mismatch")?;
             r#str = {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*literal!("Filtered "));

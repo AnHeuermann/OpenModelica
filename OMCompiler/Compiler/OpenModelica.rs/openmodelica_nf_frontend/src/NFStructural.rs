@@ -210,7 +210,11 @@ pub(crate) fn isExpressionNotFixed(
             ..
         } => {
             if (__exp_dimIndex).is_some() {
-                isNotFixed = isExpressionNotFixed(&(Util::getOption(__exp_dimIndex.clone())?), requireFinal, maxDepth)?;
+                isNotFixed = isExpressionNotFixed(
+                    &(__exp_dimIndex.clone().ok_or("pattern mismatch")?),
+                    requireFinal,
+                    maxDepth,
+                )?;
             } else {
                 isNotFixed = false;
             }
@@ -334,7 +338,7 @@ pub(crate) fn markComponent(
     InstNode::updateComponent(comp.clone(), node)?;
     binding = Binding::getExpOpt(&(Component::getBinding(&comp)));
     if (binding).is_some() {
-        markExp(&(Util::getOption(binding)?))?;
+        markExp(&(binding.ok_or("pattern mismatch")?))?;
     }
     Ok(())
 }

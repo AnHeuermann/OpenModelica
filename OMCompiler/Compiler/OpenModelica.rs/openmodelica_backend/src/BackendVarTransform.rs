@@ -324,7 +324,7 @@ pub(crate) fn removeReplacement(
     }
     if '__try0: {
         unwrap_break_err!(UnorderedMap::add(inSrc.clone(), None, repl.hashTable.clone()), '__try0);
-        unwrap_break_err!(removeReplacementInv(repl.invHashTable.clone(), unwrap_break_err!(Util::getOption(dst_opt.clone()), '__try0)), '__try0);
+        unwrap_break_err!(removeReplacementInv(repl.invHashTable.clone(), unwrap_break_err!(dst_opt.clone().ok_or("pattern mismatch"), '__try0)), '__try0);
         Ok::<(), &'static str>(())
     }.is_err() {
         Error::addInternalError({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("-BackendVarTransform.removeReplacement failed for ")); __mm_s.push_str(&*ComponentReferenceBasics::printComponentRefStr(&inSrc)?); __mm_s.push_str(&*literal!("\n")); ArcStr::from(__mm_s) }, metamodelica::sourceInfo!("BackEnd/BackendVarTransform.mo"))?;
@@ -847,7 +847,11 @@ pub(crate) fn addDerConstRepl(
     let mut repl: VariableReplacements = repl;
     let mut derConst: CrefExpTable;
     if (repl.derConst).is_some() {
-        UnorderedMap::add(inComponentRef, Some(inExp), Util::getOption(repl.derConst.clone())?)?;
+        UnorderedMap::add(
+            inComponentRef,
+            Some(inExp),
+            repl.derConst.clone().ok_or("pattern mismatch")?,
+        )?;
     } else {
         derConst = newCrefExpTable();
         UnorderedMap::add(inComponentRef, Some(inExp), derConst.clone())?;
@@ -914,7 +918,7 @@ fn getCrefExpTableEntries(
     dsts = ({
         let mut __acc: metamodelica::List<metamodelica::Ref<DAE::Exp>> = metamodelica::nil();
         for mut d in (opt_dsts).into_iter().cloned() {
-            let __x = Util::getOption(d.clone())?;
+            let __x = d.clone().ok_or("pattern mismatch")?;
             __acc = cons(__x, __acc);
         }
         __acc.reverse()
@@ -3864,7 +3868,7 @@ pub(crate) fn replaceOptionExp(
     let mut optOut: Option<metamodelica::Ref<DAE::Exp>>;
     let mut exp: metamodelica::Ref<DAE::Exp>;
     if (optIn).is_some() {
-        exp = Util::getOption(optIn)?;
+        exp = optIn.ok_or("pattern mismatch")?;
         (exp, _) = replaceExp(&exp, repl, None);
         optOut = Some(exp);
     } else {
@@ -4108,7 +4112,7 @@ pub(crate) fn dumpDerConstReplacements(mut repl: &VariableReplacements) -> Resul
     let mut dsts: metamodelica::List<metamodelica::Ref<DAE::Exp>>;
     let mut tplLst: metamodelica::List<(metamodelica::Ref<DAE::ComponentRef>, metamodelica::Ref<DAE::Exp>)>;
     if (repl.derConst).is_some() {
-        (srcs, dsts) = getCrefExpTableEntries(Util::getOption(repl.derConst.clone())?)?;
+        (srcs, dsts) = getCrefExpTableEntries(repl.derConst.clone().ok_or("pattern mismatch")?)?;
         tplLst = List::zip(srcs, dsts);
         metamodelica::print(literal!("\nDerConstReplacements: ("));
         metamodelica::print(ArcStr::from(::std::format!("{}", ((tplLst).len() as i32))));

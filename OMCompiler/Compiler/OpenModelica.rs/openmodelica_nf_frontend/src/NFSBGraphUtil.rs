@@ -389,7 +389,7 @@ pub(crate) fn intervalFromRange(
     lo = Expression::toInteger(&start)?;
     hi = Expression::toInteger(&stop)?;
     if (ostep).is_some() {
-        step = Expression::toInteger(&(Util::getOption(ostep)?))?;
+        step = Expression::toInteger(&(ostep.ok_or("pattern mismatch")?))?;
     } else {
         step = 1;
     }

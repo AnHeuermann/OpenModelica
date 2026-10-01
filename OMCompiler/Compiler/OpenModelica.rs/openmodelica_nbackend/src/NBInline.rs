@@ -2549,7 +2549,7 @@ pub mod InlineRating {
                 if (iro).is_some() {
                     Pointer::update(
                         irp.clone(),
-                        add(Pointer::access(irp), &(multiply(Util::getOption(iro)?, i)?))?,
+                        add(Pointer::access(irp), &(multiply(iro.ok_or("pattern mismatch")?, i)?))?,
                     );
                 }
                 ()
@@ -2693,7 +2693,7 @@ pub mod InlineRating {
                             irp.clone(),
                             addMapped(
                                 Pointer::access(irp.clone()),
-                                &(Util::getOption(lir)?),
+                                &(lir.ok_or("pattern mismatch")?),
                                 metamodelica::arrayFromVec(
                                     Call::arguments(metamodelica::AsArg::as_arg(&__exp_call))?
                                         .into_iter()
@@ -2733,7 +2733,7 @@ pub mod InlineRating {
                     (::match_deref::match_deref! { match &(UnorderedMap::get(ComponentRef::stripSubscriptsAll(metamodelica::AsArg::as_arg(&__exp_cref)), local_map.clone())?) {
                         __esc_lir @ Some(_) => {
                             lir = (*__esc_lir).clone();
-                            Pointer::update(irp.clone(), add(Pointer::access(irp.clone()), &(Util::getOption(lir.clone())?))?);
+                            Pointer::update(irp.clone(), add(Pointer::access(irp.clone()), &(lir.clone().ok_or("pattern mismatch")?))?);
                             false
                         },
                         _ => {

@@ -292,12 +292,13 @@ pub fn toList<T: Clone + 'static + metamodelica::gc::MMTrace>(
     if numberOfElements == 0 {
         listT = metamodelica::nil();
     } else if lastUsedIndex == 1 {
-        listT = list![Util::getOption(
+        listT = list![
             ({
                 let __elt = (*metamodelica::index_checked(&data.borrow(), 1)?).clone();
                 __elt
             })
-        )?];
+            .ok_or("pattern mismatch")?
+        ];
     } else {
         listT = ({
             let mut __acc: metamodelica::List<_> = metamodelica::nil();
@@ -310,12 +311,11 @@ pub fn toList<T: Clone + 'static + metamodelica::gc::MMTrace>(
                 {
                     continue;
                 }
-                let __x = Util::getOption(
-                    ({
-                        let __elt = (*metamodelica::index_checked(&data.borrow(), i.clone())?).clone();
-                        __elt
-                    }),
-                )?;
+                let __x = ({
+                    let __elt = (*metamodelica::index_checked(&data.borrow(), i.clone())?).clone();
+                    __elt
+                })
+                .ok_or("pattern mismatch")?;
                 __acc = cons(__x, __acc);
             }
             __acc.reverse()

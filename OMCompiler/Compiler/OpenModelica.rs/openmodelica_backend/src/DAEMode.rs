@@ -375,7 +375,7 @@ fn createDAEmodeEqSystem(
     if (globalDAEData.modelVars).is_some() {
         globalDAEData.modelVars = Some(BackendVariable::addVariables(
             travArgs.systemVars.clone(),
-            Util::getOption(globalDAEData.modelVars.clone())?,
+            globalDAEData.modelVars.clone().ok_or("pattern mismatch")?,
         )?);
     } else {
         globalDAEData.modelVars = Some(travArgs.systemVars.clone());
@@ -386,7 +386,7 @@ fn createDAEmodeEqSystem(
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*literal!("DAEmode: adding residual variables:  "));
                 __mm_s.push_str(&*intString(BackendVariable::varsSize(
-                    &(Util::getOption(globalDAEData.modelVars.clone())?),
+                    &(globalDAEData.modelVars.clone().ok_or("pattern mismatch")?),
                 )));
                 __mm_s.push_str(&*literal!(": "));
                 ArcStr::from(__mm_s)

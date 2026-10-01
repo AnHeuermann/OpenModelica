@@ -332,7 +332,7 @@ pub(crate) fn fromIdentifier(
             body = (*__esc_body).clone();
             let mut iters: metamodelica::List<metamodelica::Ref<SimIterator::SimIterator>>;
             iters = SimIterator::fromIterator(metamodelica::AsArg::as_arg(&__eqn_iter))?;
-            metamodelica::Ref::new(NSimGenericCall::SINGLE_GENERIC_CALL { index: index, iters: iters, lhs: Util::getOption(Equation::getLHS(body.clone())?)?, rhs: Util::getOption(Equation::getRHS(body.clone())?)?, resizable: resizable })
+            metamodelica::Ref::new(NSimGenericCall::SINGLE_GENERIC_CALL { index: index, iters: iters, lhs: (Equation::getLHS(body.clone())?).ok_or("pattern mismatch")?, rhs: (Equation::getRHS(body.clone())?).ok_or("pattern mismatch")?, resizable: resizable })
         },
         _ => {
             Error::addMessage(Error::INTERNAL_ERROR.clone(), list![{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("NSimGenericCall.fromIdentifier")); __mm_s.push_str(&*literal!(" failed for incorrect equation: ")); __mm_s.push_str(&*Equation::toString(eqn, literal!(""))?); ArcStr::from(__mm_s) }])?;
@@ -608,10 +608,9 @@ pub mod SimIterator {
                     stop: __range_stop,
                     ..
                 } => {
-                    step = Util::getOptionOrDefault(
-                        __range_step.clone(),
-                        metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }),
-                    );
+                    step = __range_step
+                        .clone()
+                        .unwrap_or(metamodelica::Ref::new(Expression::NFExpression::INTEGER { value: 1 }));
                     addOp = Operator::makeAdd(Expression::typeOf(__range_start.clone()));
                     mulOp = Operator::makeMul(Expression::typeOf(__range_start.clone()));
                     size = metamodelica::Ref::new(Expression::NFExpression::MULTARY {
@@ -634,7 +633,7 @@ pub mod SimIterator {
                     });
                     size = SimplifyExp::simplify(size, false)?;
                     sub_iter = if ((map).is_some()) {
-                        subIterators(&(Util::getOption(map)?))?
+                        subIterators(&(map.ok_or("pattern mismatch")?))?
                     } else {
                         metamodelica::nil()
                     };
@@ -666,7 +665,7 @@ pub mod SimIterator {
                         __acc.reverse()
                     });
                     sub_iter = if ((map).is_some()) {
-                        subIterators(&(Util::getOption(map)?))?
+                        subIterators(&(map.ok_or("pattern mismatch")?))?
                     } else {
                         metamodelica::nil()
                     };
@@ -1004,8 +1003,8 @@ pub mod SimBranch {
         for mut eqn in &*if_body.then_eqns.clone().reverse() {
             body = metamodelica::cons(
                 (
-                    Util::getOption(Equation::getLHS(Pointer::access(eqn.clone()))?)?,
-                    Util::getOption(Equation::getRHS(Pointer::access(eqn.clone()))?)?,
+                    (Equation::getLHS(Pointer::access(eqn.clone()))?).ok_or("pattern mismatch")?,
+                    (Equation::getRHS(Pointer::access(eqn.clone()))?).ok_or("pattern mismatch")?,
                 ),
                 body,
             );
@@ -1015,7 +1014,10 @@ pub mod SimBranch {
             body: body,
         });
         if (if_body.else_if).is_some() {
-            branches = metamodelica::cons(branch, fromIfBody(&(Util::getOption(if_body.else_if.clone())?))?);
+            branches = metamodelica::cons(
+                branch,
+                fromIfBody(&(if_body.else_if.clone().ok_or("pattern mismatch")?))?,
+            );
         } else {
             branches = list![branch];
         }
@@ -1039,7 +1041,10 @@ pub mod SimBranch {
             }),
         });
         if (when_body.else_when).is_some() {
-            branches = metamodelica::cons(branch, fromWhenBody(&(Util::getOption(when_body.else_when.clone())?))?);
+            branches = metamodelica::cons(
+                branch,
+                fromWhenBody(&(when_body.else_when.clone().ok_or("pattern mismatch")?))?,
+            );
         } else {
             branches = list![branch];
         }

@@ -1090,7 +1090,7 @@ fn matchConfigFlag(mut inFlagName: ArcStr, mut inFlag: Flags::ConfigFlag) -> boo
     } = inFlag;
     name = metamodelica::Own::own(__pa0);
     opt_shortname = metamodelica::Own::own(__pa1);
-    shortname = Util::getOptionOrDefault(opt_shortname, literal!(""));
+    shortname = opt_shortname.unwrap_or(literal!(""));
     outMatches =
         stringEq(&inFlagName, &shortname) || stringEq(&(System::tolower(inFlagName)), &(System::tolower(name)));
     outMatches
@@ -1738,7 +1738,7 @@ pub fn printHelp(mut inTopics: &metamodelica::List<ArcStr>) -> Result<ArcStr> {
                     desc = metamodelica::Own::own(__pa2);
                     config_flag = metamodelica::Own::own(__pa3);
                     if (short_name).is_some() {
-                        s = IOStream::append(s.clone(), { let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("-")); __mm_s.push_str(&*Util::getOption(short_name.clone())?); __mm_s.push_str(&*literal!(", ")); ArcStr::from(__mm_s) })?;
+                        s = IOStream::append(s.clone(), { let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("-")); __mm_s.push_str(&*short_name.clone().ok_or("pattern mismatch")?); __mm_s.push_str(&*literal!(", ")); ArcStr::from(__mm_s) })?;
                     }
                     s = IOStream::append(s.clone(), { let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("--")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) })?;
                     s = IOStream::append(s.clone(), literal!("\n"))?;

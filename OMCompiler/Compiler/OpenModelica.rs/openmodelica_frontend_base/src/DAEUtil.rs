@@ -3280,7 +3280,7 @@ pub fn getNamedFunction(
         if let Ok(__v) = (|| -> Result<_> {
             ::match_deref::match_deref! { match &__mc_input {
                 _ => {
-                    Ok(Util::getOption(AvlTreePathFunction::get(functions, path.clone())?)?)
+                    Ok((AvlTreePathFunction::get(functions, path.clone())?).ok_or("pattern mismatch")?)
                 }
                 _ => return Err("nomatch"),
             }}
@@ -3317,7 +3317,7 @@ pub fn getNamedFunctionWithError(
         let __mc_input = info.clone();
         if let Ok(__v) = (|| -> Result<_> {
             let _ = __mc_input.clone() else { return Err("nomatch") };
-            Ok(Util::getOption(AvlTreePathFunction::get(functions, path.clone())?)?)
+            Ok((AvlTreePathFunction::get(functions, path.clone())?).ok_or("pattern mismatch")?)
         })() {
             break 'mc __v;
         }
@@ -4216,7 +4216,7 @@ pub fn getFunctionList(
     let mut lstInvalid: metamodelica::List<(metamodelica::Ref<Absyn::Path>, Option<DAE::Function>)>;
     let mut r#str: ArcStr;
     match '__try0: {
-        fns = unwrap_break_err!(List::map(AvlTreePathFunction::listValues(ft, metamodelica::nil()), &Util::getOption), '__try0);
+        fns = unwrap_break_err!(List::map(AvlTreePathFunction::listValues(ft, metamodelica::nil()), &|o: Option<_>| o.ok_or("pattern mismatch")), '__try0);
         Ok::<_, &'static str>((fns.clone(),))
     } {
         Ok((__try0_o0,)) => {
@@ -4261,7 +4261,7 @@ pub fn getFunctionList(
             if failOnError {
                 return Err("fail");
             }
-            fns = List::mapMap(List::select(lst.clone(), (std::sync::Arc::new(move |__a0: (metamodelica::Ref<Absyn::Path>, Option<DAE::Function>)| -> metamodelica::Result<_> { ::std::result::Result::Ok(isValidFunctionEntry(&__a0)) }) as std::sync::Arc<dyn ::std::ops::Fn((metamodelica::Ref<Absyn::Path>, Option<DAE::Function>)) -> Result<bool> + 'static>))?, &fnptr!(Util::tuple22, _), &Util::getOption)?;
+            fns = List::mapMap(List::select(lst.clone(), (std::sync::Arc::new(move |__a0: (metamodelica::Ref<Absyn::Path>, Option<DAE::Function>)| -> metamodelica::Result<_> { ::std::result::Result::Ok(isValidFunctionEntry(&__a0)) }) as std::sync::Arc<dyn ::std::ops::Fn((metamodelica::Ref<Absyn::Path>, Option<DAE::Function>)) -> Result<bool> + 'static>))?, &fnptr!(Util::tuple22, _), &|o: Option<_>| o.ok_or("pattern mismatch"))?;
         }
     }
     Ok(fns)

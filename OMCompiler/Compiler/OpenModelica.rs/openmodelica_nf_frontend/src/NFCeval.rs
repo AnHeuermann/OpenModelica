@@ -4741,7 +4741,7 @@ fn evalSize(
     let mut arr: metamodelica::Array<metamodelica::Ref<Expression::NFExpression>>;
     info = EvalTarget::getInfo(target);
     if (optIndex).is_some() {
-        index_exp = evalExp(Util::getOption(optIndex)?, target)?;
+        index_exp = evalExp(optIndex.ok_or("pattern mismatch")?, target)?;
         index = Expression::toInteger(&index_exp)?;
         (dim, _, ty_err) = Typing::typeExpDim(exp.clone(), index, InstContext::CLASS.clone(), info.clone())?;
         Typing::checkSizeTypingError(&ty_err, exp, index, &info)?;
@@ -4875,7 +4875,7 @@ fn printUnboundError(
             return Err("fail")
         },
         _ => {
-            if listMember(Component::variability(component)?, list![Variability::STRUCTURAL_PARAMETER.clone(), Variability::PARAMETER.clone()]) && Util::getOptionOrDefault(Component::getEvaluateAnnotation(component)?, false) {
+            if listMember(Component::variability(component)?, list![Variability::STRUCTURAL_PARAMETER.clone(), Variability::PARAMETER.clone()]) && (Component::getEvaluateAnnotation(component)?).unwrap_or(false) {
                 if Component::isFixed(component)? {
                     Error::addMultiSourceMessage(&(Error::UNBOUND_PARAMETER_EVALUATE_TRUE.clone()), &(list![{ let mut __mm_s = String::new(); __mm_s.push_str(&*Expression::toString(exp.clone())?); __mm_s.push_str(&*literal!("(fixed = true)")); ArcStr::from(__mm_s) }]), &(list![NFInstNode::InstNode::info(&(ComponentRef::node(&(Expression::toCref(&exp)?))?)), EvalTarget::getInfo(target)]))?;
                 }

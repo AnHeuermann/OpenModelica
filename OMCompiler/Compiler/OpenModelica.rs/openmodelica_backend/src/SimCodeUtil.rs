@@ -854,7 +854,7 @@ pub fn createSimCode(
                 setBVars: __pa17,
                 symbolicJacobianH: __pa18,
                 relatedBoundaryConditions: __pa19,
-            } = unwrap_break_err!(Util::getOption(shared.dataReconciliationData.clone()), '__try0);
+            } = unwrap_break_err!(shared.dataReconciliationData.clone().ok_or("pattern mismatch"), '__try0);
             dataReconJac = metamodelica::Own::own(__pa14);
             setcVars = metamodelica::Own::own(__pa15);
             datareconinputvars = metamodelica::Own::own(__pa16);
@@ -869,7 +869,7 @@ pub fn createSimCode(
             uniqueEqIndex = metamodelica::Own::own(__pa21);
             tempvars = metamodelica::Own::own(__pa22);
             if (dataReconJacH).is_some() {
-                let (__pa23, __pa24, __pa25) = ::match_deref::match_deref! { match &(unwrap_break_err!(createSymbolicSimulationJacobian(&(unwrap_break_err!(Util::getOption(dataReconJacH.clone()), '__try0)), uniqueEqIndex, tempvars.clone(), false), '__try0)) {
+                let (__pa23, __pa24, __pa25) = ::match_deref::match_deref! { match &(unwrap_break_err!(createSymbolicSimulationJacobian(&(unwrap_break_err!(dataReconJacH.clone().ok_or("pattern mismatch"), '__try0)), uniqueEqIndex, tempvars.clone(), false), '__try0)) {
                     (Some(__pa23), __pa24, __pa25) => (__pa23.clone(), __pa24.clone(), __pa25.clone()),
                     _ => break '__try0 Err::<_, _>("pattern mismatch"),
                 } };
@@ -1034,7 +1034,7 @@ pub fn createSimCode(
                 setBVars: __pa31,
                 relatedBoundaryConditions: __pa32,
                 ..
-            } = unwrap_break_err!(Util::getOption(shared.dataReconciliationData.clone()), '__try0);
+            } = unwrap_break_err!(shared.dataReconciliationData.clone().ok_or("pattern mismatch"), '__try0);
             setcVars = metamodelica::Own::own(__pa29);
             datareconinputvars = metamodelica::Own::own(__pa30);
             setBVars = metamodelica::Own::own(__pa31);
@@ -1049,7 +1049,7 @@ pub fn createSimCode(
             tmpSimVars.dataReconinputVars = tmpdatareconinputvars.clone();
             modelInfo.vars = tmpSimVars.clone();
             if (setBVars).is_some() {
-                (tmpsetBVars, _) = unwrap_break_err!(BackendVariable::traverseBackendDAEVars(unwrap_break_err!(Util::getOption(setBVars.clone()), '__try0), (std::sync::Arc::new(move |__a0: metamodelica::Ref<BackendDAE::Var>, __a1: (metamodelica::List<metamodelica::Ref<SimCodeVar::SimVar>>, BackendDAE::Variables)| traversingdlowvarToSimvar(__a0, &__a1)) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<BackendDAE::Var>, (metamodelica::List<metamodelica::Ref<SimCodeVar::SimVar>>, BackendDAE::Variables)) -> Result<(metamodelica::Ref<BackendDAE::Var>, (metamodelica::List<metamodelica::Ref<SimCodeVar::SimVar>>, BackendDAE::Variables))> + 'static>), (metamodelica::nil(), emptyVars.clone())), '__try0);
+                (tmpsetBVars, _) = unwrap_break_err!(BackendVariable::traverseBackendDAEVars(unwrap_break_err!(setBVars.clone().ok_or("pattern mismatch"), '__try0), (std::sync::Arc::new(move |__a0: metamodelica::Ref<BackendDAE::Var>, __a1: (metamodelica::List<metamodelica::Ref<SimCodeVar::SimVar>>, BackendDAE::Variables)| traversingdlowvarToSimvar(__a0, &__a1)) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<BackendDAE::Var>, (metamodelica::List<metamodelica::Ref<SimCodeVar::SimVar>>, BackendDAE::Variables)) -> Result<(metamodelica::Ref<BackendDAE::Var>, (metamodelica::List<metamodelica::Ref<SimCodeVar::SimVar>>, BackendDAE::Variables))> + 'static>), (metamodelica::nil(), emptyVars.clone())), '__try0);
                 (tmpsetBVars, _) = rewriteIndex(&tmpsetBVars, 0);
                 tmpSimVars.dataReconSetBVars = tmpsetBVars.clone();
                 modelInfo.vars = tmpSimVars.clone();
@@ -1686,7 +1686,7 @@ fn createClockedSimPartitions(
         if basePartition.nSubClocks.clone() > 0 {
             simSubPartitions = List::map(
                 Array::getRange(off, off + basePartition.nSubClocks.clone() - 1, subPartitions.clone())?,
-                &Util::getOption,
+                &|o: Option<_>| o.ok_or("pattern mismatch"),
             )?;
             simSubPartitions = simSubPartitions.reverse();
         } else {
@@ -2131,7 +2131,7 @@ fn setSystemIndexMap(
             assign_field!(lSystem.indexLinearSystem = sysIndex);
             assign_variant_field!(simEq => SimCode::SimEqSystem::SES_LINEAR; lSystem = lSystem.clone());
             if (alternativeTearingL).is_some() {
-                lSystem = Util::getOption(alternativeTearingL.clone())?;
+                lSystem = alternativeTearingL.clone().ok_or("pattern mismatch")?;
                 sysIndex = ({let __elt = (*metamodelica::index_checked(&inSysIndexMap.borrow(), lSystem.index.clone())?).clone(); __elt});
                 assign_field!(lSystem.indexLinearSystem = sysIndex);
                 alternativeTearingL = Some(lSystem.clone());
@@ -2148,7 +2148,7 @@ fn setSystemIndexMap(
             assign_field!(nlSystem.indexNonLinearSystem = sysIndex);
             assign_variant_field!(simEq => SimCode::SimEqSystem::SES_NONLINEAR; nlSystem = nlSystem.clone());
             if (alternativeTearingNL).is_some() {
-                nlSystem = Util::getOption(alternativeTearingNL.clone())?;
+                nlSystem = alternativeTearingNL.clone().ok_or("pattern mismatch")?;
                 sysIndex = ({let __elt = (*metamodelica::index_checked(&inSysIndexMap.borrow(), nlSystem.index.clone())?).clone(); __elt});
                 assign_field!(nlSystem.indexNonLinearSystem = sysIndex);
                 alternativeTearingNL = Some(nlSystem.clone());
@@ -2199,7 +2199,7 @@ pub fn addAlgebraicLoopsModelInfo(
                 let mut optNlSyst = (*optNlSyst).clone();
                 (nlSyst, modelInfo, symJacs) = updateNonLinearSyst(nlSyst.clone(), modelInfo, symJacs)?;
                 if (optNlSyst).is_some() {
-                    altNlSyst = Util::getOption(optNlSyst.clone())?;
+                    altNlSyst = optNlSyst.clone().ok_or("pattern mismatch")?;
                     (altNlSyst, modelInfo, symJacs) = updateNonLinearSyst(altNlSyst, modelInfo, symJacs)?;
                     optNlSyst = Some(altNlSyst);
                 }
@@ -2216,7 +2216,7 @@ pub fn addAlgebraicLoopsModelInfo(
                 let mut optLinearSyst = (*optLinearSyst).clone();
                 (linearSyst, modelInfo, symJacs) = updateLinearSyst(linearSyst.clone(), modelInfo, symJacs)?;
                 if (optLinearSyst).is_some() {
-                    altLinearSyst = Util::getOption(optLinearSyst.clone())?;
+                    altLinearSyst = optLinearSyst.clone().ok_or("pattern mismatch")?;
                     (altLinearSyst, modelInfo, symJacs) = updateLinearSyst(altLinearSyst, modelInfo, symJacs)?;
                     optLinearSyst = Some(altLinearSyst);
                 }
@@ -2256,7 +2256,7 @@ fn updateNonLinearSyst(
     varInfo.numNonLinearSystems = varInfo.numNonLinearSystems.clone() + 1;
     modelInfo.varInfo = varInfo;
     if (inSyst.jacobianMatrix).is_some() {
-        tmpSymJac = Util::getOption(inSyst.jacobianMatrix.clone())?;
+        tmpSymJac = inSyst.jacobianMatrix.clone().ok_or("pattern mismatch")?;
         if !((tmpSymJac.columns).is_empty()) {
             let (__pa0, __pa1, __pa2) = ::match_deref::match_deref! { match &(addAlgebraicLoopsModelInfoSymJacs(list![tmpSymJac], modelInfo)) {
                 (Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: Deref @ metamodelica::ListNode::Nil }, __pa1, __pa2) => (__pa0.clone(), __pa1.clone(), __pa2.clone()),
@@ -2308,7 +2308,7 @@ fn updateLinearSyst(
     varInfo.numLinearSystems = varInfo.numLinearSystems.clone() + 1;
     modelInfo.varInfo = varInfo;
     if (inSyst.jacobianMatrix).is_some() {
-        tmpSymJac = Util::getOption(inSyst.jacobianMatrix.clone())?;
+        tmpSymJac = inSyst.jacobianMatrix.clone().ok_or("pattern mismatch")?;
         if !((tmpSymJac.columns).is_empty()) {
             let (__pa0, __pa1, __pa2) = ::match_deref::match_deref! { match &(addAlgebraicLoopsModelInfoSymJacs(list![tmpSymJac], modelInfo)) {
                 (Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: Deref @ metamodelica::ListNode::Nil }, __pa1, __pa2) => (__pa0.clone(), __pa1.clone(), __pa2.clone()),
@@ -3376,7 +3376,7 @@ pub fn getSimCodeDAEModeDataEqns(
     let mut daeEquations: metamodelica::List<metamodelica::List<metamodelica::Ref<SimCode::SimEqSystem>>>;
     let mut daeModeData: SimCode::DaeModeData;
     if (inOptDaeMode).is_some() {
-        daeModeData = Util::getOption(inOptDaeMode)?;
+        daeModeData = inOptDaeMode.ok_or("pattern mismatch")?;
         daeEquations = daeModeData.daeEquations.clone();
     } else {
         daeEquations = metamodelica::nil();
@@ -7392,7 +7392,7 @@ pub(crate) fn createJacobianLinearCode(
                     setBVars: _,
                     symbolicJacobianH: __pa0,
                     ..
-                } = Util::getOption(shared.dataReconciliationData.clone())?;
+                } = shared.dataReconciliationData.clone().ok_or("pattern mismatch")?;
                 jacH = metamodelica::Own::own(__pa0);
                 if (jacH).is_some() {
                     matrixnames = list![
@@ -12039,7 +12039,7 @@ fn evaluateStartValues(
                             let mut value: metamodelica::Ref<Values::Value>;
                             let mut inVar: metamodelica::Ref<BackendDAE::Var> = inVar.clone();
                             if (o1).is_some() {
-                                startValue = Util::getOption(o1.clone())?;
+                                startValue = o1.clone().ok_or("pattern mismatch")?;
                                 startValue_ = (::match_deref::match_deref! { match &(&*startValue) {
                 Deref @ DAE::Exp::CALL { expLst: exps, .. } if (Expression::isConstWorkList(exps.clone())?) => {
                             let mut startValue1: metamodelica::Ref<DAE::Exp>;
@@ -12063,7 +12063,7 @@ fn evaluateStartValues(
                                 }
                             }
                             if (o2).is_some() {
-                                attr = Util::getOption(o2.clone())?;
+                                attr = o2.clone().ok_or("pattern mismatch")?;
                                 attr_ = evaluateVariableAttributes(attr.clone(), &inShared);
                                 if !(referenceEq(&*(&*attr),&*(&*attr_))) {
                                     assign_field!(inVar.values = Some(attr_.clone()));
@@ -13620,7 +13620,7 @@ fn extractVarFromVar2(
     assign_field!(simVar.exportVar = getExportVar(dlowVar)?);
     if BackendVariable::isStringParam(dlowVar)
         && (simVar.initialValue).is_some()
-        && !(Expression::isEvaluatedConst(&(Util::getOption(simVar.initialValue.clone())?)))
+        && !(Expression::isEvaluatedConst(&(simVar.initialValue.clone().ok_or("pattern mismatch")?)))
     {
         assign_field!(simVar.exportVar = None);
     }
@@ -13812,17 +13812,18 @@ fn derVarFromStateVar(
         deriv.minValue = None,
         deriv.maxValue = None
     );
-    if (iterationVars).is_some() && UnorderedSet::contains(deriv.name.clone(), Util::getOption(iterationVars.clone())?)?
+    if (iterationVars).is_some()
+        && UnorderedSet::contains(deriv.name.clone(), iterationVars.clone().ok_or("pattern mismatch")?)?
     {
         if (timeInterval).is_some() {
             nominal = Expression::makeDiv(
-                Util::getOptionOrDefault(
-                    deriv.nominalValue.clone(),
-                    metamodelica::Ref::new(DAE::Exp::RCONST {
+                deriv
+                    .nominalValue
+                    .clone()
+                    .unwrap_or(metamodelica::Ref::new(DAE::Exp::RCONST {
                         real: metamodelica::OrderedFloat(1.0_f64),
-                    }),
-                ),
-                Util::getOption(timeInterval)?,
+                    })),
+                timeInterval.ok_or("pattern mismatch")?,
             )?;
             assign_field!(deriv.nominalValue = Some((ExpressionSimplify::simplify(nominal)?).0));
         }
@@ -13837,7 +13838,9 @@ fn derVarFromStateVar(
         deriv.isValueChangeable = false,
         deriv.variability = Some(openmodelica_simcode_types::SimCodeVar::Variability::CONTINUOUS)
     );
-    if (iterationVars).is_some() && UnorderedSet::contains(deriv.name.clone(), Util::getOption(iterationVars)?)? {
+    if (iterationVars).is_some()
+        && UnorderedSet::contains(deriv.name.clone(), iterationVars.ok_or("pattern mismatch")?)?
+    {
         assign_field!(
             deriv.initial_ = Some(openmodelica_simcode_types::SimCodeVar::Initial::APPROX),
             deriv.initialValue = Some(metamodelica::Ref::new(DAE::Exp::RCONST {
@@ -14319,7 +14322,7 @@ pub(crate) fn simEqSystemString(mut eqSysIn: &metamodelica::Ref<SimCode::SimEqSy
                     s = { let mut __mm_s = String::new(); __mm_s.push_str(&*s); __mm_s.push_str(&*dumpWhenOps(metamodelica::AsArg::as_arg(&whenStmtLst))?); ArcStr::from(__mm_s) };
                     if (elseWhen).is_some() {
                         s = { let mut __mm_s = String::new(); __mm_s.push_str(&*s); __mm_s.push_str(&*literal!(" ELSEWHEN: ")); ArcStr::from(__mm_s) };
-                        s = { let mut __mm_s = String::new(); __mm_s.push_str(&*s); __mm_s.push_str(&*simEqSystemString(&(Util::getOption(elseWhen.clone())?))); ArcStr::from(__mm_s) };
+                        s = { let mut __mm_s = String::new(); __mm_s.push_str(&*s); __mm_s.push_str(&*simEqSystemString(&(elseWhen.clone().ok_or("pattern mismatch")?))); ArcStr::from(__mm_s) };
                     }
                     Ok(s.clone())
                 }
@@ -14939,7 +14942,7 @@ pub(crate) fn dumpSimCodeDAEmodeDataString(mut inDaeModedata: Option<SimCode::Da
                     ArcStr::from(__mm_s)
                 };
                 metamodelica::print(r#str);
-                let __arc2 = Util::getOption(dmd.sparsityPattern.clone())?;
+                let __arc2 = dmd.sparsityPattern.clone().ok_or("pattern mismatch")?;
                 let SimCode::JAC_MATRIX {
                     sparsity: __pa0,
                     sparsityT: __pa1,
@@ -16842,7 +16845,7 @@ fn getInitialAttributeHelperForParameters(
     let mut initial_: SimCodeVar::Initial;
     if !(isFixed)
         && (iterationVars).is_some()
-        && UnorderedSet::contains(var.varName.clone(), Util::getOption(iterationVars)?)?
+        && UnorderedSet::contains(var.varName.clone(), iterationVars.ok_or("pattern mismatch")?)?
         && startValueIsConstOrNone(var)?
     {
         initial_ = openmodelica_simcode_types::SimCodeVar::Initial::APPROX;
@@ -16858,9 +16861,9 @@ fn startValueIsConstOrNone(mut var: &metamodelica::Ref<BackendDAE::Var>) -> Resu
     if (start_value).is_none() && (var.bindExp).is_none() {
         b = true;
     } else if (start_value).is_none() && (var.bindExp).is_some() {
-        b = Expression::isEvaluatedConst(&(Util::getOption(var.bindExp.clone())?));
+        b = Expression::isEvaluatedConst(&(var.bindExp.clone().ok_or("pattern mismatch")?));
     } else {
-        b = Expression::isEvaluatedConst(&(Util::getOption(start_value)?));
+        b = Expression::isEvaluatedConst(&(start_value.ok_or("pattern mismatch")?));
     }
     Ok(b)
 }
@@ -16874,7 +16877,7 @@ fn getInitialAttributeHelper(
     if isFixed && startValueIsConstOrNone(var)? {
         initial_ = openmodelica_simcode_types::SimCodeVar::Initial::EXACT;
     } else if (iterationVars).is_some()
-        && UnorderedSet::contains(var.varName.clone(), Util::getOption(iterationVars)?)?
+        && UnorderedSet::contains(var.varName.clone(), iterationVars.ok_or("pattern mismatch")?)?
         && startValueIsConstOrNone(var)?
     {
         initial_ = openmodelica_simcode_types::SimCodeVar::Initial::APPROX;
@@ -16939,7 +16942,7 @@ fn startValueIsConstOrDefault(
     let mut outstart_value: Option<metamodelica::Ref<DAE::Exp>>;
     if (start_value).is_none() {
         outstart_value = None;
-    } else if Expression::isConstValue(&(Util::getOption(start_value.clone())?))? {
+    } else if Expression::isConstValue(&(start_value.clone().ok_or("pattern mismatch")?))? {
         outstart_value = start_value;
     } else {
         outstart_value = setDefaultStartValue(type_)?;
@@ -20651,7 +20654,7 @@ pub(crate) fn getReqSimEqSysForSimVar(
     } = &**__arc2;
     sesLst = metamodelica::Own::own(__pa0);
     bmapOpt = metamodelica::Own::own(__pa1);
-    bmap = Util::getOption(bmapOpt)?;
+    bmap = bmapOpt.ok_or("pattern mismatch")?;
     sesIdcs = getReqSimEqsForSimVar(simVar, bmap)?;
     ses = List::map1(
         sesIdcs,
@@ -22335,8 +22338,8 @@ fn isInitialApproxOrCalculatedSimVar(mut simVar: &metamodelica::Ref<SimCodeVar::
         } => true,
         SimCodeVar::SimVar { initial_: None, .. } => {
             default_initial = SimCodeCodegenUtil::getDefaultFmiInitialAttribute(
-                Util::getOptionOrDefault(simVar.variability.clone(), default_variability),
-                Util::getOptionOrDefault(simVar.causality.clone(), default_causality),
+                simVar.variability.clone().unwrap_or(default_variability),
+                simVar.causality.clone().unwrap_or(default_causality),
             );
             outBoolean = isInitialApproxOrCalculated(default_initial);
             outBoolean
@@ -23031,8 +23034,8 @@ fn isInitialExactSimVar(mut simVar: &metamodelica::Ref<SimCodeVar::SimVar>) -> b
         } => true,
         SimCodeVar::SimVar { initial_: None, .. } => {
             default_initial = SimCodeCodegenUtil::getDefaultFmiInitialAttribute(
-                Util::getOptionOrDefault(simVar.variability.clone(), default_variability),
-                Util::getOptionOrDefault(simVar.causality.clone(), default_causality),
+                simVar.variability.clone().unwrap_or(default_variability),
+                simVar.causality.clone().unwrap_or(default_causality),
             );
             outBoolean = isInitialExact(default_initial);
             outBoolean
@@ -24381,7 +24384,7 @@ fn fmiPlotsFromExp(
     for mut e in &*elems {
         op = fmiPlotFromExp(metamodelica::AsArg::as_arg(&e), nameMap, terminals)?;
         if (op).is_some() {
-            plots = metamodelica::cons(Util::getOption(op)?, plots);
+            plots = metamodelica::cons(op.ok_or("pattern mismatch")?, plots);
         }
     }
     plots = plots.reverse();
@@ -24440,7 +24443,7 @@ fn fmiCurvesFromExp(
     for mut e in &*elems {
         oc = fmiCurveFromExp(metamodelica::AsArg::as_arg(&e), nameMap)?;
         if (oc).is_some() {
-            curves = metamodelica::cons(Util::getOption(oc)?, curves);
+            curves = metamodelica::cons(oc.ok_or("pattern mismatch")?, curves);
         }
     }
     curves = curves.reverse();
@@ -24578,7 +24581,10 @@ fn curvesCommonTerminal(
         if first {
             terminal = t;
             first = false;
-        } else if !(stringEq(&(Util::getOption(t.clone())?), &(Util::getOption(terminal.clone())?))) {
+        } else if !(stringEq(
+            &(t.clone().ok_or("pattern mismatch")?),
+            &(terminal.clone().ok_or("pattern mismatch")?),
+        )) {
             terminal = None;
             return Ok(terminal);
         }

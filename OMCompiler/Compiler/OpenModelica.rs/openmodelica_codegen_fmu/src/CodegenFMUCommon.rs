@@ -1942,7 +1942,7 @@ pub fn ScalarVariableAttribute2(
             let mut ret_29;
             let mut ret_30;
             let mut ret_31;
-            ret_1 = Util::getOption(i_exportVar.clone())?;
+            ret_1 = i_exportVar.clone().ok_or("pattern mismatch")?;
             txt_2 = CodegenUtil::crefStrNoUnderscore((*Tpl::emptyTxt).clone(), &ret_1)?;
             ret_3 = System::stringReplace(Tpl::textString(txt_2)?, literal!("$"), literal!("_D_"))?;
             ret_4 = Util::escapeModelicaStringToXmlString(ret_3)?;

@@ -725,7 +725,7 @@ pub(crate) fn hashContinue(mut exp: metamodelica::Ref<NFExpression>, mut hash: i
                 hash = hashContinue(__exp_start.clone(), hash)?;
                 hash = stringHashDjb2Continue(&(literal!(":")), hash);
                 if (__exp_step).is_some() {
-                    hash = hashContinue(Util::getOption(__exp_step.clone())?, hash)?;
+                    hash = hashContinue(__exp_step.clone().ok_or("pattern mismatch")?, hash)?;
                     hash = stringHashDjb2Continue(&(literal!(":")), hash);
                 }
                 { (exp, hash) = (__exp_stop.clone(), hash); continue '__tco; }
@@ -755,7 +755,7 @@ pub(crate) fn hashContinue(mut exp: metamodelica::Ref<NFExpression>, mut hash: i
                 hash = hashContinue(__exp_exp.clone(), hash)?;
                 if (__exp_dimIndex).is_some() {
                     hash = stringHashDjb2Continue(&(literal!(", ")), hash);
-                    hash = hashContinue(Util::getOption(__exp_dimIndex.clone())?, hash)?;
+                    hash = hashContinue(__exp_dimIndex.clone().ok_or("pattern mismatch")?, hash)?;
                 }
                 return Ok(stringHashDjb2Continue(&(literal!(")")), hash))
             },
@@ -2399,7 +2399,7 @@ pub fn getIntegerRange(mut range: metamodelica::Ref<NFExpression>, mut resize: b
                 start = unwrap_break_err!(getInteger(__range_start.clone(), resize), '__try0);
                 stop = unwrap_break_err!(getInteger(__range_stop.clone(), resize), '__try0);
                 if (__range_step).is_some() {
-                    step = unwrap_break_err!(getInteger(unwrap_break_err!(Util::getOption(__range_step.clone()), '__try0), resize), '__try0);
+                    step = unwrap_break_err!(getInteger(unwrap_break_err!(__range_step.clone().ok_or("pattern mismatch"), '__try0), resize), '__try0);
                 } else {
                     step = if (start > stop) { -1 } else { 1 };
                 }
@@ -3630,7 +3630,7 @@ pub fn toString(mut exp: metamodelica::Ref<NFExpression>) -> Result<ArcStr> {
             }
             __acc.reverse()
         }), literal!("; "))); __mm_s.push_str(&*literal!("]")); ArcStr::from(__mm_s) }),
-            Deref @ RANGE { start: __exp_start, step: __exp_step, stop: __exp_stop, .. } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*operandString(__exp_start.clone(), &exp, false)?); __mm_s.push_str(&*if ((__exp_step).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandString(Util::getOption(__exp_step.clone())?, &exp, false)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandString(__exp_stop.clone(), &exp, false)?); ArcStr::from(__mm_s) }),
+            Deref @ RANGE { start: __exp_start, step: __exp_step, stop: __exp_stop, .. } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*operandString(__exp_start.clone(), &exp, false)?); __mm_s.push_str(&*if ((__exp_step).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandString(__exp_step.clone().ok_or("pattern mismatch")?, &exp, false)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandString(__exp_stop.clone(), &exp, false)?); ArcStr::from(__mm_s) }),
             Deref @ TUPLE { elements: __exp_elements, .. } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("(")); __mm_s.push_str(&*stringDelimitList(({
             let mut __acc: metamodelica::List<ArcStr> = metamodelica::nil();
             for mut e in (__exp_elements.clone()).into_iter().cloned() {
@@ -3641,7 +3641,7 @@ pub fn toString(mut exp: metamodelica::Ref<NFExpression>) -> Result<ArcStr> {
         }), literal!(", "))); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) }),
             Deref @ RECORD { elements: __exp_elements, path: __exp_path, .. } => return Ok(List::toStringCustom(__exp_elements.clone(), &toString, AbsynUtil::pathString(__exp_path.clone(), literal!("."), true, false)?, literal!("("), literal!(", "), literal!(")"), true, 0)?),
             Deref @ CALL { call: __exp_call } => return Ok(Call::toString(metamodelica::AsArg::as_arg(&__exp_call))?),
-            Deref @ SIZE { dimIndex: __exp_dimIndex, exp: __exp_exp } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("size(")); __mm_s.push_str(&*toString(__exp_exp.clone())?); __mm_s.push_str(&*if ((__exp_dimIndex).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(", ")); __mm_s.push_str(&*toString(Util::getOption(__exp_dimIndex.clone())?)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) }),
+            Deref @ SIZE { dimIndex: __exp_dimIndex, exp: __exp_exp } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("size(")); __mm_s.push_str(&*toString(__exp_exp.clone())?); __mm_s.push_str(&*if ((__exp_dimIndex).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(", ")); __mm_s.push_str(&*toString(__exp_dimIndex.clone().ok_or("pattern mismatch")?)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) }),
             Deref @ END { .. } => return Ok(literal!("end")),
             Deref @ MULTARY { arguments: __exp_arguments, inv_arguments: __exp_inv_arguments, operator: __exp_operator } if ((__exp_inv_arguments).is_empty()) => return Ok(multaryString(__exp_arguments.clone(), &exp, metamodelica::AsArg::as_arg(&__exp_operator), false)?),
             Deref @ MULTARY { arguments: __exp_arguments, inv_arguments: __exp_inv_arguments, operator: __exp_operator } if ((__exp_arguments).is_empty() && Operator::isDashClassification(Operator::getMathClassification(metamodelica::AsArg::as_arg(&__exp_operator))?)) => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("-")); __mm_s.push_str(&*multaryString(__exp_inv_arguments.clone(), &exp, metamodelica::AsArg::as_arg(&__exp_operator), true)?); ArcStr::from(__mm_s) }),
@@ -3729,7 +3729,7 @@ pub(crate) fn toFlatString(
             }
             __acc.reverse()
         }), literal!("; "))); __mm_s.push_str(&*literal!("]")); ArcStr::from(__mm_s) }),
-            Deref @ RANGE { start: __exp_start, step: __exp_step, stop: __exp_stop, .. } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*operandFlatString(__exp_start.clone(), &exp, false, format)?); __mm_s.push_str(&*if ((__exp_step).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandFlatString(Util::getOption(__exp_step.clone())?, &exp, false, format)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandFlatString(__exp_stop.clone(), &exp, false, format)?); ArcStr::from(__mm_s) }),
+            Deref @ RANGE { start: __exp_start, step: __exp_step, stop: __exp_stop, .. } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*operandFlatString(__exp_start.clone(), &exp, false, format)?); __mm_s.push_str(&*if ((__exp_step).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandFlatString(__exp_step.clone().ok_or("pattern mismatch")?, &exp, false, format)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(":")); __mm_s.push_str(&*operandFlatString(__exp_stop.clone(), &exp, false, format)?); ArcStr::from(__mm_s) }),
             Deref @ TUPLE { elements: __exp_elements, .. } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("(")); __mm_s.push_str(&*stringDelimitList(({
             let mut __acc: metamodelica::List<ArcStr> = metamodelica::nil();
             for mut e in (__exp_elements.clone()).into_iter().cloned() {
@@ -3740,7 +3740,7 @@ pub(crate) fn toFlatString(
         }), literal!(", "))); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) }),
             Deref @ RECORD { elements: __exp_elements, ty: __exp_ty, .. } => return Ok(List::toStringCustom(__exp_elements.clone(), &({ let __pe_b1 = format; move |__pe_a0| toFlatString(__pe_a0, __pe_b1.clone()) }), Type::toFlatString(metamodelica::AsArg::as_arg(&__exp_ty), format)?, literal!("("), literal!(", "), literal!(")"), true, 0)?),
             Deref @ CALL { call: __exp_call } => return Ok(Call::toFlatString(metamodelica::AsArg::as_arg(&__exp_call), format)?),
-            Deref @ SIZE { dimIndex: __exp_dimIndex, exp: __exp_exp } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("size(")); __mm_s.push_str(&*toFlatString(__exp_exp.clone(), format)?); __mm_s.push_str(&*if ((__exp_dimIndex).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(", ")); __mm_s.push_str(&*toFlatString(Util::getOption(__exp_dimIndex.clone())?, format)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) }),
+            Deref @ SIZE { dimIndex: __exp_dimIndex, exp: __exp_exp } => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("size(")); __mm_s.push_str(&*toFlatString(__exp_exp.clone(), format)?); __mm_s.push_str(&*if ((__exp_dimIndex).is_some()) {{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!(", ")); __mm_s.push_str(&*toFlatString(__exp_dimIndex.clone().ok_or("pattern mismatch")?, format)?); ArcStr::from(__mm_s) }} else {literal!("")}); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) }),
             Deref @ END { .. } => return Ok(literal!("end")),
             Deref @ MULTARY { arguments: __exp_arguments, inv_arguments: __exp_inv_arguments, operator: __exp_operator } if ((__exp_inv_arguments).is_empty()) => return Ok(multaryFlatString(__exp_arguments.clone(), &exp, metamodelica::AsArg::as_arg(&__exp_operator), format, false)?),
             Deref @ MULTARY { arguments: __exp_arguments, inv_arguments: __exp_inv_arguments, operator: __exp_operator } if ((__exp_arguments).is_empty() && Operator::isDashClassification(Operator::getMathClassification(metamodelica::AsArg::as_arg(&__exp_operator))?)) => return Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("-")); __mm_s.push_str(&*multaryFlatString(__exp_inv_arguments.clone(), &exp, metamodelica::AsArg::as_arg(&__exp_operator), format, true)?); ArcStr::from(__mm_s) }),
@@ -4089,7 +4089,7 @@ pub(crate) fn computeNominal(mut exp: metamodelica::Ref<NFExpression>) -> Result
             } };
             varPointer = metamodelica::Own::own(__pa0);
             nominal = Variable::getNominal(&(Pointer::access(PointerWeak::upgrade(varPointer)?)))?;
-            Util::getOptionOrDefault(nominal, exp.clone())
+            nominal.unwrap_or(exp.clone())
         },
         Deref @ INTEGER { value: __exp_value } => {
             metamodelica::Ref::new(NFExpression::INTEGER { value: (__exp_value.clone()).abs() })
@@ -4202,7 +4202,7 @@ pub(crate) fn toAbsyn(mut exp: metamodelica::Ref<NFExpression>) -> Result<metamo
                 return Ok(Call::toAbsyn(metamodelica::AsArg::as_arg(&__exp_call))?)
             },
             Deref @ SIZE { dimIndex: __exp_dimIndex, .. } => {
-                return Ok(AbsynUtil::makeCall(metamodelica::Ref::new(Absyn::ComponentRef::CREF_IDENT { name: literal!("size"), subscripts: metamodelica::nil() }), if ((__exp_dimIndex).is_some()) {list![toAbsyn(Util::getOption(__exp_dimIndex.clone())?)?]} else {metamodelica::nil()}, metamodelica::nil()))
+                return Ok(AbsynUtil::makeCall(metamodelica::Ref::new(Absyn::ComponentRef::CREF_IDENT { name: literal!("size"), subscripts: metamodelica::nil() }), if ((__exp_dimIndex).is_some()) {list![toAbsyn(__exp_dimIndex.clone().ok_or("pattern mismatch")?)?]} else {metamodelica::nil()}, metamodelica::nil()))
             },
             Deref @ END { .. } => {
                 return Ok(openmodelica_ast::Absyn::Exp::interned_END())
@@ -4350,7 +4350,7 @@ pub fn toDAE(mut exp: metamodelica::Ref<NFExpression>, mut allowEmpty: bool) -> 
                     ty: Type::toDAE(metamodelica::AsArg::as_arg(&__exp_ty), true)?,
                     start: toDAE(__exp_start.clone(), false)?,
                     step: if ((__exp_step).is_some()) {
-                        Some(toDAE(Util::getOption(__exp_step.clone())?, false)?)
+                        Some(toDAE(__exp_step.clone().ok_or("pattern mismatch")?, false)?)
                     } else {
                         None
                     },
@@ -4380,7 +4380,7 @@ pub fn toDAE(mut exp: metamodelica::Ref<NFExpression>, mut allowEmpty: bool) -> 
                 return Ok(metamodelica::Ref::new(DAE::Exp::SIZE {
                     exp: toDAE(__exp_exp.clone(), false)?,
                     sz: if ((__exp_dimIndex).is_some()) {
-                        Some(toDAE(Util::getOption(__exp_dimIndex.clone())?, false)?)
+                        Some(toDAE(__exp_dimIndex.clone().ok_or("pattern mismatch")?, false)?)
                     } else {
                         None
                     },
@@ -8026,13 +8026,13 @@ pub(crate) fn makeDefaultValue(
     let mut exp: metamodelica::Ref<NFExpression>;
     exp = (match &**ty {
         Type::INTEGER => {
-            if (min).is_some() && isNonNegative(&(Util::getOption(min.clone())?))? {
+            if (min).is_some() && isNonNegative(&(min.clone().ok_or("pattern mismatch")?))? {
                 let __pa0 = ::match_deref::match_deref! { match &(min) {
                     Some(__pa0) => __pa0.clone(),
                     _ => return Err("pattern mismatch"),
                 } };
                 exp = metamodelica::Own::own(__pa0);
-            } else if (max).is_some() && isNonPositive(&(Util::getOption(max.clone())?))? {
+            } else if (max).is_some() && isNonPositive(&(max.clone().ok_or("pattern mismatch")?))? {
                 let __pa1 = ::match_deref::match_deref! { match &(max) {
                     Some(__pa1) => __pa1.clone(),
                     _ => return Err("pattern mismatch"),
@@ -8044,13 +8044,13 @@ pub(crate) fn makeDefaultValue(
             exp
         }
         Type::REAL => {
-            if (min).is_some() && isNonNegative(&(Util::getOption(min.clone())?))? {
+            if (min).is_some() && isNonNegative(&(min.clone().ok_or("pattern mismatch")?))? {
                 let __pa0 = ::match_deref::match_deref! { match &(min) {
                     Some(__pa0) => __pa0.clone(),
                     _ => return Err("pattern mismatch"),
                 } };
                 exp = metamodelica::Own::own(__pa0);
-            } else if (max).is_some() && isNonPositive(&(Util::getOption(max.clone())?))? {
+            } else if (max).is_some() && isNonPositive(&(max.clone().ok_or("pattern mismatch")?))? {
                 let __pa1 = ::match_deref::match_deref! { match &(max) {
                     Some(__pa1) => __pa1.clone(),
                     _ => return Err("pattern mismatch"),
@@ -8563,7 +8563,7 @@ pub fn variability(mut exp: metamodelica::Ref<NFExpression>) -> Result<Variabili
             var = variability(__exp_start.clone())?;
             var = Prefixes::variabilityMax(var, variability(__exp_stop.clone())?);
             if (__exp_step).is_some() {
-                var = Prefixes::variabilityMax(var, variability(Util::getOption(__exp_step.clone())?)?);
+                var = Prefixes::variabilityMax(var, variability(__exp_step.clone().ok_or("pattern mismatch")?)?);
             }
             var
         }
@@ -8589,7 +8589,7 @@ pub fn variability(mut exp: metamodelica::Ref<NFExpression>) -> Result<Variabili
             if (__exp_dimIndex).is_some() {
                 var = Prefixes::variabilityMax(
                     Variability::PARAMETER.clone(),
-                    variability(Util::getOption(__exp_dimIndex.clone())?)?,
+                    variability(__exp_dimIndex.clone().ok_or("pattern mismatch")?)?,
                 );
             } else {
                 var = Variability::PARAMETER.clone();
@@ -8737,7 +8737,7 @@ pub fn purity(mut exp: metamodelica::Ref<NFExpression>) -> Result<Purity> {
             pur = purity(__exp_start.clone())?;
             pur = Prefixes::purityMin(pur, purity(__exp_stop.clone())?);
             if (__exp_step).is_some() {
-                pur = Prefixes::purityMin(pur, purity(Util::getOption(__exp_step.clone())?)?);
+                pur = Prefixes::purityMin(pur, purity(__exp_step.clone().ok_or("pattern mismatch")?)?);
             }
             pur
         }
@@ -8761,7 +8761,7 @@ pub fn purity(mut exp: metamodelica::Ref<NFExpression>) -> Result<Purity> {
             ..
         } => {
             if ((__exp_dimIndex).is_some()) {
-                purity(Util::getOption(__exp_dimIndex.clone())?)?
+                purity(__exp_dimIndex.clone().ok_or("pattern mismatch")?)?
             } else {
                 Purity::PURE.clone()
             }
@@ -10033,7 +10033,7 @@ pub fn toJSON(mut exp: metamodelica::Ref<NFExpression>) -> Result<metamodelica::
             if (__exp_step).is_some() {
                 json = JSON::addPair(
                     &(literal!("step")),
-                    &(toJSON(Util::getOption(__exp_step.clone())?)?),
+                    &(toJSON(__exp_step.clone().ok_or("pattern mismatch")?)?),
                     json,
                 )?;
             }
@@ -10127,7 +10127,7 @@ pub fn toJSON(mut exp: metamodelica::Ref<NFExpression>) -> Result<metamodelica::
                     &(literal!("arguments")),
                     &(JSON::makeList(list![
                         toJSON(__exp_exp.clone())?,
-                        toJSON(Util::getOption(__exp_dimIndex.clone())?)?
+                        toJSON(__exp_dimIndex.clone().ok_or("pattern mismatch")?)?
                     ])),
                     json,
                 )?;
@@ -10517,7 +10517,7 @@ pub fn replaceLiteral(
         let mut idx_opt: Option<i32>;
         idx_opt = UnorderedMap::get(exp.clone(), map.clone())?;
         if (idx_opt).is_some() {
-            idx = Util::getOption(idx_opt)?;
+            idx = idx_opt.ok_or("pattern mismatch")?;
         } else {
             idx = Pointer::access(idx_ptr.clone());
             Pointer::update(idx_ptr, idx + 1);

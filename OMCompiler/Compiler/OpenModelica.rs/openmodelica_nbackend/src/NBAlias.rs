@@ -251,7 +251,7 @@ pub mod AliasSet {
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*literal!("\tConstant/Parameter Binding: "));
                 __mm_s.push_str(&*BEquation::Equation::toString(
-                    Pointer::access(Util::getOption(set.const_opt.clone())?),
+                    Pointer::access(set.const_opt.clone().ok_or("pattern mismatch")?),
                     literal!(""),
                 )?);
                 __mm_s.push_str(&*literal!("\n"));
@@ -1263,7 +1263,7 @@ fn forToFullArrayEquation(
             >),
     )?;
     if ((List::filterOnTrue(
-        Util::getOption(Pointer::access(subs_ptr))?,
+        Pointer::access(subs_ptr).ok_or("pattern mismatch")?,
         (std::sync::Arc::new(
             move |__a0: metamodelica::Ref<Subscript::NFSubscript>| -> metamodelica::Result<_> {
                 ::std::result::Result::Ok(Subscript::isIndex(&__a0))
@@ -1277,7 +1277,7 @@ fn forToFullArrayEquation(
         return Ok(eq);
     }
     eq = metamodelica::Ref::new(Equation::Equation::ARRAY_EQUATION {
-        ty: Util::getOption(Pointer::access(ty_ptr))?,
+        ty: Pointer::access(ty_ptr).ok_or("pattern mismatch")?,
         lhs: lhs,
         rhs: rhs,
         source: BEquation::Equation::getSource(eq.clone()),
@@ -1398,7 +1398,7 @@ fn fullVariableCref(
             if ok {
                 ok = (::match_deref::match_deref! { match &(Pointer::access(subs_ptr.clone())) {
                     Some(subs2) => {
-                        List::isEqualOnTrue(subs, subs2.clone(), &move |__a0: metamodelica::Ref<Subscript::NFSubscript>, __a1: metamodelica::Ref<Subscript::NFSubscript>| Subscript::isEqual(&__a0, &__a1))? && Type::isEqual(&ty, &(Util::getOption(Pointer::access(ty_ptr))?))?
+                        List::isEqualOnTrue(subs, subs2.clone(), &move |__a0: metamodelica::Ref<Subscript::NFSubscript>, __a1: metamodelica::Ref<Subscript::NFSubscript>| Subscript::isEqual(&__a0, &__a1))? && Type::isEqual(&ty, &(Pointer::access(ty_ptr).ok_or("pattern mismatch")?))?
                     },
                     _ => {
                         ok = (((List::uniqueOnTrue(&(List::filterOnTrue(subs.clone(), (std::sync::Arc::new(move |__a0: metamodelica::Ref<Subscript::NFSubscript>| -> metamodelica::Result<_> { ::std::result::Result::Ok(Subscript::isIndex(&__a0)) }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<Subscript::NFSubscript>) -> Result<bool> + 'static>))?), &move |__a0: metamodelica::Ref<Subscript::NFSubscript>, __a1: metamodelica::Ref<Subscript::NFSubscript>| Subscript::isEqual(&__a0, &__a1))?)).len() as i32) == (((List::filterOnTrue(subs.clone(), (std::sync::Arc::new(move |__a0: metamodelica::Ref<Subscript::NFSubscript>| -> metamodelica::Result<_> { ::std::result::Result::Ok(Subscript::isIndex(&__a0)) }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<Subscript::NFSubscript>) -> Result<bool> + 'static>))?)).len() as i32);
@@ -1925,7 +1925,7 @@ fn setNewAttributes(
         );
         UnorderedMap::add(
             BVariable::getVarName(var_to_keep.clone()),
-            Util::getOption(new_min)?,
+            new_min.ok_or("pattern mismatch")?,
             attrcollector.min_val_map.clone(),
         )?;
     }
@@ -1937,7 +1937,7 @@ fn setNewAttributes(
         );
         UnorderedMap::add(
             BVariable::getVarName(var_to_keep.clone()),
-            Util::getOption(new_max)?,
+            new_max.ok_or("pattern mismatch")?,
             attrcollector.max_val_map.clone(),
         )?;
     }
@@ -1950,7 +1950,7 @@ fn setNewAttributes(
         )?;
         if (new_cref).is_some() {
             new_start = Some(UnorderedMap::getSafe(
-                Util::getOption(new_cref)?,
+                new_cref.ok_or("pattern mismatch")?,
                 attrcollector.start_map.clone(),
                 metamodelica::sourceInfo!("NBackEnd/Modules/2_Pre/NBAlias.mo"),
             )?);
@@ -1958,13 +1958,13 @@ fn setNewAttributes(
                 var_to_keep.clone(),
                 BVariable::setStartAttribute(
                     Pointer::access(var_to_keep.clone()),
-                    Util::getOption(new_start.clone())?,
+                    new_start.clone().ok_or("pattern mismatch")?,
                     true,
                 )?,
             );
             UnorderedMap::add(
                 BVariable::getVarName(var_to_keep.clone()),
-                Util::getOption(new_start)?,
+                new_start.ok_or("pattern mismatch")?,
                 attrcollector.start_map.clone(),
             )?;
         }
@@ -1990,13 +1990,13 @@ fn setNewAttributes(
             var_to_keep.clone(),
             BVariable::setStartAttribute(
                 Pointer::access(var_to_keep.clone()),
-                Util::getOption(new_start.clone())?,
+                new_start.clone().ok_or("pattern mismatch")?,
                 true,
             )?,
         );
         UnorderedMap::add(
             BVariable::getVarName(var_to_keep.clone()),
-            Util::getOption(new_start)?,
+            new_start.ok_or("pattern mismatch")?,
             attrcollector.start_map.clone(),
         )?;
     }
@@ -2012,18 +2012,18 @@ fn setNewAttributes(
             var_to_keep.clone(),
             BVariable::setStateSelect(
                 Pointer::access(var_to_keep.clone()),
-                Util::getOption(new_stateSelect.clone())?,
+                new_stateSelect.clone().ok_or("pattern mismatch")?,
                 true,
             )?,
         );
         UnorderedMap::add(
             BVariable::getVarName(var_to_keep.clone()),
-            Util::getOption(new_stateSelect.clone())?,
+            new_stateSelect.clone().ok_or("pattern mismatch")?,
             attrcollector.stateSelect_map.clone(),
         )?;
-        if Util::getOption(new_stateSelect)? == StateSelect::ALWAYS.clone() {
+        if new_stateSelect.ok_or("pattern mismatch")? == StateSelect::ALWAYS.clone() {
             new_start = Some(UnorderedMap::getSafe(
-                Util::getOption(new_cref)?,
+                new_cref.ok_or("pattern mismatch")?,
                 attrcollector.start_map.clone(),
                 metamodelica::sourceInfo!("NBackEnd/Modules/2_Pre/NBAlias.mo"),
             )?);
@@ -2031,13 +2031,13 @@ fn setNewAttributes(
                 var_to_keep.clone(),
                 BVariable::setStartAttribute(
                     Pointer::access(var_to_keep.clone()),
-                    Util::getOption(new_start.clone())?,
+                    new_start.clone().ok_or("pattern mismatch")?,
                     true,
                 )?,
             );
             UnorderedMap::add(
                 BVariable::getVarName(var_to_keep.clone()),
-                Util::getOption(new_start)?,
+                new_start.ok_or("pattern mismatch")?,
                 attrcollector.start_map.clone(),
             )?;
         }
@@ -2054,13 +2054,13 @@ fn setNewAttributes(
             var_to_keep.clone(),
             BVariable::setTearingSelect(
                 Pointer::access(var_to_keep.clone()),
-                Util::getOption(new_tearingSelect.clone())?,
+                new_tearingSelect.clone().ok_or("pattern mismatch")?,
                 true,
             ),
         );
         UnorderedMap::add(
             BVariable::getVarName(var_to_keep.clone()),
-            Util::getOption(new_tearingSelect)?,
+            new_tearingSelect.ok_or("pattern mismatch")?,
             attrcollector.tearingSelect_map.clone(),
         )?;
     }
@@ -3236,11 +3236,11 @@ fn rateVar(
             attrcollector = optionMinMax(var_ptr.clone(), var_field!((**attr).min, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone(), var_field!((**attr).max, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone(), attrcollector)?;
             attrcollector = optionStartFixed(var_ptr.clone(), var_field!((**attr).start, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone(), var_field!((**attr).fixed, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone(), attrcollector)?;
             if (var_field!((**attr).nominal, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL)).is_some() {
-                nominal_val = Binding::getTypedExp(&(Util::getOption(var_field!((**attr).nominal, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone())?))?;
+                nominal_val = Binding::getTypedExp(&(var_field!((**attr).nominal, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone().ok_or("pattern mismatch")?))?;
                 UnorderedMap::add(BVariable::getVarName(var_ptr.clone()), nominal_val, attrcollector.nominal_map.clone())?;
             }
             if (var_field!((**attr).stateSelect, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL)).is_some() {
-                stateSelect_val = Util::getOption(var_field!((**attr).stateSelect, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone())?;
+                stateSelect_val = var_field!((**attr).stateSelect, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone().ok_or("pattern mismatch")?;
                 if stateSelect_val == StateSelect::ALWAYS.clone() {
                     rating = rating + 100;
                 } else if stateSelect_val == StateSelect::PREFER.clone() {
@@ -3249,7 +3249,7 @@ fn rateVar(
                 UnorderedMap::add(BVariable::getVarName(var_ptr.clone()), stateSelect_val, attrcollector.stateSelect_map.clone())?;
             }
             if (var_field!((**attr).tearingSelect, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL)).is_some() {
-                tearingSelect_val = Util::getOption(var_field!((**attr).tearingSelect, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone())?;
+                tearingSelect_val = var_field!((**attr).tearingSelect, BackendExtension::VariableAttributes::VariableAttributes::VAR_ATTR_REAL).clone().ok_or("pattern mismatch")?;
                 UnorderedMap::add(BVariable::getVarName(var_ptr), tearingSelect_val, attrcollector.tearingSelect_map.clone())?;
             }
             ()
@@ -3510,7 +3510,7 @@ pub mod AttributeCollector {
         } };
         rhs = metamodelica::Own::own(__pa0);
         if (min_val_opt).is_some() {
-            UnorderedMap::add(var_cref.clone(), Util::getOption(min_val_opt)?, repl.clone())?;
+            UnorderedMap::add(var_cref.clone(), min_val_opt.ok_or("pattern mismatch")?, repl.clone())?;
             new_rhs = Expression::map(
                 rhs.clone(),
                 (std::sync::Arc::new({
@@ -3530,7 +3530,7 @@ pub mod AttributeCollector {
             min_val_opt = UnorderedMap::get(var_cref.clone(), attrcollector.min_val_map.clone())?;
         }
         if (max_val_opt).is_some() {
-            UnorderedMap::add(var_cref.clone(), Util::getOption(max_val_opt)?, repl.clone())?;
+            UnorderedMap::add(var_cref.clone(), max_val_opt.ok_or("pattern mismatch")?, repl.clone())?;
             new_rhs = Expression::map(
                 rhs.clone(),
                 (std::sync::Arc::new({
@@ -3588,17 +3588,17 @@ pub mod AttributeCollector {
         if swap_min_max && (min_val_opt).is_some() && (max_val_opt).is_some() {
             UnorderedMap::add(
                 var_cref.clone(),
-                Util::getOption(max_val_opt)?,
+                max_val_opt.ok_or("pattern mismatch")?,
                 attrcollector.min_val_map.clone(),
             )?;
             UnorderedMap::add(
                 var_cref.clone(),
-                Util::getOption(min_val_opt)?,
+                min_val_opt.ok_or("pattern mismatch")?,
                 attrcollector.max_val_map.clone(),
             )?;
         }
         if (start_opt).is_some() {
-            UnorderedMap::add(var_cref.clone(), Util::getOption(start_opt)?, repl.clone())?;
+            UnorderedMap::add(var_cref.clone(), start_opt.ok_or("pattern mismatch")?, repl.clone())?;
             new_rhs = Expression::map(
                 rhs.clone(),
                 (std::sync::Arc::new({
@@ -3617,7 +3617,7 @@ pub mod AttributeCollector {
             UnorderedMap::add(var_cref.clone(), new_rhs, attrcollector.start_map.clone())?;
         }
         if (nominal_opt).is_some() {
-            UnorderedMap::add(var_cref.clone(), Util::getOption(nominal_opt)?, repl.clone())?;
+            UnorderedMap::add(var_cref.clone(), nominal_opt.ok_or("pattern mismatch")?, repl.clone())?;
             new_rhs = Expression::map(
                 rhs,
                 (std::sync::Arc::new({

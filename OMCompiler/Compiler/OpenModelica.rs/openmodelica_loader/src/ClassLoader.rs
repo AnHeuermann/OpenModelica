@@ -421,7 +421,7 @@ fn loadClassFromMps(
     cl = loadClassFromMp(id, mp, name, isDir, encoding, encrypted)?;
     if (cl).is_some() {
         outProgram = Absyn::Program {
-            classes: list![Util::getOption(cl)?],
+            classes: list![cl.ok_or("pattern mismatch")?],
             within_: openmodelica_ast::Absyn::Within::TOP,
         };
     } else {
@@ -458,7 +458,7 @@ pub fn loadClassFromMp(
                         if (System::regularFileExists(encodingfile.clone())) {
                             System::readFile(encodingfile)?
                         } else {
-                            Util::getOptionOrDefault(optEncoding, literal!("UTF-8"))
+                            optEncoding.unwrap_or(literal!("UTF-8"))
                         },
                         literal!("\n"),
                     )?,
@@ -502,7 +502,7 @@ pub fn loadClassFromMp(
                         if (System::regularFileExists(encodingfile.clone())) {
                             System::readFile(encodingfile)?
                         } else {
-                            Util::getOptionOrDefault(optEncoding, literal!("UTF-8"))
+                            optEncoding.unwrap_or(literal!("UTF-8"))
                         },
                         literal!("\n"),
                     )?,
@@ -731,7 +731,7 @@ fn loadCompletePackageFromMp(
                 encrypted,
             )?;
             if (opt_cl).is_some() {
-                let (__pa5, __pa0, __pa1, __pa2, __pa3, __pa4) = ::match_deref::match_deref! { match &(Util::getOption(opt_cl.clone())?) {
+                let (__pa5, __pa0, __pa1, __pa2, __pa3, __pa4) = ::match_deref::match_deref! { match &(opt_cl.clone().ok_or("pattern mismatch")?) {
                     __pa5 @ Deref @ Absyn::Class { body: Deref @ Absyn::ClassDef::PARTS { typeVars: __pa0, classAttrs: __pa1, classParts: __pa2, ann: __pa3, comment: __pa4 }, .. } => (__pa5.clone(), __pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone()),
                     _ => return Err("pattern mismatch"),
                 } };
@@ -910,7 +910,7 @@ fn loadCompletePackageFromMp2(
                     encrypted,
                 )?;
                 if (cl).is_some() {
-                    ei = AbsynUtil::makeClassElement(Util::getOption(cl)?);
+                    ei = AbsynUtil::makeClassElement(cl.ok_or("pattern mismatch")?);
                     cps = mergeBefore(
                         metamodelica::Ref::new(Absyn::ClassPart::PUBLIC { contents: list![ei] }),
                         acc,
@@ -942,7 +942,7 @@ fn loadCompletePackageFromMp2(
                 }
                 cl = parsePackageFile(file, &strategy, false, &w1, id.clone(), encrypted)?;
                 if (cl).is_some() {
-                    ei = AbsynUtil::makeClassElement(Util::getOption(cl)?);
+                    ei = AbsynUtil::makeClassElement(cl.ok_or("pattern mismatch")?);
                     cps = mergeBefore(
                         metamodelica::Ref::new(Absyn::ClassPart::PUBLIC { contents: list![ei] }),
                         acc,

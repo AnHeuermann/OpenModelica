@@ -533,7 +533,7 @@ fn eqnstplDebugString(
     if (Util::tuple32(tpl.clone())).is_some() {
         s = literal!("");
     } else {
-        s = BackendDump::equationString(&(Util::getOption(Util::tuple32(tpl.clone()))?))?;
+        s = BackendDump::equationString(&(Util::tuple32(tpl.clone()).ok_or("pattern mismatch")?))?;
     }
     s = {
         let mut __mm_s = String::new();
@@ -1163,7 +1163,7 @@ fn differentiateEqnsLst(
         eqs = metamodelica::Own::own(__pa1);
         (eqTplOpt, oShared) = differentiateEqnsLst1(e, vars.clone(), eqns.clone(), oShared)?;
         if (eqTplOpt).is_some() {
-            outEqnTpl = metamodelica::cons(Util::getOption(eqTplOpt)?, outEqnTpl);
+            outEqnTpl = metamodelica::cons(eqTplOpt.ok_or("pattern mismatch")?, outEqnTpl);
         } else {
             outEqnTpl = metamodelica::nil();
             oShared = inShared;

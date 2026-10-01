@@ -1161,7 +1161,7 @@ pub(crate) fn balanceInitialization(
                         None,
                     )?);
                     __mm_s.push_str(&*Adjacency::Mapping::toString(
-                        &(Util::getOptionOrDefault(mapping_opt, Adjacency::Mapping::empty())),
+                        &(mapping_opt.unwrap_or(Adjacency::Mapping::empty())),
                     )?);
                     __mm_s.push_str(&*Adjacency::Matrix::toString(&adj, literal!(""))?);
                     __mm_s.push_str(&*literal!("\n"));

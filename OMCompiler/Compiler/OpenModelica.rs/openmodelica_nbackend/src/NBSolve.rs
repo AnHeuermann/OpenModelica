@@ -221,7 +221,7 @@ pub(crate) fn main(
             if (var_field!((*bdae).init_0, BackendDAE::NBackendDAE::MAIN)).is_some() {
                 assign_variant_field!(bdae => BackendDAE::NBackendDAE::MAIN; init_0 = Some(({
                     let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
-                    for mut par in (Util::getOption(var_field!((*bdae).init_0, BackendDAE::NBackendDAE::MAIN).clone())?).into_iter().cloned() {
+                    for mut par in (var_field!((*bdae).init_0, BackendDAE::NBackendDAE::MAIN).clone().ok_or("pattern mismatch")?).into_iter().cloned() {
                         let __x = solvePartition(par.clone(), var_field!((*bdae).funcMap, BackendDAE::NBackendDAE::MAIN).clone(), implicit_index_ptr.clone(), duplicate_map.clone(), &(var_field!((*bdae).varData, BackendDAE::NBackendDAE::MAIN).clone()), &(var_field!((*bdae).eqData, BackendDAE::NBackendDAE::MAIN).clone()))?;
                         __acc = cons(__x, __acc);
                     }
@@ -231,7 +231,7 @@ pub(crate) fn main(
             if (var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN)).is_some() {
                 assign_variant_field!(bdae => BackendDAE::NBackendDAE::MAIN; dae = Some(({
                     let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
-                    for mut par in (Util::getOption(var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN).clone())?).into_iter().cloned() {
+                    for mut par in (var_field!((*bdae).dae, BackendDAE::NBackendDAE::MAIN).clone().ok_or("pattern mismatch")?).into_iter().cloned() {
                         let __x = solvePartition(par.clone(), var_field!((*bdae).funcMap, BackendDAE::NBackendDAE::MAIN).clone(), implicit_index_ptr.clone(), duplicate_map.clone(), &(var_field!((*bdae).varData, BackendDAE::NBackendDAE::MAIN).clone()), &(var_field!((*bdae).eqData, BackendDAE::NBackendDAE::MAIN).clone()))?;
                         __acc = cons(__x, __acc);
                     }
@@ -350,7 +350,10 @@ pub(crate) fn solvePartition(
     let mut name: metamodelica::Ref<ComponentRef::NFComponentRef>;
     let mut sliced_eqns: metamodelica::List<Pointer::Pointer<metamodelica::Ref<Equation::Equation>>>;
     if (partition.strongComponents).is_some() {
-        let __range0 = Util::getOption(partition.strongComponents.clone())?
+        let __range0 = partition
+            .strongComponents
+            .clone()
+            .ok_or("pattern mismatch")?
             .borrow()
             .iter()
             .cloned()
@@ -1144,8 +1147,10 @@ pub(crate) fn solveMultiRecordStrongComponent(
         }
         __acc.reverse()
     });
-    let mut lhs: metamodelica::Ref<Expression::NFExpression> = Util::getOption(Equation::getLHS(eqn.clone())?)?;
-    let mut rhs: metamodelica::Ref<Expression::NFExpression> = Util::getOption(Equation::getRHS(eqn.clone())?)?;
+    let mut lhs: metamodelica::Ref<Expression::NFExpression> =
+        (Equation::getLHS(eqn.clone())?).ok_or("pattern mismatch")?;
+    let mut rhs: metamodelica::Ref<Expression::NFExpression> =
+        (Equation::getRHS(eqn.clone())?).ok_or("pattern mismatch")?;
     let mut record_crefs: metamodelica::Ref<
         UnorderedSet::UnorderedSet<metamodelica::Ref<ComponentRef::NFComponentRef>>,
     >;
@@ -1381,8 +1386,8 @@ pub(crate) fn solveBody(
                 if ((lhs).is_some() && (rhs).is_some()) {
                     metamodelica::Ref::new(Equation::Equation::SCALAR_EQUATION {
                         ty: Type::arrayElementType(metamodelica::AsArg::as_arg(&__eqn_ty)),
-                        lhs: Util::getOption(lhs)?,
-                        rhs: Util::getOption(rhs)?,
+                        lhs: lhs.ok_or("pattern mismatch")?,
+                        rhs: rhs.ok_or("pattern mismatch")?,
                         source: __eqn_source.clone(),
                         attr: __eqn_attr.clone(),
                     })
@@ -1585,7 +1590,7 @@ pub(crate) fn solveIfBody(
     assign_field!(body.then_eqns = new_then_eqns.reverse());
     if (body.else_if).is_some() {
         (else_if, status, implicit_index) = solveIfBody(
-            Util::getOption(body.else_if.clone())?,
+            body.else_if.clone().ok_or("pattern mismatch")?,
             vars,
             funcMap,
             kind,
@@ -1731,7 +1736,7 @@ fn solveSimpleIf(
     let mut else_if: metamodelica::Ref<IfEquationBody::IfEquationBody>;
     let mut eqn: metamodelica::Ref<Equation::Equation>;
     if (body.else_if).is_some() {
-        (else_if, status, _) = solveSimpleIf(Util::getOption(body.else_if.clone())?, cref)?;
+        (else_if, status, _) = solveSimpleIf(body.else_if.clone().ok_or("pattern mismatch")?, cref)?;
         if status == Status::EXPLICIT.clone() {
             assign_field!(body.else_if = Some(else_if));
         }
@@ -2930,7 +2935,11 @@ fn getVarSlice(
             metamodelica::sourceInfo!("NBackEnd/Modules/3_Post/NBSolve.mo"),
         )?);
         if (record_parent).is_some() {
-            (var_cref, solve_status) = getVarSlice(BVariable::getVarName(Util::getOption(record_parent)?), None, eqn)?;
+            (var_cref, solve_status) = getVarSlice(
+                BVariable::getVarName(record_parent.ok_or("pattern mismatch")?),
+                None,
+                eqn,
+            )?;
         } else if (slices_lst).is_empty() {
             solve_status = Status::UNSOLVABLE.clone();
         } else {

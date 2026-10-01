@@ -700,12 +700,10 @@ pub(crate) fn updateVariability(
         assign_field!(attr.variability = Variability::CONTINUOUS.clone());
     } else if var == Variability::PARAMETER.clone()
         && !(Flags::isSet(Flags::NF_SCALARIZE.clone())?)
-        && Util::getOptionOrDefault(
-            SCodeUtil::lookupBooleanAnnotationMod(
-                &((InstNode::getAnnotation(&(literal!("__OpenModelica_resizable")), compNode)?).0),
-            ),
-            false,
+        && SCodeUtil::lookupBooleanAnnotationMod(
+            &((InstNode::getAnnotation(&(literal!("__OpenModelica_resizable")), compNode)?).0),
         )
+        .unwrap_or(false)
     {
         assign_field!(
             attr.variability = Variability::NON_STRUCTURAL_PARAMETER.clone(),

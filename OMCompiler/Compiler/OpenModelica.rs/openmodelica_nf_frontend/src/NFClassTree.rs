@@ -3163,11 +3163,11 @@ pub mod ClassTree {
             info = SCodeUtil::getModifierInfo(&bm.r#mod);
             opt_dentry = DuplicateTree::getOpt(duplicates, bm.ident.clone());
             if (opt_dentry).is_some() {
-                entries = DuplicateTree::getLookupEntries(&(Util::getOption(opt_dentry)?));
+                entries = DuplicateTree::getLookupEntries(&(opt_dentry.ok_or("pattern mismatch")?));
             } else {
                 opt_lentry = LookupTree::getOpt(tree, bm.ident.clone());
                 entries = if ((opt_lentry).is_some()) {
-                    list![Util::getOption(opt_lentry)?]
+                    list![opt_lentry.ok_or("pattern mismatch")?]
                 } else {
                     metamodelica::nil()
                 };

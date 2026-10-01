@@ -354,14 +354,14 @@ pub fn getFmiInitialAttributeStr(mut simVar: &metamodelica::Ref<SimCodeVar::SimV
     } };
     var_initial = metamodelica::Own::own(__pa0);
     default_initial = getDefaultFmiInitialAttribute(
-        Util::getOptionOrDefault(
-            simVar.variability.clone(),
-            openmodelica_simcode_types::SimCodeVar::Variability::CONTINUOUS,
-        ),
-        Util::getOptionOrDefault(
-            simVar.causality.clone(),
-            openmodelica_simcode_types::SimCodeVar::Causality::LOCAL,
-        ),
+        simVar
+            .variability
+            .clone()
+            .unwrap_or(openmodelica_simcode_types::SimCodeVar::Variability::CONTINUOUS),
+        simVar
+            .causality
+            .clone()
+            .unwrap_or(openmodelica_simcode_types::SimCodeVar::Causality::LOCAL),
     );
     if var_initial == default_initial && !(Flags::isSet(Flags::DUMP_FORCE_FMI_ATTRIBUTES.clone())?) {
         var_initial = openmodelica_simcode_types::SimCodeVar::Initial::NONE_INITIAL;
@@ -490,9 +490,11 @@ pub(crate) fn simBranchString(mut branch: &SimCode::SimBranch) -> Result<ArcStr>
                 {
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*literal!("if "));
-                    __mm_s.push_str(&*ExpressionBasics::printExpStr(Util::getOption(
-                        var_field!(branch.condition, SimCode::SimBranch::SIM_BRANCH).clone(),
-                    )?)?);
+                    __mm_s.push_str(&*ExpressionBasics::printExpStr(
+                        var_field!(branch.condition, SimCode::SimBranch::SIM_BRANCH)
+                            .clone()
+                            .ok_or("pattern mismatch")?,
+                    )?);
                     __mm_s.push_str(&*literal!(" then\n"));
                     ArcStr::from(__mm_s)
                 }
@@ -528,9 +530,11 @@ pub(crate) fn simBranchString(mut branch: &SimCode::SimBranch) -> Result<ArcStr>
                 {
                     let mut __mm_s = String::new();
                     __mm_s.push_str(&*literal!("if "));
-                    __mm_s.push_str(&*ExpressionBasics::printExpStr(Util::getOption(
-                        var_field!(branch.condition, SimCode::SimBranch::SIM_BRANCH_STMT).clone(),
-                    )?)?);
+                    __mm_s.push_str(&*ExpressionBasics::printExpStr(
+                        var_field!(branch.condition, SimCode::SimBranch::SIM_BRANCH_STMT)
+                            .clone()
+                            .ok_or("pattern mismatch")?,
+                    )?);
                     __mm_s.push_str(&*literal!(" then\n"));
                     ArcStr::from(__mm_s)
                 }
@@ -619,7 +623,7 @@ pub fn simVarString(mut inVar: &metamodelica::Ref<SimCodeVar::SimVar>) -> Result
     s = {
         let mut __mm_s = String::new();
         __mm_s.push_str(&*s);
-        __mm_s.push_str(&*if (Util::getOptionOrDefault(inVar.hideResult.clone(), false)) {
+        __mm_s.push_str(&*if (inVar.hideResult.clone().unwrap_or(false)) {
             literal!(" hideResult ")
         } else {
             literal!("")
@@ -645,7 +649,7 @@ pub fn simVarString(mut inVar: &metamodelica::Ref<SimCodeVar::SimVar>) -> Result
                 let mut __mm_s = String::new();
                 __mm_s.push_str(&*literal!("\tarrCref:"));
                 __mm_s.push_str(&*ComponentReferenceBasics::printComponentRefStr(
-                    &(Util::getOption(inVar.arrayCref.clone())?),
+                    &(inVar.arrayCref.clone().ok_or("pattern mismatch")?),
                 )?);
                 ArcStr::from(__mm_s)
             }
@@ -659,7 +663,7 @@ pub fn simVarString(mut inVar: &metamodelica::Ref<SimCodeVar::SimVar>) -> Result
         __mm_s.push_str(&*s);
         __mm_s.push_str(&*literal!(" index:("));
         __mm_s.push_str(&*if ((inVar.variable_index).is_some()) {
-            intString(Util::getOption(inVar.variable_index.clone())?)
+            intString(inVar.variable_index.clone().ok_or("pattern mismatch")?)
         } else {
             literal!("")
         });
@@ -2108,7 +2112,7 @@ fn fillScalarElements(
             assign_field!(
                 elt.name = ComponentReference::crefSetLastSubs(&elt.name, &subs)?,
                 elt.exportVar = Some(ComponentReference::crefSetLastSubs(
-                    &(Util::getOption(elt.exportVar.clone())?),
+                    &(elt.exportVar.clone().ok_or("pattern mismatch")?),
                     &subs
                 )?)
             );
@@ -2469,7 +2473,7 @@ pub fn getFMI3ValueReferenceFromFMIIndex(
         }
     }
     outValueReference = (::match_deref::match_deref! { match &(found.clone()) {
-        Some(_) => getFMI3ValueReference(&(Util::getOption(found)?), inSimCode)?,
+        Some(_) => getFMI3ValueReference(&(found.ok_or("pattern mismatch")?), inSimCode)?,
         _ => ArcStr::from(::std::format!("{}", inFMIIndex)),
         _ => unreachable!("match_deref! exhaustiveness placeholder"),
     } });
@@ -4185,7 +4189,7 @@ fn fmi3ArrayVar(
             })
         }),
         var.exportVar = Some(ComponentReferenceBasics::crefStripLastSubs(
-            &(Util::getOption(first.exportVar.clone())?)
+            &(first.exportVar.clone().ok_or("pattern mismatch")?)
         )?)
     );
     assign_field!(
@@ -4193,7 +4197,7 @@ fn fmi3ArrayVar(
             Some(_) => Some(metamodelica::Ref::new(DAE::Exp::ARRAY { ty: var.type_.clone(), scalar: true, array: ({
             let mut __acc: metamodelica::List<metamodelica::Ref<DAE::Exp>> = metamodelica::nil();
             for mut v in (metamodelica::cons(first, others)).into_iter().cloned() {
-                let __x = Util::getOption(v.initialValue.clone())?;
+                let __x = v.initialValue.clone().ok_or("pattern mismatch")?;
                 __acc = cons(__x, __acc);
             }
             __acc.reverse()
@@ -4541,7 +4545,7 @@ pub fn getFMI3Terminals(
     for mut v in &*allVars {
         om = connectorMemberOf(metamodelica::AsArg::as_arg(&v));
         if (om).is_some() {
-            flat = metamodelica::cons(Util::getOption(om)?, flat);
+            flat = metamodelica::cons(om.ok_or("pattern mismatch")?, flat);
         }
     }
     flat = flat.reverse();
@@ -4596,7 +4600,7 @@ fn simplePortTerminals(
                         let mut cr: metamodelica::Ref<DAE::ComponentRef>;
                         let mut nm: ArcStr;
                         let mut seen: metamodelica::List<ArcStr> = seen.clone();
-                        cr = Util::getOption(v.exportVar.clone())?;
+                        cr = v.exportVar.clone().ok_or("pattern mismatch")?;
                         let __pa0 = ::match_deref::match_deref! { match &(cr.clone()) {
                             Deref @ DAE::ComponentRef::CREF_IDENT { ident: __pa0, subscriptLst: Deref @ metamodelica::ListNode::Nil, .. } => __pa0.clone(),
                             _ => return Err("pattern mismatch"),
@@ -4647,7 +4651,7 @@ fn connectorMemberOf(
                     let mut tkind: ArcStr;
                     let mut kind: ArcStr;
                     let mut isExp: bool;
-                    cref = Util::getOption(var.exportVar.clone())?;
+                    cref = var.exportVar.clone().ok_or("pattern mismatch")?;
                     (tname, member, isExp, tkind) = crefConnectorSplit(&cref)?;
                     kind = if (var.isConnectorFlow.clone()) {literal!("inflow")} else {literal!("signal")};
                     Ok(Some((tname.clone(), tkind.clone(), isExp, SimCode::FmiTerminalMember { variable: cref.clone(), memberName: member.clone(), variableKind: kind.clone() })))
@@ -4946,7 +4950,7 @@ pub fn selectNLEqSys(
 
 fn matrixFormatC(mut size: i32, mut nnz: Option<i32>, mut isLinear: bool) -> Result<ArcStr> {
     let mut format: ArcStr;
-    let mut entries: i32 = Util::getOptionOrDefault(nnz.clone(), size * size);
+    let mut entries: i32 = nnz.clone().unwrap_or(size * size);
     format = if (useSparseSolver(size, entries, isLinear)?) {
         literal!("OMC_MATRIX_SPARSE")
     } else {

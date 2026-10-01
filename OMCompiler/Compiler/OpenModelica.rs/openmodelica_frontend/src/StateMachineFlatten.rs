@@ -1427,7 +1427,7 @@ fn createResetEquationCT(
     });
     startValueOpt = BaseHashTable::get(inLHSCref.clone(), crToExpOpt)?;
     if (startValueOpt).is_some() {
-        startValueExp = Util::getOption(startValueOpt)?;
+        startValueExp = startValueOpt.ok_or("pattern mismatch")?;
     } else {
         startValueExp = (match &**inLHSty {
             DAE::Type::T_INTEGER { .. } => {
@@ -1660,7 +1660,7 @@ fn createResetEquation(
     });
     startValueOpt = BaseHashTable::get(inLHSCref.clone(), crToExpOpt)?;
     if (startValueOpt).is_some() {
-        startValueExp = Util::getOption(startValueOpt)?;
+        startValueExp = startValueOpt.ok_or("pattern mismatch")?;
     } else {
         startValueExp = (match &*inLHSty {
             DAE::Type::T_INTEGER { .. } => {
@@ -2119,8 +2119,8 @@ fn addPropagationEquations(
             peqs,
         );
     } else {
-        enclosingStateCref = Util::getOption(inEnclosingStateCrefOption.clone())?;
-        enclosingFlatSMSemantics = Util::getOption(inEnclosingFlatSmSemanticsOption)?;
+        enclosingStateCref = inEnclosingStateCrefOption.clone().ok_or("pattern mismatch")?;
+        enclosingFlatSMSemantics = inEnclosingFlatSmSemanticsOption.ok_or("pattern mismatch")?;
         let FlatSmSemantics { smComps: __pa8, .. } = enclosingFlatSMSemantics;
         enclosingFlatSMComps = metamodelica::Own::own(__pa8);
         let __pa9 = ::match_deref::match_deref! { match &(metamodelica::arrayGet(enclosingFlatSMComps.clone(), 1)?) {

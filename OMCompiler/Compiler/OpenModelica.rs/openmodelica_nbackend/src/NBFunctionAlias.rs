@@ -1480,7 +1480,7 @@ fn introduceAlias(
     });
     aux_opt = UnorderedMap::get(id.clone(), map.clone())?;
     if (aux_opt).is_some() {
-        aux = Util::getOption(aux_opt)?;
+        aux = aux_opt.ok_or("pattern mismatch")?;
         exp = aux.replacer.clone();
     } else {
         (exp, aux_opt) = (::match_deref::match_deref! { match &(exp.clone()) {
@@ -1816,7 +1816,7 @@ fn filterFrames(
         m = metamodelica::Own::own(__pa5);
         UnorderedMap::add(name.clone(), (range, map.clone()), frame_map.clone())?;
         if (map).is_some() {
-            (local_n, _, _) = BEquation::Iterator::getFrames(&(Util::getOption(map)?));
+            (local_n, _, _) = BEquation::Iterator::getFrames(&(map.ok_or("pattern mismatch")?));
             for mut cref in &*local_n {
                 UnorderedMap::add(cref.clone(), name.clone(), sub_map.clone())?;
             }

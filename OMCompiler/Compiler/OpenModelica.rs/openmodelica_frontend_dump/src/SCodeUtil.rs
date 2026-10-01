@@ -4122,7 +4122,7 @@ pub fn lookupElementAnnotation(
     let mut ann: Option<metamodelica::Ref<SCode::Annotation>>;
     ann = getElementAnnotation(element, name);
     r#mod = if ((ann).is_some()) {
-        lookupAnnotation(&(Util::getOption(ann)?), name)
+        lookupAnnotation(&(ann.ok_or("pattern mismatch")?), name)
     } else {
         openmodelica_frontend_types::SCode::Mod::interned_NOMOD()
     };
@@ -6890,7 +6890,7 @@ pub fn mapEquationExps(
         }
         SCode::Equation::EQ_FOR { .. } => {
             if (var_field!((*eq).range, SCode::Equation::EQ_FOR)).is_some() {
-                assign_variant_field!(eq => SCode::Equation::EQ_FOR; range = Some(func(Util::getOption(var_field!((*eq).range, SCode::Equation::EQ_FOR).clone())?)?));
+                assign_variant_field!(eq => SCode::Equation::EQ_FOR; range = Some(func(var_field!((*eq).range, SCode::Equation::EQ_FOR).clone().ok_or("pattern mismatch")?)?));
             }
             ()
         }
@@ -7098,13 +7098,13 @@ pub fn mapStatementExps(
         }
         SCode::Statement::ALG_FOR { .. } => {
             if (var_field!((*stmt).range, SCode::Statement::ALG_FOR)).is_some() {
-                assign_variant_field!(stmt => SCode::Statement::ALG_FOR; range = Some(func(Util::getOption(var_field!((*stmt).range, SCode::Statement::ALG_FOR).clone())?)?));
+                assign_variant_field!(stmt => SCode::Statement::ALG_FOR; range = Some(func(var_field!((*stmt).range, SCode::Statement::ALG_FOR).clone().ok_or("pattern mismatch")?)?));
             }
             ()
         }
         SCode::Statement::ALG_PARFOR { .. } => {
             if (var_field!((*stmt).range, SCode::Statement::ALG_PARFOR)).is_some() {
-                assign_variant_field!(stmt => SCode::Statement::ALG_PARFOR; range = Some(func(Util::getOption(var_field!((*stmt).range, SCode::Statement::ALG_PARFOR).clone())?)?));
+                assign_variant_field!(stmt => SCode::Statement::ALG_PARFOR; range = Some(func(var_field!((*stmt).range, SCode::Statement::ALG_PARFOR).clone().ok_or("pattern mismatch")?)?));
             }
             ()
         }
@@ -7197,7 +7197,7 @@ pub fn onlyLiteralsInMod(mut r#mod: &metamodelica::Ref<SCode::Mod>) -> Result<bo
             ..
         } => {
             if (__mod_binding).is_some() {
-                onlyLiterals = AbsynUtil::onlyLiteralsInExp(Util::getOption(__mod_binding.clone())?)?;
+                onlyLiterals = AbsynUtil::onlyLiteralsInExp(__mod_binding.clone().ok_or("pattern mismatch")?)?;
             } else {
                 onlyLiterals = true;
             }
@@ -7384,7 +7384,7 @@ pub fn setAnnotationInComment(
             cmt.annotation_ = Some(setAnnotationValue(
                 name,
                 value,
-                Util::getOption(cmt.annotation_.clone())?,
+                cmt.annotation_.clone().ok_or("pattern mismatch")?,
                 replace
             )?)
         );

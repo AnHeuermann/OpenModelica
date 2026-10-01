@@ -416,7 +416,7 @@ fn analyseStrongComponentBlock(
                         (jac, shared) = SymbolicJacobian::calculateJacobian(vars_1.clone(), eqns_1.clone(), m.clone(), true, ishared.clone());
                         (jac_tp, jacConstant) = SymbolicJacobian::analyzeJacobian(vars_1.clone(), eqns_1.clone(), jac.clone());
                         if jacConstant && (jac).is_some() {
-                            let true = (analyzeConstantJacobian(&(Util::getOption(jac.clone())?), metamodelica::arrayLength(mt.clone()), var_lst.clone(), eqn_lst.clone(), &shared)?) else { return Err("pattern mismatch") };
+                            let true = (analyzeConstantJacobian(&(jac.clone().ok_or("pattern mismatch")?), metamodelica::arrayLength(mt.clone()), var_lst.clone(), eqn_lst.clone(), &shared)?) else { return Err("pattern mismatch") };
                         }
                     } else {
                         jac = None;

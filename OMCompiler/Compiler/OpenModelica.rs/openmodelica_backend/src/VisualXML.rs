@@ -1104,7 +1104,7 @@ fn fillShapeObject(
                     let BackendDAE::VAR { bindExp: __pa0, .. } = &**__arc1;
                     bind = metamodelica::Own::own(__pa0);
                     if (bind).is_some() {
-                        let __owned_variant_shapeType_0 = Util::getOption(bind.clone())?;
+                        let __owned_variant_shapeType_0 = bind.clone().ok_or("pattern mismatch")?;
                         if let Visualization::SHAPE { shapeType, .. } = &mut vis {
                             *shapeType = __owned_variant_shapeType_0;
                         } else { panic!("owned-variant field-assign: value held a different variant than Visualization::SHAPE"); }

@@ -6376,10 +6376,10 @@ fn handleVarSetAttributes(
                         (v, b2) = mergeNominalAttribute(nominalset.clone(), v.clone(), metamodelica::AsArg::as_arg(&globalKnownVars))?;
                         (min, max) = minmaxset.clone();
                         if (min).is_some() {
-                            min = Some((ExpressionSimplify::simplify(Util::getOption(min.clone())?)?).0);
+                            min = Some((ExpressionSimplify::simplify(min.clone().ok_or("pattern mismatch")?)?).0);
                         }
                         if (max).is_some() {
-                            max = Some((ExpressionSimplify::simplify(Util::getOption(max.clone())?)?).0);
+                            max = Some((ExpressionSimplify::simplify(max.clone().ok_or("pattern mismatch")?)?).0);
                         }
                         v = BackendVariable::setVarMinMax(v.clone(), min.clone(), max.clone())?;
                         vars = BackendVariable::addVar(v.clone(), inVars.clone())?;

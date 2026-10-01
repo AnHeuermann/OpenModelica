@@ -102,7 +102,7 @@ pub(crate) fn appendElementSourceCommentString(
     let mut opt_cmt: Option<metamodelica::Ref<SCode::Comment>>;
     opt_cmt = ElementSource::getOptComment(source)?;
     if (opt_cmt).is_some() {
-        s = appendCommentString(&(Util::getOption(opt_cmt)?), s)?;
+        s = appendCommentString(&(opt_cmt.ok_or("pattern mismatch")?), s)?;
     }
     Ok(s)
 }
@@ -118,7 +118,7 @@ pub(crate) fn appendElementSourceCommentAnnotation(
     let mut opt_cmt: Option<metamodelica::Ref<SCode::Comment>>;
     opt_cmt = ElementSource::getOptComment(source)?;
     if (opt_cmt).is_some() {
-        s = appendCommentAnnotation(&(Util::getOption(opt_cmt)?), elementType, indent, ending, s)?;
+        s = appendCommentAnnotation(&(opt_cmt.ok_or("pattern mismatch")?), elementType, indent, ending, s)?;
     }
     Ok(s)
 }
@@ -140,7 +140,7 @@ pub(crate) fn appendCommentOpt(
 ) -> Result<IOStream::IOStream> {
     let mut s: IOStream::IOStream = s;
     if (comment).is_some() {
-        s = appendComment(&(Util::getOption(comment)?), elementType, s)?;
+        s = appendComment(&(comment.ok_or("pattern mismatch")?), elementType, s)?;
     }
     Ok(s)
 }
@@ -253,7 +253,7 @@ pub(crate) fn appendAnnotationMod(
             }
             if (__mod_binding).is_some() {
                 s = IOStream::append(s, literal!(" = "))?;
-                s = appendExp(Util::getOption(__mod_binding.clone())?, s)?;
+                s = appendExp(__mod_binding.clone().ok_or("pattern mismatch")?, s)?;
             }
             ()
         }

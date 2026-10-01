@@ -8567,7 +8567,7 @@ pub(crate) fn setClassDefAnnotation(
                 assign_variant_field!(cdef => Absyn::ClassDef::PARTS; ann = (var_field!((*cdef).ann, Absyn::ClassDef::PARTS)).rest()?);
             }
             if (ann).is_some() {
-                assign_variant_field!(cdef => Absyn::ClassDef::PARTS; ann = metamodelica::cons(Util::getOption(ann)?, var_field!((*cdef).ann, Absyn::ClassDef::PARTS).clone()));
+                assign_variant_field!(cdef => Absyn::ClassDef::PARTS; ann = metamodelica::cons(ann.ok_or("pattern mismatch")?, var_field!((*cdef).ann, Absyn::ClassDef::PARTS).clone()));
             }
             ()
         }
@@ -8597,7 +8597,7 @@ pub(crate) fn setClassDefAnnotation(
                 assign_variant_field!(cdef => Absyn::ClassDef::CLASS_EXTENDS; ann = (var_field!((*cdef).ann, Absyn::ClassDef::CLASS_EXTENDS)).rest()?);
             }
             if (ann).is_some() {
-                assign_variant_field!(cdef => Absyn::ClassDef::CLASS_EXTENDS; ann = metamodelica::cons(Util::getOption(ann)?, var_field!((*cdef).ann, Absyn::ClassDef::CLASS_EXTENDS).clone()));
+                assign_variant_field!(cdef => Absyn::ClassDef::CLASS_EXTENDS; ann = metamodelica::cons(ann.ok_or("pattern mismatch")?, var_field!((*cdef).ann, Absyn::ClassDef::CLASS_EXTENDS).clone()));
             }
             ()
         }

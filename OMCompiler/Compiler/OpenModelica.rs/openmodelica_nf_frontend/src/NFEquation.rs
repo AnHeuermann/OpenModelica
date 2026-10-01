@@ -883,7 +883,7 @@ pub(crate) fn applyExp(
         } => {
             applyExpList(metamodelica::AsArg::as_arg(&__eq_body), func)?;
             if (__eq_range).is_some() {
-                func(Util::getOption(__eq_range.clone())?)?;
+                func(__eq_range.clone().ok_or("pattern mismatch")?)?;
             }
             ()
         }
@@ -990,7 +990,7 @@ pub(crate) fn applyExpShallow(
         }
         FOR { range: __eq_range, .. } => {
             if (__eq_range).is_some() {
-                func(Util::getOption(__eq_range.clone())?)?;
+                func(__eq_range.clone().ok_or("pattern mismatch")?)?;
             }
             ()
         }
@@ -1498,7 +1498,7 @@ pub(crate) fn foldExp<ArgT: Clone + 'static + metamodelica::gc::MMTrace>(
         } => {
             arg = foldExpList(metamodelica::AsArg::as_arg(&__eq_body), func, arg)?;
             if (__eq_range).is_some() {
-                arg = func(Util::getOption(__eq_range.clone())?, arg)?;
+                arg = func(__eq_range.clone().ok_or("pattern mismatch")?, arg)?;
             }
             ()
         }
@@ -1673,7 +1673,7 @@ pub(crate) fn containsExp(
             ..
         } => {
             res = if ((__eq_range).is_some()) {
-                r#fn(Util::getOption(__eq_range.clone())?)?
+                r#fn(__eq_range.clone().ok_or("pattern mismatch")?)?
             } else {
                 false
             };
@@ -1860,7 +1860,7 @@ pub fn sizeOf(mut eq: &metamodelica::Ref<NFEquation>) -> i32 {
             ::match_deref::match_deref! { match &__mc_input {
                 Deref @ FOR { .. } => {
                     let mut size: i32 = size.clone();
-                    size = Type::sizeOf(&(Expression::typeOf(Util::getOption(var_field!((**eq).range, NFEquation::FOR).clone())?)), false)?;
+                    size = Type::sizeOf(&(Expression::typeOf(var_field!((**eq).range, NFEquation::FOR).clone().ok_or("pattern mismatch")?)), false)?;
                     Ok((size * sizeOfList(var_field!((**eq).body, NFEquation::FOR)), size.clone()))
                 }
                 _ => return Err("nomatch"),
@@ -1978,7 +1978,7 @@ pub(crate) fn toStream(
             )?;
             if (__eq_range).is_some() {
                 s = IOStream::append(s, literal!(" in "))?;
-                s = IOStream::append(s, Expression::toString(Util::getOption(__eq_range.clone())?)?)?;
+                s = IOStream::append(s, Expression::toString(__eq_range.clone().ok_or("pattern mismatch")?)?)?;
             }
             s = IOStream::append(s, literal!(" loop\n"))?;
             s = toStreamList(
@@ -2163,7 +2163,7 @@ pub(crate) fn toFlatStream(
                 s = IOStream::append(s, literal!(" in "))?;
                 s = IOStream::append(
                     s,
-                    Expression::toFlatString(Util::getOption(__eq_range.clone())?, format)?,
+                    Expression::toFlatString(__eq_range.clone().ok_or("pattern mismatch")?, format)?,
                 )?;
             }
             s = IOStream::append(s, literal!(" loop\n"))?;

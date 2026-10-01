@@ -1092,9 +1092,8 @@ pub fn comment(mut component: &metamodelica::Ref<NFComponent>) -> Result<metamod
         COMPONENT_DEF {
             definition: __component_definition,
             ..
-        } => Util::getOption(SCodeUtil::getElementComment(metamodelica::AsArg::as_arg(
-            &__component_definition,
-        )))?,
+        } => SCodeUtil::getElementComment(metamodelica::AsArg::as_arg(&__component_definition))
+            .ok_or("pattern mismatch")?,
         COMPONENT {
             comment: __component_comment,
             ..
@@ -1213,7 +1212,8 @@ pub(crate) fn countConnectorVars(
     let mut known_size: bool;
     cls = InstNode::getClass(classInstance(component)?)?;
     (eq_node_opt, _) = Class::tryLookupElement(literal!("equalityConstraint"), cls.clone());
-    if (eq_node_opt).is_some() && SCodeUtil::isFunction(&(InstNode::definition(Util::getOption(eq_node_opt.clone())?)?))
+    if (eq_node_opt).is_some()
+        && SCodeUtil::isFunction(&(InstNode::definition(eq_node_opt.clone().ok_or("pattern mismatch")?)?))
     {
         let __pa0 = ::match_deref::match_deref! { match &(eq_node_opt) {
             Some(__pa0) => __pa0.clone(),

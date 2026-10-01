@@ -2234,10 +2234,7 @@ fn appendDimensions(
     let mut outType: metamodelica::Ref<DAE::Type>;
     let mut binding_dims: metamodelica::List<i32>;
     binding_dims = ValuesUtil::valueDimensions(
-        &(Util::getOptionOrDefault(
-            inOptBinding,
-            metamodelica::Ref::new(Values::Value::INTEGER { integer: 0 }),
-        )),
+        &(inOptBinding.unwrap_or(metamodelica::Ref::new(Values::Value::INTEGER { integer: 0 }))),
     );
     (outCache, outType) = appendDimensions2(inType, inDims, binding_dims, inCache, inEnv)?;
     Ok((outCache, outType))

@@ -1001,8 +1001,8 @@ pub(crate) fn deduceDimensionFromExp(
     let mut e: metamodelica::Ref<Expression::NFExpression>;
     let mut dim_index: i32;
     dim_index = index + parentDims;
-    if (ty).is_some() && !(Type::isConditionalArray(&(Util::getOption(ty.clone())?))) {
-        (dim, error) = nthDimensionBoundsChecked(Util::getOption(ty)?, dim_index, 0);
+    if (ty).is_some() && !(Type::isConditionalArray(&(ty.clone().ok_or("pattern mismatch")?))) {
+        (dim, error) = nthDimensionBoundsChecked(ty.ok_or("pattern mismatch")?, dim_index, 0);
         if Dimension::isUnknown(&dim) {
             (dim, oe, error) = typeExpDim(
                 exp.clone(),
@@ -1022,7 +1022,11 @@ pub(crate) fn deduceDimensionFromExp(
         )?;
     }
     if Dimension::isUnknown(&dim) && !(TypingError::isError(&error)) {
-        e = if ((oe).is_some()) { Util::getOption(oe)? } else { exp };
+        e = if ((oe).is_some()) {
+            oe.ok_or("pattern mismatch")?
+        } else {
+            exp
+        };
         if InstContext::inRelaxed(context) {
             e = Ceval::tryEvalExp(e, &(Ceval::noTarget().clone()));
         } else {

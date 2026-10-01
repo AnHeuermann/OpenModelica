@@ -131,7 +131,7 @@ pub(crate) fn main(
             if Flags::isSet(Flags::INITIALIZATION.clone())? {
                 metamodelica::print({ let mut __mm_s = String::new(); __mm_s.push_str(&*StringUtil::headline_1(&(literal!("Balance Initialization")))?); __mm_s.push_str(&*literal!("\n")); ArcStr::from(__mm_s) });
             }
-            (partitions, varData, eqData, twins) = applyModule(metamodelica::AsArg::as_arg(&partitions), kind, varData.clone(), eqData.clone(), var_field!((*bdae).funcMap, BackendDAE::NBackendDAE::MAIN).clone(), &*(func.clone()), Util::getOptionOrDefault(var_field!((*bdae).init_0, BackendDAE::NBackendDAE::MAIN).clone(), metamodelica::nil()))?;
+            (partitions, varData, eqData, twins) = applyModule(metamodelica::AsArg::as_arg(&partitions), kind, varData.clone(), eqData.clone(), var_field!((*bdae).funcMap, BackendDAE::NBackendDAE::MAIN).clone(), &*(func.clone()), var_field!((*bdae).init_0, BackendDAE::NBackendDAE::MAIN).clone().unwrap_or(metamodelica::nil()))?;
             assign_variant_field!(bdae => BackendDAE::NBackendDAE::MAIN; init = partitions.clone());
             if (var_field!((*bdae).init_0, BackendDAE::NBackendDAE::MAIN)).is_some() {
                 assign_variant_field!(bdae => BackendDAE::NBackendDAE::MAIN; init_0 = Some(twins));
@@ -253,7 +253,10 @@ pub(crate) fn checkSystemVariabilities(mut partition: &metamodelica::Ref<Partiti
     let mut violated: bool = false;
     let mut err: ArcStr;
     if (partition.strongComponents).is_some() {
-        let __range0 = Util::getOption(partition.strongComponents.clone())?
+        let __range0 = partition
+            .strongComponents
+            .clone()
+            .ok_or("pattern mismatch")?
             .borrow()
             .iter()
             .cloned()

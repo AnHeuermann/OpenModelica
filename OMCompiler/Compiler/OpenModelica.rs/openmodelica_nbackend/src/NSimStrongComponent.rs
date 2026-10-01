@@ -1942,7 +1942,7 @@ pub mod Block {
                                 crefs = metamodelica::cons(scal_var.name.clone(), crefs);
                                 osimvar = UnorderedMap::get(scal_var.name.clone(), simcode_map.clone())?;
                                 if (osimvar).is_some() {
-                                    linVars = metamodelica::cons(Util::getOption(osimvar)?, linVars);
+                                    linVars = metamodelica::cons(osimvar.ok_or("pattern mismatch")?, linVars);
                                 } else {
                                     allLinVarsFound = false;
                                 }
@@ -1951,15 +1951,18 @@ pub mod Block {
                             crefs = metamodelica::cons(var.name.clone(), crefs);
                             osimvar = UnorderedMap::get(var.name.clone(), simcode_map.clone())?;
                             if (osimvar).is_some() {
-                                linVars = metamodelica::cons(Util::getOption(osimvar)?, linVars);
+                                linVars = metamodelica::cons(osimvar.ok_or("pattern mismatch")?, linVars);
                             } else {
                                 allLinVarsFound = false;
                             }
                         }
                     }
                     if (strict.jac).is_some() {
-                        (jacobian, simCodeIndices) =
-                            SimJacobian::create(&(Util::getOption(strict.jac.clone())?), simCodeIndices, simcode_map)?;
+                        (jacobian, simCodeIndices) = SimJacobian::create(
+                            &(strict.jac.clone().ok_or("pattern mismatch")?),
+                            simCodeIndices,
+                            simcode_map,
+                        )?;
                     } else {
                         jacobian = None;
                     }
@@ -1973,7 +1976,7 @@ pub mod Block {
                                 ::std::result::Result::Ok(isForOrGenericResidual(&__a0))
                             },
                         )?)
-                        && !(jacobianHasGenericLoopCalls(&(Util::getOption(jacobian.clone())?)))
+                        && !(jacobianHasGenericLoopCalls(&(jacobian.clone().ok_or("pattern mismatch")?)))
                         && allLinVarsFound
                     {
                         linSystem = metamodelica::Ref::new(LinearSystem::LinearSystem {
@@ -2133,7 +2136,7 @@ pub mod Block {
             },
             (Deref @ BEquation::Equation::FOR_EQUATION { body: Deref @ metamodelica::ListNode::Cons { head: _, tail: Deref @ metamodelica::ListNode::Nil }, .. }, Deref @ metamodelica::ListNode::Nil) => {
                 let mut tmp: metamodelica::Ref<Block>;
-                tmp = metamodelica::Ref::new(Block::FOR_RESIDUAL { index: simCodeIndices.equationIndex.clone(), res_index: res_idx, iterators: SimIterator::fromIterator(var_field!((*eqn).iter, Equation::Equation::FOR_EQUATION))?, exp: Util::getOption(BEquation::Equation::getRHS(eqn.clone())?)?, source: var_field!((*eqn).source, Equation::Equation::FOR_EQUATION).clone(), attr: var_field!((*eqn).attr, Equation::Equation::FOR_EQUATION).clone() });
+                tmp = metamodelica::Ref::new(Block::FOR_RESIDUAL { index: simCodeIndices.equationIndex.clone(), res_index: res_idx, iterators: SimIterator::fromIterator(var_field!((*eqn).iter, Equation::Equation::FOR_EQUATION))?, exp: (BEquation::Equation::getRHS(eqn.clone())?).ok_or("pattern mismatch")?, source: var_field!((*eqn).source, Equation::Equation::FOR_EQUATION).clone(), attr: var_field!((*eqn).attr, Equation::Equation::FOR_EQUATION).clone() });
                 simCodeIndices.equationIndex = simCodeIndices.equationIndex.clone() + 1;
                 res_idx = res_idx + BEquation::Equation::size(Slice::getT(slice), false)?;
                 tmp
@@ -2144,7 +2147,7 @@ pub mod Block {
             },
             (Deref @ BEquation::Equation::FOR_EQUATION { body: Deref @ metamodelica::ListNode::Cons { head: _, tail: Deref @ metamodelica::ListNode::Nil }, .. }, _) => {
                 let mut tmp: metamodelica::Ref<Block>;
-                tmp = metamodelica::Ref::new(Block::GENERIC_RESIDUAL { index: simCodeIndices.equationIndex.clone(), res_index: res_idx, scal_indices: slice.indices.clone(), iterators: SimIterator::fromIterator(var_field!((*eqn).iter, Equation::Equation::FOR_EQUATION))?, exp: Util::getOption(BEquation::Equation::getRHS(eqn.clone())?)?, source: var_field!((*eqn).source, Equation::Equation::FOR_EQUATION).clone(), attr: var_field!((*eqn).attr, Equation::Equation::FOR_EQUATION).clone() });
+                tmp = metamodelica::Ref::new(Block::GENERIC_RESIDUAL { index: simCodeIndices.equationIndex.clone(), res_index: res_idx, scal_indices: slice.indices.clone(), iterators: SimIterator::fromIterator(var_field!((*eqn).iter, Equation::Equation::FOR_EQUATION))?, exp: (BEquation::Equation::getRHS(eqn.clone())?).ok_or("pattern mismatch")?, source: var_field!((*eqn).source, Equation::Equation::FOR_EQUATION).clone(), attr: var_field!((*eqn).attr, Equation::Equation::FOR_EQUATION).clone() });
                 simCodeIndices.equationIndex = simCodeIndices.equationIndex.clone() + 1;
                 res_idx = res_idx + ((slice.indices).len() as i32);
                 tmp
@@ -2321,7 +2324,7 @@ pub mod Block {
         (conditions, when_stmts, else_when) = BEquation::WhenEquationBody::getBodyAttributes(body)?;
         if (else_when).is_some() {
             (tmp, simCodeIndices) = createWhenBody(
-                &(Util::getOption(else_when)?),
+                &(else_when.ok_or("pattern mismatch")?),
                 source.clone(),
                 attr.clone(),
                 simCodeIndices,
@@ -2399,7 +2402,7 @@ pub mod Block {
         branches = metamodelica::cons((body.condition.clone(), blcks), branches);
         if (body.else_if).is_some() {
             (branches, simCodeIndices) = createIfBody(
-                Util::getOption(body.else_if.clone())?,
+                body.else_if.clone().ok_or("pattern mismatch")?,
                 branches,
                 simCodeIndices,
                 kind,
@@ -2530,7 +2533,8 @@ pub mod Block {
                     system: __blck_system, ..
                 } => {
                     if (__blck_system.jacobian).is_some() {
-                        jacobians = metamodelica::cons(Util::getOption(__blck_system.jacobian.clone())?, jacobians);
+                        jacobians =
+                            metamodelica::cons(__blck_system.jacobian.clone().ok_or("pattern mismatch")?, jacobians);
                     }
                     (metamodelica::cons(blck, linearLoops), nonlinearLoops)
                 }
@@ -2541,7 +2545,7 @@ pub mod Block {
                     let mut jacobian: metamodelica::Ref<SimJacobian::SimJacobian>;
                     opt_jacobian = NonlinearSystem::getJacobian(metamodelica::AsArg::as_arg(&__blck_system));
                     if (opt_jacobian).is_some() {
-                        jacobian = Util::getOption(opt_jacobian.clone())?;
+                        jacobian = opt_jacobian.clone().ok_or("pattern mismatch")?;
                         jacobians = metamodelica::cons(jacobian, jacobians);
                     }
                     assign_variant_field!(blck => Block::NONLINEAR; system = NonlinearSystem::setJacobian(__blck_system.clone(), opt_jacobian));
@@ -3017,7 +3021,9 @@ pub mod Block {
                 indices.equationIndex = indices.equationIndex.clone() + 1;
                 if (var_field!((*blck).else_when, Block::WHEN)).is_some() {
                     (tmp, indices) = fixIndex(
-                        Util::getOption(var_field!((*blck).else_when, Block::WHEN).clone())?,
+                        var_field!((*blck).else_when, Block::WHEN)
+                            .clone()
+                            .ok_or("pattern mismatch")?,
                         indices,
                     )?;
                     assign_variant_field!(blck => Block::WHEN; else_when = Some(tmp));
@@ -3115,7 +3121,7 @@ pub mod Block {
                 __mm_s.push_str(&*r#str);
                 __mm_s.push_str(&*indent);
                 __mm_s.push_str(&*literal!("else"));
-                __mm_s.push_str(&*toString(&(Util::getOption(else_when)?), literal!(""))?);
+                __mm_s.push_str(&*toString(&(else_when.ok_or("pattern mismatch")?), literal!(""))?);
                 ArcStr::from(__mm_s)
             };
         } else {

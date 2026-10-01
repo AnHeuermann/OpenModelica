@@ -2439,7 +2439,7 @@ fn flattenComplexComponent(
     ty = flattenType(nodeTy, &prefix, &info)?;
     dims = Type::arrayDims(ty.clone());
     binding = if ((outerBinding).is_some()) {
-        Util::getOption(outerBinding)?
+        outerBinding.ok_or("pattern mismatch")?
     } else {
         Component::getBinding(comp)
     };
@@ -5468,7 +5468,7 @@ pub(crate) fn collectStatementFuncs(
                 },
                 funcs,
             )?;
-            funcs = collectExpFuncs(Util::getOption(__stmt_range.clone())?, funcs)?;
+            funcs = collectExpFuncs(__stmt_range.clone().ok_or("pattern mismatch")?, funcs)?;
             ()
         }
         Statement::IF {

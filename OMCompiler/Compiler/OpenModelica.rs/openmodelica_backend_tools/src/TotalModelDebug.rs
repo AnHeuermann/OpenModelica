@@ -181,7 +181,7 @@ pub(crate) fn analyseClassDef(mut def: &metamodelica::Ref<SCode::ClassDef>, mut 
             analyseAlgorithms(metamodelica::AsArg::as_arg(&__def_normalAlgorithmLst), used.clone())?;
             analyseAlgorithms(metamodelica::AsArg::as_arg(&__def_initialAlgorithmLst), used.clone())?;
             if (__def_externalDecl).is_some() {
-                analyseExternalDecl(&(Util::getOption(__def_externalDecl.clone())?), used)?;
+                analyseExternalDecl(&(__def_externalDecl.clone().ok_or("pattern mismatch")?), used)?;
             }
             ()
         }
@@ -213,7 +213,7 @@ pub(crate) fn analyseExternalDecl(
     mut used: UseTable,
 ) -> Result<()> {
     if (extDecl.annotation_).is_some() {
-        analyseAnnotation(&(Util::getOption(extDecl.annotation_.clone())?), used)?;
+        analyseAnnotation(&(extDecl.annotation_.clone().ok_or("pattern mismatch")?), used)?;
     }
     Ok(())
 }
@@ -300,7 +300,7 @@ pub(crate) fn analyseTypeSpec(mut ty: &metamodelica::Ref<Absyn::TypeSpec>, mut u
         } => {
             analysePath(metamodelica::AsArg::as_arg(&__ty_path), used.clone())?;
             if (__ty_arrayDim).is_some() {
-                analyseDims(Util::getOption(__ty_arrayDim.clone())?, used)?;
+                analyseDims(__ty_arrayDim.clone().ok_or("pattern mismatch")?, used)?;
             }
             ()
         }
@@ -314,7 +314,7 @@ pub(crate) fn analyseTypeSpec(mut ty: &metamodelica::Ref<Absyn::TypeSpec>, mut u
                 analyseTypeSpec(metamodelica::AsArg::as_arg(&t), used.clone())?;
             }
             if (__ty_arrayDim).is_some() {
-                analyseDims(Util::getOption(__ty_arrayDim.clone())?, used)?;
+                analyseDims(__ty_arrayDim.clone().ok_or("pattern mismatch")?, used)?;
             }
             ()
         }
@@ -658,7 +658,7 @@ pub(crate) fn analyseSubscript(mut sub: &metamodelica::Ref<Absyn::Subscript>, mu
 
 pub(crate) fn analyseExpOpt(mut exp: Option<metamodelica::Ref<Absyn::Exp>>, mut used: UseTable) -> Result<()> {
     if (exp).is_some() {
-        analyseExp(Util::getOption(exp)?, used)?;
+        analyseExp(exp.ok_or("pattern mismatch")?, used)?;
     }
     Ok(())
 }
@@ -762,7 +762,7 @@ pub(crate) fn analyseCref(
 
 pub(crate) fn analyseComment(mut comment: &metamodelica::Ref<SCode::Comment>, mut used: UseTable) -> Result<()> {
     if (comment.annotation_).is_some() {
-        analyseAnnotation(&(Util::getOption(comment.annotation_.clone())?), used)?;
+        analyseAnnotation(&(comment.annotation_.clone().ok_or("pattern mismatch")?), used)?;
     }
     Ok(())
 }

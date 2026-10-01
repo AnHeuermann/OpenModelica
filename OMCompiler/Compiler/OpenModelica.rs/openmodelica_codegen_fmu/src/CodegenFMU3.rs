@@ -2758,7 +2758,7 @@ pub fn AliasElement3(
             let mut ret_4;
             let mut l_nm;
             let mut l_desc;
-            ret_1 = Util::getOption(i_exportVar.clone())?;
+            ret_1 = i_exportVar.clone().ok_or("pattern mismatch")?;
             txt_2 = CodegenUtil::crefStrNoUnderscore((*Tpl::emptyTxt).clone(), &ret_1)?;
             ret_3 = System::stringReplace(Tpl::textString(txt_2)?, literal!("$"), literal!("_D_"))?;
             ret_4 = Util::escapeModelicaStringToXmlString(ret_3)?;
@@ -3152,7 +3152,7 @@ pub fn VariableCommonAttributes3(
             let mut ret_14;
             let mut ret_15;
             let mut ret_16;
-            ret_1 = Util::getOption(i_exportVar.clone())?;
+            ret_1 = i_exportVar.clone().ok_or("pattern mismatch")?;
             txt_2 = CodegenUtil::crefStrNoUnderscore((*Tpl::emptyTxt).clone(), &ret_1)?;
             ret_3 = System::stringReplace(Tpl::textString(txt_2)?, literal!("$"), literal!("_D_"))?;
             ret_4 = Util::escapeModelicaStringToXmlString(ret_3)?;

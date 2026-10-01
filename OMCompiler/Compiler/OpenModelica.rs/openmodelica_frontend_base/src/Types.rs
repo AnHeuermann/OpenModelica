@@ -8619,7 +8619,7 @@ fn subtypePolymorphic(
                     let mut farg1 = (*farg1).clone();
                     let mut ty1 = (*ty1).clone();
                     let mut bindings: metamodelica::List<(ArcStr, metamodelica::List<metamodelica::Ref<DAE::Type>>)> = bindings.clone();
-                    if AbsynUtil::pathPrefixOf(Util::getOptionOrDefault(envPath.clone(), metamodelica::Ref::new(Absyn::Path::IDENT { name: literal!("$TOP$") })), path1.clone()) {
+                    if AbsynUtil::pathPrefixOf(envPath.clone().unwrap_or(metamodelica::Ref::new(Absyn::Path::IDENT { name: literal!("$TOP$") })), path1.clone()) {
                         tList1 = List::map(farg1.clone(), &move |__a0: metamodelica::Ref<DAE::FuncArg>| -> metamodelica::Result<_> { ::std::result::Result::Ok(funcArgType(&__a0)) })?;
                         tList2 = List::map(farg2.clone(), &move |__a0: metamodelica::Ref<DAE::FuncArg>| -> metamodelica::Result<_> { ::std::result::Result::Ok(funcArgType(&__a0)) })?;
                         bindings = subtypePolymorphicList(tList1.clone(), tList2.clone(), envPath.clone(), inBindings.clone())?;

@@ -6666,7 +6666,7 @@ pub(crate) fn getExternalFunctionSpecification(
             vals.clone(),
         );
         vals = metamodelica::cons(
-            ValuesMake::makeString(Util::getOptionOrDefault(ext_decl.funcName.clone(), literal!(""))),
+            ValuesMake::makeString(ext_decl.funcName.clone().unwrap_or(literal!(""))),
             vals.clone(),
         );
         vals = metamodelica::cons(
@@ -6676,7 +6676,7 @@ pub(crate) fn getExternalFunctionSpecification(
             vals.clone(),
         );
         vals = metamodelica::cons(
-            ValuesMake::makeString(Util::getOptionOrDefault(ext_decl.lang.clone(), literal!(""))),
+            ValuesMake::makeString(ext_decl.lang.clone().unwrap_or(literal!(""))),
             vals.clone(),
         );
         Ok::<_, &'static str>((vals.clone(),))
@@ -10593,7 +10593,7 @@ pub(crate) fn getConversionsInClass(
         })),
         &getConversionsInClassMod,
     );
-    result = Util::getOptionOrDefault(res, metamodelica::nil());
+    result = res.unwrap_or(metamodelica::nil());
     result
 }
 
@@ -11086,7 +11086,7 @@ fn getBaseClasses(
                     (_, _, cenv) = Lookup::lookupClass(&(FCore::emptyCache()), &env, metamodelica::AsArg::as_arg(&path), Some(cls.info.clone()))?;
                     env_path_opt = FGraph::getScopePath(&cenv)?;
                     if (env_path_opt).is_some() {
-                        path = AbsynUtil::suffixPath(&(Util::getOption(env_path_opt.clone())?), &(AbsynUtil::pathLastIdent(metamodelica::AsArg::as_arg(&path))));
+                        path = AbsynUtil::suffixPath(&(env_path_opt.clone().ok_or("pattern mismatch")?), &(AbsynUtil::pathLastIdent(metamodelica::AsArg::as_arg(&path))));
                     }
                     Ok((list![path.clone()], cenv.clone(), env_path_opt.clone()))
                 }
@@ -11147,7 +11147,7 @@ fn getBaseClassesFromElt(
                     (_, _, cenv) = Lookup::lookupClass(&(FCore::emptyCache()), env, metamodelica::AsArg::as_arg(&path), Some(info.clone()))?;
                     env_path_opt = FGraph::getScopePath(&cenv)?;
                     if (env_path_opt).is_some() {
-                        path = AbsynUtil::suffixPath(&(Util::getOption(env_path_opt.clone())?), &(AbsynUtil::pathLastIdent(metamodelica::AsArg::as_arg(&path))));
+                        path = AbsynUtil::suffixPath(&(env_path_opt.clone().ok_or("pattern mismatch")?), &(AbsynUtil::pathLastIdent(metamodelica::AsArg::as_arg(&path))));
                     }
                     Ok((metamodelica::cons(path.clone(), baseClasses.clone()), cenv.clone(), env_path_opt.clone()))
                 }
@@ -12017,7 +12017,7 @@ pub(crate) fn getComponentModification(
             comps = (*__esc_comps).clone();
             for mut c in &*comps.clone() {
                 opt_mod = c.component.modification.clone();
-                r#mod = if ((opt_mod).is_some()) {Util::getOption(opt_mod)?} else {Absyn::emptyMod.clone()};
+                r#mod = if ((opt_mod).is_some()) {opt_mod.ok_or("pattern mismatch")?} else {Absyn::emptyMod.clone()};
                 vals = metamodelica::cons(metamodelica::Ref::new(Values::Value::CODE { A: metamodelica::Ref::new(Absyn::CodeNode::C_MODIFICATION { modification: r#mod }) }), vals);
             }
             vals = Dangerous::listReverseInPlace(vals);
@@ -14545,7 +14545,7 @@ fn updateEquation_impl(
             rest_eqs = metamodelica::Own::own(__pa3);
             if AbsynUtil::equationItemEqual(&eq, oldEq, matchShallow, !(matchDescription))? {
                 if (newEq).is_some() {
-                    new_eq = Util::getOption(newEq.clone())?;
+                    new_eq = newEq.clone().ok_or("pattern mismatch")?;
                     if mergeDescription {
                         new_eq = merge_desc(&eq, new_eq)?;
                     }

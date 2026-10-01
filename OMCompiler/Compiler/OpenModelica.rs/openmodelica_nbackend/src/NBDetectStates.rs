@@ -715,7 +715,7 @@ fn resolveGeneralDer(
                 if List::hasOneElement(&oDiffArgs.new_vars) {
                     der_var = (oDiffArgs.new_vars).head().cloned()?;
                     Pointer::update(acc_derivatives.clone(), metamodelica::cons(der_var.clone(), Pointer::access(acc_derivatives)));
-                    Pointer::update(acc_states.clone(), metamodelica::cons(Util::getOption((BVariable::getVarState(der_var)?).0)?, Pointer::access(acc_states)));
+                    Pointer::update(acc_states.clone(), metamodelica::cons(((BVariable::getVarState(der_var)?).0).ok_or("pattern mismatch")?, Pointer::access(acc_states)));
                 } else if List::hasSeveralElements(&oDiffArgs.new_vars) {
                     Error::addMessage(Error::INTERNAL_ERROR.clone(), list![{ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("NBDetectStates.resolveGeneralDer")); __mm_s.push_str(&*literal!(" failed because the number of algebraic variables were miscounted! ")); __mm_s.push_str(&*literal!("Expected: 0 or 1, got: ")); __mm_s.push_str(&*intString(((oDiffArgs.new_vars).len() as i32))); ArcStr::from(__mm_s) }])?;
                     return Err("fail");
@@ -1124,7 +1124,7 @@ fn collectDiscreteStatesFromWhenInIf(
     }
     if (body.else_if).is_some() {
         collectDiscreteStatesFromWhenInIf(
-            &(Util::getOption(body.else_if.clone())?),
+            &(body.else_if.clone().ok_or("pattern mismatch")?),
             acc_discrete_states,
             acc_previous,
             scalarized,
