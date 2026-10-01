@@ -1,0 +1,378 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use openmodelica_ast::Absyn;
+use openmodelica_frontend_dump::AbsynUtil;
+use openmodelica_util::Util;
+
+//import DoubleEnded;
+//import Global;
+//import List;
+// function getAllPartsExceptRecords
+//   input Absyn.Class cls;
+//   output list<Absyn.ClassPart> parts;
+// algorithm
+// end getAllPartsExceptRecords;
+// function getPartsThatAreRecords
+//   input Absyn.Class cls;
+//   output list<Absyn.ClassPart> parts;
+// algorithm
+// end getPartsThatAreRecords;
+// function splitRecordsAndOtherElements
+// "This functions separates the records from the other elements of a given class."
+//   input Absyn.Class cls;
+//   output list<Absyn.ClassPart> bodyWithOnlyRecords = {};
+//   output list<Absyn.ClassPart> otherElements = {};
+// algorithm
+//   bodyWithOnlyRecords := getPartsThatAreRecords(cls);
+//   otherElements := getAllPartsExceptRecords(cls);
+// end splitRecordsAndOtherElements;
+// function restrictionIsRecord
+//   input Absyn.Restriction restriction;
+//   output Boolean isRecord;
+// algorithm
+//   isRecord := match restriction
+//     case R_RECORD(__) then true;
+//     else false;
+//   end match;
+// end restrictionIsRecord;
+// public
+// function refactorNonStandardUniontypes
+//   input Absyn.Program inProgram;
+//   output Absyn.Program outProgram;
+// protected
+//   constant Integer UNUSED;
+//   Absyn.Program tmpProgram = inProgram;
+//   Class tmpClass;
+// algorithm
+//   //Traverse all classes and create a package around each uniontype containing functions
+//   outProgram := AbsynUtil.traverseClasses(program,
+//                                           NONE(),
+//                                           createPackageAroundUniontypeIfContainsFuncs,
+//                                           UNUSED,
+//                                           true);
+//   //Traverse all classes and replace all uniontypes containing functions and other crap with with uniontypes containing only records.
+//   //AbsynUtil.traverseClasses()
+//   //Traverse all classes and replace all references to the old uniontype with <package>.<uniontype> instead
+//   //AbsynUtil.traverseClasses()
+// end refactorNonStandardUniontypes;
+// function refactorUniontypesWithFunctions
+//   input Absyn.Program inProgram;
+//   output Absyn.Program outProgram;
+// algorithm
+//   //Replace all uniontype containing functions with uniontypes containing only records.
+// end refactorUniontypesWithFunctions;
+// function createPackageAroundUniontypeIfContainsFuncs
+//   input tuple<Absyn.Class, Option<Absyn.Path>, Integer> inTuple;
+//   output tuple<Absyn.Class, Option<Absyn.Path>, Integer> outTuple;
+// protected
+//   Absyn.ClassDef classDef = Util.tuple31(inTuple);
+//   constant Boolean VISIT_PROTECTED = true;
+//   constant String PACKAGE_NAME = "P" + AbsynUtil.getClassName(Util.tuple31(inTuple));
+//   constant Integer UNUSED = 0;
+//   list<Absyn.ClassPart> bodyWithOnlyRecords = {};
+//   list<Absyn.ClassPart> otherElements = {};
+// algorithm
+//   if not AbsynUtil.isUniontype(cls) then
+//     classDef := Util.tuple31(inTuple);
+//   end if;
+//   (bodyWithOnlyRecords, otherElements) := splitRecordsAndOtherElements(cls);
+//   classDef := PARTS({} /*Assume no typevars for the package..*/,
+//                     {}/*Class Attributes. Only for Optimica, not used*/,
+//                     /*classParts*/ otherElements,
+//                     {}/* Annotations, they are kept in the nested uniontype */,
+//                     SOME("Generated top level package")/*Class comment*/);
+// // From these parts we create a package and inside this package we store things accordingly
+//  cls :=  CLASS(PACKAGE_NAME,
+//                false,
+//                false,
+//                Absyn.R_PACKAGE(),
+//                packageClsDef,
+//                cls.info);
+//    outTuple := (cls, NONE(), UNUSED);
+// end createPackageAroundUniontypeIfContainsFuncs;
+//TODO first figure out what we should rename
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub(crate) enum Context {
+    FUNCTION {
+        /// Contains return values
+        retValsStr: ArcStr,
+    },
+    FUNCTION_RETURN_CONTEXT {
+        /// Contains return values
+        retValsStr: ArcStr,
+        /// String of the type we are currently operating on
+        ty_str: ArcStr,
+    },
+    PACKAGE,
+    UNIONTYPE {
+        name: ArcStr,
+    },
+    NO_CONTEXT,
+    INPUT_CONTEXT {
+        ty_str: ArcStr,
+    },
+    MATCH_CONTEXT {
+        inputExp: metamodelica::Ref<Absyn::Exp>,
+    },
+}
+impl metamodelica::gc::MMTrace for Context {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Context::FUNCTION { retValsStr } => {
+                metamodelica::gc::MMTrace::mm_accept(retValsStr, __mmv)?;
+                Ok(())
+            }
+            Context::FUNCTION_RETURN_CONTEXT { retValsStr, ty_str } => {
+                metamodelica::gc::MMTrace::mm_accept(retValsStr, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(ty_str, __mmv)?;
+                Ok(())
+            }
+            Context::PACKAGE => Ok(()),
+            Context::UNIONTYPE { name } => {
+                metamodelica::gc::MMTrace::mm_accept(name, __mmv)?;
+                Ok(())
+            }
+            Context::NO_CONTEXT => Ok(()),
+            Context::INPUT_CONTEXT { ty_str } => {
+                metamodelica::gc::MMTrace::mm_accept(ty_str, __mmv)?;
+                Ok(())
+            }
+            Context::MATCH_CONTEXT { inputExp } => {
+                metamodelica::gc::MMTrace::mm_accept(inputExp, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for Context {
+    fn default() -> Self {
+        Self::PACKAGE
+    }
+}
+pub(crate) use self::Context::{
+    FUNCTION, FUNCTION_RETURN_CONTEXT, INPUT_CONTEXT, MATCH_CONTEXT, NO_CONTEXT, PACKAGE, UNIONTYPE,
+};
+
+pub(crate) static packageContext: Context = crate::MMToJuliaUtil::Context::PACKAGE;
+
+pub(crate) static noContext: Context = crate::MMToJuliaUtil::Context::NO_CONTEXT;
+
+pub(crate) static functionContext: Context = Context::FUNCTION {
+    retValsStr: literal!(""),
+};
+
+pub(crate) static returnContext: Context = Context::FUNCTION_RETURN_CONTEXT {
+    retValsStr: literal!(""),
+    ty_str: literal!(""),
+};
+
+pub(crate) static inputContext: Context = Context::INPUT_CONTEXT { ty_str: literal!("") };
+
+pub(crate) fn makeUniontypeContext(mut name: ArcStr) -> Context {
+    let mut context: Context;
+    context = Context::UNIONTYPE { name: name };
+    context
+}
+
+pub(crate) fn makeInputContext(mut ty_str: ArcStr) -> Context {
+    let mut context: Context;
+    context = Context::INPUT_CONTEXT { ty_str: ty_str };
+    context
+}
+
+pub(crate) fn makeFunctionContext(mut returnValuesStr: ArcStr) -> Context {
+    let mut context: Context;
+    context = Context::FUNCTION {
+        retValsStr: returnValuesStr,
+    };
+    context
+}
+
+pub(crate) fn makeFunctionReturnContext(mut returnValuesStr: ArcStr, mut ty_str: ArcStr) -> Context {
+    let mut context: Context;
+    context = Context::FUNCTION_RETURN_CONTEXT {
+        retValsStr: returnValuesStr,
+        ty_str: ty_str,
+    };
+    context
+}
+
+pub(crate) fn makeMatchContext(mut iExp: metamodelica::Ref<Absyn::Exp>) -> Context {
+    let mut context: Context;
+    context = Context::MATCH_CONTEXT { inputExp: iExp };
+    context
+}
+
+pub(crate) fn makeInputDirection() -> Absyn::Direction {
+    let mut direction: Absyn::Direction;
+    direction = openmodelica_ast::Absyn::Direction::INPUT;
+    direction
+}
+
+pub(crate) fn makeOutputDirection() -> Absyn::Direction {
+    let mut direction: Absyn::Direction;
+    direction = openmodelica_ast::Absyn::Direction::OUTPUT;
+    direction
+}
+
+pub(crate) fn makeInputOutputDirection() -> Absyn::Direction {
+    let mut direction: Absyn::Direction;
+    direction = openmodelica_ast::Absyn::Direction::INPUT_OUTPUT;
+    direction
+}
+
+pub(crate) fn makeBDirection() -> Absyn::Direction {
+    let mut direction: Absyn::Direction;
+    direction = openmodelica_ast::Absyn::Direction::BIDIR;
+    direction
+}
+
+pub(crate) fn isFunctionContext(mut givenCTX: &Context) -> bool {
+    let mut isFuncCTX: bool = false;
+    isFuncCTX = (match givenCTX.clone() {
+        Context::FUNCTION { retValsStr: _ } => true,
+        _ => false,
+    });
+    isFuncCTX
+}
+
+pub(crate) fn filterOnDirection(
+    mut inputs: &metamodelica::List<metamodelica::Ref<Absyn::ElementItem>>,
+    mut direction: Absyn::Direction,
+) -> metamodelica::List<metamodelica::Ref<Absyn::ElementItem>> {
+    let mut outputs: metamodelica::List<metamodelica::Ref<Absyn::ElementItem>> = metamodelica::nil();
+    let mut ioDirection: Absyn::Direction = makeInputOutputDirection();
+    let mut directionEQ: bool = false;
+    for mut i in &**inputs {
+        directionEQ = AbsynUtil::directionEqual(direction, AbsynUtil::getDirection(metamodelica::AsArg::as_arg(&i)))
+            || AbsynUtil::directionEqual(ioDirection, AbsynUtil::getDirection(metamodelica::AsArg::as_arg(&i)));
+        if directionEQ {
+            outputs = metamodelica::cons(i.clone(), outputs);
+        }
+    }
+    outputs
+}
+
+pub(crate) fn elementSpecIsBIDIR(mut spec: &metamodelica::Ref<Absyn::ElementSpec>) -> bool {
+    let mut isBidir: bool;
+    isBidir = (match &**spec {
+        Absyn::ElementSpec::COMPONENTS { attributes, .. } => {
+            (match attributes.direction.clone() {
+                Absyn::Direction::BIDIR { .. } => true,
+                _ => false,
+            })
+        }
+        _ => false,
+    });
+    isBidir
+}
+
+pub(crate) fn elementSpecIsOUTPUT(mut spec: &metamodelica::Ref<Absyn::ElementSpec>) -> bool {
+    let mut isOutput: bool;
+    isOutput = (match &**spec {
+        Absyn::ElementSpec::COMPONENTS { attributes, .. } => {
+            (match attributes.direction.clone() {
+                Absyn::Direction::OUTPUT { .. } => true,
+                _ => false,
+            })
+        }
+        _ => false,
+    });
+    isOutput
+}
+
+pub(crate) fn elementSpecIsOUTPUT_OR_BIDIR(mut spec: &metamodelica::Ref<Absyn::ElementSpec>) -> bool {
+    let mut isOutput: bool;
+    isOutput = elementSpecIsOUTPUT(spec) || elementSpecIsBIDIR(spec);
+    isOutput
+}
+
+pub(crate) fn explicitReturnInClassPart(
+    mut classParts: &metamodelica::List<metamodelica::Ref<Absyn::ClassPart>>,
+) -> bool {
+    let mut existsImplicitReturn: bool = false;
+    for mut cp in &**classParts {
+        existsImplicitReturn = (match &*cp.clone() {
+            Absyn::ClassPart::ALGORITHMS { contents } => {
+                algorithmItemsContainsReturn(metamodelica::AsArg::as_arg(&contents))
+            }
+            _ => false,
+        });
+    }
+    existsImplicitReturn
+}
+
+pub(crate) fn algorithmItemsContainsReturn(
+    mut contents: &metamodelica::List<metamodelica::Ref<Absyn::AlgorithmItem>>,
+) -> bool {
+    let mut existsReturn: bool = false;
+    for mut item in &**contents {
+        existsReturn = (match &*item.clone() {
+            Absyn::AlgorithmItem::ALGORITHMITEM { algorithm_: alg, .. } => {
+                (match &*alg.clone() {
+                    Absyn::Algorithm::ALG_RETURN => true,
+                    _ => false,
+                })
+            }
+            _ => false,
+        });
+    }
+    existsReturn
+}
+
+pub(crate) fn mMKeywordToJLKeyword() -> () {
+    ()
+}

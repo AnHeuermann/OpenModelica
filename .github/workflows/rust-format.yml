@@ -3,7 +3,6 @@ name: Rust Format
 # rustfmt + taplo over the Rust parts of OMCompiler (both cargo workspaces).
 # Check only: a failing run prints the diff; fix it locally with
 #   OMCompiler/Compiler/OpenModelica.rs/format.sh
-# Generated sources are not in git; mmtorust and susan format those themselves.
 
 on:
   pull_request:

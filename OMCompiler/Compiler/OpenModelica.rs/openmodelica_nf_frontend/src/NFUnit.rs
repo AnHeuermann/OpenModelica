@@ -1,0 +1,1785 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::NFComponentRef as ComponentRef;
+use crate::NFInstNode;
+use crate::NFInstNode::InstNode;
+use crate::NFType as Type;
+use openmodelica_ast::Absyn;
+use openmodelica_util::Debug;
+use openmodelica_util::Error;
+use openmodelica_util::Flags;
+use openmodelica_util::UnorderedMap;
+use openmodelica_util::Util;
+use openmodelica_util_datatypes_basic::List;
+
+pub type StringToUnitTable = metamodelica::Ref<UnorderedMap::UnorderedMap<ArcStr, Unit>>;
+
+pub type UnitToStringTable = metamodelica::Ref<UnorderedMap::UnorderedMap<Unit, ArcStr>>;
+
+pub type CrefToUnitTable =
+    metamodelica::Ref<UnorderedMap::UnorderedMap<metamodelica::Ref<ComponentRef::NFComponentRef>, Unit>>;
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum Unit {
+    /// based on SI base units
+    UNIT {
+        /// second
+        s: i32,
+        /// meter
+        m: i32,
+        /// gram
+        g: i32,
+        /// ampere
+        A: i32,
+        /// kelvin
+        K: i32,
+        /// mole
+        mol: i32,
+        /// candela
+        cd: i32,
+        /// prefix
+        factor: metamodelica::Real,
+        /// v_SI = factor*v + offset; nonzero only for a bare affine unit
+        ///                 (degC, degF), since composing units drops it
+        offset: metamodelica::Real,
+    },
+    /// unknown unit that belongs to all the variables from varList
+    MASTER {
+        varList: metamodelica::List<metamodelica::Ref<ComponentRef::NFComponentRef>>,
+    },
+    /// unknown SI base unit decomposition
+    UNKNOWN { unit: ArcStr },
+}
+impl metamodelica::gc::MMTrace for Unit {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Unit::UNIT {
+                s,
+                m,
+                g,
+                A,
+                K,
+                mol,
+                cd,
+                factor,
+                offset,
+            } => {
+                metamodelica::gc::MMTrace::mm_accept(s, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(m, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(g, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(A, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(K, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(mol, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(cd, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(factor, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(offset, __mmv)?;
+                Ok(())
+            }
+            Unit::MASTER { varList } => {
+                metamodelica::gc::MMTrace::mm_accept(varList, __mmv)?;
+                Ok(())
+            }
+            Unit::UNKNOWN { unit } => {
+                metamodelica::gc::MMTrace::mm_accept(unit, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for Unit {
+    fn default() -> Self {
+        Self::MASTER {
+            varList: Default::default(),
+        }
+    }
+}
+pub use self::Unit::{MASTER, UNIT, UNKNOWN};
+
+pub(crate) const fn ONE() -> Unit {
+    Unit::UNIT {
+        s: 0,
+        m: 0,
+        g: 0,
+        A: 0,
+        K: 0,
+        mol: 0,
+        cd: 0,
+        factor: metamodelica::OrderedFloat(1e0_f64),
+        offset: metamodelica::OrderedFloat(0.0_f64),
+    }
+}
+
+pub const fn SECOND() -> Unit {
+    Unit::UNIT {
+        s: 1,
+        m: 0,
+        g: 0,
+        A: 0,
+        K: 0,
+        mol: 0,
+        cd: 0,
+        factor: metamodelica::OrderedFloat(1e0_f64),
+        offset: metamodelica::OrderedFloat(0.0_f64),
+    }
+}
+
+//public constant Unit THRICE = ?
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub(crate) enum Token {
+    T_NUMBER { number: i32 },
+    T_UNIT { unit: ArcStr },
+    T_MUL,
+    T_DIV,
+    T_LPAREN,
+    T_RPAREN,
+}
+impl metamodelica::gc::MMTrace for Token {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Token::T_NUMBER { number } => {
+                metamodelica::gc::MMTrace::mm_accept(number, __mmv)?;
+                Ok(())
+            }
+            Token::T_UNIT { unit } => {
+                metamodelica::gc::MMTrace::mm_accept(unit, __mmv)?;
+                Ok(())
+            }
+            Token::T_MUL => Ok(()),
+            Token::T_DIV => Ok(()),
+            Token::T_LPAREN => Ok(()),
+            Token::T_RPAREN => Ok(()),
+        }
+    }
+}
+pub(crate) use self::Token::{T_DIV, T_LPAREN, T_MUL, T_NUMBER, T_RPAREN, T_UNIT};
+
+thread_local! { static __UPDATECREF_TLS: metamodelica::Ref<ComponentRef::NFComponentRef> = metamodelica::Ref::new(ComponentRef::NFComponentRef::CREF { node: metamodelica::Ref::new(NFInstNode::NodeHandle::VALUE { node: metamodelica::Ref::new(InstNode::InstNode::NAME_NODE { name: literal!("jhagemann") }) }), subscripts: metamodelica::nil(), ty: crate::NFType::interned_UNKNOWN(), origin: ComponentRef::Origin::CREF.clone(), restCref: crate::NFComponentRef::interned_EMPTY() }); }
+pub(crate) fn UPDATECREF() -> metamodelica::Ref<ComponentRef::NFComponentRef> {
+    __UPDATECREF_TLS.with(|__t| __t.clone())
+}
+
+/* from https://www.bipm.org/documents/d/guest/si-brochure-9-en-pdf */
+thread_local! { static __LU_COMPLEXUNITS_TLS: metamodelica::List<(ArcStr, Unit)> = list![(literal!("1"), Unit::UNIT { s: 0, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("s"), Unit::UNIT { s: 1, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("m"), Unit::UNIT { s: 0, m: 1, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("g"), Unit::UNIT { s: 0, m: 0, g: 1, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("A"), Unit::UNIT { s: 0, m: 0, g: 0, A: 1, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("K"), Unit::UNIT { s: 0, m: 0, g: 0, A: 0, K: 1, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("mol"), Unit::UNIT { s: 0, m: 0, g: 0, A: 0, K: 0, mol: 1, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("cd"), Unit::UNIT { s: 0, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 1, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("rad"), Unit::UNIT { s: 0, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("Hz"), Unit::UNIT { s: -1, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("N"), Unit::UNIT { s: -2, m: 1, g: 1, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("Pa"), Unit::UNIT { s: -2, m: -1, g: 1, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("J"), Unit::UNIT { s: -2, m: 2, g: 1, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("W"), Unit::UNIT { s: -3, m: 2, g: 1, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("C"), Unit::UNIT { s: 1, m: 0, g: 0, A: 1, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("V"), Unit::UNIT { s: -3, m: 2, g: 1, A: -1, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("F"), Unit::UNIT { s: 4, m: -2, g: -1, A: 2, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e-3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("Ohm"), Unit::UNIT { s: -3, m: 2, g: 1, A: -2, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("S"), Unit::UNIT { s: 3, m: -2, g: -1, A: 2, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e-3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("Wb"), Unit::UNIT { s: -2, m: 2, g: 1, A: -1, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("T"), Unit::UNIT { s: -2, m: 0, g: 1, A: -1, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("H"), Unit::UNIT { s: -2, m: 2, g: 1, A: -2, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("degC"), Unit::UNIT { s: 0, m: 0, g: 0, A: 0, K: 1, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(273.15_f64) }), (literal!("kat"), Unit::UNIT { s: -1, m: 0, g: 0, A: 0, K: 0, mol: 1, cd: 0, factor: metamodelica::OrderedFloat(1e0_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("min"), Unit::UNIT { s: 1, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat((60) as f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("h"), Unit::UNIT { s: 1, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat((3600) as f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("d"), Unit::UNIT { s: 1, m: 0, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat((86400) as f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("l"), Unit::UNIT { s: 0, m: 3, g: 0, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e-3_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("bar"), Unit::UNIT { s: -2, m: -1, g: 1, A: 0, K: 0, mol: 0, cd: 0, factor: metamodelica::OrderedFloat(1e8_f64), offset: metamodelica::OrderedFloat(0.0_f64) }), (literal!("degF"), Unit::UNIT { s: 0, m: 0, g: 0, A: 0, K: 1, mol: 0, cd: 0, factor: metamodelica::real_div_checked(metamodelica::OrderedFloat(5.0_f64), metamodelica::OrderedFloat(9.0_f64)).unwrap(), offset: metamodelica::real_div_checked(metamodelica::OrderedFloat(459.67_f64) * metamodelica::OrderedFloat(5.0_f64), metamodelica::OrderedFloat(9.0_f64)).unwrap() })]; }
+pub(crate) fn LU_COMPLEXUNITS() -> metamodelica::List<(ArcStr, Unit)> {
+    __LU_COMPLEXUNITS_TLS.with(|__t| __t.clone())
+}
+
+pub fn getKnownUnits() -> Result<StringToUnitTable> {
+    let mut outKnownUnits: StringToUnitTable;
+    let mut s: ArcStr;
+    let mut ut: Unit;
+    outKnownUnits = UnorderedMap::new(
+        (std::sync::Arc::new(fnptr!(stringHashDjb2, ArcStr))
+            as std::sync::Arc<dyn ::std::ops::Fn(ArcStr) -> Result<i32> + 'static>),
+        (std::sync::Arc::new(fnptr!(stringEq, ArcStr, ArcStr))
+            as std::sync::Arc<dyn ::std::ops::Fn(ArcStr, ArcStr) -> Result<bool> + 'static>),
+        Util::nextPrime(((LU_COMPLEXUNITS()).len() as i32)),
+    );
+    for mut unit in &*LU_COMPLEXUNITS().clone() {
+        (s, ut) = unit.clone();
+        UnorderedMap::add(s, ut, outKnownUnits.clone())?;
+    }
+    Ok(outKnownUnits)
+}
+
+pub fn getKnownUnitsInverse() -> Result<UnitToStringTable> {
+    let mut outKnownUnitsInverse: UnitToStringTable;
+    let mut s: ArcStr;
+    let mut ut: Unit;
+    outKnownUnitsInverse = UnorderedMap::new(
+        (std::sync::Arc::new(move |__a0: Unit| hash(&__a0))
+            as std::sync::Arc<dyn ::std::ops::Fn(Unit) -> Result<i32> + 'static>),
+        (std::sync::Arc::new(move |__a0: Unit, __a1: Unit| isEqual(&__a0, &__a1))
+            as std::sync::Arc<dyn ::std::ops::Fn(Unit, Unit) -> Result<bool> + 'static>),
+        Util::nextPrime(((LU_COMPLEXUNITS()).len() as i32)),
+    );
+    for mut unit in &*LU_COMPLEXUNITS().clone() {
+        (s, ut) = unit.clone();
+        UnorderedMap::tryAdd(ut, s, outKnownUnitsInverse.clone())?;
+    }
+    Ok(outKnownUnitsInverse)
+}
+
+pub(crate) fn newCrefUnitTable(mut size: i32) -> CrefToUnitTable {
+    let mut table: CrefToUnitTable;
+    table = UnorderedMap::new(
+        (std::sync::Arc::new(move |__a0: metamodelica::Ref<ComponentRef::NFComponentRef>| ComponentRef::hash(&__a0))
+            as std::sync::Arc<
+                dyn ::std::ops::Fn(metamodelica::Ref<ComponentRef::NFComponentRef>) -> Result<i32> + 'static,
+            >),
+        (std::sync::Arc::new(
+            move |__a0: metamodelica::Ref<ComponentRef::NFComponentRef>,
+                  __a1: metamodelica::Ref<ComponentRef::NFComponentRef>| {
+                ComponentRef::isEqual(&__a0, &__a1)
+            },
+        )
+            as std::sync::Arc<
+                dyn ::std::ops::Fn(
+                        metamodelica::Ref<ComponentRef::NFComponentRef>,
+                        metamodelica::Ref<ComponentRef::NFComponentRef>,
+                    ) -> Result<bool>
+                    + 'static,
+            >),
+        size,
+    );
+    table
+}
+
+pub(crate) fn isUnit(mut inUnit: &Unit) -> bool {
+    let mut b: bool;
+    b = (match inUnit.clone() {
+        Unit::UNIT { .. } => true,
+        _ => false,
+    });
+    b
+}
+
+pub(crate) fn isMaster(mut unit: &Unit) -> bool {
+    let mut res: bool;
+    res = (match unit.clone() {
+        Unit::MASTER { .. } => true,
+        _ => false,
+    });
+    res
+}
+
+pub(crate) fn hash(mut inKey: &Unit) -> Result<i32> {
+    let mut outHash: i32 = stringHashDjb2(&(unit2string(inKey)?));
+    Ok(outHash)
+}
+
+pub(crate) fn realAlmostEqRel(
+    mut a: metamodelica::Real,
+    mut b: metamodelica::Real,
+    mut relTol: metamodelica::Real,
+) -> Result<bool> {
+    let mut c: bool;
+    c = if (a == b) {
+        true
+    } else {
+        relTol > metamodelica::real_div_checked((a - b).abs(), ((a).abs() + (b).abs()))?
+    };
+    Ok(c)
+}
+
+pub(crate) fn isEqual(mut unit1: &Unit, mut unit2: &Unit) -> Result<bool> {
+    let mut res: bool;
+    res = (match (unit1.clone(), unit2.clone()) {
+        (Unit::UNIT { .. }, Unit::UNIT { .. }) => {
+            var_field!(unit1.s, Unit::UNIT).clone() == var_field!(unit2.s, Unit::UNIT).clone()
+                && var_field!(unit1.m, Unit::UNIT).clone() == var_field!(unit2.m, Unit::UNIT).clone()
+                && var_field!(unit1.g, Unit::UNIT).clone() == var_field!(unit2.g, Unit::UNIT).clone()
+                && var_field!(unit1.A, Unit::UNIT).clone() == var_field!(unit2.A, Unit::UNIT).clone()
+                && var_field!(unit1.K, Unit::UNIT).clone() == var_field!(unit2.K, Unit::UNIT).clone()
+                && var_field!(unit1.mol, Unit::UNIT).clone() == var_field!(unit2.mol, Unit::UNIT).clone()
+                && var_field!(unit1.cd, Unit::UNIT).clone() == var_field!(unit2.cd, Unit::UNIT).clone()
+                && realAlmostEqRel(
+                    var_field!(unit1.factor, Unit::UNIT).clone(),
+                    var_field!(unit2.factor, Unit::UNIT).clone(),
+                    metamodelica::OrderedFloat(1e-3_f64),
+                )?
+        }
+        (Unit::MASTER { .. }, Unit::MASTER { .. }) => true,
+        (Unit::UNKNOWN { .. }, Unit::UNKNOWN { .. }) => metamodelica::stringEq(
+            &var_field!(unit1.unit, Unit::UNKNOWN),
+            &var_field!(unit2.unit, Unit::UNKNOWN),
+        ),
+        _ => false,
+    });
+    Ok(res)
+}
+
+pub(crate) fn unit2string(mut unit: &Unit) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    outString = (match unit.clone() {
+        Unit::UNIT { .. } => {
+            let mut s: ArcStr;
+            let mut r#str: ArcStr;
+            let mut b: bool;
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*realString(var_field!(unit.factor, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(" * "));
+                ArcStr::from(__mm_s)
+            };
+            b = false;
+            s = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("mol^("));
+                __mm_s.push_str(&*intString(var_field!(unit.mol, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            };
+            s = if (intEq(var_field!(unit.mol, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s
+            };
+            b = b || intNe(var_field!(unit.mol, Unit::UNIT).clone(), 0);
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = if (b && intNe(var_field!(unit.cd, Unit::UNIT).clone(), 0)) {
+                literal!(" * ")
+            } else {
+                literal!("")
+            };
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("cd^("));
+                __mm_s.push_str(&*intString(var_field!(unit.cd, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            };
+            s = if (intEq(var_field!(unit.cd, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s
+            };
+            b = b || intNe(var_field!(unit.cd, Unit::UNIT).clone(), 0);
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = if (b && intNe(var_field!(unit.m, Unit::UNIT).clone(), 0)) {
+                literal!(" * ")
+            } else {
+                literal!("")
+            };
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("m^("));
+                __mm_s.push_str(&*intString(var_field!(unit.m, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            };
+            s = if (intEq(var_field!(unit.m, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s
+            };
+            b = b || intNe(var_field!(unit.m, Unit::UNIT).clone(), 0);
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = if (b && intNe(var_field!(unit.s, Unit::UNIT).clone(), 0)) {
+                literal!(" * ")
+            } else {
+                literal!("")
+            };
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("s^("));
+                __mm_s.push_str(&*intString(var_field!(unit.s, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            };
+            s = if (intEq(var_field!(unit.s, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s
+            };
+            b = b || intNe(var_field!(unit.s, Unit::UNIT).clone(), 0);
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = if (b && intNe(var_field!(unit.A, Unit::UNIT).clone(), 0)) {
+                literal!(" * ")
+            } else {
+                literal!("")
+            };
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("A^("));
+                __mm_s.push_str(&*intString(var_field!(unit.A, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            };
+            s = if (intEq(var_field!(unit.A, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s
+            };
+            b = b || intNe(var_field!(unit.A, Unit::UNIT).clone(), 0);
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = if (b && intNe(var_field!(unit.K, Unit::UNIT).clone(), 0)) {
+                literal!(" * ")
+            } else {
+                literal!("")
+            };
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("K^("));
+                __mm_s.push_str(&*intString(var_field!(unit.K, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            };
+            s = if (intEq(var_field!(unit.K, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s
+            };
+            b = b || intNe(var_field!(unit.K, Unit::UNIT).clone(), 0);
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = if (b && intNe(var_field!(unit.g, Unit::UNIT).clone(), 0)) {
+                literal!(" * ")
+            } else {
+                literal!("")
+            };
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            s = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("g^("));
+                __mm_s.push_str(&*intString(var_field!(unit.g, Unit::UNIT).clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            };
+            s = if (intEq(var_field!(unit.g, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s
+            };
+            b = b || intNe(var_field!(unit.g, Unit::UNIT).clone(), 0);
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*s);
+                ArcStr::from(__mm_s)
+            };
+            r#str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*r#str);
+                __mm_s.push_str(&*if (b) { literal!("") } else { literal!("1") });
+                ArcStr::from(__mm_s)
+            };
+            r#str
+        }
+        Unit::MASTER { .. } => List::toStringCustom(
+            var_field!(unit.varList, Unit::MASTER).clone(),
+            &move |__a0: metamodelica::Ref<ComponentRef::NFComponentRef>| ComponentRef::toString(&__a0),
+            literal!("MASTER"),
+            literal!("("),
+            literal!(", "),
+            literal!(")"),
+            true,
+            0,
+        )?,
+        Unit::UNKNOWN { .. } => {
+            let mut __mm_s = String::new();
+            __mm_s.push_str(&*literal!("UNKOWN("));
+            __mm_s.push_str(&*var_field!(unit.unit, Unit::UNKNOWN));
+            __mm_s.push_str(&*literal!(")"));
+            ArcStr::from(__mm_s)
+        }
+    });
+    Ok(outString)
+}
+
+fn isOne(mut unit: &Unit) -> bool {
+    let mut res: bool;
+    res = (match unit.clone() {
+        Unit::UNIT { .. } => {
+            var_field!(unit.s, Unit::UNIT).clone() == 0
+                && var_field!(unit.m, Unit::UNIT).clone() == 0
+                && var_field!(unit.g, Unit::UNIT).clone() == 0
+                && var_field!(unit.A, Unit::UNIT).clone() == 0
+                && var_field!(unit.K, Unit::UNIT).clone() == 0
+                && var_field!(unit.mol, Unit::UNIT).clone() == 0
+                && var_field!(unit.cd, Unit::UNIT).clone() == 0
+                && var_field!(unit.factor, Unit::UNIT).clone() == metamodelica::OrderedFloat(1.0_f64)
+                && var_field!(unit.offset, Unit::UNIT).clone() == metamodelica::OrderedFloat(0.0_f64)
+        }
+        _ => false,
+    });
+    res
+}
+
+pub(crate) fn unitMul(mut inUnit1: &Unit, mut inUnit2: &Unit) -> Result<Unit> {
+    let mut outUnit: Unit;
+    outUnit = (match (inUnit1.clone(), inUnit2.clone()) {
+        (Unit::UNIT { .. }, Unit::UNIT { .. }) => Unit::UNIT {
+            s: var_field!(inUnit1.s, Unit::UNIT).clone() + var_field!(inUnit2.s, Unit::UNIT).clone(),
+            m: var_field!(inUnit1.m, Unit::UNIT).clone() + var_field!(inUnit2.m, Unit::UNIT).clone(),
+            g: var_field!(inUnit1.g, Unit::UNIT).clone() + var_field!(inUnit2.g, Unit::UNIT).clone(),
+            A: var_field!(inUnit1.A, Unit::UNIT).clone() + var_field!(inUnit2.A, Unit::UNIT).clone(),
+            K: var_field!(inUnit1.K, Unit::UNIT).clone() + var_field!(inUnit2.K, Unit::UNIT).clone(),
+            mol: var_field!(inUnit1.mol, Unit::UNIT).clone() + var_field!(inUnit2.mol, Unit::UNIT).clone(),
+            cd: var_field!(inUnit1.cd, Unit::UNIT).clone() + var_field!(inUnit2.cd, Unit::UNIT).clone(),
+            factor: var_field!(inUnit1.factor, Unit::UNIT).clone() * var_field!(inUnit2.factor, Unit::UNIT).clone(),
+            offset: if (isOne(inUnit1)) {
+                var_field!(inUnit2.offset, Unit::UNIT).clone()
+            } else if (isOne(inUnit2)) {
+                var_field!(inUnit1.offset, Unit::UNIT).clone()
+            } else {
+                metamodelica::OrderedFloat(0.0_f64)
+            },
+        },
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outUnit)
+}
+
+pub fn unitDiv(mut inUnit1: &Unit, mut inUnit2: &Unit) -> Result<Unit> {
+    let mut outUnit: Unit;
+    outUnit = (match (inUnit1.clone(), inUnit2.clone()) {
+        (Unit::UNIT { .. }, Unit::UNIT { .. }) => Unit::UNIT {
+            s: var_field!(inUnit1.s, Unit::UNIT).clone() - var_field!(inUnit2.s, Unit::UNIT).clone(),
+            m: var_field!(inUnit1.m, Unit::UNIT).clone() - var_field!(inUnit2.m, Unit::UNIT).clone(),
+            g: var_field!(inUnit1.g, Unit::UNIT).clone() - var_field!(inUnit2.g, Unit::UNIT).clone(),
+            A: var_field!(inUnit1.A, Unit::UNIT).clone() - var_field!(inUnit2.A, Unit::UNIT).clone(),
+            K: var_field!(inUnit1.K, Unit::UNIT).clone() - var_field!(inUnit2.K, Unit::UNIT).clone(),
+            mol: var_field!(inUnit1.mol, Unit::UNIT).clone() - var_field!(inUnit2.mol, Unit::UNIT).clone(),
+            cd: var_field!(inUnit1.cd, Unit::UNIT).clone() - var_field!(inUnit2.cd, Unit::UNIT).clone(),
+            factor: metamodelica::real_div_checked(
+                var_field!(inUnit1.factor, Unit::UNIT).clone(),
+                var_field!(inUnit2.factor, Unit::UNIT).clone(),
+            )?,
+            offset: if (isOne(inUnit2)) {
+                var_field!(inUnit1.offset, Unit::UNIT).clone()
+            } else {
+                metamodelica::OrderedFloat(0.0_f64)
+            },
+        },
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outUnit)
+}
+
+pub(crate) fn unitPow(mut inUnit: &Unit, mut inExp: i32) -> Result<Unit> {
+    let mut outUnit: Unit;
+    outUnit = (match inUnit.clone() {
+        Unit::UNIT { .. } => Unit::UNIT {
+            s: var_field!(inUnit.s, Unit::UNIT).clone() * inExp,
+            m: var_field!(inUnit.m, Unit::UNIT).clone() * inExp,
+            g: var_field!(inUnit.g, Unit::UNIT).clone() * inExp,
+            A: var_field!(inUnit.A, Unit::UNIT).clone() * inExp,
+            K: var_field!(inUnit.K, Unit::UNIT).clone() * inExp,
+            mol: var_field!(inUnit.mol, Unit::UNIT).clone() * inExp,
+            cd: var_field!(inUnit.cd, Unit::UNIT).clone() * inExp,
+            factor: (var_field!(inUnit.factor, Unit::UNIT).clone()).powf(metamodelica::OrderedFloat((inExp) as f64)),
+            offset: if (inExp == 1) {
+                var_field!(inUnit.offset, Unit::UNIT).clone()
+            } else {
+                metamodelica::OrderedFloat(0.0_f64)
+            },
+        },
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outUnit)
+}
+
+pub(crate) fn unitMulReal(mut inUnit: Unit, mut inFactor: metamodelica::Real) -> Result<Unit> {
+    let mut outUnit: Unit;
+    outUnit = (match inUnit {
+        mut unit @ Unit::UNIT { .. } => {
+            let __owned_variant_factor_0 = var_field!(unit.factor, Unit::UNIT).clone() * inFactor;
+            let __owned_variant_offset_1 = var_field!(unit.offset, Unit::UNIT).clone() * inFactor;
+            if let Unit::UNIT { factor, offset, .. } = &mut unit {
+                *factor = __owned_variant_factor_0;
+                *offset = __owned_variant_offset_1;
+            } else {
+                panic!("owned-variant field-assign: value held a different variant than Unit::UNIT");
+            }
+            unit.clone()
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outUnit)
+}
+
+pub(crate) fn unitRoot(mut inUnit: &Unit, mut inExponent: metamodelica::Real) -> Result<Unit> {
+    let mut outUnit: Unit;
+    outUnit = (match inUnit.clone() {
+        Unit::UNIT { .. } => {
+            let mut r: metamodelica::Real;
+            let mut factor: metamodelica::Real;
+            let mut i: i32;
+            let mut s: i32;
+            let mut m: i32;
+            let mut g: i32;
+            let mut A: i32;
+            let mut K: i32;
+            let mut mol: i32;
+            let mut cd: i32;
+            i = ((inExponent).0.floor() as i32);
+            r = realDiv(metamodelica::OrderedFloat(1.0_f64), inExponent);
+            factor = realPow(var_field!(inUnit.factor, Unit::UNIT).clone(), r);
+            r = realDiv(intReal(var_field!(inUnit.s, Unit::UNIT).clone()), inExponent);
+            s = intDiv(var_field!(inUnit.s, Unit::UNIT).clone(), i);
+            let true = (realEq(r, intReal(s))) else {
+                return Err("pattern mismatch");
+            };
+            r = realDiv(intReal(var_field!(inUnit.m, Unit::UNIT).clone()), inExponent);
+            m = intDiv(var_field!(inUnit.m, Unit::UNIT).clone(), i);
+            let true = (realEq(r, intReal(m))) else {
+                return Err("pattern mismatch");
+            };
+            r = realDiv(intReal(var_field!(inUnit.g, Unit::UNIT).clone()), inExponent);
+            g = intDiv(var_field!(inUnit.g, Unit::UNIT).clone(), i);
+            let true = (realEq(r, intReal(g))) else {
+                return Err("pattern mismatch");
+            };
+            r = realDiv(intReal(var_field!(inUnit.A, Unit::UNIT).clone()), inExponent);
+            A = intDiv(var_field!(inUnit.A, Unit::UNIT).clone(), i);
+            let true = (realEq(r, intReal(A))) else {
+                return Err("pattern mismatch");
+            };
+            r = realDiv(intReal(var_field!(inUnit.K, Unit::UNIT).clone()), inExponent);
+            K = intDiv(var_field!(inUnit.K, Unit::UNIT).clone(), i);
+            let true = (realEq(r, intReal(K))) else {
+                return Err("pattern mismatch");
+            };
+            r = realDiv(intReal(var_field!(inUnit.mol, Unit::UNIT).clone()), inExponent);
+            mol = intDiv(var_field!(inUnit.mol, Unit::UNIT).clone(), i);
+            let true = (realEq(r, intReal(mol))) else {
+                return Err("pattern mismatch");
+            };
+            r = realDiv(intReal(var_field!(inUnit.cd, Unit::UNIT).clone()), inExponent);
+            cd = intDiv(var_field!(inUnit.cd, Unit::UNIT).clone(), i);
+            let true = (realEq(r, intReal(cd))) else {
+                return Err("pattern mismatch");
+            };
+            Unit::UNIT {
+                s: s,
+                m: m,
+                g: g,
+                A: A,
+                K: K,
+                mol: mol,
+                cd: cd,
+                factor: factor,
+                offset: metamodelica::OrderedFloat(0.0_f64),
+            }
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outUnit)
+}
+
+pub fn unitString(mut inUnit: Unit, mut inHtU2S: UnitToStringTable) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    let mut opt_s: Option<ArcStr>;
+    let mut s: ArcStr;
+    let mut s1: ArcStr;
+    let mut s2: ArcStr;
+    let mut s3: ArcStr;
+    let mut s4: ArcStr;
+    let mut s5: ArcStr;
+    let mut s6: ArcStr;
+    let mut s7: ArcStr;
+    let mut sExponent: ArcStr;
+    let mut b: bool;
+    let mut unit: Unit;
+    opt_s = UnorderedMap::get(inUnit.clone(), inHtU2S)?;
+    if (opt_s).is_some() {
+        let __pa0 = ::match_deref::match_deref! { match &(opt_s) {
+            Some(__pa0) => __pa0.clone(),
+            _ => return Err("pattern mismatch"),
+        } };
+        outString = metamodelica::Own::own(__pa0);
+        return Ok(outString);
+    }
+    outString = (match inUnit.clone() {
+        mut __esc_unit @ Unit::UNIT { .. } => {
+            unit = __esc_unit.clone();
+            s = if (var_field!(unit.factor, Unit::UNIT).clone() == metamodelica::OrderedFloat(1.0_f64)) {
+                literal!("")
+            } else {
+                prefix2String(var_field!(unit.factor, Unit::UNIT).clone())
+            };
+            b = false;
+            sExponent = if (intEq(var_field!(unit.mol, Unit::UNIT).clone(), 1)) {
+                literal!("")
+            } else {
+                intString(var_field!(unit.mol, Unit::UNIT).clone())
+            };
+            s1 = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("mol"));
+                __mm_s.push_str(&*sExponent);
+                ArcStr::from(__mm_s)
+            };
+            s1 = if (intEq(var_field!(unit.mol, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s1
+            };
+            b = b || intNe(var_field!(unit.mol, Unit::UNIT).clone(), 0);
+            s2 = if (b && intNe(var_field!(unit.cd, Unit::UNIT).clone(), 0)) {
+                literal!(".")
+            } else {
+                literal!("")
+            };
+            sExponent = if (intEq(var_field!(unit.cd, Unit::UNIT).clone(), 1)) {
+                literal!("")
+            } else {
+                intString(var_field!(unit.cd, Unit::UNIT).clone())
+            };
+            s2 = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*s2);
+                __mm_s.push_str(&*literal!("cd"));
+                __mm_s.push_str(&*sExponent);
+                ArcStr::from(__mm_s)
+            };
+            s2 = if (intEq(var_field!(unit.cd, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s2
+            };
+            b = b || intNe(var_field!(unit.cd, Unit::UNIT).clone(), 0);
+            s3 = if (b && intNe(var_field!(unit.m, Unit::UNIT).clone(), 0)) {
+                literal!(".")
+            } else {
+                literal!("")
+            };
+            sExponent = if (intEq(var_field!(unit.m, Unit::UNIT).clone(), 1)) {
+                literal!("")
+            } else {
+                intString(var_field!(unit.m, Unit::UNIT).clone())
+            };
+            s3 = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*s3);
+                __mm_s.push_str(&*literal!("m"));
+                __mm_s.push_str(&*sExponent);
+                ArcStr::from(__mm_s)
+            };
+            s3 = if (intEq(var_field!(unit.m, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s3
+            };
+            b = b || intNe(var_field!(unit.m, Unit::UNIT).clone(), 0);
+            s4 = if (b && intNe(var_field!(unit.s, Unit::UNIT).clone(), 0)) {
+                literal!(".")
+            } else {
+                literal!("")
+            };
+            sExponent = if (intEq(var_field!(unit.s, Unit::UNIT).clone(), 1)) {
+                literal!("")
+            } else {
+                intString(var_field!(unit.s, Unit::UNIT).clone())
+            };
+            s4 = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*s4);
+                __mm_s.push_str(&*literal!("s"));
+                __mm_s.push_str(&*sExponent);
+                ArcStr::from(__mm_s)
+            };
+            s4 = if (intEq(var_field!(unit.s, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s4
+            };
+            b = b || intNe(var_field!(unit.s, Unit::UNIT).clone(), 0);
+            s5 = if (b && intNe(var_field!(unit.A, Unit::UNIT).clone(), 0)) {
+                literal!(".")
+            } else {
+                literal!("")
+            };
+            sExponent = if (intEq(var_field!(unit.A, Unit::UNIT).clone(), 1)) {
+                literal!("")
+            } else {
+                intString(var_field!(unit.A, Unit::UNIT).clone())
+            };
+            s5 = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*s5);
+                __mm_s.push_str(&*literal!("A"));
+                __mm_s.push_str(&*sExponent);
+                ArcStr::from(__mm_s)
+            };
+            s5 = if (intEq(var_field!(unit.A, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s5
+            };
+            b = b || intNe(var_field!(unit.A, Unit::UNIT).clone(), 0);
+            s6 = if (b && intNe(var_field!(unit.K, Unit::UNIT).clone(), 0)) {
+                literal!(".")
+            } else {
+                literal!("")
+            };
+            sExponent = if (intEq(var_field!(unit.K, Unit::UNIT).clone(), 1)) {
+                literal!("")
+            } else {
+                intString(var_field!(unit.K, Unit::UNIT).clone())
+            };
+            s6 = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*s6);
+                __mm_s.push_str(&*literal!("K"));
+                __mm_s.push_str(&*sExponent);
+                ArcStr::from(__mm_s)
+            };
+            s6 = if (intEq(var_field!(unit.K, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s6
+            };
+            b = b || intNe(var_field!(unit.K, Unit::UNIT).clone(), 0);
+            s7 = if (b && intNe(var_field!(unit.g, Unit::UNIT).clone(), 0)) {
+                literal!(".")
+            } else {
+                literal!("")
+            };
+            sExponent = if (intEq(var_field!(unit.g, Unit::UNIT).clone(), 1)) {
+                literal!("")
+            } else {
+                intString(var_field!(unit.g, Unit::UNIT).clone())
+            };
+            s7 = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*s7);
+                __mm_s.push_str(&*literal!("g"));
+                __mm_s.push_str(&*sExponent);
+                ArcStr::from(__mm_s)
+            };
+            s7 = if (intEq(var_field!(unit.g, Unit::UNIT).clone(), 0)) {
+                literal!("")
+            } else {
+                s7
+            };
+            b = b || intNe(var_field!(unit.g, Unit::UNIT).clone(), 0);
+            s = if (b) {
+                {
+                    let mut __mm_s = String::new();
+                    __mm_s.push_str(&*s);
+                    __mm_s.push_str(&*s1);
+                    __mm_s.push_str(&*s2);
+                    __mm_s.push_str(&*s3);
+                    __mm_s.push_str(&*s4);
+                    __mm_s.push_str(&*s5);
+                    __mm_s.push_str(&*s6);
+                    __mm_s.push_str(&*s7);
+                    ArcStr::from(__mm_s)
+                }
+            } else {
+                literal!("1")
+            };
+            s
+        }
+        _ => {
+            Error::addCompilerWarning({
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("function Unit.unitString failed for \""));
+                __mm_s.push_str(&*unit2string(&inUnit)?);
+                __mm_s.push_str(&*literal!("\"."));
+                ArcStr::from(__mm_s)
+            })?;
+            return Err("fail");
+        }
+    });
+    Ok(outString)
+}
+
+fn prefix2String(mut inReal: metamodelica::Real) -> ArcStr {
+    let mut outPrefix: ArcStr;
+    outPrefix = (match inReal {
+        __rlit_0 if __rlit_0.eq(&metamodelica::OrderedFloat((1e30) as f64)) => literal!("Q"),
+        __rlit_1 if __rlit_1.eq(&metamodelica::OrderedFloat((1e27) as f64)) => literal!("R"),
+        __rlit_2 if __rlit_2.eq(&metamodelica::OrderedFloat((1e24) as f64)) => literal!("Y"),
+        __rlit_3 if __rlit_3.eq(&metamodelica::OrderedFloat((1e21) as f64)) => literal!("Z"),
+        __rlit_4 if __rlit_4.eq(&metamodelica::OrderedFloat((1e18) as f64)) => literal!("E"),
+        __rlit_5 if __rlit_5.eq(&metamodelica::OrderedFloat((1e15) as f64)) => literal!("P"),
+        __rlit_6 if __rlit_6.eq(&metamodelica::OrderedFloat((1e12) as f64)) => literal!("T"),
+        __rlit_7 if __rlit_7.eq(&metamodelica::OrderedFloat((1e9) as f64)) => literal!("G"),
+        __rlit_8 if __rlit_8.eq(&metamodelica::OrderedFloat((1e6) as f64)) => literal!("M"),
+        __rlit_9 if __rlit_9.eq(&metamodelica::OrderedFloat((1e3) as f64)) => literal!("k"),
+        __rlit_10 if __rlit_10.eq(&metamodelica::OrderedFloat((1e2) as f64)) => literal!("h"),
+        __rlit_11 if __rlit_11.eq(&metamodelica::OrderedFloat((1e1) as f64)) => literal!("da"),
+        __rlit_12 if __rlit_12.eq(&metamodelica::OrderedFloat((1e-1) as f64)) => literal!("d"),
+        __rlit_13 if __rlit_13.eq(&metamodelica::OrderedFloat((1e-2) as f64)) => literal!("c"),
+        __rlit_14 if __rlit_14.eq(&metamodelica::OrderedFloat((1e-3) as f64)) => literal!("m"),
+        __rlit_15 if __rlit_15.eq(&metamodelica::OrderedFloat((1e-6) as f64)) => literal!("u"),
+        __rlit_16 if __rlit_16.eq(&metamodelica::OrderedFloat((1e-9) as f64)) => literal!("n"),
+        __rlit_17 if __rlit_17.eq(&metamodelica::OrderedFloat((1e-12) as f64)) => literal!("p"),
+        __rlit_18 if __rlit_18.eq(&metamodelica::OrderedFloat((1e-15) as f64)) => literal!("f"),
+        __rlit_19 if __rlit_19.eq(&metamodelica::OrderedFloat((1e-18) as f64)) => literal!("a"),
+        __rlit_20 if __rlit_20.eq(&metamodelica::OrderedFloat((1e-21) as f64)) => literal!("z"),
+        __rlit_21 if __rlit_21.eq(&metamodelica::OrderedFloat((1e-24) as f64)) => literal!("y"),
+        __rlit_22 if __rlit_22.eq(&metamodelica::OrderedFloat((1e-27) as f64)) => literal!("r"),
+        __rlit_23 if __rlit_23.eq(&metamodelica::OrderedFloat((1e-30) as f64)) => literal!("q"),
+        _ => realString(inReal),
+    });
+    outPrefix
+}
+
+pub fn parseUnitString(
+    mut inUnitString: ArcStr,
+    mut inKnownUnits: StringToUnitTable,
+    mut info: &SourceInfo,
+) -> Result<Unit> {
+    let mut outUnit: Unit;
+    let mut charList: metamodelica::List<ArcStr>;
+    let mut tokenList: metamodelica::List<Token>;
+    charList = stringListStringChar(inUnitString.clone());
+    if (charList).is_empty() {
+        return Err("fail");
+    }
+    if let Ok(__iflet0) = lexer(charList.clone()) {
+        tokenList = __iflet0;
+    } else {
+        Error::addSourceMessage(&(Error::INVALID_UNIT.clone()), list![inUnitString.clone()], info)?;
+        return Err("fail");
+    }
+    outUnit = parser3(&(list![true, true]), &tokenList, &(ONE().clone()), inKnownUnits);
+    if !(isUnit(&outUnit)) {
+        if Flags::isSet(Flags::FAILTRACE.clone())? {
+            Debug::traceln({
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("NFUnit.parseUnitString"));
+                __mm_s.push_str(&*literal!(": failed to parse unit string "));
+                __mm_s.push_str(&*inUnitString);
+                ArcStr::from(__mm_s)
+            })?;
+        }
+    }
+    Ok(outUnit)
+}
+
+fn parser3(
+    mut inMul: &metamodelica::List<bool>,
+    mut inTokenList: &metamodelica::List<Token>,
+    mut inUnit: &Unit,
+    mut inHtS2U: StringToUnitTable,
+) -> Unit {
+    let mut outUnit: Unit;
+    outUnit = 'mc: {
+        let __mc_input = (&**inMul, &**inTokenList);
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: true, tail: Deref @ metamodelica::ListNode::Nil }, Deref @ metamodelica::ListNode::Nil) => {
+                    Ok(inUnit.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: bMul, tail: bRest }, Deref @ metamodelica::ListNode::Cons { head: Token::T_NUMBER { number: 1 }, tail: tokens }) => {
+                    let mut ut: Unit;
+                    ut = ONE().clone();
+                    ut = if (bMul.clone()) {unitMul(inUnit, &ut)?} else {unitDiv(inUnit, &ut)?};
+                    ut = parser3(metamodelica::AsArg::as_arg(&bRest), metamodelica::AsArg::as_arg(&tokens), &ut, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: bMul, tail: bRest }, Deref @ metamodelica::ListNode::Cons { head: Token::T_UNIT { unit: s }, tail: Deref @ metamodelica::ListNode::Cons { head: Token::T_NUMBER { number: exponent }, tail: tokens } }) => {
+                    let mut ut: Unit;
+                    ut = unitToken2unit(s.clone(), inHtS2U.clone())?;
+                    ut = unitPow(&ut, exponent.clone())?;
+                    ut = if (bMul.clone()) {unitMul(inUnit, &ut)?} else {unitDiv(inUnit, &ut)?};
+                    ut = parser3(metamodelica::AsArg::as_arg(&bRest), metamodelica::AsArg::as_arg(&tokens), &ut, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: bMul, tail: bRest }, Deref @ metamodelica::ListNode::Cons { head: Token::T_UNIT { unit: s }, tail: tokens }) => {
+                    let mut ut: Unit;
+                    ut = unitToken2unit(s.clone(), inHtS2U.clone())?;
+                    ut = if (bMul.clone()) {unitMul(inUnit, &ut)?} else {unitDiv(inUnit, &ut)?};
+                    ut = parser3(metamodelica::AsArg::as_arg(&bRest), metamodelica::AsArg::as_arg(&tokens), &ut, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: bMul, tail: _ }, Deref @ metamodelica::ListNode::Cons { head: Token::T_MUL { .. }, tail: Deref @ metamodelica::ListNode::Cons { head: Token::T_LPAREN { .. }, tail: tokens } }) => {
+                    let mut ut: Unit;
+                    ut = parser3(&(metamodelica::cons(bMul.clone(), metamodelica::cons(bMul.clone(), inMul.clone()))), metamodelica::AsArg::as_arg(&tokens), inUnit, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: bMul, tail: _ }, Deref @ metamodelica::ListNode::Cons { head: Token::T_DIV { .. }, tail: Deref @ metamodelica::ListNode::Cons { head: Token::T_LPAREN { .. }, tail: tokens } }) => {
+                    let mut ut: Unit;
+                    let mut b: bool;
+                    b = !(bMul.clone());
+                    ut = parser3(&(metamodelica::cons(b, metamodelica::cons(b, inMul.clone()))), metamodelica::AsArg::as_arg(&tokens), inUnit, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: _, tail: bRest }, Deref @ metamodelica::ListNode::Cons { head: Token::T_RPAREN { .. }, tail: tokens }) => {
+                    let mut ut: Unit;
+                    ut = parser3(metamodelica::AsArg::as_arg(&bRest), metamodelica::AsArg::as_arg(&tokens), inUnit, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: bMul, tail: _ }, Deref @ metamodelica::ListNode::Cons { head: Token::T_MUL { .. }, tail: tokens }) => {
+                    let mut ut: Unit;
+                    ut = parser3(&(metamodelica::cons(bMul.clone(), inMul.clone())), metamodelica::AsArg::as_arg(&tokens), inUnit, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ metamodelica::ListNode::Cons { head: bMul, tail: _ }, Deref @ metamodelica::ListNode::Cons { head: Token::T_DIV { .. }, tail: tokens }) => {
+                    let mut ut: Unit;
+                    let mut b: bool;
+                    b = !(bMul.clone());
+                    ut = parser3(&(metamodelica::cons(b, inMul.clone())), metamodelica::AsArg::as_arg(&tokens), inUnit, inHtS2U.clone());
+                    Ok(ut.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(Unit::UNKNOWN { unit: literal!("") })
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outUnit
+}
+
+fn unitToken2unit(mut inS: ArcStr, mut inHtS2U: StringToUnitTable) -> Result<Unit> {
+    let mut outUnit: Unit;
+    let mut opt_unit: Option<Unit>;
+    let mut s: ArcStr;
+    let mut r: metamodelica::Real;
+    opt_unit = UnorderedMap::get(inS.clone(), inHtS2U.clone())?;
+    if (opt_unit).is_some() {
+        let __pa0 = ::match_deref::match_deref! { match &(opt_unit) {
+            Some(__pa0) => __pa0.clone(),
+            _ => return Err("pattern mismatch"),
+        } };
+        outUnit = metamodelica::Own::own(__pa0);
+    } else {
+        s = stringGetStringChar(inS.clone(), 1)?;
+        (r, s) = getPrefix(&s, inS)?;
+        outUnit = unitToken2unit(s, inHtS2U)?;
+        outUnit = unitMulReal(outUnit, r)?;
+    }
+    Ok(outUnit)
+}
+
+fn getPrefix(mut inS: &ArcStr, mut inS2: ArcStr) -> Result<(metamodelica::Real, ArcStr)> {
+    let mut outR: metamodelica::Real;
+    let mut outUnit: ArcStr;
+    (outR, outUnit) = 'mc: {
+        let __mc_input = inS.clone();
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "y" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-24_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "z" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-21_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "a" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-18_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "f" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-15_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "p" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-12_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "u" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-6_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "m" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-3_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "c" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-2_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "d" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    strRest = stringListStringChar(inS2.clone());
+                    let __pa0 = ::match_deref::match_deref! { match &(strRest.clone()) {
+                        Deref @ metamodelica::ListNode::Cons { head: Deref @ "d", tail: Deref @ metamodelica::ListNode::Cons { head: Deref @ "a", tail: __pa0 } } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e1_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "d" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e-1_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "h" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e2_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "k" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e3_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "M" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e6_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "G" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e9_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "T" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e12_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "P" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e15_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "E" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e18_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "Z" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e21_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ "Y" => {
+                    let mut strRest: metamodelica::List<ArcStr>;
+                    let mut s: ArcStr;
+                    let __pa0 = ::match_deref::match_deref! { match &(stringListStringChar(inS2.clone())) {
+                        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    strRest = metamodelica::Own::own(__pa0);
+                    s = stringCharListString(strRest.clone());
+                    Ok((metamodelica::OrderedFloat(1e24_f64), s.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(return Err("fail"))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok((outR, outUnit))
+}
+
+fn lexer(mut inCharList: metamodelica::List<ArcStr>) -> Result<metamodelica::List<Token>> {
+    let mut outTokenList: metamodelica::List<Token>;
+    outTokenList = 'mc: {
+        let __mc_input = inCharList;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Nil => {
+                    Ok(metamodelica::nil())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Cons { head: Deref @ ".", tail: charList } => {
+                    let mut tokenList: metamodelica::List<Token>;
+                    tokenList = lexer(charList.clone())?;
+                    Ok(metamodelica::cons(crate::NFUnit::Token::T_MUL, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Cons { head: Deref @ "(", tail: charList } => {
+                    let mut tokenList: metamodelica::List<Token>;
+                    tokenList = lexer(charList.clone())?;
+                    Ok(metamodelica::cons(crate::NFUnit::Token::T_LPAREN, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Cons { head: Deref @ ")", tail: charList } => {
+                    let mut tokenList: metamodelica::List<Token>;
+                    tokenList = lexer(charList.clone())?;
+                    Ok(metamodelica::cons(crate::NFUnit::Token::T_RPAREN, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Cons { head: Deref @ "/", tail: charList } => {
+                    let mut tokenList: metamodelica::List<Token>;
+                    tokenList = lexer(charList.clone())?;
+                    Ok(metamodelica::cons(crate::NFUnit::Token::T_DIV, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Cons { head: Deref @ "+", tail: charList } => {
+                    let mut number: ArcStr;
+                    let mut tokenList: metamodelica::List<Token>;
+                    let mut i: i32;
+                    let mut charList = (*charList).clone();
+                    (charList, number) = popNumber(metamodelica::AsArg::as_arg(&charList));
+                    let false = (metamodelica::stringEq(&number, &(literal!("")))) else { return Err("pattern mismatch") };
+                    tokenList = lexer(charList.clone())?;
+                    i = stringInt(number.clone())?;
+                    Ok(metamodelica::cons(Token::T_NUMBER { number: i }, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Cons { head: Deref @ "-", tail: charList } => {
+                    let mut number: ArcStr;
+                    let mut tokenList: metamodelica::List<Token>;
+                    let mut i: i32;
+                    let mut charList = (*charList).clone();
+                    (charList, number) = popNumber(metamodelica::AsArg::as_arg(&charList));
+                    let false = (metamodelica::stringEq(&number, &(literal!("")))) else { return Err("pattern mismatch") };
+                    tokenList = lexer(charList.clone())?;
+                    i = -(stringInt(number.clone())?);
+                    Ok(metamodelica::cons(Token::T_NUMBER { number: i }, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                charList => {
+                    let mut number: ArcStr;
+                    let mut tokenList: metamodelica::List<Token>;
+                    let mut i: i32;
+                    let mut charList = (*charList).clone();
+                    (charList, number) = popNumber(metamodelica::AsArg::as_arg(&charList));
+                    let false = (metamodelica::stringEq(&number, &(literal!("")))) else { return Err("pattern mismatch") };
+                    tokenList = lexer(charList.clone())?;
+                    i = stringInt(number.clone())?;
+                    Ok(metamodelica::cons(Token::T_NUMBER { number: i }, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                charList => {
+                    let mut unit: ArcStr;
+                    let mut tokenList: metamodelica::List<Token>;
+                    let mut charList = (*charList).clone();
+                    (charList, unit) = popUnit(metamodelica::AsArg::as_arg(&charList));
+                    let false = (metamodelica::stringEq(&unit, &(literal!("")))) else { return Err("pattern mismatch") };
+                    tokenList = lexer(charList.clone())?;
+                    Ok(metamodelica::cons(Token::T_UNIT { unit: unit.clone() }, tokenList.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(outTokenList)
+}
+
+fn popUnit(mut inCharList: &metamodelica::List<ArcStr>) -> (metamodelica::List<ArcStr>, ArcStr) {
+    let mut outCharList: metamodelica::List<ArcStr>;
+    let mut outUnit: ArcStr;
+    (outCharList, outUnit) = (::match_deref::match_deref! { match inCharList {
+        Deref @ metamodelica::ListNode::Nil => {
+            (metamodelica::nil(), literal!(""))
+        },
+        Deref @ metamodelica::ListNode::Cons { head: s1, tail: strRest } if (stringCompare(&s1, &(literal!("a"))) >= 0 && stringCompare(&s1, &(literal!("z"))) <= 0) => {
+            let mut s2: ArcStr;
+            let mut strRest = (*strRest).clone();
+            (strRest, s2) = popUnit(metamodelica::AsArg::as_arg(&strRest));
+            (strRest.clone(), { let mut __mm_s = String::new(); __mm_s.push_str(&*s1); __mm_s.push_str(&*s2); ArcStr::from(__mm_s) })
+        },
+        Deref @ metamodelica::ListNode::Cons { head: s1, tail: strRest } if (stringCompare(&s1, &(literal!("A"))) >= 0 && stringCompare(&s1, &(literal!("Z"))) <= 0) => {
+            let mut s2: ArcStr;
+            let mut strRest = (*strRest).clone();
+            (strRest, s2) = popUnit(metamodelica::AsArg::as_arg(&strRest));
+            (strRest.clone(), { let mut __mm_s = String::new(); __mm_s.push_str(&*s1); __mm_s.push_str(&*s2); ArcStr::from(__mm_s) })
+        },
+        _ => {
+            (inCharList.clone(), literal!(""))
+        },
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    (outCharList, outUnit)
+}
+
+fn popNumber(mut inCharList: &metamodelica::List<ArcStr>) -> (metamodelica::List<ArcStr>, ArcStr) {
+    let mut outCharList: metamodelica::List<ArcStr>;
+    let mut outNumber: ArcStr;
+    (outCharList, outNumber) = 'mc: {
+        let __mc_input = &**inCharList;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Nil => {
+                    Ok((metamodelica::nil(), literal!("")))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ metamodelica::ListNode::Cons { head: s1, tail: strRest } => {
+                    let mut s2: ArcStr;
+                    let mut i: i32;
+                    let mut strRest = (*strRest).clone();
+                    i = stringInt(s1.clone())?;
+                    let true = (metamodelica::stringEq(&(intString(i)), &s1)) else { return Err("pattern mismatch") };
+                    (strRest, s2) = popNumber(metamodelica::AsArg::as_arg(&strRest));
+                    Ok((strRest.clone(), { let mut __mm_s = String::new(); __mm_s.push_str(&*s1); __mm_s.push_str(&*s2); ArcStr::from(__mm_s) }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok((inCharList.clone(), literal!("")))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    (outCharList, outNumber)
+}

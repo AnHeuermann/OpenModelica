@@ -1,0 +1,155 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::FGraph;
+use crate::FNode;
+use crate::FVisit;
+use openmodelica_ast::Absyn;
+use openmodelica_frontend_dump::FCore;
+use openmodelica_util_datatypes_basic::Mutable;
+
+// public imports
+// protected imports
+/// An identifier is just a string
+pub type Ident = ArcStr;
+
+pub type Import = Absyn::Import;
+
+pub type Node = metamodelica::Ref<FCore::Node>;
+
+pub type Ref = Mutable::Mutable<metamodelica::Ref<FCore::Node>>;
+
+pub type Data = metamodelica::Ref<FCore::Data>;
+
+pub type Visited = FCore::Visited;
+
+pub type Graph = FCore::Graph;
+
+#[derive(Clone, Copy, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub(crate) enum WalkOptions {
+    /// breadth first search
+    BFS,
+    /// depth first search
+    DFS,
+}
+impl metamodelica::gc::MMTrace for WalkOptions {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            WalkOptions::BFS => Ok(()),
+            WalkOptions::DFS => Ok(()),
+        }
+    }
+}
+pub(crate) use self::WalkOptions::{BFS, DFS};
+
+#[derive(Clone, Copy, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub(crate) enum VisitOptions {
+    /// mark node as visited and report an error if already visited
+    VISIT,
+    /// do not mark as visited
+    NO_VISIT,
+}
+impl metamodelica::gc::MMTrace for VisitOptions {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            VisitOptions::VISIT => Ok(()),
+            VisitOptions::NO_VISIT => Ok(()),
+        }
+    }
+}
+pub(crate) use self::VisitOptions::{NO_VISIT, VISIT};
+
+#[derive(Clone, Copy, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub(crate) enum Options {
+    NO_OPTIONS,
+    OPTIONS { ws: WalkOptions, vs: VisitOptions },
+}
+impl metamodelica::gc::MMTrace for Options {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Options::NO_OPTIONS => Ok(()),
+            Options::OPTIONS { ws, vs } => {
+                metamodelica::gc::MMTrace::mm_accept(ws, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(vs, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+pub(crate) use self::Options::{NO_OPTIONS, OPTIONS};
+
+pub(crate) fn walk<Extra: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut inGraph: Graph,
+    mut inWalker: &dyn ::std::ops::Fn(
+        (FCore::Graph, Mutable::Mutable<metamodelica::Ref<FCore::Node>>, Extra),
+    ) -> Result<(FCore::Graph, Mutable::Mutable<metamodelica::Ref<FCore::Node>>, Extra)>,
+    mut inExtra: Extra,
+    mut inOptions: Options,
+) -> (Graph, Extra) {
+    pub type Walker<Extra: Clone + 'static> = std::sync::Arc<
+        dyn ::std::ops::Fn(
+                (FCore::Graph, Mutable::Mutable<metamodelica::Ref<FCore::Node>>, Extra),
+            )
+                -> Result<(FCore::Graph, Mutable::Mutable<metamodelica::Ref<FCore::Node>>, Extra)>
+            + 'static,
+    >;
+
+    let mut outGraph: Graph;
+    let mut outExtra: Extra;
+    (outGraph, outExtra) = (match inOptions {
+        _ => (inGraph, inExtra),
+    });
+    (outGraph, outExtra)
+}

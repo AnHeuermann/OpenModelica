@@ -1,22 +1,15 @@
-# Build the Rust (mmtorust) omc port instead of the bootstrapped C omc.
+# Build the Rust omc instead of the bootstrapped C omc.
 #
-# Enabled with -DOM_OMC_ENABLE_RUST=ON. The chain, all native Rust (no bomc/omc,
-# no system omc, no shell scripts):
+# Enabled with -DOM_OMC_ENABLE_RUST=ON. The compiler is plain Rust source in
+# OpenModelica.rs (the crates once transpiled from MetaModelica by mmtorust are
+# committed there too), so the build is just cargo: no bomc/omc, no Susan, no
+# transpile. cargo builds the omc artifacts (openmodelica,
+# libopenmodelica_compiler) with a selectable profile (RUST_OMC_PROFILE, default
+# "debug").
 #
-#   1. cargo build the build *tools* (mmtorust, susan) -- always --release, since
-#      they run during the build and release is dramatically faster.
-#   2. `mmtorust susan` transpiles the Susan-subset crates; cargo builds `susan`.
-#   3. `susan` compiles every *.tpl -> *.mo (the omc_add_template_target rules,
-#      which use ${OMC_EXE}; in Rust mode ${OMC_EXE} is the susan binary).
-#   4. `mmtorust` (full) transpiles all of compilerSources.txt -> crate .rs.
-#   5. cargo builds the omc artifacts (openmodelica, libopenmodelica_compiler)
-#      with a selectable profile (RUST_OMC_PROFILE, default "debug").
-#
-# mmtorust writes the generated *.rs into the crate src/ dirs and cargo builds
-# there, so each build gets its OWN copy (RUST_OMC_DIR) mirrored from the source
-# (RUST_OMC_SRC_DIR) — a shared in-source tree let concurrent builds clobber each
-# other's generated sources. Hand-written and generated *.rs share src/ dirs, so
-# the whole hand-written set (.cmake/rust_src_files.txt) is copied.
+# cargo builds in a per-build copy (RUST_OMC_DIR) mirrored from the source
+# (RUST_OMC_SRC_DIR), so concurrent builds of one checkout never share a tree;
+# the mirrored set is .cmake/rust_src_files.txt.
 
 find_program(CARGO_EXECUTABLE cargo REQUIRED)
 
@@ -41,8 +34,8 @@ set(RUST_SRC_MANIFEST ${CMAKE_CURRENT_SOURCE_DIR}/.cmake/rust_src_files.txt)
 set(RUST_SIMRT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../SimulationRuntime/rust)
 set(RUST_SIMRT_DIR ${RUST_OMC_TREE}/SimulationRuntime/rust)
 
-# Mirror now so the configure-time reads below (.gitignore, susanSources.txt) see
-# a populated copy; the rust_src_sync target re-mirrors before each build step.
+# Mirror now so configure-time reads of the copy see a populated tree; the
+# rust_src_sync target re-mirrors before each build step.
 set(_rust_src_sync_cmd ${CMAKE_COMMAND}
     -DSRC=${RUST_OMC_SRC_DIR} -DDST=${RUST_OMC_DIR} -DMANIFEST=${RUST_SRC_MANIFEST} -DBUILTINS=ON
     -P ${CMAKE_CURRENT_SOURCE_DIR}/.cmake/rust_src_sync.cmake)
@@ -59,30 +52,8 @@ endforeach()
 add_custom_target(rust_src_sync
   COMMAND ${_rust_src_sync_cmd}
   COMMAND ${_rust_simrt_sync_cmd}
-  COMMENT "Rust: syncing hand-written sources -> per-build working copy"
+  COMMENT "Rust: syncing sources -> per-build working copy"
   VERBATIM)
-
-# Bootstrap placeholder src/lib.rs for the crates whose lib.rs is emitted by the
-# mmtorust transpile (and therefore .gitignore'd). On a clean checkout these
-# files don't exist yet, but every `cargo` invocation loads the whole workspace,
-# and a member with a Cargo.toml but no src/lib.rs (or main.rs) aborts the load
-# with "no targets specified in the manifest". That kills the very first cargo
-# build (mmtorust / scripting_api_gen / susan, all run *before* the full codegen)
-# before mmtorust ever runs to emit them. Drop an empty placeholder so the
-# manifest has a target; the transpile overwrites it (the susan-subset crates at
-# `mmtorust susan`, the rest at the full transpile). Only write it when missing,
-# so a real generated lib.rs is never clobbered (mtimes / codegen DEPENDS stay
-# put). The set IS the `*/src/lib.rs` entries of OpenModelica.rs/.gitignore —
-# read them straight from there so this never drifts from the ignore list.
-file(STRINGS ${RUST_OMC_DIR}/.gitignore _rust_gitignore_lines)
-foreach(_line ${_rust_gitignore_lines})
-  if(_line MATCHES "/src/lib\\.rs$" AND NOT _line MATCHES "^#")
-    if(NOT EXISTS ${RUST_OMC_DIR}/${_line})
-      file(WRITE ${RUST_OMC_DIR}/${_line}
-           "// Bootstrap placeholder; overwritten by the mmtorust transpile. See rust_omc.cmake.\n")
-    endif()
-  endif()
-endforeach()
 
 # CI builds: one switch that flips the defaults to a clean, reproducible build —
 # the release profile and cargo incremental compilation OFF (incremental
@@ -99,7 +70,6 @@ else()
 endif()
 
 # The omc artifacts (the deliverables) honour this profile; default debug.
-# The build tools (mmtorust, susan) are always release regardless.
 set(RUST_OMC_PROFILE "${_rust_omc_profile_default}"
     CACHE STRING "Cargo profile for the Rust omc artifacts: debug or release.")
 if(RUST_OMC_PROFILE STREQUAL "release")
@@ -169,18 +139,18 @@ option(RUST_OMC_SCRIPTING_API
   ${OM_ENABLE_GUI_CLIENTS})
 
 # Prebuilt-cdylib hand-off (mirrors RUST_OMC_WASM_RUNTIME below): point a GUI-only
-# build at an already-built libOpenModelicaCompiler.so + the generated Qt API
-# sources from an earlier stage, so configuring with the GUI clients ON does NOT
-# run cargo or the codegen at all (Compiler/CMakeLists.txt takes the prebuilt
-# branch). Empty = build the cdylib normally via cargo.
+# build at an already-built libOpenModelicaCompiler.so from an earlier stage, so
+# configuring with the GUI clients ON does NOT run cargo at all
+# (Compiler/CMakeLists.txt takes the prebuilt branch). Empty = build the cdylib
+# normally via cargo.
 set(RUST_OMC_PREBUILT_CDYLIB "" CACHE FILEPATH
     "Prebuilt libOpenModelicaCompiler.so to link the GUI against (empty = build it via cargo). Set in the GUI-only CI stage to skip the Rust build entirely.")
-set(RUST_OMC_PREBUILT_SCRIPTING_API_QT_DIR "" CACHE PATH
-    "Directory holding the prebuilt OpenModelicaScriptingAPIQt.{cpp,h} (used with RUST_OMC_PREBUILT_CDYLIB).")
 
-option(RUST_OMC_PREBUILT_GENERATED_SRC
-  "Assume the mmtorust-generated *.rs are already present (e.g. unstashed from an earlier CI stage) and skip the transpile."
-  OFF)
+# OMEdit's typed OMCInterface (OpenModelicaScriptingAPIQt): committed C++ beside
+# the openmodelica_scripting_qt crate that implements its C ABI. OMEditLIB, the
+# Qt web page and generate-msvc-c-sources all read it from here.
+set(OMC_SCRIPTING_API_QT_DIR ${RUST_OMC_SRC_DIR}/openmodelica_scripting_qt/qt
+    CACHE INTERNAL "OpenModelicaScriptingAPIQt C++ sources")
 
 # Each client is a separate cargo build resolving the workspace to a different
 # feature set than the cdylib, sharing one target directory: cargo cannot reuse
@@ -939,10 +909,6 @@ list(APPEND CARGO_ENV
 
 # Always via ${CARGO_BUILD} so target/ is never the in-source default.
 set(CARGO_BUILD ${CARGO_ENV} ${CARGO_EXECUTABLE} build --target-dir ${RUST_TARGET_DIR})
-# The build tools (mmtorust, susan, scripting_api_gen) always run on and target
-# the host, so they use ${CARGO_BUILD} and live in target/<profile>/.
-set(SUSAN_BIN   ${RUST_TARGET_DIR}/release/susan)
-set(MMTORUST_BIN ${RUST_TARGET_DIR}/release/mmtorust)
 
 # ${CARGO_BUILD_ARTIFACT}: the cargo invocation for the omc *artifacts* (cdylib,
 # launcher, native GUI clients). Identical to ${CARGO_BUILD} for a native build;
@@ -997,8 +963,9 @@ endif()
 # `cmake --build . && ctest`. The unit tests use the default dev profile (the
 # cranelift backend, opt-level 0) — far faster to compile than the release
 # artifacts — not RUST_OMC_PROFILE. --workspace covers every crate's tests. The
-# test does not run codegen itself, so the omc targets must be built first (CTest
-# has no build dependency on them) — the standard build-then-ctest order.
+# test needs the synced working copy and the wasm artifacts, so the omc targets
+# must be built first (CTest has no build dependency on them) — the standard
+# build-then-ctest order.
 #
 # `openmodelica` is excluded: it is the thin omc launcher, which links against
 # libOpenModelicaCompiler.so of the *build's* profile. That library is only ever
@@ -1069,233 +1036,22 @@ add_custom_target(rust_wasm_runtime
 add_dependencies(rust_wasm_runtime rust_src_sync)
 
 # ---------------------------------------------------------------------------
-# Autoconf.mo is a generated compiler source (configure_file from
-# Autoconf.mo.in; the actual generation is in Compiler/CMakeLists.txt, which has
-# the substitution vars). It is written to the BUILD tree, not Compiler/Util —
-# an in-source Compiler/Util/Autoconf.mo collides with a parallel autotools build
-# of the same checkout. The two mmtorust source lists (the full
-# rust_compilerSources.txt built in omc_rust_setup_codegen, and the susan subset
-# below) reference the in-source Util/Autoconf.mo, so each redirects that one
-# entry to RUST_AUTOCONF_MO. mmtorust routes classes to crates by their
-# `__OpenModelica_Interface` annotation, not the file path, so the build-tree
-# location is transparent.
-# ---------------------------------------------------------------------------
-set(RUST_AUTOCONF_MO ${CMAKE_CURRENT_BINARY_DIR}/generated-mo/Autoconf.mo
-    CACHE INTERNAL "Build-tree Autoconf.mo (generated out of the source tree).")
-
-# Build-tree copy of susanSources.txt: redirect the Autoconf.mo entry to
-# RUST_AUTOCONF_MO and resolve the other ../-relative entries to absolute source
-# paths (mmtorust now runs in the per-build copy, so ../ no longer reaches them).
-# file(READ)+string(REPLACE), not file(STRINGS): the latter splits lines on the
-# header's em-dash. copy_if_different keeps the mtime stable across reconfigures.
-set(RUST_SUSAN_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/rust_susanSources.txt)
-file(READ ${RUST_OMC_SRC_DIR}/susanSources.txt _susan_content)
-string(REPLACE "../Util/Autoconf.mo" "${RUST_AUTOCONF_MO}" _susan_content "${_susan_content}")
-string(REPLACE "../" "${CMAKE_CURRENT_SOURCE_DIR}/" _susan_content "${_susan_content}")
-file(WRITE ${RUST_SUSAN_SOURCES}.tmp "${_susan_content}")
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${RUST_SUSAN_SOURCES}.tmp ${RUST_SUSAN_SOURCES})
-
-# ---------------------------------------------------------------------------
-# Step 1+2: build mmtorust (release), transpile the Susan subset, build susan.
-# A stamp file marks completion; cargo itself handles incremental rebuilds, so
-# the command is a fast no-op when only some of its inputs changed.
-#
-# The stamp has to name those inputs: a stamp rule with no DEPENDS is up to date
-# the moment the file exists, so the rule never runs a second time and every
-# later build compiles the templates with the `susan` of the first one.
-# ---------------------------------------------------------------------------
-file(GLOB_RECURSE SUSAN_TOOL_SOURCES CONFIGURE_DEPENDS ${RUST_OMC_DIR}/mmtorust/src/*.rs)
-file(GLOB SUSAN_INDEX_SOURCES CONFIGURE_DEPENDS ${RUST_OMC_DIR}/openmodelica_susan_index/src/*.rs)
-list(APPEND SUSAN_TOOL_SOURCES
-     ${RUST_OMC_DIR}/mmtorust/Cargo.toml
-     ${RUST_OMC_DIR}/openmodelica_susan/Cargo.toml
-     ${RUST_OMC_DIR}/openmodelica_susan/src/main.rs
-     ${RUST_OMC_DIR}/openmodelica_susan/src/rust_backend.rs
-     ${RUST_OMC_DIR}/openmodelica_susan_index/Cargo.toml
-     ${SUSAN_INDEX_SOURCES})
-# The subset's *.mo: the rest of openmodelica_susan/src is transpiled from them.
-file(STRINGS ${RUST_SUSAN_SOURCES} SUSAN_SUBSET_MO REGEX "\\.mo$")
-set(SUSAN_STAMP ${CMAKE_CURRENT_BINARY_DIR}/rust_susan.stamp)
-add_custom_command(
-  OUTPUT ${SUSAN_STAMP}
-  WORKING_DIRECTORY ${RUST_OMC_DIR}
-  # Hand make's -jN jobserver tokens to cargo (needs CMake >= 3.28).
-  ${OMC_JOB_SERVER_AWARE}
-  # Build tools always in release.
-  COMMAND ${CARGO_BUILD} --release -p mmtorust
-  # `--sources <susan subset>` is exactly what the `susan` subcommand does (it
-  # only picks that default list); pass the build-tree list so Autoconf.mo
-  # resolves to its build-tree copy rather than the in-source path.
-  COMMAND ${MMTORUST_BIN} --sources ${RUST_SUSAN_SOURCES}
-  COMMAND ${CARGO_BUILD} --release -p openmodelica_susan -p openmodelica_susan_index --bin susan --bin susan-index
-  COMMAND ${CMAKE_COMMAND} -E touch ${SUSAN_STAMP}
-  DEPENDS ${SUSAN_TOOL_SOURCES} ${SUSAN_SUBSET_MO} ${RUST_SUSAN_SOURCES}
-  COMMENT "Rust: building mmtorust + Susan template compiler (release)"
-  VERBATIM)
-add_custom_target(rust_susan DEPENDS ${SUSAN_STAMP})
-add_dependencies(rust_susan rust_src_sync)
-
-# In Rust mode the template rules (omc_add_template_target) invoke ${OMC_EXE} on
-# each *.tpl; point it at susan and make each *.mo rule depend on rust_susan via
-# TPL_EXTRA_DEPENDS (consumed by the macro).
-set(OMC_EXE ${SUSAN_BIN})
-set(TPL_EXTRA_DEPENDS ${SUSAN_STAMP})
-
-# ---------------------------------------------------------------------------
-# Step 4: full transpile. Depends on every template-generated *.mo
-# (TPL_OUTPUT_MO_FILES, populated by template_compilation.cmake) plus the
-# scripting-API .mo (generated below by the standalone scripting_api_gen tool).
+# The omc artifacts, the wasm bundle and the native GUI clients.
 # ---------------------------------------------------------------------------
 function(omc_rust_setup_codegen)
-  # Use the canonical CMake source list (meta_modelica_source_list.cmake), the
-  # same set the C build compiles, instead of a separate hardcoded
-  # compilerSources.txt — so the Rust build can never drift from it (e.g. the
-  # wasm-jit files added in #15847 are picked up automatically). We materialise
-  # it to a file and pass `mmtorust --sources`. Absolute paths are fine; mmtorust
-  # writes its output relative to its working directory (the crate tree).
-  set(RUST_SOURCES_FILE ${CMAKE_CURRENT_BINARY_DIR}/rust_compilerSources.txt)
-  set(_rust_src_content "# Generated by rust_omc.cmake from meta_modelica_source_list.cmake.\n# Do not edit by hand — the canonical list is the CMake one.\n")
-  # Also collect the .mo files as codegen dependencies (RUST_MO_SOURCES): the
-  # transpile must re-run when any hand-written source changes, not only when the
-  # list file / templates change (else editing e.g. CevalScriptBackend.mo is a
-  # silent no-op — cargo sees unchanged .rs and does nothing).
-  set(RUST_MO_SOURCES "")
-  foreach(_f ${OMC_MM_ALWAYS_SOURCES} ${OMC_MM_BACKEND_SOURCES})
-    # Redirect the in-source Util/Autoconf.mo to the build-tree copy (see
-    # RUST_AUTOCONF_MO above); it isn't generated into Compiler/Util in Rust mode.
-    if(_f MATCHES "Util/Autoconf\\.mo$")
-      string(APPEND _rust_src_content "${RUST_AUTOCONF_MO}\n")
-      list(APPEND RUST_MO_SOURCES ${RUST_AUTOCONF_MO})
-    else()
-      string(APPEND _rust_src_content "${_f}\n")
-      list(APPEND RUST_MO_SOURCES ${_f})
-    endif()
-  endforeach()
-  # Per-target declarations: `X.rust.mo` beside `X.mo` replaces the items the
-  # Rust port declares differently (see mmtorust/src/overrides.rs). They are not
-  # in the source list -- the C compiler must never see them -- so list them as
-  # dependencies explicitly, or editing one would not re-run codegen.
-  set(RUST_MO_OVERRIDES "")
-  foreach(_mo ${RUST_MO_SOURCES})
-    string(REGEX REPLACE "\\.mo$" ".rust.mo" _ovr "${_mo}")
-    if(EXISTS ${_ovr})
-      list(APPEND RUST_MO_OVERRIDES ${_ovr})
-    endif()
-  endforeach()
-  # copy_if_different so the mtime (which rust_codegen DEPENDS on) only moves on
-  # a real change — a plain file(WRITE) would rewrite it every reconfigure.
-  file(WRITE ${RUST_SOURCES_FILE}.tmp "${_rust_src_content}")
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                  ${RUST_SOURCES_FILE}.tmp ${RUST_SOURCES_FILE})
-
-  # -------------------------------------------------------------------------
-  # Generate Script/OpenModelicaScriptingAPI.mo (the typed thin wrappers around
-  # the interactive API) WITHOUT a built omc, breaking the bootstrap cycle: omc
-  # links libOpenModelicaCompiler.so, whose openmodelica_scripting_qt crate is
-  # mmtorust-generated *from this .mo*; in the C build the .mo came from running
-  # omc itself (OpenModelica.Scripting.generateScriptingAPI), which the Rust port
-  # cannot do before omc exists. The standalone `scripting_api_gen` tool depends
-  # only on the hand-written parser crate (openmodelica_ast, not generated), so it
-  # builds and runs with no prior codegen. It parses the OpenModelica.Scripting
-  # package out of FrontEnd/ModelicaBuiltin.mo and emits the .mo directly (no Tpl,
-  # no Lookup). The Qt .cpp/.h are emitted later by mmtorust (emit_scripting_api_qt).
-  #
-  # DEPENDS on ModelicaBuiltin.mo so the API is regenerated whenever the builtin
-  # OpenModelica.Scripting package changes, and on the generator's own source.
-  set(SCRIPTING_API_MO ${CMAKE_CURRENT_SOURCE_DIR}/Script/OpenModelicaScriptingAPI.mo)
-  set(MODELICA_BUILTIN_MO ${CMAKE_CURRENT_SOURCE_DIR}/FrontEnd/ModelicaBuiltin.mo)
-  add_custom_command(
-    OUTPUT ${SCRIPTING_API_MO}
-    WORKING_DIRECTORY ${RUST_OMC_DIR}
-    ${OMC_JOB_SERVER_AWARE}
-    COMMAND ${CARGO_BUILD} --release -p openmodelica_scripting_api_gen
-    COMMAND ${RUST_TARGET_DIR}/release/scripting_api_gen ${MODELICA_BUILTIN_MO} ${SCRIPTING_API_MO}
-    DEPENDS ${MODELICA_BUILTIN_MO}
-            ${RUST_OMC_DIR}/openmodelica_scripting_api_gen/src/main.rs
-    COMMENT "Rust: generating OpenModelicaScriptingAPI.mo from ModelicaBuiltin.mo (no omc)"
-    VERBATIM)
-  add_custom_target(rust_scripting_api DEPENDS ${SCRIPTING_API_MO})
-  add_dependencies(rust_scripting_api rust_src_sync)
-
-  # mmtorust emits OMEdit's C++ Qt scripting-API here (build tree); OMEditLIB reads it.
-  set(OMC_SCRIPTING_API_QT_DIR ${CMAKE_CURRENT_BINARY_DIR}/scripting-api-qt
-      CACHE INTERNAL "Generated OpenModelicaScriptingAPIQt C++ sources (build tree)")
-
-  set(CODEGEN_STAMP ${CMAKE_CURRENT_BINARY_DIR}/rust_codegen.stamp)
-  # The generated *.rs depend on how mmtorust lowers, not only on the *.mo it
-  # lowers; without these a transpiler change leaves stale *.rs in place.
-  file(GLOB_RECURSE MMTORUST_SOURCES CONFIGURE_DEPENDS
-       ${RUST_OMC_DIR}/mmtorust/src/*.rs)
-  list(APPEND MMTORUST_SOURCES ${RUST_OMC_DIR}/mmtorust/Cargo.toml)
-  # A `<Package>.handwritten.rs` decides which of its package's items are generated.
-  file(GLOB MMTORUST_HANDWRITTEN CONFIGURE_DEPENDS ${RUST_OMC_SRC_DIR}/*/src/*.handwritten.rs)
-  list(APPEND MMTORUST_SOURCES ${MMTORUST_HANDWRITTEN})
-  if(RUST_OMC_PREBUILT_GENERATED_SRC)
-    # Stamp completion with no dependency on the transpile chain, so mmtorust /
-    # susan / the templates are never built; the .rs are already in the tree.
-    # Everything below still applies: a CI stage handed the generated sources
-    # builds the very same artifacts from them, it just does not transpile.
-    add_custom_command(
-      OUTPUT ${CODEGEN_STAMP}
-      COMMAND ${CMAKE_COMMAND} -E touch ${CODEGEN_STAMP}
-      COMMENT "Rust: reusing prebuilt generated sources (RUST_OMC_PREBUILT_GENERATED_SRC)"
-      VERBATIM)
-  else()
-  # Susan writes the templates' *.rs against what susan-index extracts from the
-  # Rust mmtorust just wrote; mmtorust only compiles their callers (it still
-  # reads the templates' *.mo for their signatures).
-  file(GLOB SUSAN_INTERFACES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Template/*TV.mo)
-  set(SUSAN_IFACE_DIR ${CMAKE_CURRENT_BINARY_DIR}/susan-interfaces)
-  set(SUSAN_RUST_PACKAGES)
-  set(SUSAN_RUST_COMMANDS)
-  foreach(_mo ${TPL_OUTPUT_MO_FILES})
-    get_filename_component(_dir ${_mo} DIRECTORY)
-    get_filename_component(_sub ${_dir} NAME)
-    if(_sub STREQUAL "Template")
-      get_filename_component(_pkg ${_mo} NAME_WE)
-      list(APPEND SUSAN_RUST_PACKAGES ${_pkg})
-      list(APPEND SUSAN_RUST_COMMANDS COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_SOURCE_DIR}/Template
-           ${SUSAN_BIN} --tplOutputDir=${RUST_OMC_DIR} --tplInterfaceDir=${SUSAN_IFACE_DIR}
-           --tplRustIndex=${SUSAN_IFACE_DIR}/susan-index.json ${_pkg}.tpl)
-    endif()
-  endforeach()
-  string(REPLACE ";" "," SUSAN_RUST_LIST "${SUSAN_RUST_PACKAGES}")
-  add_custom_command(
-    OUTPUT ${CODEGEN_STAMP}
-    WORKING_DIRECTORY ${RUST_OMC_DIR}
-    ${OMC_JOB_SERVER_AWARE}
-    COMMAND ${CARGO_BUILD} --release -p mmtorust
-    # Strip unused `import X;` from the Susan-generated *.mo before transpiling:
-    # mmtorust lowers every import to a `use crate::X`, so an unused import
-    # becomes a `use` of a crate the target does not depend on (e.g.
-    # `openmodelica_backend::SimCodeUtil` in openmodelica_codegen_xml). CI runs
-    # the same boot/find-unused-import.sh over the hand-written sources. It exits
-    # non-zero when it removes something, so `; true` keeps the build going.
-    COMMAND bash -c "\"$0\" \"$@\" ; true" ${CMAKE_CURRENT_SOURCE_DIR}/boot/find-unused-import.sh ${TPL_OUTPUT_MO_FILES}
-    COMMAND ${CMAKE_COMMAND} -E env OMC_SCRIPTING_API_QT_OUT=${OMC_SCRIPTING_API_QT_DIR}
-            MMTORUST_SUSAN_RUST=${SUSAN_RUST_LIST}
-            ${MMTORUST_BIN} --sources ${RUST_SOURCES_FILE}
-    COMMAND ${RUST_TARGET_DIR}/release/susan-index --rust-src ${RUST_OMC_DIR} --out-dir ${SUSAN_IFACE_DIR}
-            --report ${SUSAN_IFACE_DIR}/report.txt ${SUSAN_INTERFACES}
-    ${SUSAN_RUST_COMMANDS}
-    COMMAND ${CMAKE_COMMAND} -E touch ${CODEGEN_STAMP}
-    DEPENDS ${TPL_OUTPUT_MO_FILES} ${SUSAN_STAMP} ${RUST_SOURCES_FILE} ${SUSAN_INTERFACES}
-            ${CMAKE_CURRENT_SOURCE_DIR}/Script/OpenModelicaScriptingAPI.mo
-            ${RUST_MO_SOURCES} ${RUST_MO_OVERRIDES} ${MMTORUST_SOURCES}
-    COMMENT "Rust: transpiling all MetaModelica sources (mmtorust --sources <cmake list>)"
-    VERBATIM)
-  endif()
-  add_custom_target(rust_codegen DEPENDS ${CODEGEN_STAMP})
+  # rust_codegen: the compiler sources are in place in the per-build copy. There
+  # is nothing to generate any more (the formerly transpiled crates are
+  # committed), so this is only the sync; the cargo targets below and OMEditLIB
+  # order themselves after it.
+  add_custom_target(rust_codegen)
   add_dependencies(rust_codegen rust_src_sync)
 
   # -------------------------------------------------------------------------
   # rust_wasm_artifacts: produce everything a RUST_OMC_PREBUILT_WASM_DIR build
   # expects, so one CI stage can build the wasm half once for all the others.
   # Building openmodelica_wasm_jit alone runs the build script that produces the
-  # blobs and the FMU loaders, and it depends only on the hand-written crates --
-  # not on the transpiled compiler, which is what every target stage compiles
-  # for itself.
+  # blobs and the FMU loaders, and it depends only on the runtime crates -- not
+  # on the compiler, which is what every target stage compiles for itself.
   # -------------------------------------------------------------------------
   if(RUST_OMC_WASM_ARTIFACTS_OUT)
     set(_wasm_out ${RUST_OMC_WASM_ARTIFACTS_OUT})
@@ -1341,12 +1097,11 @@ function(omc_rust_setup_codegen)
   # The native omc artifacts (and their install rules) are pointless for the
   # wasm/web target — it ships a single .wasm bundle, not the cdylib + launcher —
   # so in wasm mode they are not defined at all, leaving `make all` to build only
-  # the wasm bundle (omc_rust_setup_wasm). The codegen above is still needed: the
-  # wasm crate is built from the same generated .rs.
+  # the wasm bundle (omc_rust_setup_wasm), which is built from the same crates.
   if(NOT OM_OMC_WASM)
   # -------------------------------------------------------------------------
   # Code-generation target features for the cdylib (forwarded to
-  # openmodelica_backend_main). mmtorust gates every reference to a disabled
+  # openmodelica_backend_main). The backend gates every reference to a disabled
   # target crate (the dispatch bails/panics), so a dropped target is neither
   # compiled nor linked. The native default set is C, C++ and FMU:
   #   * `cpp` is dropped when the C++ simulation runtime is not built
@@ -1544,7 +1299,7 @@ function(omc_rust_setup_codegen)
   # The desktop egui OMShell client (omshell_egui). It links the compiler
   # in-process as an ordinary cargo dependency (omshell_omc ->
   # openmodelica_backend_main), so building it compiles the compiler crates too;
-  # hence the DEPENDS on rust_codegen (the generated sources must exist first).
+  # hence the DEPENDS on rust_codegen (the synced sources).
   # The browser build of OMShell is handled by the wasm target.
   if(OM_ENABLE_GUI_CLIENTS AND RUST_OMC_OMSHELL_CLIENTS)
     # Serialised after rust_omc: concurrent cargo-xwin runs race on the shared clang-cl wrapper.
@@ -1574,7 +1329,7 @@ function(omc_rust_setup_codegen)
             DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT omc)
   endif()
   # The library-documentation generator. Frontend-only, so it does not link the
-  # cdylib and only DEPENDS on the transpile.
+  # cdylib and only DEPENDS on the source sync.
   #
   # MAKEFLAGS is cleared because tikv-jemalloc-sys prepends its own flags to it
   # before running autotools make, which leaves make's dash-less leading option
@@ -1616,33 +1371,23 @@ function(omc_rust_setup_codegen)
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
           DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/omc/ COMPONENT omc)
   endif() # NOT OM_OMC_WASM
-
-  # NOTE: OpenModelicaScriptingAPI.mo is now produced by the standalone
-  # scripting_api_gen tool above (rust_scripting_api target / SCRIPTING_API_MO),
-  # *before* codegen, so it no longer needs a built omc and there is no bootstrap
-  # cycle. The previous omc-based regeneration target has been removed.
 endfunction()
 
 # Provides, for the native CMake build of the Qt GUI clients in Rust mode, the
 # OpenModelicaCompiler target they link. The OpenModelicaScriptingAPIQt sources
-# OMEdit compiles are generated into OMC_SCRIPTING_API_QT_DIR by rust_codegen.
+# OMEdit compiles are the committed ones in OMC_SCRIPTING_API_QT_DIR.
 # Called whenever OM_ENABLE_GUI_CLIENTS is ON.
 #
 # Two modes:
 #   * normal: link the cargo-built cdylib and depend on rust_libopenmodelica so it
-#     is built first (the Qt sources come from rust_codegen, in this build).
-#   * prebuilt (RUST_OMC_PREBUILT_CDYLIB set): link an already-built cdylib and
-#     read the Qt sources from RUST_OMC_PREBUILT_SCRIPTING_API_QT_DIR, with NO
-#     cargo target/dependency. Compiler/CMakeLists.txt skips the whole codegen
-#     setup in this mode, so the GUI is the only thing built here. This is how a
+#     is built first.
+#   * prebuilt (RUST_OMC_PREBUILT_CDYLIB set): link an already-built cdylib, with
+#     NO cargo target/dependency. Compiler/CMakeLists.txt skips
+#     omc_rust_setup_codegen in this mode, so the GUI is the only thing built here. This is how a
 #     split CI builds the GUI in parallel with the tests off a stage-1 cdylib.
 function(omc_rust_setup_omedit)
   if(RUST_OMC_PREBUILT_CDYLIB)
     get_filename_component(_cdylib ${RUST_OMC_PREBUILT_CDYLIB} ABSOLUTE)
-    # OMEditLIB reads the generated Qt API sources from OMC_SCRIPTING_API_QT_DIR;
-    # in prebuilt mode rust_codegen never ran here, so point it at the stage-1 copy.
-    set(OMC_SCRIPTING_API_QT_DIR ${RUST_OMC_PREBUILT_SCRIPTING_API_QT_DIR}
-        CACHE INTERNAL "Generated OpenModelicaScriptingAPIQt C++ sources (prebuilt)")
   else()
     set(RUST_OMC_ARTIFACT_DIR ${RUST_TARGET_DIR}/${RUST_OMC_ARTIFACT_SUBDIR})
     set(_cdylib ${RUST_OMC_ARTIFACT_DIR}/${RUST_OMC_CDYLIB_NAME})
@@ -1948,7 +1693,7 @@ function(omc_rust_omnotebook_qt_web_page)
 endfunction()
 
 # Qt OMEdit web page: same shape as the OMShell/OMNotebook pages, pointed at the
-# build-tree OpenModelicaScriptingAPIQt sources (OMC_SCRIPTING_API_QT_DIR).
+# committed OpenModelicaScriptingAPIQt sources (OMC_SCRIPTING_API_QT_DIR).
 function(omc_rust_omedit_qt_web_page)
   set(OMSHELL_QT_WASM_PREFIX "/opt/Qt/6.11.2/wasm_singlethread"
       CACHE PATH "Qt-for-WebAssembly install prefix used to build the Qt OMShell web page.")

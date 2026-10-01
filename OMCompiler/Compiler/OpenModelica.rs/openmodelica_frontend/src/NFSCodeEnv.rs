@@ -1,0 +1,3599 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::FBuiltin;
+use crate::NFEnvExtends;
+use crate::NFSCodeCheck;
+use crate::NFSCodeFlattenRedeclare;
+use crate::NFSCodeLookup;
+use openmodelica_ast::Absyn;
+use openmodelica_frontend_dump::AbsynToSCode;
+use openmodelica_frontend_dump::AbsynUtil;
+use openmodelica_frontend_dump::SCodeDump;
+use openmodelica_frontend_dump::SCodeUtil;
+use openmodelica_frontend_types::SCode;
+use openmodelica_util::BaseAvlSet;
+use openmodelica_util::BaseAvlTree;
+use openmodelica_util::Error;
+use openmodelica_util::System;
+use openmodelica_util::Util;
+use openmodelica_util_datatypes_basic::List;
+use openmodelica_util_datatypes_basic::Mutable;
+
+pub type Import = Absyn::Import;
+
+pub(crate) const tmpTickIndex: i32 = 2;
+
+pub(crate) const extendsTickIndex: i32 = 3;
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct ImportTable {
+    /// If true means that the imports are hidden.
+    pub hidden: bool,
+    pub qualifiedImports: metamodelica::List<Absyn::Import>,
+    pub unqualifiedImports: metamodelica::List<Absyn::Import>,
+}
+
+impl metamodelica::gc::MMTrace for ImportTable {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.hidden, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.qualifiedImports, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.unqualifiedImports, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for ImportTable {
+    fn default() -> Self {
+        Self {
+            hidden: Default::default(),
+            qualifiedImports: Default::default(),
+            unqualifiedImports: Default::default(),
+        }
+    }
+}
+
+pub type IMPORT_TABLE = ImportTable;
+
+/// This uniontype stores a redeclare modifier (which might be derived from an
+///  element redeclare). The RAW_MODIFIER stores a 'raw' modifier, i.e. the raw
+///  element stored in the SCode representation. These are processed when they are
+///  used, i.e. when replacements are done, and converted into PROCESSED_MODIFIERs
+///  which are environment items ready to be replaced in the environment.
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub(crate) enum Redeclaration {
+    RAW_MODIFIER {
+        modifier: metamodelica::Ref<SCode::Element>,
+    },
+    PROCESSED_MODIFIER {
+        modifier: metamodelica::Ref<Item>,
+    },
+}
+impl metamodelica::gc::MMTrace for Redeclaration {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Redeclaration::RAW_MODIFIER { modifier } => {
+                metamodelica::gc::MMTrace::mm_accept(modifier, __mmv)?;
+                Ok(())
+            }
+            Redeclaration::PROCESSED_MODIFIER { modifier } => {
+                metamodelica::gc::MMTrace::mm_accept(modifier, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for Redeclaration {
+    fn default() -> Self {
+        Self::RAW_MODIFIER {
+            modifier: Default::default(),
+        }
+    }
+}
+pub(crate) use self::Redeclaration::{PROCESSED_MODIFIER, RAW_MODIFIER};
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct Extends {
+    pub baseClass: metamodelica::Ref<Absyn::Path>,
+    pub redeclareModifiers: metamodelica::List<metamodelica::Ref<Redeclaration>>,
+    pub index: i32,
+    pub info: SourceInfo,
+}
+
+impl metamodelica::gc::MMTrace for Extends {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.baseClass, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.redeclareModifiers, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.index, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.info, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for Extends {
+    fn default() -> Self {
+        Self {
+            baseClass: Default::default(),
+            redeclareModifiers: Default::default(),
+            index: Default::default(),
+            info: Default::default(),
+        }
+    }
+}
+
+pub type EXTENDS = Extends;
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct ExtendsTable {
+    pub baseClasses: metamodelica::List<metamodelica::Ref<Extends>>,
+    pub redeclaredElements: metamodelica::List<metamodelica::Ref<SCode::Element>>,
+    pub classExtendsInfo: Option<metamodelica::Ref<SCode::Element>>,
+}
+
+impl metamodelica::gc::MMTrace for ExtendsTable {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.baseClasses, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.redeclaredElements, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.classExtendsInfo, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for ExtendsTable {
+    fn default() -> Self {
+        Self {
+            baseClasses: Default::default(),
+            redeclaredElements: Default::default(),
+            classExtendsInfo: Default::default(),
+        }
+    }
+}
+
+pub type EXTENDS_TABLE = ExtendsTable;
+
+#[derive(Clone, Copy, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum FrameType {
+    NORMAL_SCOPE,
+    ENCAPSULATED_SCOPE,
+    /// This scope contains one or more iterators; they are made unique by the following index (plus their name)
+    IMPLICIT_SCOPE {
+        iterIndex: i32,
+    },
+}
+impl metamodelica::gc::MMTrace for FrameType {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            FrameType::NORMAL_SCOPE => Ok(()),
+            FrameType::ENCAPSULATED_SCOPE => Ok(()),
+            FrameType::IMPLICIT_SCOPE { iterIndex } => {
+                metamodelica::gc::MMTrace::mm_accept(iterIndex, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for FrameType {
+    fn default() -> Self {
+        Self::NORMAL_SCOPE
+    }
+}
+pub use self::FrameType::{ENCAPSULATED_SCOPE, IMPLICIT_SCOPE, NORMAL_SCOPE};
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct Frame {
+    pub name: Option<ArcStr>,
+    pub frameType: FrameType,
+    pub clsAndVars: metamodelica::Ref<EnvTree::Tree>,
+    pub extendsTable: metamodelica::Ref<ExtendsTable>,
+    pub importTable: ImportTable,
+    /// Used by SCodeDependency.
+    pub isUsed: Option<Mutable::Mutable<bool>>,
+}
+
+impl metamodelica::gc::MMTrace for Frame {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.name, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.frameType, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.clsAndVars, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.extendsTable, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.importTable, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.isUsed, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for Frame {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            frameType: Default::default(),
+            clsAndVars: Default::default(),
+            extendsTable: Default::default(),
+            importTable: Default::default(),
+            isUsed: Default::default(),
+        }
+    }
+}
+
+pub type FRAME = Frame;
+
+#[derive(Clone, Copy, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum ClassType {
+    USERDEFINED,
+    BUILTIN,
+    CLASS_EXTENDS,
+    BASIC_TYPE,
+}
+impl metamodelica::gc::MMTrace for ClassType {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            ClassType::USERDEFINED => Ok(()),
+            ClassType::BUILTIN => Ok(()),
+            ClassType::CLASS_EXTENDS => Ok(()),
+            ClassType::BASIC_TYPE => Ok(()),
+        }
+    }
+}
+impl Default for ClassType {
+    fn default() -> Self {
+        Self::USERDEFINED
+    }
+}
+pub use self::ClassType::{BASIC_TYPE, BUILTIN, CLASS_EXTENDS, USERDEFINED};
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum Item {
+    VAR {
+        var: metamodelica::Ref<SCode::Element>,
+        /// Used by SCodeDependency.
+        isUsed: Option<Mutable::Mutable<bool>>,
+    },
+    CLASS {
+        cls: metamodelica::Ref<SCode::Element>,
+        env: Env,
+        classType: ClassType,
+    },
+    /// An alias for another Item, see comment in SCodeFlattenRedeclare package.
+    ALIAS {
+        name: ArcStr,
+        path: Option<metamodelica::Ref<Absyn::Path>>,
+        info: SourceInfo,
+    },
+    REDECLARED_ITEM {
+        item: metamodelica::Ref<Item>,
+        declaredEnv: Env,
+    },
+}
+impl metamodelica::gc::MMTrace for Item {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Item::VAR { var, isUsed } => {
+                metamodelica::gc::MMTrace::mm_accept(var, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(isUsed, __mmv)?;
+                Ok(())
+            }
+            Item::CLASS { cls, env, classType } => {
+                metamodelica::gc::MMTrace::mm_accept(cls, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(env, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(classType, __mmv)?;
+                Ok(())
+            }
+            Item::ALIAS { name, path, info } => {
+                metamodelica::gc::MMTrace::mm_accept(name, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(path, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(info, __mmv)?;
+                Ok(())
+            }
+            Item::REDECLARED_ITEM { item, declaredEnv } => {
+                metamodelica::gc::MMTrace::mm_accept(item, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(declaredEnv, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for Item {
+    fn default() -> Self {
+        Self::VAR {
+            var: Default::default(),
+            isUsed: Default::default(),
+        }
+    }
+}
+pub use self::Item::{ALIAS, CLASS, REDECLARED_ITEM, VAR};
+
+pub mod EnvTree {
+    use super::*;
+    pub type Key = ArcStr;
+
+    pub type Value = metamodelica::Ref<Item>;
+
+    pub(crate) fn keyStr(mut inKey: Key) -> ArcStr {
+        let mut outString: ArcStr;
+        outString = inKey;
+        outString
+    }
+
+    pub(crate) fn valueStr(mut inValue: Value) -> ArcStr {
+        let mut outString: ArcStr;
+        outString = literal!("$item");
+        outString
+    }
+
+    pub(crate) fn keyCompare(mut inKey1: Key, mut inKey2: Key) -> i32 {
+        let mut outResult: i32;
+        outResult = stringCompare(&inKey1, &inKey2);
+        outResult
+    }
+
+    pub use addConflictReplace as addConflictDefault;
+
+    pub type ConflictFunc = std::sync::Arc<dyn ::std::ops::Fn(Value, Value, Key) -> Result<Value> + 'static>;
+
+    /// The binary tree data structure.
+    #[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+    pub(crate) enum Tree {
+        NODE {
+            /// The key of the node.
+            key: Key,
+            value: Value,
+            /// Height of tree, used for balancing
+            height: i32,
+            /// Left subtree.
+            left: metamodelica::Ref<Tree>,
+            /// Right subtree.
+            right: metamodelica::Ref<Tree>,
+        },
+        LEAF {
+            /// The key of the node.
+            key: Key,
+            value: Value,
+        },
+        EMPTY,
+    }
+    impl metamodelica::gc::MMTrace for Tree {
+        fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+            match self {
+                Tree::NODE {
+                    key,
+                    value,
+                    height,
+                    left,
+                    right,
+                } => {
+                    metamodelica::gc::MMTrace::mm_accept(key, __mmv)?;
+                    metamodelica::gc::MMTrace::mm_accept(value, __mmv)?;
+                    metamodelica::gc::MMTrace::mm_accept(height, __mmv)?;
+                    metamodelica::gc::MMTrace::mm_accept(left, __mmv)?;
+                    metamodelica::gc::MMTrace::mm_accept(right, __mmv)?;
+                    Ok(())
+                }
+                Tree::LEAF { key, value } => {
+                    metamodelica::gc::MMTrace::mm_accept(key, __mmv)?;
+                    metamodelica::gc::MMTrace::mm_accept(value, __mmv)?;
+                    Ok(())
+                }
+                Tree::EMPTY => Ok(()),
+            }
+        }
+    }
+    impl Tree {
+        pub fn interned_EMPTY() -> metamodelica::Ref<Tree> {
+            static INTERNED: std::sync::LazyLock<metamodelica::Ref<Tree>> =
+                std::sync::LazyLock::new(|| metamodelica::Ref::new(Tree::EMPTY));
+            (*INTERNED).clone()
+        }
+    }
+    pub fn interned_EMPTY() -> metamodelica::Ref<Tree> {
+        Tree::interned_EMPTY()
+    }
+    impl Default for Tree {
+        fn default() -> Self {
+            Self::EMPTY
+        }
+    }
+    pub(crate) use self::Tree::{EMPTY, LEAF, NODE};
+
+    pub type ValueNode = ArcStr;
+
+    pub(crate) fn add(
+        mut inTree: metamodelica::Ref<Tree>,
+        mut inKey: &Key,
+        mut inValue: &Value,
+        mut conflictFunc: &dyn ::std::ops::Fn(metamodelica::Ref<Item>, metamodelica::Ref<Item>, ArcStr) -> Result<metamodelica::Ref<Item>>,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        let mut tree: metamodelica::Ref<Tree> = inTree;
+        tree = (match &*tree.clone() {
+            Tree::EMPTY { .. } => metamodelica::Ref::new(Tree::LEAF {
+                key: inKey.clone(),
+                value: inValue.clone(),
+            }),
+            Tree::NODE { key, .. } => {
+                let mut value: Value;
+                let mut key_comp: i32;
+                key_comp = keyCompare(inKey.clone(), key.clone());
+                if key_comp == -1 {
+                    assign_variant_field!(tree => Tree::NODE; left = add(var_field!((*tree).left, Tree::NODE).clone(), inKey, inValue, conflictFunc)?);
+                } else if key_comp == 1 {
+                    assign_variant_field!(tree => Tree::NODE; right = add(var_field!((*tree).right, Tree::NODE).clone(), inKey, inValue, conflictFunc)?);
+                } else {
+                    value = conflictFunc(
+                        inValue.clone(),
+                        var_field!((*tree).value, Tree::NODE).clone(),
+                        key.clone(),
+                    )?;
+                    if !(referenceEq(&*(var_field!((*tree).value, Tree::NODE).clone()), &*(&*value))) {
+                        assign_variant_field!(tree => Tree::NODE; value = value);
+                    }
+                }
+                if (key_comp == 0) { tree } else { balance(tree)? }
+            }
+            Tree::LEAF { key: __tree_key, .. } => {
+                let mut value: Value;
+                let mut key_comp: i32;
+                let mut outTree: metamodelica::Ref<Tree>;
+                key_comp = keyCompare(inKey.clone(), __tree_key.clone());
+                if key_comp == -1 {
+                    outTree = metamodelica::Ref::new(Tree::NODE {
+                        key: var_field!((*tree).key, Tree::LEAF).clone(),
+                        value: var_field!((*tree).value, Tree::LEAF).clone(),
+                        height: 2,
+                        left: metamodelica::Ref::new(Tree::LEAF {
+                            key: inKey.clone(),
+                            value: inValue.clone(),
+                        }),
+                        right: crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY(),
+                    });
+                } else if key_comp == 1 {
+                    outTree = metamodelica::Ref::new(Tree::NODE {
+                        key: var_field!((*tree).key, Tree::LEAF).clone(),
+                        value: var_field!((*tree).value, Tree::LEAF).clone(),
+                        height: 2,
+                        left: crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY(),
+                        right: metamodelica::Ref::new(Tree::LEAF {
+                            key: inKey.clone(),
+                            value: inValue.clone(),
+                        }),
+                    });
+                } else {
+                    value = conflictFunc(
+                        inValue.clone(),
+                        var_field!((*tree).value, Tree::LEAF).clone(),
+                        var_field!((*tree).key, Tree::LEAF).clone(),
+                    )?;
+                    if !(referenceEq(&*(var_field!((*tree).value, Tree::LEAF).clone()), &*(&*value))) {
+                        assign_variant_field!(tree => Tree::LEAF; value = value);
+                    }
+                    outTree = tree;
+                }
+                if (key_comp == 0) { outTree } else { balance(outTree)? }
+            }
+        });
+        Ok(tree)
+    }
+
+    pub(crate) fn addConflictFail(mut newValue: &Value, mut oldValue: &Value, mut key: &Key) -> Result<Value> {
+        let mut value: Value;
+        return Err("fail");
+        Ok(value)
+    }
+
+    pub(crate) fn addConflictKeep(mut newValue: &Value, mut oldValue: Value, mut key: &Key) -> Value {
+        let mut value: Value = oldValue;
+        value
+    }
+
+    pub fn addConflictReplace(mut newValue: Value, mut oldValue: Value, mut key: Key) -> Value {
+        let mut value: Value = newValue;
+        value
+    }
+
+    pub(crate) fn addList(
+        mut tree: metamodelica::Ref<Tree>,
+        mut inValues: &metamodelica::List<(ArcStr, metamodelica::Ref<Item>)>,
+        mut conflictFunc: &dyn ::std::ops::Fn(metamodelica::Ref<Item>, metamodelica::Ref<Item>, ArcStr) -> Result<metamodelica::Ref<Item>>,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        let mut tree: metamodelica::Ref<Tree> = tree;
+        let mut key: Key;
+        let mut value: Value;
+        for mut t in &**inValues {
+            (key, value) = t.clone();
+            tree = add(tree, &key, &value, conflictFunc)?;
+        }
+        Ok(tree)
+    }
+
+    pub(crate) fn addUpdate(
+        mut tree: metamodelica::Ref<Tree>,
+        mut key: &Key,
+        mut r#fn: &dyn ::std::ops::Fn(Option<metamodelica::Ref<Item>>) -> Result<metamodelica::Ref<Item>>,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        pub type UpdateFn =
+            std::sync::Arc<dyn ::std::ops::Fn(Option<metamodelica::Ref<Item>>) -> Result<Value> + 'static>;
+
+        let mut tree: metamodelica::Ref<Tree> = tree;
+        let mut key_comp: i32;
+        let mut new_tree: metamodelica::Ref<Tree>;
+        tree = (match &*tree {
+            Tree::EMPTY { .. } => metamodelica::Ref::new(Tree::LEAF {
+                key: key.clone(),
+                value: r#fn(None)?,
+            }),
+            Tree::NODE { key: __tree_key, .. } => {
+                key_comp = keyCompare(key.clone(), __tree_key.clone());
+                if key_comp == -1 {
+                    assign_variant_field!(tree => Tree::NODE; left = addUpdate(var_field!((*tree).left, Tree::NODE).clone(), key, r#fn)?);
+                } else if key_comp == 1 {
+                    assign_variant_field!(tree => Tree::NODE; right = addUpdate(var_field!((*tree).right, Tree::NODE).clone(), key, r#fn)?);
+                } else {
+                    assign_variant_field!(tree => Tree::NODE; value = r#fn(Some(var_field!((*tree).value, Tree::NODE).clone()))?);
+                }
+                if (key_comp == 0) { tree } else { balance(tree)? }
+            }
+            Tree::LEAF { key: __tree_key, .. } => {
+                key_comp = keyCompare(key.clone(), __tree_key.clone());
+                if key_comp == -1 {
+                    new_tree = metamodelica::Ref::new(Tree::NODE {
+                        key: var_field!((*tree).key, Tree::LEAF).clone(),
+                        value: var_field!((*tree).value, Tree::LEAF).clone(),
+                        height: 2,
+                        left: metamodelica::Ref::new(Tree::LEAF {
+                            key: key.clone(),
+                            value: r#fn(None)?,
+                        }),
+                        right: crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY(),
+                    });
+                } else if key_comp == 1 {
+                    new_tree = metamodelica::Ref::new(Tree::NODE {
+                        key: var_field!((*tree).key, Tree::LEAF).clone(),
+                        value: var_field!((*tree).value, Tree::LEAF).clone(),
+                        height: 2,
+                        left: crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY(),
+                        right: metamodelica::Ref::new(Tree::LEAF {
+                            key: key.clone(),
+                            value: r#fn(None)?,
+                        }),
+                    });
+                } else {
+                    assign_variant_field!(tree => Tree::LEAF; value = r#fn(Some(var_field!((*tree).value, Tree::LEAF).clone()))?);
+                    new_tree = tree;
+                }
+                if (key_comp == 0) { new_tree } else { balance(new_tree)? }
+            }
+        });
+        Ok(tree)
+    }
+
+    fn balance(mut inTree: metamodelica::Ref<Tree>) -> Result<metamodelica::Ref<Tree>> {
+        let mut outTree: metamodelica::Ref<Tree> = inTree.clone();
+        outTree = (match &*outTree {
+            Tree::LEAF { .. } => inTree,
+            Tree::NODE {
+                left: __outTree_left,
+                right: __outTree_right,
+                ..
+            } => {
+                let mut lh: i32;
+                let mut rh: i32;
+                let mut diff: i32;
+                let mut balanced_tree: metamodelica::Ref<Tree>;
+                lh = height(metamodelica::AsArg::as_arg(&__outTree_left));
+                rh = height(metamodelica::AsArg::as_arg(&__outTree_right));
+                diff = lh - rh;
+                if diff < -1 {
+                    balanced_tree = if (calculateBalance(var_field!((*outTree).right, Tree::NODE)) > 0) {
+                        rotateLeft(setTreeLeftRight(
+                            outTree.clone(),
+                            var_field!((*outTree).left, Tree::NODE).clone(),
+                            rotateRight(var_field!((*outTree).right, Tree::NODE).clone())?,
+                        )?)?
+                    } else {
+                        rotateLeft(outTree)?
+                    };
+                } else if diff > 1 {
+                    balanced_tree = if (calculateBalance(var_field!((*outTree).left, Tree::NODE)) < 0) {
+                        rotateRight(setTreeLeftRight(
+                            outTree.clone(),
+                            rotateLeft(var_field!((*outTree).left, Tree::NODE).clone())?,
+                            var_field!((*outTree).right, Tree::NODE).clone(),
+                        )?)?
+                    } else {
+                        rotateRight(outTree)?
+                    };
+                } else if var_field!((*outTree).height, Tree::NODE).clone() != std::cmp::max(lh, rh) + 1 {
+                    assign_variant_field!(outTree => Tree::NODE; height = std::cmp::max(lh, rh) + 1);
+                    balanced_tree = outTree;
+                } else {
+                    balanced_tree = outTree;
+                }
+                balanced_tree
+            }
+            _ => return Err("match: no arm matched"),
+        });
+        Ok(outTree)
+    }
+
+    fn calculateBalance(mut inNode: &metamodelica::Ref<Tree>) -> i32 {
+        let mut outBalance: i32;
+        outBalance = (match &**inNode {
+            Tree::NODE {
+                left: __inNode_left,
+                right: __inNode_right,
+                ..
+            } => {
+                height(metamodelica::AsArg::as_arg(&__inNode_left))
+                    - height(metamodelica::AsArg::as_arg(&__inNode_right))
+            }
+            Tree::LEAF { .. } => 0,
+            _ => 0,
+        });
+        outBalance
+    }
+
+    pub(crate) fn fold<'__b, FT: Clone + 'static + metamodelica::gc::MMTrace>(
+        mut inTree: &'__b metamodelica::Ref<Tree>,
+        mut inFunc: &'__b dyn ::std::ops::Fn(ArcStr, metamodelica::Ref<Item>, FT) -> Result<FT>,
+        mut inStartValue: FT,
+    ) -> Result<FT> {
+        pub type FoldFunc<FT: Clone + 'static> =
+            std::sync::Arc<dyn ::std::ops::Fn(Key, Value, FT) -> Result<FT> + 'static>;
+
+        let mut outResult: FT = inStartValue;
+        outResult = (match &**inTree {
+            Tree::NODE { key, value, .. } => {
+                outResult = fold(var_field!((**inTree).left, Tree::NODE), inFunc, outResult)?;
+                outResult = inFunc(key.clone(), value.clone(), outResult)?;
+                outResult = fold(var_field!((**inTree).right, Tree::NODE), inFunc, outResult)?;
+                outResult
+            }
+            Tree::LEAF { key, value } => {
+                outResult = inFunc(key.clone(), value.clone(), outResult)?;
+                outResult
+            }
+            _ => outResult,
+        });
+        Ok(outResult)
+    }
+
+    pub(crate) fn foldCond<FT: Clone + 'static + metamodelica::gc::MMTrace>(
+        mut tree: &metamodelica::Ref<Tree>,
+        mut foldFunc: &dyn ::std::ops::Fn(ArcStr, metamodelica::Ref<Item>, FT) -> Result<(FT, bool)>,
+        mut value: FT,
+    ) -> Result<FT> {
+        pub type FoldFunc<FT: Clone + 'static> =
+            std::sync::Arc<dyn ::std::ops::Fn(Key, Value, FT) -> Result<(FT, bool)> + 'static>;
+
+        let mut value: FT = value;
+        value = (match &**tree {
+            Tree::NODE {
+                key: __tree_key,
+                left: __tree_left,
+                right: __tree_right,
+                value: __tree_value,
+                ..
+            } => {
+                let mut c: bool;
+                (value, c) = foldFunc(__tree_key.clone(), __tree_value.clone(), value)?;
+                if c {
+                    value = foldCond(metamodelica::AsArg::as_arg(&__tree_left), foldFunc, value)?;
+                    value = foldCond(metamodelica::AsArg::as_arg(&__tree_right), foldFunc, value)?;
+                }
+                value
+            }
+            Tree::LEAF {
+                key: __tree_key,
+                value: __tree_value,
+            } => {
+                let mut c: bool;
+                (value, c) = foldFunc(__tree_key.clone(), __tree_value.clone(), value)?;
+                value
+            }
+            _ => value,
+        });
+        Ok(value)
+    }
+
+    pub(crate) fn fold_2<
+        FT1: Clone + 'static + metamodelica::gc::MMTrace,
+        FT2: Clone + 'static + metamodelica::gc::MMTrace,
+    >(
+        mut tree: &metamodelica::Ref<Tree>,
+        mut foldFunc: &dyn ::std::ops::Fn(ArcStr, metamodelica::Ref<Item>, FT1, FT2) -> Result<(FT1, FT2)>,
+        mut foldArg1: FT1,
+        mut foldArg2: FT2,
+    ) -> Result<(FT1, FT2)> {
+        pub type FoldFunc<FT1: Clone + 'static, FT2: Clone + 'static> =
+            std::sync::Arc<dyn ::std::ops::Fn(Key, Value, FT1, FT2) -> Result<(FT1, FT2)> + 'static>;
+
+        let mut foldArg1: FT1 = foldArg1;
+        let mut foldArg2: FT2 = foldArg2;
+        let () = (match &**tree {
+            Tree::NODE {
+                key: __tree_key,
+                left: __tree_left,
+                right: __tree_right,
+                value: __tree_value,
+                ..
+            } => {
+                (foldArg1, foldArg2) = fold_2(metamodelica::AsArg::as_arg(&__tree_left), foldFunc, foldArg1, foldArg2)?;
+                (foldArg1, foldArg2) = foldFunc(__tree_key.clone(), __tree_value.clone(), foldArg1, foldArg2)?;
+                (foldArg1, foldArg2) =
+                    fold_2(metamodelica::AsArg::as_arg(&__tree_right), foldFunc, foldArg1, foldArg2)?;
+                ()
+            }
+            Tree::LEAF {
+                key: __tree_key,
+                value: __tree_value,
+            } => {
+                (foldArg1, foldArg2) = foldFunc(__tree_key.clone(), __tree_value.clone(), foldArg1, foldArg2)?;
+                ()
+            }
+            _ => (),
+        });
+        Ok((foldArg1, foldArg2))
+    }
+
+    pub(crate) fn forEach(
+        mut tree: &metamodelica::Ref<Tree>,
+        mut func: &dyn ::std::ops::Fn(ArcStr, metamodelica::Ref<Item>) -> Result<()>,
+    ) -> Result<()> {
+        pub type EachFunc = std::sync::Arc<dyn ::std::ops::Fn(Key, Value) -> Result<()> + 'static>;
+
+        let () = (match &**tree {
+            Tree::NODE {
+                key: __tree_key,
+                left: __tree_left,
+                right: __tree_right,
+                value: __tree_value,
+                ..
+            } => {
+                forEach(metamodelica::AsArg::as_arg(&__tree_left), func)?;
+                func(__tree_key.clone(), __tree_value.clone())?;
+                forEach(metamodelica::AsArg::as_arg(&__tree_right), func)?;
+                ()
+            }
+            Tree::LEAF {
+                key: __tree_key,
+                value: __tree_value,
+            } => {
+                func(__tree_key.clone(), __tree_value.clone())?;
+                ()
+            }
+            Tree::EMPTY { .. } => (),
+        });
+        Ok(())
+    }
+
+    pub(crate) fn fromList(
+        mut inValues: &metamodelica::List<(ArcStr, metamodelica::Ref<Item>)>,
+        mut conflictFunc: &dyn ::std::ops::Fn(metamodelica::Ref<Item>, metamodelica::Ref<Item>, ArcStr) -> Result<metamodelica::Ref<Item>>,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        let mut tree: metamodelica::Ref<Tree> = crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY();
+        let mut key: Key;
+        let mut value: Value;
+        for mut t in &**inValues {
+            (key, value) = t.clone();
+            tree = add(tree, &key, &value, conflictFunc)?;
+        }
+        Ok(tree)
+    }
+
+    pub(crate) fn get<'__b>(mut tree: &'__b metamodelica::Ref<Tree>, mut key: Key) -> Result<Value> {
+        let mut value: Value;
+        let mut k: Key;
+        k = (match &**tree {
+            Tree::NODE { .. } => var_field!((**tree).key, Tree::NODE).clone(),
+            Tree::LEAF { .. } => var_field!((**tree).key, Tree::LEAF).clone(),
+            _ => return Err("match: no arm matched"),
+        });
+        value = (::match_deref::match_deref! { match &((keyCompare(key.clone(), k), tree.clone())) {
+            (0, Deref @ Tree::LEAF { .. }) => var_field!((**tree).value, Tree::LEAF).clone(),
+            (0, Deref @ Tree::NODE { .. }) => var_field!((**tree).value, Tree::NODE).clone(),
+            (1, Deref @ Tree::NODE { .. }) => get(var_field!((**tree).right, Tree::NODE), key)?,
+            ((-1), Deref @ Tree::NODE { .. }) => get(var_field!((**tree).left, Tree::NODE), key)?,
+            _ => return Err("match: no arm matched"),
+        } });
+        Ok(value)
+    }
+
+    pub(crate) fn getOpt<'__b>(
+        mut tree: &'__b metamodelica::Ref<Tree>,
+        mut key: Key,
+    ) -> Option<metamodelica::Ref<Item>> {
+        '__tco: loop {
+            let mut k: Key;
+            k = (match &**tree {
+                Tree::NODE { .. } => var_field!((**tree).key, Tree::NODE).clone(),
+                Tree::LEAF { .. } => var_field!((**tree).key, Tree::LEAF).clone(),
+                _ => key.clone(),
+            });
+            ::match_deref::match_deref! { match &((keyCompare(key.clone(), k), tree.clone())) {
+                (0, Deref @ Tree::LEAF { .. }) => return Some(var_field!((**tree).value, Tree::LEAF).clone()),
+                (0, Deref @ Tree::NODE { .. }) => return Some(var_field!((**tree).value, Tree::NODE).clone()),
+                (1, Deref @ Tree::NODE { .. }) => { (tree, key) = (var_field!((**tree).right, Tree::NODE), key); continue '__tco; },
+                ((-1), Deref @ Tree::NODE { .. }) => { (tree, key) = (var_field!((**tree).left, Tree::NODE), key); continue '__tco; },
+                _ => return None,
+                _ => unreachable!("tail-call lowered match: no arm matched"),
+            } }
+        }
+    }
+
+    pub(crate) fn hasKey(mut inTree: metamodelica::Ref<Tree>, mut inKey: Key) -> Result<bool> {
+        let mut comp: bool = false;
+        let mut key: Key;
+        let mut key_comp: i32;
+        let mut tree: metamodelica::Ref<Tree>;
+        key = (match &*inTree {
+            Tree::NODE { key: __inTree_key, .. } => __inTree_key.clone(),
+            Tree::LEAF { key: __inTree_key, .. } => __inTree_key.clone(),
+            Tree::EMPTY { .. } => {
+                return Ok(comp);
+                return Err("fail");
+            }
+        });
+        key_comp = keyCompare(inKey.clone(), key);
+        comp = (::match_deref::match_deref! { match &((key_comp, inTree)) {
+            (0, _) => true,
+            (1, Deref @ Tree::NODE { right: __esc_tree, .. }) => {
+                tree = (*__esc_tree).clone();
+                hasKey(tree.clone(), inKey)?
+            },
+            ((-1), Deref @ Tree::NODE { left: __esc_tree, .. }) => {
+                tree = (*__esc_tree).clone();
+                hasKey(tree.clone(), inKey)?
+            },
+            _ => false,
+            _ => unreachable!("match_deref! exhaustiveness placeholder"),
+        } });
+        Ok(comp)
+    }
+
+    fn height(mut inNode: &metamodelica::Ref<Tree>) -> i32 {
+        let mut outHeight: i32;
+        outHeight = (match &**inNode {
+            Tree::NODE {
+                height: __inNode_height,
+                ..
+            } => __inNode_height.clone(),
+            Tree::LEAF { .. } => 1,
+            _ => 0,
+        });
+        outHeight
+    }
+
+    pub(crate) fn intersection() -> Result<()> {
+        return Err("fail");
+        Ok(())
+    }
+
+    pub(crate) fn isEmpty(mut tree: &metamodelica::Ref<Tree>) -> bool {
+        let mut isEmpty: bool;
+        isEmpty = (match &**tree {
+            Tree::EMPTY { .. } => true,
+            _ => false,
+        });
+        isEmpty
+    }
+
+    pub(crate) fn join<'__b>(
+        mut tree: metamodelica::Ref<Tree>,
+        mut treeToJoin: &'__b metamodelica::Ref<Tree>,
+        mut conflictFunc: &'__b dyn ::std::ops::Fn(
+            metamodelica::Ref<Item>,
+            metamodelica::Ref<Item>,
+            ArcStr,
+        ) -> Result<metamodelica::Ref<Item>>,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        '__tco: loop {
+            match &**treeToJoin {
+                Tree::EMPTY { .. } => return Ok(tree),
+                Tree::NODE { .. } => {
+                    tree = add(
+                        tree,
+                        var_field!((**treeToJoin).key, Tree::NODE),
+                        var_field!((**treeToJoin).value, Tree::NODE),
+                        conflictFunc,
+                    )?;
+                    tree = join(tree, var_field!((**treeToJoin).left, Tree::NODE), conflictFunc)?;
+                    {
+                        (tree, treeToJoin, conflictFunc) =
+                            (tree, var_field!((**treeToJoin).right, Tree::NODE), conflictFunc);
+                        continue '__tco;
+                    }
+                }
+                Tree::LEAF { .. } => {
+                    return Ok(add(
+                        tree,
+                        var_field!((**treeToJoin).key, Tree::LEAF),
+                        var_field!((**treeToJoin).value, Tree::LEAF),
+                        conflictFunc,
+                    )?);
+                }
+            }
+        }
+    }
+
+    pub(crate) fn listKeys<'__b>(
+        mut tree: &'__b metamodelica::Ref<Tree>,
+        mut lst: metamodelica::List<ArcStr>,
+    ) -> metamodelica::List<ArcStr> {
+        '__tco: loop {
+            match &**tree {
+                Tree::NODE { key, .. } => {
+                    lst = listKeys(var_field!((**tree).right, Tree::NODE), lst);
+                    lst = metamodelica::cons(key.clone(), lst);
+                    {
+                        (tree, lst) = (var_field!((**tree).left, Tree::NODE), lst);
+                        continue '__tco;
+                    }
+                }
+                Tree::LEAF { key, .. } => return metamodelica::cons(key.clone(), lst),
+                _ => return lst,
+            }
+        }
+    }
+
+    pub(crate) fn listKeysReverse<'__b>(
+        mut inTree: &'__b metamodelica::Ref<Tree>,
+        mut lst: metamodelica::List<ArcStr>,
+    ) -> metamodelica::List<ArcStr> {
+        '__tco: loop {
+            match &**inTree {
+                Tree::LEAF { .. } => return metamodelica::cons(var_field!((**inTree).key, Tree::LEAF).clone(), lst),
+                Tree::NODE { .. } => {
+                    lst = listKeysReverse(var_field!((**inTree).left, Tree::NODE), lst);
+                    lst = metamodelica::cons(var_field!((**inTree).key, Tree::NODE).clone(), lst);
+                    {
+                        (inTree, lst) = (var_field!((**inTree).right, Tree::NODE), lst);
+                        continue '__tco;
+                    }
+                }
+                _ => return lst,
+            }
+        }
+    }
+
+    pub(crate) fn listValues<'__b>(
+        mut tree: &'__b metamodelica::Ref<Tree>,
+        mut lst: metamodelica::List<metamodelica::Ref<Item>>,
+    ) -> metamodelica::List<metamodelica::Ref<Item>> {
+        '__tco: loop {
+            match &**tree {
+                Tree::NODE { value, .. } => {
+                    lst = listValues(var_field!((**tree).right, Tree::NODE), lst);
+                    lst = metamodelica::cons(value.clone(), lst);
+                    {
+                        (tree, lst) = (var_field!((**tree).left, Tree::NODE), lst);
+                        continue '__tco;
+                    }
+                }
+                Tree::LEAF { value, .. } => return metamodelica::cons(value.clone(), lst),
+                _ => return lst,
+            }
+        }
+    }
+
+    pub(crate) fn map(
+        mut inTree: metamodelica::Ref<Tree>,
+        mut inFunc: &dyn ::std::ops::Fn(ArcStr, metamodelica::Ref<Item>) -> Result<metamodelica::Ref<Item>>,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        pub type MapFunc = std::sync::Arc<dyn ::std::ops::Fn(Key, Value) -> Result<Value> + 'static>;
+
+        let mut outTree: metamodelica::Ref<Tree> = inTree.clone();
+        outTree = (match &*outTree.clone() {
+            Tree::NODE {
+                key,
+                value,
+                left: __outTree_left,
+                right: __outTree_right,
+                ..
+            } => {
+                let mut new_value: Value;
+                let mut new_left: metamodelica::Ref<Tree>;
+                let mut new_right: metamodelica::Ref<Tree>;
+                new_left = map(__outTree_left.clone(), inFunc)?;
+                new_value = inFunc(key.clone(), value.clone())?;
+                new_right = map(__outTree_right.clone(), inFunc)?;
+                if !(referenceEq(&*(&*new_left), &*(var_field!((*outTree).left, Tree::NODE).clone())))
+                    || !(referenceEq(&*(value.clone()), &*(&*new_value)))
+                    || !(referenceEq(&*(&*new_right), &*(var_field!((*outTree).right, Tree::NODE).clone())))
+                {
+                    outTree = metamodelica::Ref::new(Tree::NODE {
+                        key: key.clone(),
+                        value: new_value,
+                        height: var_field!((*outTree).height, Tree::NODE).clone(),
+                        left: new_left,
+                        right: new_right,
+                    });
+                }
+                outTree
+            }
+            Tree::LEAF { key, value } => {
+                let mut new_value: Value;
+                new_value = inFunc(key.clone(), value.clone())?;
+                if !(referenceEq(&*(value.clone()), &*(&*new_value))) {
+                    assign_variant_field!(outTree => Tree::LEAF; value = new_value);
+                }
+                outTree
+            }
+            _ => inTree,
+        });
+        Ok(outTree)
+    }
+
+    pub(crate) fn mapFold<FT: Clone + 'static + metamodelica::gc::MMTrace>(
+        mut inTree: metamodelica::Ref<Tree>,
+        mut inFunc: &dyn ::std::ops::Fn(ArcStr, metamodelica::Ref<Item>, FT) -> Result<(metamodelica::Ref<Item>, FT)>,
+        mut inStartValue: FT,
+    ) -> Result<(metamodelica::Ref<Tree>, FT)> {
+        pub type MapFunc<FT: Clone + 'static> =
+            std::sync::Arc<dyn ::std::ops::Fn(Key, Value, FT) -> Result<Value> + 'static>;
+
+        let mut outTree: metamodelica::Ref<Tree> = inTree.clone();
+        let mut outResult: FT = inStartValue;
+        outTree = (match &*outTree.clone() {
+            Tree::NODE {
+                key,
+                value,
+                left: __outTree_left,
+                right: __outTree_right,
+                ..
+            } => {
+                let mut new_value: Value;
+                let mut new_left: metamodelica::Ref<Tree>;
+                let mut new_right: metamodelica::Ref<Tree>;
+                (new_left, outResult) = mapFold(__outTree_left.clone(), inFunc, outResult)?;
+                (new_value, outResult) = inFunc(key.clone(), value.clone(), outResult)?;
+                (new_right, outResult) = mapFold(__outTree_right.clone(), inFunc, outResult)?;
+                if !(referenceEq(&*(&*new_left), &*(var_field!((*outTree).left, Tree::NODE).clone())))
+                    || !(referenceEq(&*(value.clone()), &*(&*new_value)))
+                    || !(referenceEq(&*(&*new_right), &*(var_field!((*outTree).right, Tree::NODE).clone())))
+                {
+                    outTree = metamodelica::Ref::new(Tree::NODE {
+                        key: key.clone(),
+                        value: new_value,
+                        height: var_field!((*outTree).height, Tree::NODE).clone(),
+                        left: new_left,
+                        right: new_right,
+                    });
+                }
+                outTree
+            }
+            Tree::LEAF { key, value } => {
+                let mut new_value: Value;
+                (new_value, outResult) = inFunc(key.clone(), value.clone(), outResult)?;
+                if !(referenceEq(&*(value.clone()), &*(&*new_value))) {
+                    assign_variant_field!(outTree => Tree::LEAF; value = new_value);
+                }
+                outTree
+            }
+            _ => inTree,
+        });
+        Ok((outTree, outResult))
+    }
+
+    pub(crate) fn new() -> metamodelica::Ref<Tree> {
+        let mut outTree: metamodelica::Ref<Tree> = crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY();
+        outTree
+    }
+
+    pub(crate) fn printNodeStr(mut inNode: &metamodelica::Ref<Tree>) -> Result<ArcStr> {
+        let mut outString: ArcStr;
+        outString = (match &**inNode {
+            Tree::NODE {
+                key: __inNode_key,
+                value: __inNode_value,
+                ..
+            } => {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("("));
+                __mm_s.push_str(&*keyStr(__inNode_key.clone()));
+                __mm_s.push_str(&*literal!(", "));
+                __mm_s.push_str(&*valueStr(__inNode_value.clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            }
+            Tree::LEAF {
+                key: __inNode_key,
+                value: __inNode_value,
+            } => {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("("));
+                __mm_s.push_str(&*keyStr(__inNode_key.clone()));
+                __mm_s.push_str(&*literal!(", "));
+                __mm_s.push_str(&*valueStr(__inNode_value.clone()));
+                __mm_s.push_str(&*literal!(")"));
+                ArcStr::from(__mm_s)
+            }
+            _ => return Err("match: no arm matched"),
+        });
+        Ok(outString)
+    }
+
+    pub(crate) fn printTreeStr(mut inTree: &metamodelica::Ref<Tree>) -> Result<ArcStr> {
+        let mut outString: ArcStr;
+        let mut left: metamodelica::Ref<Tree>;
+        let mut right: metamodelica::Ref<Tree>;
+        outString = (match &**inTree {
+            Tree::EMPTY { .. } => literal!("EMPTY()"),
+            Tree::LEAF { .. } => printNodeStr(inTree)?,
+            Tree::NODE {
+                left: __esc_left,
+                right: __esc_right,
+                ..
+            } => {
+                left = (*__esc_left).clone();
+                right = (*__esc_right).clone();
+                {
+                    let mut __mm_s = String::new();
+                    __mm_s.push_str(&*printTreeStr2(
+                        metamodelica::AsArg::as_arg(&left),
+                        true,
+                        &(literal!("")),
+                    )?);
+                    __mm_s.push_str(&*printNodeStr(inTree)?);
+                    __mm_s.push_str(&*literal!("\n"));
+                    __mm_s.push_str(&*printTreeStr2(
+                        metamodelica::AsArg::as_arg(&right),
+                        false,
+                        &(literal!("")),
+                    )?);
+                    ArcStr::from(__mm_s)
+                }
+            }
+        });
+        Ok(outString)
+    }
+
+    fn printTreeStr2(mut inTree: &metamodelica::Ref<Tree>, mut isLeft: bool, mut inIndent: &ArcStr) -> Result<ArcStr> {
+        let mut outString: ArcStr;
+        let mut left: Option<metamodelica::Ref<Tree>>;
+        let mut right: Option<metamodelica::Ref<Tree>>;
+        outString = (match &**inTree {
+            Tree::NODE {
+                left: __inTree_left,
+                right: __inTree_right,
+                ..
+            } => {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*printTreeStr2(
+                    metamodelica::AsArg::as_arg(&__inTree_left),
+                    true,
+                    &({
+                        let mut __mm_s = String::new();
+                        __mm_s.push_str(&*inIndent);
+                        __mm_s.push_str(&*if (isLeft) {
+                            literal!("     ")
+                        } else {
+                            literal!(" │   ")
+                        });
+                        ArcStr::from(__mm_s)
+                    }),
+                )?);
+                __mm_s.push_str(&*inIndent);
+                __mm_s.push_str(&*if (isLeft) { literal!(" ┌") } else { literal!(" └") });
+                __mm_s.push_str(&*literal!("────"));
+                __mm_s.push_str(&*printNodeStr(inTree)?);
+                __mm_s.push_str(&*literal!("\n"));
+                __mm_s.push_str(&*printTreeStr2(
+                    metamodelica::AsArg::as_arg(&__inTree_right),
+                    false,
+                    &({
+                        let mut __mm_s = String::new();
+                        __mm_s.push_str(&*inIndent);
+                        __mm_s.push_str(&*if (isLeft) {
+                            literal!(" │   ")
+                        } else {
+                            literal!("     ")
+                        });
+                        ArcStr::from(__mm_s)
+                    }),
+                )?);
+                ArcStr::from(__mm_s)
+            }
+            Tree::LEAF { .. } => {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*inIndent);
+                __mm_s.push_str(&*if (isLeft) { literal!(" ┌") } else { literal!(" └") });
+                __mm_s.push_str(&*literal!("────"));
+                __mm_s.push_str(&*printNodeStr(inTree)?);
+                __mm_s.push_str(&*literal!("\n"));
+                ArcStr::from(__mm_s)
+            }
+            _ => literal!(""),
+        });
+        Ok(outString)
+    }
+
+    fn referenceEqOrEmpty(mut t1: &metamodelica::Ref<Tree>, mut t2: &metamodelica::Ref<Tree>) -> bool {
+        let mut b: bool;
+        b = (::match_deref::match_deref! { match (t1, t2) {
+            (Deref @ Tree::EMPTY { .. }, Deref @ Tree::EMPTY { .. }) => true,
+            _ => referenceEq(&*(&**t1),&*(&**t2)),
+            _ => unreachable!("match_deref! exhaustiveness placeholder"),
+        } });
+        b
+    }
+
+    fn rotateLeft(mut inNode: metamodelica::Ref<Tree>) -> Result<metamodelica::Ref<Tree>> {
+        let mut outNode: metamodelica::Ref<Tree> = inNode.clone();
+        outNode = (::match_deref::match_deref! { match &(outNode.clone()) {
+            Deref @ Tree::NODE { right: child @ Deref @ Tree::NODE { .. }, left: __outNode_left, .. } => {
+                let mut node: metamodelica::Ref<Tree>;
+                node = setTreeLeftRight(outNode, __outNode_left.clone(), var_field!((**child).left, Tree::NODE).clone())?;
+                setTreeLeftRight(child.clone(), node, var_field!((**child).right, Tree::NODE).clone())?
+            },
+            Deref @ Tree::NODE { right: child @ Deref @ Tree::LEAF { .. }, left: __outNode_left, .. } => {
+                let mut node: metamodelica::Ref<Tree>;
+                node = setTreeLeftRight(outNode, __outNode_left.clone(), crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY())?;
+                setTreeLeftRight(child.clone(), node, crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY())?
+            },
+            _ => {
+                inNode
+            },
+            _ => unreachable!("match_deref! exhaustiveness placeholder"),
+        } });
+        Ok(outNode)
+    }
+
+    fn rotateRight(mut inNode: metamodelica::Ref<Tree>) -> Result<metamodelica::Ref<Tree>> {
+        let mut outNode: metamodelica::Ref<Tree> = inNode.clone();
+        outNode = (::match_deref::match_deref! { match &(outNode.clone()) {
+            Deref @ Tree::NODE { left: child @ Deref @ Tree::NODE { .. }, right: __outNode_right, .. } => {
+                let mut node: metamodelica::Ref<Tree>;
+                node = setTreeLeftRight(outNode, var_field!((**child).right, Tree::NODE).clone(), __outNode_right.clone())?;
+                setTreeLeftRight(child.clone(), var_field!((**child).left, Tree::NODE).clone(), node)?
+            },
+            Deref @ Tree::NODE { left: child @ Deref @ Tree::LEAF { .. }, right: __outNode_right, .. } => {
+                let mut node: metamodelica::Ref<Tree>;
+                node = setTreeLeftRight(outNode, crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY(), __outNode_right.clone())?;
+                setTreeLeftRight(child.clone(), crate::NFSCodeEnv::EnvTree::Tree::interned_EMPTY(), node)?
+            },
+            _ => {
+                inNode
+            },
+            _ => unreachable!("match_deref! exhaustiveness placeholder"),
+        } });
+        Ok(outNode)
+    }
+
+    pub(crate) fn setTreeLeftRight(
+        mut orig: metamodelica::Ref<Tree>,
+        mut left: metamodelica::Ref<Tree>,
+        mut right: metamodelica::Ref<Tree>,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        let mut res: metamodelica::Ref<Tree>;
+        res = (::match_deref::match_deref! { match &((orig.clone(), left.clone(), right.clone())) {
+            (Deref @ Tree::NODE { .. }, Deref @ Tree::EMPTY { .. }, Deref @ Tree::EMPTY { .. }) => metamodelica::Ref::new(Tree::LEAF { key: var_field!((*orig).key, Tree::NODE).clone(), value: var_field!((*orig).value, Tree::NODE).clone() }),
+            (Deref @ Tree::LEAF { .. }, Deref @ Tree::EMPTY { .. }, Deref @ Tree::EMPTY { .. }) => orig,
+            (Deref @ Tree::NODE { .. }, _, _) => if (referenceEqOrEmpty(var_field!((*orig).left, Tree::NODE), &left) && referenceEqOrEmpty(var_field!((*orig).right, Tree::NODE), &right)) {orig} else {metamodelica::Ref::new(Tree::NODE { key: var_field!((*orig).key, Tree::NODE).clone(), value: var_field!((*orig).value, Tree::NODE).clone(), height: std::cmp::max(height(&left), height(&right)) + 1, left: left, right: right })},
+            (Deref @ Tree::LEAF { .. }, _, _) => metamodelica::Ref::new(Tree::NODE { key: var_field!((*orig).key, Tree::LEAF).clone(), value: var_field!((*orig).value, Tree::LEAF).clone(), height: std::cmp::max(height(&left), height(&right)) + 1, left: left, right: right }),
+            _ => return Err("match: no arm matched"),
+        } });
+        Ok(res)
+    }
+
+    pub(crate) fn smallestKey<'__b>(mut tree: &'__b metamodelica::Ref<Tree>) -> Result<Key> {
+        '__tco: loop {
+            ::match_deref::match_deref! { match tree {
+                Deref @ Tree::NODE { right: Deref @ Tree::EMPTY { .. }, .. } => return Ok(var_field!((**tree).key, Tree::NODE).clone()),
+                Deref @ Tree::NODE { .. } => { tree = var_field!((**tree).right, Tree::NODE); continue '__tco; },
+                Deref @ Tree::LEAF { .. } => return Ok(var_field!((**tree).key, Tree::LEAF).clone()),
+                _ => return Err("match: no arm matched"),
+            } }
+        }
+    }
+
+    pub(crate) fn toList<'__b>(
+        mut inTree: &'__b metamodelica::Ref<Tree>,
+        mut lst: metamodelica::List<(ArcStr, metamodelica::Ref<Item>)>,
+    ) -> metamodelica::List<(ArcStr, metamodelica::Ref<Item>)> {
+        '__tco: loop {
+            match &**inTree {
+                Tree::NODE { key, value, .. } => {
+                    lst = toList(var_field!((**inTree).right, Tree::NODE), lst);
+                    lst = metamodelica::cons((key.clone(), value.clone()), lst);
+                    {
+                        (inTree, lst) = (var_field!((**inTree).left, Tree::NODE), lst);
+                        continue '__tco;
+                    }
+                }
+                Tree::LEAF { key, value } => return metamodelica::cons((key.clone(), value.clone()), lst),
+                _ => return lst,
+            }
+        }
+    }
+
+    pub(crate) fn update(
+        mut tree: metamodelica::Ref<Tree>,
+        mut key: &Key,
+        mut value: &Value,
+    ) -> Result<metamodelica::Ref<Tree>> {
+        let mut outTree: metamodelica::Ref<Tree> = add(
+            tree.clone(),
+            key,
+            value,
+            &fnptr!(
+                addConflictReplace,
+                metamodelica::Ref<Item>,
+                metamodelica::Ref<Item>,
+                ArcStr
+            ),
+        )?;
+        Ok(outTree)
+    }
+}
+
+pub type Env = metamodelica::List<metamodelica::Ref<Frame>>;
+
+pub(crate) static emptyEnv: std::sync::LazyLock<metamodelica::List<metamodelica::Ref<Frame>>> =
+    std::sync::LazyLock::new(|| metamodelica::nil());
+
+pub(crate) const BASE_CLASS_SUFFIX: &'static str = "$base";
+
+pub(crate) fn newEnvironment(mut inName: Option<ArcStr>) -> Env {
+    let mut outEnv: Env;
+    let mut new_frame: metamodelica::Ref<Frame>;
+    new_frame = newFrame(inName, crate::NFSCodeEnv::FrameType::NORMAL_SCOPE);
+    outEnv = list![new_frame];
+    outEnv
+}
+
+fn openScope(mut inEnv: Env, mut inClass: &metamodelica::Ref<SCode::Element>) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: ArcStr;
+    let mut encapsulatedPrefix: SCode::Encapsulated;
+    let mut new_frame: metamodelica::Ref<Frame>;
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &((*inClass)) {
+        Deref @ SCode::Element::CLASS { name: __pa0, encapsulatedPrefix: __pa1, .. } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    encapsulatedPrefix = metamodelica::Own::own(__pa1);
+    new_frame = newFrame(Some(name), getFrameType(encapsulatedPrefix));
+    outEnv = metamodelica::cons(new_frame, inEnv);
+    Ok(outEnv)
+}
+
+pub(crate) fn enterScope(mut inEnv: Env, mut inName: ArcStr) -> Result<Env> {
+    let mut outEnv: Env = metamodelica::nil();
+    outEnv = 'mc: {
+        let __mc_input = inName.clone();
+        if let Ok((__v, __wb0)) = (|| -> Result<_> {
+            let _ = __mc_input.clone() else { return Err("nomatch") };
+            let mut cls_env: metamodelica::Ref<Frame>;
+            let mut item: metamodelica::Ref<Item>;
+            let mut outEnv: metamodelica::List<metamodelica::Ref<Frame>> = outEnv.clone();
+            (item, _) = NFSCodeLookup::lookupInClass(inName.clone(), inEnv.clone())?;
+            let __pa0 = ::match_deref::match_deref! { match &(getItemEnv(&item)?) {
+                Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: Deref @ metamodelica::ListNode::Nil } => __pa0.clone(),
+                _ => return Err("pattern mismatch"),
+            } };
+            cls_env = metamodelica::Own::own(__pa0);
+            outEnv = enterFrame(cls_env.clone(), inEnv.clone());
+            Ok((outEnv.clone(), outEnv.clone()))
+        })() {
+            outEnv = __wb0;
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let _ = __mc_input.clone() else { return Err("nomatch") };
+            metamodelica::print({
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("Failed to enterScope: "));
+                __mm_s.push_str(&*inName);
+                __mm_s.push_str(&*literal!(" in env: "));
+                __mm_s.push_str(&*printEnvStr(inEnv.clone())?);
+                __mm_s.push_str(&*literal!("\n"));
+                ArcStr::from(__mm_s)
+            });
+            Ok(return Err("fail"))
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(outEnv)
+}
+
+pub(crate) fn enterScopePath<'__b>(mut inEnv: Env, mut inPath: &'__b metamodelica::Ref<Absyn::Path>) -> Result<Env> {
+    '__tco: loop {
+        match &**inPath {
+            Absyn::Path::QUALIFIED { name, path } => {
+                let mut env: Env;
+                env = enterScope(inEnv, name.clone())?;
+                {
+                    (inEnv, inPath) = (env, path);
+                    continue '__tco;
+                }
+            }
+            Absyn::Path::IDENT { name } => return Ok(enterScope(inEnv, name.clone())?),
+            Absyn::Path::FULLYQUALIFIED { path } => {
+                let mut env: Env;
+                env = getEnvTopScope(inEnv)?;
+                {
+                    (inEnv, inPath) = (env, path);
+                    continue '__tco;
+                }
+            }
+        }
+    }
+}
+
+pub(crate) fn enterFrame(mut inFrame: metamodelica::Ref<Frame>, mut inEnv: Env) -> Env {
+    let mut outEnv: Env;
+    outEnv = metamodelica::cons(inFrame, inEnv);
+    outEnv
+}
+
+pub(crate) fn getEnvTopScope(mut inEnv: Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut top_scope: metamodelica::Ref<Frame>;
+    let mut env: Env;
+    env = inEnv.reverse();
+    let __pa0 = ::match_deref::match_deref! { match &(env) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: _ } => __pa0.clone(),
+        _ => return Err("pattern mismatch"),
+    } };
+    top_scope = metamodelica::Own::own(__pa0);
+    outEnv = list![top_scope];
+    Ok(outEnv)
+}
+
+fn getFrameType(mut encapsulatedPrefix: SCode::Encapsulated) -> FrameType {
+    let mut outType: FrameType;
+    outType = (match encapsulatedPrefix {
+        SCode::Encapsulated::ENCAPSULATED { .. } => crate::NFSCodeEnv::FrameType::ENCAPSULATED_SCOPE,
+        _ => crate::NFSCodeEnv::FrameType::NORMAL_SCOPE,
+    });
+    outType
+}
+
+fn newFrame(mut inName: Option<ArcStr>, mut inType: FrameType) -> metamodelica::Ref<Frame> {
+    let mut outFrame: metamodelica::Ref<Frame>;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut imps: ImportTable;
+    let mut is_used: Mutable::Mutable<bool>;
+    tree = EnvTree::new();
+    exts = newExtendsTable();
+    imps = newImportTable();
+    is_used = Mutable::create(false);
+    outFrame = metamodelica::Ref::new(Frame {
+        name: inName,
+        frameType: inType,
+        clsAndVars: tree,
+        extendsTable: exts,
+        importTable: imps,
+        isUsed: Some(is_used),
+    });
+    outFrame
+}
+
+fn newImportTable() -> ImportTable {
+    let mut outImports: ImportTable;
+    outImports = ImportTable {
+        hidden: false,
+        qualifiedImports: metamodelica::nil(),
+        unqualifiedImports: metamodelica::nil(),
+    };
+    outImports
+}
+
+fn newExtendsTable() -> metamodelica::Ref<ExtendsTable> {
+    let mut outExtends: metamodelica::Ref<ExtendsTable>;
+    outExtends = metamodelica::Ref::new(ExtendsTable {
+        baseClasses: metamodelica::nil(),
+        redeclaredElements: metamodelica::nil(),
+        classExtendsInfo: None,
+    });
+    outExtends
+}
+
+pub(crate) fn newItem(mut inElement: metamodelica::Ref<SCode::Element>) -> Result<metamodelica::Ref<Item>> {
+    let mut outItem: metamodelica::Ref<Item>;
+    outItem = (match &*inElement {
+        SCode::Element::CLASS { .. } => {
+            let mut class_env: Env;
+            let mut item: metamodelica::Ref<Item>;
+            class_env = makeClassEnvironment(&inElement, true)?;
+            item = newClassItem(inElement, class_env, crate::NFSCodeEnv::ClassType::USERDEFINED);
+            item
+        }
+        SCode::Element::COMPONENT { .. } => newVarItem(inElement, false),
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outItem)
+}
+
+pub(crate) fn newClassItem(
+    mut inClass: metamodelica::Ref<SCode::Element>,
+    mut inEnv: Env,
+    mut inClassType: ClassType,
+) -> metamodelica::Ref<Item> {
+    let mut outClassItem: metamodelica::Ref<Item>;
+    outClassItem = metamodelica::Ref::new(Item::CLASS {
+        cls: inClass,
+        env: inEnv,
+        classType: inClassType,
+    });
+    outClassItem
+}
+
+pub(crate) fn newVarItem(mut inVar: metamodelica::Ref<SCode::Element>, mut inIsUsed: bool) -> metamodelica::Ref<Item> {
+    let mut outVarItem: metamodelica::Ref<Item>;
+    let mut is_used: Mutable::Mutable<bool>;
+    is_used = Mutable::create(inIsUsed);
+    outVarItem = metamodelica::Ref::new(Item::VAR {
+        var: inVar,
+        isUsed: Some(is_used),
+    });
+    outVarItem
+}
+
+pub(crate) fn extendEnvWithClasses(
+    mut inClasses: &metamodelica::List<metamodelica::Ref<SCode::Element>>,
+    mut inEnv: Env,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = List::fold(
+        inClasses,
+        &move |__a0: metamodelica::Ref<SCode::Element>, __a1: metamodelica::List<metamodelica::Ref<Frame>>| {
+            extendEnvWithClass(__a0, &__a1)
+        },
+        inEnv,
+    )?;
+    Ok(outEnv)
+}
+
+fn extendEnvWithClass(mut inClass: metamodelica::Ref<SCode::Element>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = extendEnvWithClassDef(inClass, inEnv)?;
+    Ok(outEnv)
+}
+
+pub(crate) fn getClassType(mut inClassDef: &metamodelica::Ref<SCode::ClassDef>) -> ClassType {
+    let mut outType: ClassType;
+    outType = (::match_deref::match_deref! { match inClassDef {
+        Deref @ SCode::ClassDef::PARTS { externalDecl: Some(Deref @ SCode::ExternalDecl { lang: Some(Deref @ "builtin"), .. }), .. } => crate::NFSCodeEnv::ClassType::BUILTIN,
+        _ => crate::NFSCodeEnv::ClassType::USERDEFINED,
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    outType
+}
+
+pub(crate) fn printClassType(mut inClassType: ClassType) -> ArcStr {
+    let mut outString: ArcStr;
+    outString = (match inClassType {
+        ClassType::BUILTIN { .. } => literal!("BUILTIN"),
+        ClassType::CLASS_EXTENDS { .. } => literal!("CLASS_EXTENDS"),
+        ClassType::USERDEFINED { .. } => literal!("USERDEFINED"),
+        ClassType::BASIC_TYPE { .. } => literal!("BASIC_TYPE"),
+    });
+    outString
+}
+
+pub(crate) fn removeExtendsFromLocalScope(mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut ty: FrameType;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut imps: ImportTable;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut rest: Env;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: __pa2, importTable: __pa3, isUsed: __pa4, .. }, tail: __pa5 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    tree = metamodelica::Own::own(__pa2);
+    imps = metamodelica::Own::own(__pa3);
+    is_used = metamodelica::Own::own(__pa4);
+    rest = metamodelica::Own::own(__pa5);
+    exts = newExtendsTable();
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: exts,
+            importTable: imps,
+            isUsed: is_used,
+        }),
+        rest,
+    );
+    Ok(outEnv)
+}
+
+pub(crate) fn removeExtendFromLocalScope(mut inExtend: metamodelica::Ref<Absyn::Path>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut ty: FrameType;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut imps: ImportTable;
+    let mut rest: Env;
+    let mut iu: Option<Mutable::Mutable<bool>>;
+    let mut bcl: metamodelica::List<metamodelica::Ref<Extends>>;
+    let mut re: metamodelica::List<metamodelica::Ref<SCode::Element>>;
+    let mut cei: Option<metamodelica::Ref<SCode::Element>>;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5, __pa6, __pa7, __pa8) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: __pa2, extendsTable: Deref @ ExtendsTable { baseClasses: __pa3, redeclaredElements: __pa4, classExtendsInfo: __pa5 }, importTable: __pa6, isUsed: __pa7 }, tail: __pa8 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone(), __pa6.clone(), __pa7.clone(), __pa8.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    tree = metamodelica::Own::own(__pa2);
+    bcl = metamodelica::Own::own(__pa3);
+    re = metamodelica::Own::own(__pa4);
+    cei = metamodelica::Own::own(__pa5);
+    imps = metamodelica::Own::own(__pa6);
+    iu = metamodelica::Own::own(__pa7);
+    rest = metamodelica::Own::own(__pa8);
+    (bcl, _) = List::deleteMemberOnTrue(inExtend, bcl, &move |__a0: metamodelica::Ref<Absyn::Path>,
+                                                              __a1: metamodelica::Ref<Extends>|
+          -> metamodelica::Result<_> {
+        ::std::result::Result::Ok(isExtendNamed(&__a0, &__a1))
+    })?;
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: metamodelica::Ref::new(ExtendsTable {
+                baseClasses: bcl,
+                redeclaredElements: re,
+                classExtendsInfo: cei,
+            }),
+            importTable: imps,
+            isUsed: iu,
+        }),
+        rest,
+    );
+    Ok(outEnv)
+}
+
+fn isExtendNamed(mut inName: &metamodelica::Ref<Absyn::Path>, mut inExtends: &metamodelica::Ref<Extends>) -> bool {
+    let mut outIsNamed: bool;
+    let mut bc: metamodelica::Ref<Absyn::Path>;
+    let __arc1 = &(*inExtends);
+    let Extends { baseClass: __pa0, .. } = &**__arc1;
+    bc = metamodelica::Own::own(__pa0);
+    outIsNamed = AbsynUtil::pathEqual(inName, &bc);
+    outIsNamed
+}
+
+pub(crate) fn removeRedeclaresFromLocalScope(mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut ty: FrameType;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut imps: ImportTable;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut rest: Env;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let mut bc: metamodelica::List<metamodelica::Ref<Extends>>;
+    let mut cei: Option<metamodelica::Ref<SCode::Element>>;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5, __pa6, __pa7) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: __pa2, extendsTable: Deref @ ExtendsTable { baseClasses: __pa3, classExtendsInfo: __pa4, .. }, importTable: __pa5, isUsed: __pa6 }, tail: __pa7 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone(), __pa6.clone(), __pa7.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    tree = metamodelica::Own::own(__pa2);
+    bc = metamodelica::Own::own(__pa3);
+    cei = metamodelica::Own::own(__pa4);
+    imps = metamodelica::Own::own(__pa5);
+    is_used = metamodelica::Own::own(__pa6);
+    rest = metamodelica::Own::own(__pa7);
+    bc = List::map(
+        bc,
+        &move |__a0: metamodelica::Ref<Extends>| -> metamodelica::Result<_> {
+            ::std::result::Result::Ok(removeRedeclaresFromExtend(&__a0))
+        },
+    )?;
+    exts = metamodelica::Ref::new(ExtendsTable {
+        baseClasses: bc,
+        redeclaredElements: metamodelica::nil(),
+        classExtendsInfo: cei,
+    });
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: exts,
+            importTable: imps,
+            isUsed: is_used,
+        }),
+        rest,
+    );
+    Ok(outEnv)
+}
+
+fn removeRedeclaresFromExtend(mut inExtend: &metamodelica::Ref<Extends>) -> metamodelica::Ref<Extends> {
+    let mut outExtend: metamodelica::Ref<Extends>;
+    let mut bc: metamodelica::Ref<Absyn::Path>;
+    let mut index: i32;
+    let mut info: SourceInfo;
+    let __arc3 = &(*inExtend);
+    let Extends {
+        baseClass: __pa0,
+        redeclareModifiers: _,
+        index: __pa1,
+        info: __pa2,
+    } = &**__arc3;
+    bc = metamodelica::Own::own(__pa0);
+    index = metamodelica::Own::own(__pa1);
+    info = metamodelica::Own::own(__pa2);
+    outExtend = metamodelica::Ref::new(Extends {
+        baseClass: bc,
+        redeclareModifiers: metamodelica::nil(),
+        index: index,
+        info: info,
+    });
+    outExtend
+}
+
+pub(crate) fn removeClsAndVarsFromFrame(
+    mut inFrame: &metamodelica::Ref<Frame>,
+) -> (metamodelica::Ref<Frame>, metamodelica::Ref<EnvTree::Tree>) {
+    let mut outFrame: metamodelica::Ref<Frame>;
+    let mut outClsAndVars: metamodelica::Ref<EnvTree::Tree>;
+    let mut name: Option<ArcStr>;
+    let mut ty: FrameType;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut imps: ImportTable;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let __arc6 = &(*inFrame);
+    let Frame {
+        name: __pa0,
+        frameType: __pa1,
+        clsAndVars: __pa2,
+        extendsTable: __pa3,
+        importTable: __pa4,
+        isUsed: __pa5,
+    } = &**__arc6;
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    outClsAndVars = metamodelica::Own::own(__pa2);
+    exts = metamodelica::Own::own(__pa3);
+    imps = metamodelica::Own::own(__pa4);
+    is_used = metamodelica::Own::own(__pa5);
+    tree = EnvTree::new();
+    outFrame = metamodelica::Ref::new(Frame {
+        name: name,
+        frameType: ty,
+        clsAndVars: tree,
+        extendsTable: exts,
+        importTable: imps,
+        isUsed: is_used,
+    });
+    (outFrame, outClsAndVars)
+}
+
+pub(crate) fn setImportTableHidden(mut inEnv: &Env, mut inHidden: bool) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut ty: FrameType;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut rest: Env;
+    let mut qi: metamodelica::List<Absyn::Import>;
+    let mut uqi: metamodelica::List<Absyn::Import>;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5, __pa6, __pa7) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: __pa2, extendsTable: __pa3, importTable: ImportTable { qualifiedImports: __pa4, unqualifiedImports: __pa5, .. }, isUsed: __pa6 }, tail: __pa7 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone(), __pa6.clone(), __pa7.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    tree = metamodelica::Own::own(__pa2);
+    exts = metamodelica::Own::own(__pa3);
+    qi = metamodelica::Own::own(__pa4);
+    uqi = metamodelica::Own::own(__pa5);
+    is_used = metamodelica::Own::own(__pa6);
+    rest = metamodelica::Own::own(__pa7);
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: exts,
+            importTable: ImportTable {
+                hidden: inHidden,
+                qualifiedImports: qi,
+                unqualifiedImports: uqi,
+            },
+            isUsed: is_used,
+        }),
+        rest,
+    );
+    Ok(outEnv)
+}
+
+pub(crate) fn setImportsInItemHidden(
+    mut inItem: metamodelica::Ref<Item>,
+    mut inHidden: bool,
+) -> Result<metamodelica::Ref<Item>> {
+    let mut outItem: metamodelica::Ref<Item>;
+    outItem = (match &*inItem {
+        Item::CLASS {
+            cls,
+            env,
+            classType: cls_ty,
+        } => {
+            let mut env = (*env).clone();
+            env = setImportTableHidden(metamodelica::AsArg::as_arg(&env), inHidden)?;
+            metamodelica::Ref::new(Item::CLASS {
+                cls: cls.clone(),
+                env: env.clone(),
+                classType: cls_ty.clone(),
+            })
+        }
+        _ => inItem,
+    });
+    Ok(outItem)
+}
+
+pub(crate) fn isItemUsed<'__b>(mut inItem: &'__b metamodelica::Ref<Item>) -> bool {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inItem {
+            Deref @ Item::CLASS { env: Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { isUsed: Some(is_used), .. }, tail: Deref @ metamodelica::ListNode::Nil }, .. } => {
+                return Mutable::access(is_used.clone())
+            },
+            Deref @ Item::VAR { isUsed: Some(is_used), .. } => {
+                return Mutable::access(is_used.clone())
+            },
+            Deref @ Item::ALIAS { .. } => {
+                return true
+            },
+            Deref @ Item::REDECLARED_ITEM { item, .. } => {
+                { inItem = item; continue '__tco; }
+            },
+            _ => {
+                return false
+            },
+            _ => unreachable!("tail-call lowered match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn linkItemUsage(
+    mut inSrcItem: &metamodelica::Ref<Item>,
+    mut inDestItem: &metamodelica::Ref<Item>,
+) -> metamodelica::Ref<Item> {
+    let mut outDestItem: metamodelica::Ref<Item>;
+    outDestItem = (::match_deref::match_deref! { match (inSrcItem, inDestItem) {
+        (Deref @ Item::VAR { isUsed: is_used, .. }, Deref @ Item::VAR { var: elem, .. }) => {
+            metamodelica::Ref::new(Item::VAR { var: elem.clone(), isUsed: is_used.clone() })
+        },
+        (Deref @ Item::CLASS { env: Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { isUsed: is_used, .. }, tail: Deref @ metamodelica::ListNode::Nil }, .. }, Deref @ Item::CLASS { cls: elem, classType: cls_ty, env: Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name, frameType: ft, clsAndVars: cv, extendsTable: exts, importTable: imps, isUsed: _ }, tail: Deref @ metamodelica::ListNode::Nil } }) => {
+            metamodelica::Ref::new(Item::CLASS { cls: elem.clone(), env: list![metamodelica::Ref::new(Frame { name: name.clone(), frameType: ft.clone(), clsAndVars: cv.clone(), extendsTable: exts.clone(), importTable: imps.clone(), isUsed: is_used.clone() })], classType: cls_ty.clone() })
+        },
+        (_, Deref @ Item::REDECLARED_ITEM { item, declaredEnv: env }) => {
+            let mut item = (*item).clone();
+            item = linkItemUsage(inSrcItem, metamodelica::AsArg::as_arg(&item));
+            metamodelica::Ref::new(Item::REDECLARED_ITEM { item: item.clone(), declaredEnv: env.clone() })
+        },
+        _ => {
+            inDestItem.clone()
+        },
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    outDestItem
+}
+
+pub(crate) fn isClassItem<'__b>(mut inItem: &'__b metamodelica::Ref<Item>) -> bool {
+    '__tco: loop {
+        match &**inItem {
+            Item::CLASS { .. } => return true,
+            Item::REDECLARED_ITEM { item, .. } => {
+                inItem = item;
+                continue '__tco;
+            }
+            _ => return false,
+        }
+    }
+}
+
+pub(crate) fn isVarItem<'__b>(mut inItem: &'__b metamodelica::Ref<Item>) -> bool {
+    '__tco: loop {
+        match &**inItem {
+            Item::VAR { .. } => return true,
+            Item::REDECLARED_ITEM { item, .. } => {
+                inItem = item;
+                continue '__tco;
+            }
+            _ => return false,
+        }
+    }
+}
+
+pub(crate) fn isClassExtendsItem<'__b>(mut inItem: &'__b metamodelica::Ref<Item>) -> bool {
+    '__tco: loop {
+        match &**inItem {
+            Item::CLASS {
+                classType: ClassType::CLASS_EXTENDS { .. },
+                ..
+            } => return true,
+            Item::REDECLARED_ITEM { item, .. } => {
+                inItem = item;
+                continue '__tco;
+            }
+            _ => return false,
+        }
+    }
+}
+
+fn extendEnvWithClassDef(mut inClassDefElement: metamodelica::Ref<SCode::Element>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = (::match_deref::match_deref! { match &(inClassDefElement.clone()) {
+        Deref @ SCode::Element::CLASS { classDef: Deref @ SCode::ClassDef::CLASS_EXTENDS { .. }, .. } => {
+            NFEnvExtends::extendEnvWithClassExtends(inClassDefElement, inEnv)?
+        },
+        Deref @ SCode::Element::CLASS { name: cls_name, classDef: cdef, prefixes: Deref @ SCode::Prefixes { replaceablePrefix: Deref @ SCode::Replaceable::REPLACEABLE { cc: _ }, .. }, info, .. } => {
+            let mut alias_name: ArcStr;
+            let mut class_env: Env;
+            let mut env: Env;
+            let mut cls_type: ClassType;
+            class_env = makeClassEnvironment(&inClassDefElement, false)?;
+            cls_type = getClassType(metamodelica::AsArg::as_arg(&cdef));
+            alias_name = { let mut __mm_s = String::new(); __mm_s.push_str(&*cls_name); __mm_s.push_str(&*arcstr::literal!(BASE_CLASS_SUFFIX)); ArcStr::from(__mm_s) };
+            env = extendEnvWithItem(&(newClassItem(inClassDefElement, class_env, cls_type)), inEnv, &alias_name)?;
+            env = extendEnvWithItem(&(metamodelica::Ref::new(Item::ALIAS { name: alias_name, path: None, info: info.clone() })), &env, metamodelica::AsArg::as_arg(&cls_name))?;
+            env
+        },
+        Deref @ SCode::Element::CLASS { name: cls_name, classDef: cdef, .. } => {
+            let mut class_env: Env;
+            let mut env: Env;
+            let mut cls_type: ClassType;
+            class_env = makeClassEnvironment(&inClassDefElement, false)?;
+            cls_type = getClassType(metamodelica::AsArg::as_arg(&cdef));
+            env = extendEnvWithItem(&(newClassItem(inClassDefElement, class_env, cls_type)), inEnv, metamodelica::AsArg::as_arg(&cls_name))?;
+            env
+        },
+        _ => return Err("match: no arm matched"),
+    } });
+    Ok(outEnv)
+}
+
+pub(crate) fn makeClassEnvironment(
+    mut inClassDefElement: &metamodelica::Ref<SCode::Element>,
+    mut inInModifierScope: bool,
+) -> Result<Env> {
+    let mut outClassEnv: Env;
+    let mut cdef: metamodelica::Ref<SCode::ClassDef>;
+    let mut cls_name: ArcStr;
+    let mut env: Env;
+    let mut enclosing_env: Env;
+    let mut info: SourceInfo;
+    let (__pa0, __pa1, __pa2) = ::match_deref::match_deref! { match &((*inClassDefElement)) {
+        Deref @ SCode::Element::CLASS { name: __pa0, classDef: __pa1, info: __pa2, .. } => (__pa0.clone(), __pa1.clone(), __pa2.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    cls_name = metamodelica::Own::own(__pa0);
+    cdef = metamodelica::Own::own(__pa1);
+    info = metamodelica::Own::own(__pa2);
+    env = openScope(emptyEnv.clone(), inClassDefElement)?;
+    enclosing_env = if (inInModifierScope) {
+        emptyEnv.clone()
+    } else {
+        env.clone()
+    };
+    outClassEnv = extendEnvWithClassComponents(cls_name, &cdef, env, &enclosing_env, info)?;
+    Ok(outClassEnv)
+}
+
+fn extendEnvWithVar(mut inVar: metamodelica::Ref<SCode::Element>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut var_name: ArcStr;
+    let mut is_used: Mutable::Mutable<bool>;
+    let mut ty: metamodelica::Ref<Absyn::TypeSpec>;
+    let mut info: SourceInfo;
+    let (__pa0, __pa1, __pa2) = ::match_deref::match_deref! { match &(inVar.clone()) {
+        Deref @ SCode::Element::COMPONENT { name: __pa0, typeSpec: __pa1, info: __pa2, .. } => (__pa0.clone(), __pa1.clone(), __pa2.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    var_name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    info = metamodelica::Own::own(__pa2);
+    is_used = Mutable::create(false);
+    outEnv = extendEnvWithItem(
+        &(metamodelica::Ref::new(Item::VAR {
+            var: inVar,
+            isUsed: Some(is_used),
+        })),
+        inEnv,
+        &var_name,
+    )?;
+    Ok(outEnv)
+}
+
+pub(crate) fn extendEnvWithItem(
+    mut inItem: &metamodelica::Ref<Item>,
+    mut inEnv: &Env,
+    mut inItemName: &ArcStr,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut imps: ImportTable;
+    let mut ty: FrameType;
+    let mut rest: Env;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5, __pa6) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: __pa2, extendsTable: __pa3, importTable: __pa4, isUsed: __pa5 }, tail: __pa6 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone(), __pa6.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    tree = metamodelica::Own::own(__pa2);
+    exts = metamodelica::Own::own(__pa3);
+    imps = metamodelica::Own::own(__pa4);
+    is_used = metamodelica::Own::own(__pa5);
+    rest = metamodelica::Own::own(__pa6);
+    tree = EnvTree::add(tree, inItemName, inItem, &move |__a0: metamodelica::Ref<Item>,
+                                                         __a1: metamodelica::Ref<Item>,
+                                                         __a2: ArcStr|
+          -> metamodelica::Result<_> {
+        ::std::result::Result::Ok(extendEnvWithItemConflict(&__a0, &__a1, &__a2))
+    })?;
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: exts,
+            importTable: imps,
+            isUsed: is_used,
+        }),
+        rest,
+    );
+    Ok(outEnv)
+}
+
+pub(crate) fn extendEnvWithItemConflict(
+    mut newItem: &metamodelica::Ref<Item>,
+    mut oldItem: &metamodelica::Ref<Item>,
+    mut name: &ArcStr,
+) -> metamodelica::Ref<Item> {
+    let mut item: metamodelica::Ref<Item>;
+    item = linkItemUsage(oldItem, newItem);
+    item
+}
+
+pub(crate) fn updateItemInEnv(
+    mut inItem: &metamodelica::Ref<Item>,
+    mut inEnv: &Env,
+    mut inItemName: &ArcStr,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut imps: ImportTable;
+    let mut ty: FrameType;
+    let mut rest: Env;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5, __pa6) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: __pa2, extendsTable: __pa3, importTable: __pa4, isUsed: __pa5 }, tail: __pa6 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone(), __pa6.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    tree = metamodelica::Own::own(__pa2);
+    exts = metamodelica::Own::own(__pa3);
+    imps = metamodelica::Own::own(__pa4);
+    is_used = metamodelica::Own::own(__pa5);
+    rest = metamodelica::Own::own(__pa6);
+    tree = EnvTree::add(
+        tree,
+        inItemName,
+        inItem,
+        &*(std::sync::Arc::new(fnptr!(EnvTree::addConflictDefault, _, _, _))
+            as std::sync::Arc<dyn ::std::ops::Fn(_, _, _) -> Result<_> + 'static>),
+    )?;
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: exts,
+            importTable: imps,
+            isUsed: is_used,
+        }),
+        rest,
+    );
+    Ok(outEnv)
+}
+
+fn extendEnvWithImport(mut inImport: &metamodelica::Ref<SCode::Element>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = (::match_deref::match_deref! { match (inImport, inEnv) {
+        (Deref @ SCode::Element::IMPORT { imp: imp @ Absyn::Import::UNQUAL_IMPORT { .. }, .. }, Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name, frameType: ty, clsAndVars: tree, extendsTable: exts, importTable: ImportTable { hidden, qualifiedImports: qual_imps, unqualifiedImports: unqual_imps }, isUsed: is_used }, tail: rest }) => {
+            let mut unqual_imps = (*unqual_imps).clone();
+            unqual_imps = metamodelica::cons(imp.clone(), unqual_imps.clone());
+            metamodelica::cons(metamodelica::Ref::new(Frame { name: name.clone(), frameType: ty.clone(), clsAndVars: tree.clone(), extendsTable: exts.clone(), importTable: ImportTable { hidden: hidden.clone(), qualifiedImports: qual_imps.clone(), unqualifiedImports: unqual_imps.clone() }, isUsed: is_used.clone() }), rest.clone())
+        },
+        (Deref @ SCode::Element::IMPORT { imp, .. }, Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name, frameType: ty, clsAndVars: tree, extendsTable: exts, importTable: ImportTable { hidden, qualifiedImports: qual_imps, unqualifiedImports: unqual_imps }, isUsed: is_used }, tail: rest }) => {
+            let mut imp = (*imp).clone();
+            let mut qual_imps = (*qual_imps).clone();
+            imp = translateQualifiedImportToNamed(imp.clone())?;
+            qual_imps = metamodelica::cons(imp.clone(), qual_imps.clone());
+            metamodelica::cons(metamodelica::Ref::new(Frame { name: name.clone(), frameType: ty.clone(), clsAndVars: tree.clone(), extendsTable: exts.clone(), importTable: ImportTable { hidden: hidden.clone(), qualifiedImports: qual_imps.clone(), unqualifiedImports: unqual_imps.clone() }, isUsed: is_used.clone() }), rest.clone())
+        },
+        _ => return Err("match: no arm matched"),
+    } });
+    Ok(outEnv)
+}
+
+fn translateQualifiedImportToNamed(mut inImport: Import) -> Result<Import> {
+    let mut outImport: Import;
+    outImport = (match inImport.clone() {
+        Absyn::Import::NAMED_IMPORT { .. } => inImport,
+        Absyn::Import::QUAL_IMPORT { path: mut path } => {
+            let mut name: ArcStr;
+            name = AbsynUtil::pathLastIdent(metamodelica::AsArg::as_arg(&path));
+            Absyn::Import::NAMED_IMPORT {
+                name: name,
+                path: path.clone(),
+            }
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outImport)
+}
+
+pub(crate) fn extendEnvWithExtends(mut inExtends: &metamodelica::Ref<SCode::Element>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut bc: metamodelica::Ref<Absyn::Path>;
+    let mut mods: metamodelica::Ref<SCode::Mod>;
+    let mut redecls: metamodelica::List<metamodelica::Ref<Redeclaration>>;
+    let mut info: SourceInfo;
+    let mut index: i32;
+    let (__pa0, __pa1, __pa2) = ::match_deref::match_deref! { match &((*inExtends)) {
+        Deref @ SCode::Element::EXTENDS { baseClassPath: __pa0, modifications: __pa1, info: __pa2, .. } => (__pa0.clone(), __pa1.clone(), __pa2.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    bc = metamodelica::Own::own(__pa0);
+    mods = metamodelica::Own::own(__pa1);
+    info = metamodelica::Own::own(__pa2);
+    redecls = NFSCodeFlattenRedeclare::extractRedeclaresFromModifier(&mods)?;
+    index = System::tmpTickIndex(extendsTickIndex.clone());
+    outEnv = addExtendsToEnvExtendsTable(
+        metamodelica::Ref::new(Extends {
+            baseClass: bc,
+            redeclareModifiers: redecls,
+            index: index,
+            info: info,
+        }),
+        inEnv,
+    )?;
+    Ok(outEnv)
+}
+
+fn addExtendsToEnvExtendsTable(mut inExtends: metamodelica::Ref<Extends>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut exts: metamodelica::List<metamodelica::Ref<Extends>>;
+    let mut re: metamodelica::List<metamodelica::Ref<SCode::Element>>;
+    let mut cei: Option<metamodelica::Ref<SCode::Element>>;
+    let __arc3 = getEnvExtendsTable(inEnv)?;
+    let ExtendsTable {
+        baseClasses: __pa0,
+        redeclaredElements: __pa1,
+        classExtendsInfo: __pa2,
+    } = &*__arc3;
+    exts = metamodelica::Own::own(__pa0);
+    re = metamodelica::Own::own(__pa1);
+    cei = metamodelica::Own::own(__pa2);
+    exts = metamodelica::cons(inExtends, exts);
+    outEnv = setEnvExtendsTable(
+        metamodelica::Ref::new(ExtendsTable {
+            baseClasses: exts,
+            redeclaredElements: re,
+            classExtendsInfo: cei,
+        }),
+        inEnv,
+    )?;
+    Ok(outEnv)
+}
+
+fn addElementRedeclarationToEnvExtendsTable(
+    mut inRedeclare: metamodelica::Ref<SCode::Element>,
+    mut inEnv: &Env,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut exts: metamodelica::List<metamodelica::Ref<Extends>>;
+    let mut re: metamodelica::List<metamodelica::Ref<SCode::Element>>;
+    let mut cei: Option<metamodelica::Ref<SCode::Element>>;
+    let __arc3 = getEnvExtendsTable(inEnv)?;
+    let ExtendsTable {
+        baseClasses: __pa0,
+        redeclaredElements: __pa1,
+        classExtendsInfo: __pa2,
+    } = &*__arc3;
+    exts = metamodelica::Own::own(__pa0);
+    re = metamodelica::Own::own(__pa1);
+    cei = metamodelica::Own::own(__pa2);
+    re = metamodelica::cons(inRedeclare, re);
+    outEnv = setEnvExtendsTable(
+        metamodelica::Ref::new(ExtendsTable {
+            baseClasses: exts,
+            redeclaredElements: re,
+            classExtendsInfo: cei,
+        }),
+        inEnv,
+    )?;
+    Ok(outEnv)
+}
+
+fn extendEnvWithClassComponents(
+    mut inClassName: ArcStr,
+    mut inClassDef: &metamodelica::Ref<SCode::ClassDef>,
+    mut inEnv: Env,
+    mut inEnclosingScope: &Env,
+    mut inInfo: SourceInfo,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = (::match_deref::match_deref! { match inClassDef {
+        Deref @ SCode::ClassDef::PARTS { elementLst: el, .. } => {
+            let mut env: Env;
+            env = List::fold(el, &extendEnvWithElement, inEnv)?;
+            env
+        },
+        Deref @ SCode::ClassDef::DERIVED { typeSpec: ty @ Deref @ Absyn::TypeSpec::TPATH { path, .. }, modifications: mods, .. } => {
+            let mut env: Env;
+            NFSCodeCheck::checkRecursiveShortDefinition(ty.clone(), inClassName, inEnclosingScope, &inInfo)?;
+            env = extendEnvWithExtends(&(metamodelica::Ref::new(SCode::Element::EXTENDS { baseClassPath: path.clone(), visibility: openmodelica_frontend_types::SCode::Visibility::PUBLIC, modifications: mods.clone(), ann: None, info: inInfo })), &inEnv)?;
+            env
+        },
+        Deref @ SCode::ClassDef::ENUMERATION { enumLst: enums } => {
+            let mut env: Env;
+            let mut path: metamodelica::Ref<Absyn::Path>;
+            path = metamodelica::Ref::new(Absyn::Path::IDENT { name: inClassName });
+            env = extendEnvWithEnumLiterals(enums, &path, 1, inEnv, &inInfo)?;
+            env
+        },
+        _ => {
+            inEnv
+        },
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    Ok(outEnv)
+}
+
+fn extendEnvWithElement(mut inElement: metamodelica::Ref<SCode::Element>, mut inEnv: Env) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = 'mc: {
+        let __mc_input = &*inElement;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ SCode::Element::COMPONENT { prefixes: Deref @ SCode::Prefixes { redeclarePrefix: SCode::Redeclare::REDECLARE { .. }, .. }, .. } => {
+                    let mut env: Env;
+                    env = addElementRedeclarationToEnvExtendsTable(inElement.clone(), &inEnv)?;
+                    env = extendEnvWithVar(inElement.clone(), &env)?;
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ SCode::Element::COMPONENT { .. } => {
+                    let mut env: Env;
+                    env = extendEnvWithVar(inElement.clone(), &inEnv)?;
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ SCode::Element::CLASS { prefixes: Deref @ SCode::Prefixes { redeclarePrefix: SCode::Redeclare::REDECLARE { .. }, .. }, .. } => {
+                    let mut env: Env;
+                    env = addElementRedeclarationToEnvExtendsTable(inElement.clone(), &inEnv)?;
+                    env = extendEnvWithClassDef(inElement.clone(), &env)?;
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ SCode::Element::CLASS { .. } => {
+                    let mut env: Env;
+                    env = extendEnvWithClassDef(inElement.clone(), &inEnv)?;
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ SCode::Element::EXTENDS { .. } => {
+                    let mut env: Env;
+                    env = extendEnvWithExtends(&inElement, &inEnv)?;
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ SCode::Element::IMPORT { .. } => {
+                    let mut env: Env;
+                    env = extendEnvWithImport(&inElement, &inEnv)?;
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ SCode::Element::DEFINEUNIT { .. } => {
+                    Ok(inEnv.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(outEnv)
+}
+
+pub(crate) fn checkUniqueQualifiedImport(
+    mut inImport: Import,
+    mut inImports: &metamodelica::List<Absyn::Import>,
+    mut inInfo: &SourceInfo,
+) -> Result<()> {
+    let () = 'mc: {
+        let __mc_input = inImport.clone();
+        if let Ok(__v) = (|| -> Result<_> {
+            let _ = __mc_input.clone() else { return Err("nomatch") };
+            let false = (List::isMemberOnTrue(
+                inImport.clone(),
+                inImports,
+                &move |__a0: Absyn::Import, __a1: Absyn::Import| -> metamodelica::Result<_> {
+                    ::std::result::Result::Ok(compareQualifiedImportNames(&__a0, &__a1))
+                },
+            )?) else {
+                return Err("pattern mismatch");
+            };
+            Ok(())
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let Absyn::Import::NAMED_IMPORT { name: mut name, .. } = __mc_input.clone() else {
+                return Err("nomatch");
+            };
+            Error::addSourceMessage(
+                &(Error::MULTIPLE_QUALIFIED_IMPORTS_WITH_SAME_NAME.clone()),
+                list![name.clone()],
+                inInfo,
+            )?;
+            Ok(return Err("fail"))
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(())
+}
+
+fn compareQualifiedImportNames(mut inImport1: &Import, mut inImport2: &Import) -> bool {
+    let mut outEqual: bool;
+    outEqual = (match (inImport1.clone(), inImport2.clone()) {
+        (Absyn::Import::NAMED_IMPORT { name: mut name1, .. }, Absyn::Import::NAMED_IMPORT { name: mut name2, .. })
+            if (stringEqual(&name1, &name2)) =>
+        {
+            true
+        }
+        _ => false,
+    });
+    outEqual
+}
+
+fn extendEnvWithEnumLiterals<'__b>(
+    mut inEnum: &'__b metamodelica::List<metamodelica::Ref<SCode::Enum>>,
+    mut inEnumPath: &'__b metamodelica::Ref<Absyn::Path>,
+    mut inNextValue: i32,
+    mut inEnv: Env,
+    mut inInfo: &'__b SourceInfo,
+) -> Result<Env> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inEnum {
+            Deref @ metamodelica::ListNode::Cons { head: lit, tail: rest_lits } => {
+                let mut env: Env;
+                env = extendEnvWithEnum(metamodelica::AsArg::as_arg(&lit), inEnumPath.clone(), inNextValue, inEnv, inInfo.clone())?;
+                { (inEnum, inEnumPath, inNextValue, inEnv, inInfo) = (rest_lits, inEnumPath, inNextValue + 1, env, inInfo); continue '__tco; }
+            },
+            Deref @ metamodelica::ListNode::Nil => {
+                return Ok(inEnv)
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+fn extendEnvWithEnum(
+    mut inEnum: &metamodelica::Ref<SCode::Enum>,
+    mut inEnumPath: metamodelica::Ref<Absyn::Path>,
+    mut inValue: i32,
+    mut inEnv: Env,
+    mut inInfo: SourceInfo,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut enum_lit: metamodelica::Ref<SCode::Element>;
+    let mut lit_name: ArcStr;
+    let mut ty: metamodelica::Ref<Absyn::TypeSpec>;
+    let mut index: ArcStr;
+    let __arc1 = &(*inEnum);
+    let SCode::ENUM { literal: __pa0, .. } = &**__arc1;
+    lit_name = metamodelica::Own::own(__pa0);
+    index = intString(inValue);
+    ty = metamodelica::Ref::new(Absyn::TypeSpec::TPATH {
+        path: metamodelica::Ref::new(Absyn::Path::QUALIFIED {
+            name: literal!("$EnumType"),
+            path: metamodelica::Ref::new(Absyn::Path::QUALIFIED {
+                name: index,
+                path: inEnumPath,
+            }),
+        }),
+        arrayDim: None,
+    });
+    enum_lit = metamodelica::Ref::new(SCode::Element::COMPONENT {
+        name: lit_name,
+        prefixes: SCode::defaultPrefixes.clone(),
+        attributes: SCode::Attributes {
+            arrayDims: metamodelica::nil(),
+            connectorType: openmodelica_frontend_types::SCode::ConnectorType::POTENTIAL,
+            parallelism: openmodelica_frontend_types::SCode::Parallelism::NON_PARALLEL,
+            variability: openmodelica_frontend_types::SCode::Variability::CONST,
+            direction: openmodelica_ast::Absyn::Direction::BIDIR,
+            isField: openmodelica_ast::Absyn::IsField::NONFIELD,
+        },
+        typeSpec: ty,
+        modifications: openmodelica_frontend_types::SCode::Mod::interned_NOMOD(),
+        comment: SCode::noComment.clone(),
+        condition: None,
+        info: inInfo,
+    });
+    outEnv = extendEnvWithElement(enum_lit, inEnv)?;
+    Ok(outEnv)
+}
+
+pub(crate) fn extendEnvWithIterators(
+    mut inIterators: &metamodelica::List<metamodelica::Ref<Absyn::ForIterator>>,
+    mut iterIndex: i32,
+    mut inEnv: Env,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut frame: metamodelica::Ref<Frame>;
+    frame = newFrame(
+        Some(literal!("$for$")),
+        FrameType::IMPLICIT_SCOPE { iterIndex: iterIndex },
+    );
+    outEnv = List::fold(
+        inIterators,
+        &move |__a0: metamodelica::Ref<Absyn::ForIterator>, __a1: metamodelica::List<metamodelica::Ref<Frame>>| {
+            extendEnvWithIterator(&__a0, __a1)
+        },
+        metamodelica::cons(frame, inEnv),
+    )?;
+    Ok(outEnv)
+}
+
+fn extendEnvWithIterator(mut inIterator: &metamodelica::Ref<Absyn::ForIterator>, mut inEnv: Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut iter_name: ArcStr;
+    let mut iter: metamodelica::Ref<SCode::Element>;
+    let __arc1 = &(*inIterator);
+    let Absyn::ITERATOR { name: __pa0, .. } = &**__arc1;
+    iter_name = metamodelica::Own::own(__pa0);
+    iter = metamodelica::Ref::new(SCode::Element::COMPONENT {
+        name: iter_name,
+        prefixes: SCode::defaultPrefixes.clone(),
+        attributes: SCode::Attributes {
+            arrayDims: metamodelica::nil(),
+            connectorType: openmodelica_frontend_types::SCode::ConnectorType::POTENTIAL,
+            parallelism: openmodelica_frontend_types::SCode::Parallelism::NON_PARALLEL,
+            variability: openmodelica_frontend_types::SCode::Variability::CONST,
+            direction: openmodelica_ast::Absyn::Direction::BIDIR,
+            isField: openmodelica_ast::Absyn::IsField::NONFIELD,
+        },
+        typeSpec: metamodelica::Ref::new(Absyn::TypeSpec::TPATH {
+            path: metamodelica::Ref::new(Absyn::Path::IDENT { name: literal!("") }),
+            arrayDim: None,
+        }),
+        modifications: openmodelica_frontend_types::SCode::Mod::interned_NOMOD(),
+        comment: SCode::noComment.clone(),
+        condition: None,
+        info: Absyn::dummyInfo.clone(),
+    });
+    outEnv = extendEnvWithElement(iter, inEnv)?;
+    Ok(outEnv)
+}
+
+pub(crate) fn extendEnvWithMatch(
+    mut inMatchExp: &metamodelica::Ref<Absyn::Exp>,
+    mut iterIndex: i32,
+    mut inEnv: Env,
+) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut frame: metamodelica::Ref<Frame>;
+    let mut local_decls: metamodelica::List<metamodelica::Ref<Absyn::ElementItem>>;
+    frame = newFrame(
+        Some(literal!("$match$")),
+        FrameType::IMPLICIT_SCOPE { iterIndex: iterIndex },
+    );
+    let __pa0 = ::match_deref::match_deref! { match &((*inMatchExp)) {
+        Deref @ Absyn::Exp::MATCHEXP { localDecls: __pa0, .. } => __pa0.clone(),
+        _ => return Err("pattern mismatch"),
+    } };
+    local_decls = metamodelica::Own::own(__pa0);
+    outEnv = List::fold(
+        &local_decls,
+        &move |__a0: metamodelica::Ref<Absyn::ElementItem>, __a1: metamodelica::List<metamodelica::Ref<Frame>>| {
+            extendEnvWithElementItem(&__a0, __a1)
+        },
+        metamodelica::cons(frame, inEnv),
+    )?;
+    Ok(outEnv)
+}
+
+fn extendEnvWithElementItem(mut inElementItem: &metamodelica::Ref<Absyn::ElementItem>, mut inEnv: Env) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = (match &**inElementItem {
+        Absyn::ElementItem::ELEMENTITEM { element } => {
+            let mut el: metamodelica::List<metamodelica::Ref<SCode::Element>>;
+            let mut env: Env;
+            el = AbsynToSCode::translateElement(element, openmodelica_frontend_types::SCode::Visibility::PROTECTED)?;
+            env = List::fold(&el, &extendEnvWithElement, inEnv)?;
+            env
+        }
+        _ => inEnv,
+    });
+    Ok(outEnv)
+}
+
+pub(crate) fn getEnvName(mut inEnv: &Env) -> ArcStr {
+    let mut outString: ArcStr;
+    outString = 'mc: {
+        let __mc_input = &**inEnv;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    let mut r#str: ArcStr;
+                    r#str = AbsynUtil::pathString(getEnvPath(inEnv)?, literal!("."), true, false)?;
+                    Ok(r#str.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(literal!(""))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outString
+}
+
+pub(crate) fn getEnvPath<'__b>(mut inEnv: &'__b Env) -> Result<metamodelica::Ref<Absyn::Path>> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inEnv {
+            Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { frameType: FrameType::IMPLICIT_SCOPE { .. }, .. }, tail: rest } => {
+                { inEnv = rest; continue '__tco; }
+            },
+            Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(name), .. }, tail: Deref @ metamodelica::ListNode::Nil } => {
+                return Ok(metamodelica::Ref::new(Absyn::Path::IDENT { name: name.clone() }))
+            },
+            Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(name), .. }, tail: Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: None, .. }, tail: Deref @ metamodelica::ListNode::Nil } } => {
+                return Ok(metamodelica::Ref::new(Absyn::Path::IDENT { name: name.clone() }))
+            },
+            Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(name), .. }, tail: rest } => {
+                let mut path: metamodelica::Ref<Absyn::Path>;
+                path = getEnvPath(rest)?;
+                return Ok(AbsynUtil::joinPaths(path, metamodelica::Ref::new(Absyn::Path::IDENT { name: name.clone() }))?)
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn getScopeName<'__b>(mut inEnv: &'__b Env) -> Result<ArcStr> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inEnv {
+            Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(name), .. }, tail: _ } => {
+                return Ok(name.clone())
+            },
+            Deref @ metamodelica::ListNode::Cons { head: _, tail: rest } => {
+                { inEnv = rest; continue '__tco; }
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn envPrefixOf(mut inPrefixEnv: Env, mut inEnv: Env) -> bool {
+    let mut outIsPrefix: bool;
+    outIsPrefix = envPrefixOf2(&(inPrefixEnv.reverse()), &(inEnv.reverse()));
+    outIsPrefix
+}
+
+pub(crate) fn envPrefixOf2<'__b>(mut inPrefixEnv: &'__b Env, mut inEnv: &'__b Env) -> bool {
+    '__tco: loop {
+        ::match_deref::match_deref! { match (inPrefixEnv, inEnv) {
+            (Deref @ metamodelica::ListNode::Nil, _) => {
+                return true
+            },
+            (Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: None, .. }, tail: rest1 }, Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: None, .. }, tail: rest2 }) => {
+                { (inPrefixEnv, inEnv) = (rest1, rest2); continue '__tco; }
+            },
+            (Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(n1), .. }, tail: rest1 }, Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(n2), .. }, tail: rest2 }) if (stringEqual(&n1, &n2)) => {
+                { (inPrefixEnv, inEnv) = (rest1, rest2); continue '__tco; }
+            },
+            _ => {
+                return false
+            },
+            _ => unreachable!("tail-call lowered match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn envScopeNames(mut inEnv: &Env) -> Result<metamodelica::List<ArcStr>> {
+    let mut outNames: metamodelica::List<ArcStr>;
+    outNames = envScopeNames2(inEnv, metamodelica::nil())?;
+    Ok(outNames)
+}
+
+pub(crate) fn envScopeNames2<'__b>(
+    mut inEnv: &'__b Env,
+    mut inAccumNames: metamodelica::List<ArcStr>,
+) -> Result<metamodelica::List<ArcStr>> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inEnv {
+            Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(name), .. }, tail: rest_env } => {
+                let mut names: metamodelica::List<ArcStr>;
+                { (inEnv, inAccumNames) = (rest_env, metamodelica::cons(name.clone(), inAccumNames)); continue '__tco; }
+            },
+            Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: None, .. }, tail: rest_env } => {
+                { (inEnv, inAccumNames) = (rest_env, inAccumNames); continue '__tco; }
+            },
+            Deref @ metamodelica::ListNode::Nil => {
+                return Ok(inAccumNames)
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn envEqualPrefix(mut inEnv1: Env, mut inEnv2: Env) -> Env {
+    let mut outPrefix: Env;
+    outPrefix = envEqualPrefix2(&(inEnv1.reverse()), &(inEnv2.reverse()), metamodelica::nil());
+    outPrefix
+}
+
+pub(crate) fn envEqualPrefix2<'__b>(mut inEnv1: &'__b Env, mut inEnv2: &'__b Env, mut inAccumEnv: Env) -> Env {
+    '__tco: loop {
+        ::match_deref::match_deref! { match (inEnv1, inEnv2) {
+            (Deref @ metamodelica::ListNode::Cons { head: frame @ Deref @ Frame { name: Some(name1), .. }, tail: rest_env1 }, Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: Some(name2), .. }, tail: rest_env2 }) if (stringEq(&name1, &name2)) => {
+                let mut env: Env;
+                { (inEnv1, inEnv2, inAccumEnv) = (rest_env1, rest_env2, metamodelica::cons(frame.clone(), inAccumEnv)); continue '__tco; }
+            },
+            (Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: None, .. }, tail: rest_env1 }, Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: None, .. }, tail: rest_env2 }) => {
+                { (inEnv1, inEnv2, inAccumEnv) = (rest_env1, rest_env2, inAccumEnv); continue '__tco; }
+            },
+            _ => {
+                return inAccumEnv
+            },
+            _ => unreachable!("tail-call lowered match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn getItemInfo<'__b>(mut inItem: &'__b metamodelica::Ref<Item>) -> Result<SourceInfo> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inItem {
+            Deref @ Item::VAR { var: Deref @ SCode::Element::COMPONENT { info, .. }, .. } => {
+                return Ok(info.clone())
+            },
+            Deref @ Item::CLASS { cls: Deref @ SCode::Element::CLASS { info, .. }, .. } => {
+                return Ok(info.clone())
+            },
+            Deref @ Item::ALIAS { info, .. } => {
+                return Ok(info.clone())
+            },
+            Deref @ Item::REDECLARED_ITEM { item, .. } => {
+                { inItem = item; continue '__tco; }
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn itemStr(mut inItem: &metamodelica::Ref<Item>) -> ArcStr {
+    let mut outName: ArcStr;
+    outName = 'mc: {
+        let __mc_input = &**inItem;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Item::VAR { var: el, .. } => {
+                    Ok(SCodeDump::unparseElementStr(el.clone(), SCodeDump::defaultOptions.clone())?)
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Item::CLASS { cls: el, .. } => {
+                    Ok(SCodeDump::unparseElementStr(el.clone(), SCodeDump::defaultOptions.clone())?)
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Item::ALIAS { name, path: Some(path), .. } => {
+                    let mut alias_str: ArcStr;
+                    alias_str = AbsynUtil::pathString(path.clone(), literal!("."), true, false)?;
+                    Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("alias ")); __mm_s.push_str(&*name); __mm_s.push_str(&*literal!(" -> (")); __mm_s.push_str(&*alias_str); __mm_s.push_str(&*literal!(".")); __mm_s.push_str(&*name); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) })
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Item::ALIAS { name, path: None, .. } => {
+                    Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("alias ")); __mm_s.push_str(&*name); __mm_s.push_str(&*literal!(" -> ()")); ArcStr::from(__mm_s) })
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Item::REDECLARED_ITEM { item, .. } => {
+                    let mut name: ArcStr;
+                    name = itemStr(metamodelica::AsArg::as_arg(&item));
+                    Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("redeclared ")); __mm_s.push_str(&*name); ArcStr::from(__mm_s) })
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(literal!("UNHANDLED ITEM"))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outName
+}
+
+pub(crate) fn getItemName<'__b>(mut inItem: &'__b metamodelica::Ref<Item>) -> Result<ArcStr> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inItem {
+            Deref @ Item::VAR { var: Deref @ SCode::Element::COMPONENT { name, .. }, .. } => {
+                return Ok(name.clone())
+            },
+            Deref @ Item::CLASS { cls: Deref @ SCode::Element::CLASS { name, .. }, .. } => {
+                return Ok(name.clone())
+            },
+            Deref @ Item::ALIAS { name, .. } => {
+                return Ok(name.clone())
+            },
+            Deref @ Item::REDECLARED_ITEM { item, .. } => {
+                { inItem = item; continue '__tco; }
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn getItemEnv<'__b>(mut inItem: &'__b metamodelica::Ref<Item>) -> Result<Env> {
+    '__tco: loop {
+        match &**inItem {
+            Item::CLASS { env, .. } => return Ok(env.clone()),
+            Item::REDECLARED_ITEM { item, .. } => {
+                inItem = item;
+                continue '__tco;
+            }
+            _ => return Err("match: no arm matched"),
+        }
+    }
+}
+
+pub(crate) fn getItemEnvNoFail(mut inItem: &metamodelica::Ref<Item>) -> Result<Env> {
+    let mut outEnv: Env;
+    outEnv = 'mc: {
+        let __mc_input = &**inItem;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Item::CLASS { env, .. } => {
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Item::REDECLARED_ITEM { item, .. } => {
+                    Ok(getItemEnvNoFail(metamodelica::AsArg::as_arg(&item))?)
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    let mut env: Env;
+                    let mut r#str: ArcStr;
+                    let mut f: metamodelica::Ref<Frame>;
+                    r#str = { let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("NO ENV FOR ITEM: ")); __mm_s.push_str(&*getItemName(inItem)?); ArcStr::from(__mm_s) };
+                    f = newFrame(Some(r#str.clone()), crate::NFSCodeEnv::FrameType::ENCAPSULATED_SCOPE);
+                    env = list![f.clone()];
+                    Ok(env.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(outEnv)
+}
+
+pub(crate) fn setItemEnv<'__b>(
+    mut inItem: &'__b metamodelica::Ref<Item>,
+    mut inNewEnv: &'__b Env,
+) -> Result<metamodelica::Ref<Item>> {
+    '__tco: loop {
+        match &**inItem {
+            Item::CLASS {
+                cls,
+                env: _,
+                classType: ct,
+            } => {
+                return Ok(metamodelica::Ref::new(Item::CLASS {
+                    cls: cls.clone(),
+                    env: inNewEnv.clone(),
+                    classType: ct.clone(),
+                }));
+            }
+            Item::REDECLARED_ITEM { item, .. } => {
+                (inItem, inNewEnv) = (item, inNewEnv);
+                continue '__tco;
+            }
+            _ => return Err("match: no arm matched"),
+        }
+    }
+}
+
+pub(crate) fn mergeItemEnv<'__b>(mut inItem: &'__b metamodelica::Ref<Item>, mut inEnv: &'__b Env) -> Env {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inItem {
+            Deref @ Item::CLASS { env: Deref @ metamodelica::ListNode::Cons { head: cls_env, tail: Deref @ metamodelica::ListNode::Nil }, .. } => {
+                return enterFrame(cls_env.clone(), inEnv.clone())
+            },
+            Deref @ Item::REDECLARED_ITEM { item, .. } => {
+                { (inItem, inEnv) = (item, inEnv); continue '__tco; }
+            },
+            _ => {
+                return inEnv.clone()
+            },
+            _ => unreachable!("tail-call lowered match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn unmergeItemEnv(mut inItem: &metamodelica::Ref<Item>, mut inEnv: Env) -> Env {
+    let mut outEnv: Env;
+    outEnv = (::match_deref::match_deref! { match &(inEnv.clone()) {
+        Deref @ metamodelica::ListNode::Cons { head: _, tail: env } => {
+            env.clone()
+        },
+        _ => {
+            inEnv
+        },
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    outEnv
+}
+
+pub(crate) fn getItemPrefixes<'__b>(
+    mut inItem: &'__b metamodelica::Ref<Item>,
+) -> Result<metamodelica::Ref<SCode::Prefixes>> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match inItem {
+            Deref @ Item::CLASS { cls: Deref @ SCode::Element::CLASS { prefixes: pf, .. }, .. } => {
+                return Ok(pf.clone())
+            },
+            Deref @ Item::VAR { var: Deref @ SCode::Element::COMPONENT { prefixes: pf, .. }, .. } => {
+                return Ok(pf.clone())
+            },
+            Deref @ Item::REDECLARED_ITEM { item, .. } => {
+                { inItem = item; continue '__tco; }
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn resolveRedeclaredItem(
+    mut inItem: metamodelica::Ref<Item>,
+    mut inEnv: Env,
+) -> (
+    metamodelica::Ref<Item>,
+    Env,
+    metamodelica::List<(metamodelica::Ref<Item>, metamodelica::List<metamodelica::Ref<Frame>>)>,
+) {
+    let mut outItem: metamodelica::Ref<Item>;
+    let mut outEnv: Env;
+    let mut outPreviousItem: metamodelica::List<(
+        metamodelica::Ref<Item>,
+        metamodelica::List<metamodelica::Ref<Frame>>,
+    )>;
+    (outItem, outEnv, outPreviousItem) = (match &*inItem {
+        Item::REDECLARED_ITEM { item, declaredEnv: env } => (item.clone(), env.clone(), list![(inItem, inEnv)]),
+        _ => (inItem, inEnv, metamodelica::nil()),
+    });
+    (outItem, outEnv, outPreviousItem)
+}
+
+pub(crate) fn getEnvExtendsTable(mut inEnv: &Env) -> Result<metamodelica::Ref<ExtendsTable>> {
+    let mut outExtendsTable: metamodelica::Ref<ExtendsTable>;
+    let __pa0 = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { extendsTable: __pa0, .. }, tail: _ } => __pa0.clone(),
+        _ => return Err("pattern mismatch"),
+    } };
+    outExtendsTable = metamodelica::Own::own(__pa0);
+    Ok(outExtendsTable)
+}
+
+pub(crate) fn getEnvExtendsFromTable(mut inEnv: &Env) -> Result<metamodelica::List<metamodelica::Ref<Extends>>> {
+    let mut outExtends: metamodelica::List<metamodelica::Ref<Extends>>;
+    let __arc1 = getEnvExtendsTable(inEnv)?;
+    let ExtendsTable { baseClasses: __pa0, .. } = &*__arc1;
+    outExtends = metamodelica::Own::own(__pa0);
+    Ok(outExtends)
+}
+
+pub(crate) fn getDerivedClassRedeclares(
+    mut inDerivedName: &ArcStr,
+    mut inTypeSpec: &metamodelica::Ref<Absyn::TypeSpec>,
+    mut inEnv: &Env,
+) -> metamodelica::List<metamodelica::Ref<Redeclaration>> {
+    let mut outRedeclarations: metamodelica::List<metamodelica::Ref<Redeclaration>>;
+    outRedeclarations = 'mc: {
+        let __mc_input = &**inTypeSpec;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Absyn::TypeSpec::TPATH { path, arrayDim: _ } => {
+                    let mut bc: metamodelica::Ref<Absyn::Path>;
+                    let mut rm: metamodelica::List<metamodelica::Ref<Redeclaration>>;
+                    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(getEnvExtendsFromTable(inEnv)?) {
+                        Deref @ metamodelica::ListNode::Cons { head: Deref @ Extends { baseClass: __pa0, redeclareModifiers: __pa1, .. }, tail: Deref @ metamodelica::ListNode::Nil } => (__pa0.clone(), __pa1.clone()),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    bc = metamodelica::Own::own(__pa0);
+                    rm = metamodelica::Own::own(__pa1);
+                    let true = (AbsynUtil::pathSuffixOf(metamodelica::AsArg::as_arg(&path), &bc)) else { return Err("pattern mismatch") };
+                    Ok(rm.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Absyn::TypeSpec::TPATH { path, arrayDim: _ } => {
+                    let mut bc: metamodelica::Ref<Absyn::Path>;
+                    let mut rm: metamodelica::List<metamodelica::Ref<Redeclaration>>;
+                    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(getEnvExtendsFromTable(inEnv)?) {
+                        Deref @ metamodelica::ListNode::Cons { head: Deref @ Extends { baseClass: __pa0, redeclareModifiers: __pa1, .. }, tail: Deref @ metamodelica::ListNode::Nil } => (__pa0.clone(), __pa1.clone()),
+                        _ => return Err("pattern mismatch"),
+                    } };
+                    bc = metamodelica::Own::own(__pa0);
+                    rm = metamodelica::Own::own(__pa1);
+                    let false = (AbsynUtil::pathSuffixOf(metamodelica::AsArg::as_arg(&path), &bc)) else { return Err("pattern mismatch") };
+                    metamodelica::print({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("Derived paths are not the same: ")); __mm_s.push_str(&*AbsynUtil::pathString(path.clone(), literal!("."), true, false)?); __mm_s.push_str(&*literal!(" != ")); __mm_s.push_str(&*AbsynUtil::pathString(bc.clone(), literal!("."), true, false)?); __mm_s.push_str(&*literal!("\n")); ArcStr::from(__mm_s) });
+                    Ok(rm.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(metamodelica::nil())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outRedeclarations
+}
+
+pub(crate) fn setEnvExtendsTable(mut inExtendsTable: metamodelica::Ref<ExtendsTable>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut ty: FrameType;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut imps: ImportTable;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let mut rest_env: Env;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: __pa2, extendsTable: _, importTable: __pa3, isUsed: __pa4 }, tail: __pa5 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    tree = metamodelica::Own::own(__pa2);
+    imps = metamodelica::Own::own(__pa3);
+    is_used = metamodelica::Own::own(__pa4);
+    rest_env = metamodelica::Own::own(__pa5);
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: inExtendsTable,
+            importTable: imps,
+            isUsed: is_used,
+        }),
+        rest_env,
+    );
+    Ok(outEnv)
+}
+
+pub(crate) fn setEnvClsAndVars(mut inTree: metamodelica::Ref<EnvTree::Tree>, mut inEnv: &Env) -> Result<Env> {
+    let mut outEnv: Env;
+    let mut name: Option<ArcStr>;
+    let mut ty: FrameType;
+    let mut ext: metamodelica::Ref<ExtendsTable>;
+    let mut imps: ImportTable;
+    let mut is_used: Option<Mutable::Mutable<bool>>;
+    let mut rest_env: Env;
+    let (__pa0, __pa1, __pa2, __pa3, __pa4, __pa5) = ::match_deref::match_deref! { match &((*inEnv)) {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: __pa0, frameType: __pa1, clsAndVars: _, extendsTable: __pa2, importTable: __pa3, isUsed: __pa4 }, tail: __pa5 } => (__pa0.clone(), __pa1.clone(), __pa2.clone(), __pa3.clone(), __pa4.clone(), __pa5.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    name = metamodelica::Own::own(__pa0);
+    ty = metamodelica::Own::own(__pa1);
+    ext = metamodelica::Own::own(__pa2);
+    imps = metamodelica::Own::own(__pa3);
+    is_used = metamodelica::Own::own(__pa4);
+    rest_env = metamodelica::Own::own(__pa5);
+    outEnv = metamodelica::cons(
+        metamodelica::Ref::new(Frame {
+            name: name,
+            frameType: ty,
+            clsAndVars: inTree,
+            extendsTable: ext,
+            importTable: imps,
+            isUsed: is_used,
+        }),
+        rest_env,
+    );
+    Ok(outEnv)
+}
+
+pub(crate) fn mergePathWithEnvPath(
+    mut inPath: metamodelica::Ref<Absyn::Path>,
+    mut inEnv: &Env,
+) -> metamodelica::Ref<Absyn::Path> {
+    let mut outPath: metamodelica::Ref<Absyn::Path>;
+    outPath = 'mc: {
+        let __mc_input = &**inEnv;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    let mut env_path: metamodelica::Ref<Absyn::Path>;
+                    let mut id: ArcStr;
+                    env_path = getEnvPath(inEnv)?;
+                    id = AbsynUtil::pathLastIdent(&inPath);
+                    Ok(AbsynUtil::joinPaths(env_path.clone(), metamodelica::Ref::new(Absyn::Path::IDENT { name: id.clone() }))?)
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(inPath.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outPath
+}
+
+pub(crate) fn mergeTypeSpecWithEnvPath(
+    mut inTS: metamodelica::Ref<Absyn::TypeSpec>,
+    mut inEnv: &Env,
+) -> metamodelica::Ref<Absyn::TypeSpec> {
+    let mut outTS: metamodelica::Ref<Absyn::TypeSpec>;
+    outTS = 'mc: {
+        let __mc_input = &*inTS;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Absyn::TypeSpec::TPATH { path, arrayDim: ad } => {
+                    let mut id: ArcStr;
+                    let mut path = (*path).clone();
+                    id = AbsynUtil::pathLastIdent(metamodelica::AsArg::as_arg(&path));
+                    path = AbsynUtil::joinPaths(getEnvPath(inEnv)?, metamodelica::Ref::new(Absyn::Path::IDENT { name: id.clone() }))?;
+                    Ok(metamodelica::Ref::new(Absyn::TypeSpec::TPATH { path: path.clone(), arrayDim: ad.clone() }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(inTS.clone())
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outTS
+}
+
+pub(crate) fn prefixIdentWithEnv(mut inIdent: ArcStr, mut inEnv: &Env) -> Result<metamodelica::Ref<Absyn::Path>> {
+    let mut outPath: metamodelica::Ref<Absyn::Path>;
+    outPath = (::match_deref::match_deref! { match inEnv {
+        Deref @ metamodelica::ListNode::Cons { head: Deref @ Frame { name: None, .. }, tail: Deref @ metamodelica::ListNode::Nil } => {
+            metamodelica::Ref::new(Absyn::Path::IDENT { name: inIdent })
+        },
+        _ => {
+            let mut path: metamodelica::Ref<Absyn::Path>;
+            path = getEnvPath(inEnv)?;
+            path = AbsynUtil::suffixPath(&path, &inIdent);
+            path
+        },
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    Ok(outPath)
+}
+
+pub(crate) fn getRedeclarationElement(
+    mut inRedeclare: metamodelica::Ref<Redeclaration>,
+) -> Result<metamodelica::Ref<SCode::Element>> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match &(inRedeclare) {
+            Deref @ Redeclaration::RAW_MODIFIER { modifier: e } => {
+                return Ok(e.clone())
+            },
+            Deref @ Redeclaration::PROCESSED_MODIFIER { modifier: Deref @ Item::CLASS { cls: e, .. } } => {
+                return Ok(e.clone())
+            },
+            Deref @ Redeclaration::PROCESSED_MODIFIER { modifier: Deref @ Item::VAR { var: e, .. } } => {
+                return Ok(e.clone())
+            },
+            Deref @ Redeclaration::PROCESSED_MODIFIER { modifier: Deref @ Item::REDECLARED_ITEM { item, .. } } => {
+                { inRedeclare = metamodelica::Ref::new(Redeclaration::PROCESSED_MODIFIER { modifier: item.clone() }); continue '__tco; }
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn getRedeclarationNameInfo(
+    mut inRedeclare: metamodelica::Ref<Redeclaration>,
+) -> Result<(ArcStr, SourceInfo)> {
+    let mut outName: ArcStr;
+    let mut outInfo: SourceInfo;
+    (outName, outInfo) = (::match_deref::match_deref! { match &(inRedeclare.clone()) {
+        Deref @ Redeclaration::PROCESSED_MODIFIER { modifier: Deref @ Item::ALIAS { name, info, .. } } => {
+            (name.clone(), info.clone())
+        },
+        _ => {
+            let mut el: metamodelica::Ref<SCode::Element>;
+            let mut name: ArcStr;
+            let mut info: SourceInfo;
+            el = getRedeclarationElement(inRedeclare)?;
+            (name, info) = SCodeUtil::elementNameInfo(&el)?;
+            (name, info)
+        },
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    Ok((outName, outInfo))
+}
+
+pub(crate) fn buildInitialEnv() -> Result<Env> {
+    let mut outInitialEnv: Env;
+    let mut tree: metamodelica::Ref<EnvTree::Tree>;
+    let mut exts: metamodelica::Ref<ExtendsTable>;
+    let mut imps: ImportTable;
+    let mut is_used: Mutable::Mutable<bool>;
+    let mut p: metamodelica::List<metamodelica::Ref<SCode::Element>>;
+    tree = EnvTree::new();
+    exts = newExtendsTable();
+    imps = newImportTable();
+    is_used = Mutable::create(false);
+    tree = addDummyClassToTree(literal!("String"), tree)?;
+    tree = addDummyClassToTree(literal!("Integer"), tree)?;
+    tree = addDummyClassToTree(literal!("spliceFunction"), tree)?;
+    outInitialEnv = list![metamodelica::Ref::new(Frame {
+        name: None,
+        frameType: crate::NFSCodeEnv::FrameType::NORMAL_SCOPE,
+        clsAndVars: tree,
+        extendsTable: exts,
+        importTable: imps,
+        isUsed: Some(is_used)
+    })];
+    (_, p) = FBuiltin::getInitialFunctions()?;
+    outInitialEnv = extendEnvWithClasses(&p, outInitialEnv)?;
+    Ok(outInitialEnv)
+}
+
+fn addDummyClassToTree(
+    mut inName: ArcStr,
+    mut inTree: metamodelica::Ref<EnvTree::Tree>,
+) -> Result<metamodelica::Ref<EnvTree::Tree>> {
+    let mut outTree: metamodelica::Ref<EnvTree::Tree>;
+    let mut cls: metamodelica::Ref<SCode::Element>;
+    cls = metamodelica::Ref::new(SCode::Element::CLASS {
+        name: inName.clone(),
+        prefixes: SCode::defaultPrefixes.clone(),
+        encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+        partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+        restriction: openmodelica_frontend_types::SCode::Restriction::R_CLASS,
+        classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+            elementLst: metamodelica::nil(),
+            normalEquationLst: metamodelica::nil(),
+            initialEquationLst: metamodelica::nil(),
+            normalAlgorithmLst: metamodelica::nil(),
+            initialAlgorithmLst: metamodelica::nil(),
+            constraintLst: metamodelica::nil(),
+            clsattrs: metamodelica::nil(),
+            externalDecl: None,
+        }),
+        cmt: SCode::noComment.clone(),
+        info: Absyn::dummyInfo.clone(),
+    });
+    outTree = EnvTree::add(
+        inTree,
+        &inName,
+        &(metamodelica::Ref::new(Item::CLASS {
+            cls: cls,
+            env: emptyEnv.clone(),
+            classType: crate::NFSCodeEnv::ClassType::BUILTIN,
+        })),
+        &*(std::sync::Arc::new(fnptr!(EnvTree::addConflictDefault, _, _, _))
+            as std::sync::Arc<dyn ::std::ops::Fn(_, _, _) -> Result<_> + 'static>),
+    )?;
+    Ok(outTree)
+}
+
+pub(crate) fn printEnvStr(mut inEnv: Env) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    let mut env: Env;
+    env = inEnv.reverse();
+    outString = stringDelimitList(
+        List::map(env, &move |__a0: metamodelica::Ref<Frame>| printFrameStr(&__a0))?,
+        literal!("\n"),
+    );
+    Ok(outString)
+}
+
+fn printFrameStr(mut inFrame: &metamodelica::Ref<Frame>) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    outString = (match &**inFrame {
+        Frame {
+            name,
+            frameType: ty,
+            clsAndVars: tree,
+            extendsTable: exts,
+            importTable: imps,
+            isUsed: _,
+        } => {
+            let mut name_str: ArcStr;
+            let mut ty_str: ArcStr;
+            let mut tree_str: ArcStr;
+            let mut ext_str: ArcStr;
+            let mut imp_str: ArcStr;
+            let mut out: ArcStr;
+            name_str = printFrameNameStr(name.clone());
+            ty_str = printFrameTypeStr(ty.clone());
+            tree_str = EnvTree::printTreeStr(tree)?;
+            ext_str = printExtendsTableStr(exts)?;
+            imp_str = printImportTableStr(imps.clone())?;
+            name_str = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("<<<"));
+                __mm_s.push_str(&*ty_str);
+                __mm_s.push_str(&*literal!(" frame "));
+                __mm_s.push_str(&*name_str);
+                __mm_s.push_str(&*literal!(">>>\n"));
+                ArcStr::from(__mm_s)
+            };
+            out = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*name_str);
+                __mm_s.push_str(&*literal!("\tImports:\n"));
+                __mm_s.push_str(&*imp_str);
+                __mm_s.push_str(&*literal!("\n\tExtends:\n"));
+                __mm_s.push_str(&*ext_str);
+                __mm_s.push_str(&*literal!("\n\tComponents:\n"));
+                __mm_s.push_str(&*tree_str);
+                __mm_s.push_str(&*literal!("\n"));
+                ArcStr::from(__mm_s)
+            };
+            out
+        }
+    });
+    Ok(outString)
+}
+
+fn printFrameNameStr(mut inFrame: Option<ArcStr>) -> ArcStr {
+    let mut outString: ArcStr;
+    outString = (match inFrame {
+        None => {
+            literal!("global")
+        }
+        Some(mut name) => name,
+    });
+    outString
+}
+
+fn printFrameTypeStr(mut inFrame: FrameType) -> ArcStr {
+    let mut outString: ArcStr;
+    outString = (match inFrame {
+        FrameType::NORMAL_SCOPE { .. } => literal!("Normal"),
+        FrameType::ENCAPSULATED_SCOPE { .. } => literal!("Encapsulated"),
+        FrameType::IMPLICIT_SCOPE { .. } => literal!("Implicit"),
+    });
+    outString
+}
+
+pub(crate) fn printExtendsTableStr(mut inExtendsTable: &metamodelica::Ref<ExtendsTable>) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    let mut bcl: metamodelica::List<metamodelica::Ref<Extends>>;
+    let mut re: metamodelica::List<metamodelica::Ref<SCode::Element>>;
+    let mut cei: Option<metamodelica::Ref<SCode::Element>>;
+    let __arc3 = &(*inExtendsTable);
+    let ExtendsTable {
+        baseClasses: __pa0,
+        redeclaredElements: __pa1,
+        classExtendsInfo: __pa2,
+    } = &**__arc3;
+    bcl = metamodelica::Own::own(__pa0);
+    re = metamodelica::Own::own(__pa1);
+    cei = metamodelica::Own::own(__pa2);
+    outString = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*stringDelimitList(
+            List::map(bcl, &move |__a0: metamodelica::Ref<Extends>| printExtendsStr(&__a0))?,
+            literal!("\n"),
+        ));
+        __mm_s.push_str(&*literal!("\n\t\tRedeclare elements:\n\t\t\t"));
+        __mm_s.push_str(&*stringDelimitList(
+            List::map1(re, &SCodeDump::unparseElementStr, SCodeDump::defaultOptions.clone())?,
+            literal!("\n\t\t\t"),
+        ));
+        __mm_s.push_str(&*literal!("\n\t\tClass extends:\n\t\t\t"));
+        __mm_s.push_str(&*Util::applyOptionOrDefault(
+            cei,
+            &({
+                let __pe_b1 = SCodeDump::defaultOptions.clone();
+                move |__pe_a0| SCodeDump::unparseElementStr(__pe_a0, __pe_b1.clone())
+            }),
+            literal!(""),
+        )?);
+        ArcStr::from(__mm_s)
+    };
+    Ok(outString)
+}
+
+pub(crate) fn printExtendsStr(mut inExtends: &metamodelica::Ref<Extends>) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    let mut bc: metamodelica::Ref<Absyn::Path>;
+    let mut mods: metamodelica::List<metamodelica::Ref<Redeclaration>>;
+    let mut mods_str: ArcStr;
+    let __arc2 = &(*inExtends);
+    let Extends {
+        baseClass: __pa0,
+        redeclareModifiers: __pa1,
+        ..
+    } = &**__arc2;
+    bc = metamodelica::Own::own(__pa0);
+    mods = metamodelica::Own::own(__pa1);
+    mods_str = stringDelimitList(List::map(mods, &printRedeclarationStr)?, literal!("\n"));
+    outString = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*literal!("\t\t"));
+        __mm_s.push_str(&*AbsynUtil::pathString(bc, literal!("."), true, false)?);
+        __mm_s.push_str(&*literal!("("));
+        __mm_s.push_str(&*mods_str);
+        __mm_s.push_str(&*literal!(")"));
+        ArcStr::from(__mm_s)
+    };
+    Ok(outString)
+}
+
+pub(crate) fn printRedeclarationStr(mut inRedeclare: metamodelica::Ref<Redeclaration>) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    outString = 'mc: {
+        let __mc_input = &*inRedeclare;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Redeclaration::PROCESSED_MODIFIER { modifier: Deref @ Item::ALIAS { name, path: Some(p), .. } } => {
+                    Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("ALIAS(")); __mm_s.push_str(&*AbsynUtil::pathString(p.clone(), literal!("."), true, false)?); __mm_s.push_str(&*literal!(".")); __mm_s.push_str(&*name); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) })
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ Redeclaration::PROCESSED_MODIFIER { modifier: Deref @ Item::ALIAS { name, .. } } => {
+                    Ok({ let mut __mm_s = String::new(); __mm_s.push_str(&*literal!("ALIAS(")); __mm_s.push_str(&*name); __mm_s.push_str(&*literal!(")")); ArcStr::from(__mm_s) })
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Ok(SCodeDump::unparseElementStr(getRedeclarationElement(inRedeclare.clone())?, SCodeDump::defaultOptions.clone())?)
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(outString)
+}
+
+fn printImportTableStr(mut inImports: ImportTable) -> Result<ArcStr> {
+    let mut outString: ArcStr;
+    let mut qual_imps: metamodelica::List<Absyn::Import>;
+    let mut unqual_imps: metamodelica::List<Absyn::Import>;
+    let mut qual_str: ArcStr;
+    let mut unqual_str: ArcStr;
+    let ImportTable {
+        qualifiedImports: __pa0,
+        unqualifiedImports: __pa1,
+        ..
+    } = inImports;
+    qual_imps = metamodelica::Own::own(__pa0);
+    unqual_imps = metamodelica::Own::own(__pa1);
+    qual_str = stringDelimitList(
+        List::map(qual_imps, &move |__a0: Absyn::Import| {
+            AbsynUtil::printImportString(&__a0)
+        })?,
+        literal!("\n\t\t"),
+    );
+    unqual_str = stringDelimitList(
+        List::map(unqual_imps, &move |__a0: Absyn::Import| {
+            AbsynUtil::printImportString(&__a0)
+        })?,
+        literal!("\n\t\t"),
+    );
+    outString = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*literal!("\t\t"));
+        __mm_s.push_str(&*qual_str);
+        __mm_s.push_str(&*unqual_str);
+        ArcStr::from(__mm_s)
+    };
+    Ok(outString)
+}

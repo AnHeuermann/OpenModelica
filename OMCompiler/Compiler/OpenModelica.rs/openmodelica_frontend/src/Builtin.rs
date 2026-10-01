@@ -1,0 +1,250 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::FBuiltin;
+use crate::FGraph;
+use crate::FGraphBuildEnv;
+use openmodelica_ast::Absyn;
+use openmodelica_frontend_dump::FCore;
+use openmodelica_frontend_types::DAE;
+use openmodelica_frontend_types::SCode;
+use openmodelica_util::Config;
+use openmodelica_util::Flags;
+use openmodelica_util::Global;
+use openmodelica_util::Util;
+use openmodelica_util_datatypes_basic::Mutable;
+
+pub(crate) fn variableIsBuiltin(mut cref: &metamodelica::Ref<DAE::ComponentRef>) -> Result<bool> {
+    let mut b: bool;
+    b = (match &**cref {
+        DAE::ComponentRef::CREF_IDENT { ident: id, .. } => variableNameIsBuiltin(id)?,
+        _ => false,
+    });
+    Ok(b)
+}
+
+pub(crate) fn variableNameIsBuiltin(mut name: &ArcStr) -> Result<bool> {
+    let mut b: bool;
+    b = (::match_deref::match_deref! { match &(name.clone()) {
+        Deref @ "time" => true,
+        Deref @ "startTime" => Config::acceptOptimicaGrammar()?,
+        Deref @ "finalTime" => Config::acceptOptimicaGrammar()?,
+        Deref @ "objective" => Config::acceptOptimicaGrammar()?,
+        Deref @ "objectiveIntegrand" => Config::acceptOptimicaGrammar()?,
+        _ => false,
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    Ok(b)
+}
+
+pub fn isDer(mut inPath: &metamodelica::Ref<Absyn::Path>) -> Result<()> {
+    let () = (::match_deref::match_deref! { match inPath {
+        Deref @ Absyn::Path::IDENT { name: Deref @ "der" } => {
+            ()
+        },
+        Deref @ Absyn::Path::FULLYQUALIFIED { path } => {
+            isDer(path)?;
+            ()
+        },
+        _ => return Err("match: no arm matched"),
+    } });
+    Ok(())
+}
+
+pub fn initialGraph(mut inCache: FCore::Cache) -> Result<(FCore::Cache, FCore::Graph)> {
+    let mut outCache: FCore::Cache;
+    let mut graph: FCore::Graph = <FCore::Graph as ::std::default::Default>::default();
+    let mut cache: FCore::Cache;
+    (outCache, graph) = 'mc: {
+        let __mc_input = inCache;
+        if let Ok((__v, __wb0)) = (|| -> Result<_> {
+            let mut cache = __mc_input.clone() else {
+                return Err("nomatch");
+            };
+            let mut graph: FCore::Graph = graph.clone();
+            graph = FCore::getCachedInitialGraph(&cache)?;
+            graph = FGraph::clone(graph.clone())?;
+            Ok(((cache.clone(), graph.clone()), graph.clone()))
+        })() {
+            graph = __wb0;
+            break 'mc __v;
+        }
+        if let Ok((__v, __wb0)) = (|| -> Result<_> {
+            let mut cache = __mc_input.clone() else {
+                return Err("nomatch");
+            };
+            let mut graph: FCore::Graph = graph.clone();
+            graph = getSetInitialGraph(None)?;
+            Ok(((cache.clone(), graph.clone()), graph.clone()))
+        })() {
+            graph = __wb0;
+            break 'mc __v;
+        }
+        if let Ok((__v, __wb0)) = (|| -> Result<_> {
+            let mut cache = __mc_input.clone() else {
+                return Err("nomatch");
+            };
+            let mut initialProgram: metamodelica::List<metamodelica::Ref<SCode::Element>>;
+            let mut graph: FCore::Graph = graph.clone();
+            graph = FGraph::new(literal!("graph"), FCore::dummyTopModel.clone());
+            graph = FGraphBuildEnv::mkProgramGraph(
+                &(FBuiltin::getBasicTypes()?),
+                openmodelica_frontend_dump::FCore::Kind::BASIC_TYPE,
+                graph.clone(),
+            )?;
+            graph = FBuiltin::initialGraphModelica(
+                graph.clone(),
+                &FGraphBuildEnv::mkTypeNode,
+                &FGraphBuildEnv::mkCompNode,
+            )?;
+            (_, initialProgram) = FBuiltin::getInitialFunctions()?;
+            graph = FGraphBuildEnv::mkProgramGraph(
+                &initialProgram,
+                openmodelica_frontend_dump::FCore::Kind::BUILTIN,
+                graph.clone(),
+            )?;
+            graph = FBuiltin::initialGraphOptimica(graph.clone(), &FGraphBuildEnv::mkCompNode)?;
+            graph = FBuiltin::initialGraphMetaModelica(graph.clone(), &FGraphBuildEnv::mkTypeNode)?;
+            cache = FCore::setCachedInitialGraph(cache.clone(), graph.clone());
+            getSetInitialGraph(Some(graph.clone()))?;
+            graph = FGraph::clone(graph.clone())?;
+            Ok(((cache.clone(), graph.clone()), graph.clone()))
+        })() {
+            graph = __wb0;
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok((outCache, graph))
+}
+
+fn getSetInitialGraph(mut inEnvOpt: Option<FCore::Graph>) -> Result<FCore::Graph> {
+    let mut initialEnv: FCore::Graph;
+    initialEnv = 'mc: {
+        let __mc_input = inEnvOpt;
+        if let Ok(__v) = (|| -> Result<_> {
+            let _ = __mc_input.clone() else { return Err("nomatch") };
+            if '__try0: {
+                crate::Globals::builtinGraphIndex.with(|__root| __root.borrow().clone());
+                Ok::<(), &'static str>(())
+            }
+            .is_ok()
+            {
+                return Err("failure(): body succeeded");
+            }
+            {
+                let __v = metamodelica::nil();
+                crate::Globals::builtinGraphIndex.with(|__root| *__root.borrow_mut() = __v)
+            };
+            Ok(return Err("fail"))
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let None = __mc_input.clone() else {
+                return Err("nomatch");
+            };
+            let mut assocLst: metamodelica::List<(i32, FCore::Graph)>;
+            let mut graph: FCore::Graph;
+            assocLst = crate::Globals::builtinGraphIndex.with(|__root| __root.borrow().clone());
+            graph = FGraph::clone(Util::assoc(
+                Flags::getConfigEnum(Flags::GRAMMAR.clone())?,
+                assocLst.clone(),
+            )?)?;
+            Ok(graph.clone())
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let Some(mut graph) = __mc_input.clone() else {
+                return Err("nomatch");
+            };
+            let mut assocLst: metamodelica::List<(i32, FCore::Graph)>;
+            let mut f: i32;
+            assocLst = crate::Globals::builtinGraphIndex.with(|__root| __root.borrow().clone());
+            f = Flags::getConfigEnum(Flags::GRAMMAR.clone())?;
+            assocLst = if (f == Flags::METAMODELICA.clone()) {
+                metamodelica::cons((Flags::METAMODELICA.clone(), graph.clone()), assocLst.clone())
+            } else {
+                if (f == Flags::PARMODELICA.clone()) {
+                    metamodelica::cons((Flags::PARMODELICA.clone(), graph.clone()), assocLst.clone())
+                } else {
+                    if (f == Flags::MODELICA.clone()) {
+                        metamodelica::cons((Flags::MODELICA.clone(), graph.clone()), assocLst.clone())
+                    } else {
+                        assocLst.clone()
+                    }
+                }
+            };
+            {
+                let __v = assocLst.clone();
+                crate::Globals::builtinGraphIndex.with(|__root| *__root.borrow_mut() = __v)
+            };
+            Ok(graph.clone())
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(initialEnv)
+}
+
+pub fn clearInitialGraph() -> () {
+    {
+        let __v = metamodelica::nil();
+        crate::Globals::builtinGraphIndex.with(|__root| *__root.borrow_mut() = __v)
+    };
+    ()
+}

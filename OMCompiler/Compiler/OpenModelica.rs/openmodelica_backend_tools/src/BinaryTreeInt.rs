@@ -1,0 +1,570 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use openmodelica_util::Error;
+use openmodelica_util::Util;
+
+/* *************************
+ imports
+**************************/
+/* *************************
+ types
+**************************/
+/// Generic Binary tree implementation
+///  - Binary Tree
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct BinTree {
+    /// Value
+    pub value: Option<TreeValue>,
+    /// left subtree
+    pub leftSubTree: Option<metamodelica::Ref<BinTree>>,
+    /// right subtree
+    pub rightSubTree: Option<metamodelica::Ref<BinTree>>,
+}
+
+impl metamodelica::gc::MMTrace for BinTree {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.value, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.leftSubTree, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.rightSubTree, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for BinTree {
+    fn default() -> Self {
+        Self {
+            value: Default::default(),
+            leftSubTree: Default::default(),
+            rightSubTree: Default::default(),
+        }
+    }
+}
+
+pub type TREENODE = BinTree;
+
+/// Each node in the binary tree can have a value associated with it.
+///  - Tree Value
+#[derive(Clone, Copy, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct TreeValue {
+    /// Key
+    pub key: Key,
+    /// Value
+    pub value: Value,
+}
+
+impl metamodelica::gc::MMTrace for TreeValue {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.key, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.value, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for TreeValue {
+    fn default() -> Self {
+        Self {
+            key: Default::default(),
+            value: Default::default(),
+        }
+    }
+}
+
+pub type TREEVALUE = TreeValue;
+
+/// A key is a Integer
+pub type Key = i32;
+
+/// - Value
+pub type Value = i32;
+
+pub(crate) static emptyBinTree: std::sync::LazyLock<metamodelica::Ref<BinTree>> = std::sync::LazyLock::new(|| {
+    metamodelica::Ref::new(BinTree {
+        value: None,
+        leftSubTree: None,
+        rightSubTree: None,
+    })
+});
+
+/* *************************
+ implementation
+**************************/
+fn keyCmp(mut keya: Key, mut keyb: Key) -> i32 {
+    let mut cmp: i32;
+    cmp = Util::intSign(keya - keyb);
+    cmp
+}
+
+pub(crate) fn treeGet(mut bt: metamodelica::Ref<BinTree>, mut key: Key) -> Result<Value> {
+    let mut v: Value;
+    v = treeGet3(bt.clone(), key, treeGet2(&bt, key)?)?;
+    Ok(v)
+}
+
+fn treeGet2(mut inBinTree: &metamodelica::Ref<BinTree>, mut ikey: Key) -> Result<i32> {
+    let mut compResult: i32;
+    compResult = (match &**inBinTree {
+        BinTree {
+            value: Some(TreeValue { key, .. }),
+            ..
+        } => keyCmp(key.clone(), ikey),
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(compResult)
+}
+
+fn treeGet3(mut inBinTree: metamodelica::Ref<BinTree>, mut ikey: Key, mut inCompResult: i32) -> Result<Value> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match &((inBinTree, inCompResult)) {
+            (Deref @ BinTree { value: Some(TreeValue { value: rval, .. }), .. }, 0) => {
+                return Ok(rval.clone())
+            },
+            (Deref @ BinTree { rightSubTree: Some(right), .. }, 1) => {
+                let mut compResult: i32;
+                compResult = treeGet2(metamodelica::AsArg::as_arg(&right), ikey)?;
+                { (inBinTree, ikey, inCompResult) = (right.clone(), ikey, compResult); continue '__tco; }
+            },
+            (Deref @ BinTree { leftSubTree: Some(left), .. }, (-1)) => {
+                let mut compResult: i32;
+                compResult = treeGet2(metamodelica::AsArg::as_arg(&left), ikey)?;
+                { (inBinTree, ikey, inCompResult) = (left.clone(), ikey, compResult); continue '__tco; }
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn treeAddList(
+    mut inBinTree: metamodelica::Ref<BinTree>,
+    mut inKeyLst: metamodelica::List<i32>,
+) -> Result<metamodelica::Ref<BinTree>> {
+    '__tco: loop {
+        ::match_deref::match_deref! { match &((inBinTree, inKeyLst)) {
+            (bt, Deref @ metamodelica::ListNode::Nil) => {
+                return Ok(bt.clone())
+            },
+            (bt, Deref @ metamodelica::ListNode::Cons { head: key, tail: res }) => {
+                let mut bt_1: metamodelica::Ref<BinTree>;
+                let mut bt_2: metamodelica::Ref<BinTree>;
+                bt_1 = treeAdd(metamodelica::AsArg::as_arg(&bt), key.clone(), 0)?;
+                { (inBinTree, inKeyLst) = (bt_1, res.clone()); continue '__tco; }
+            },
+            _ => return Err("match: no arm matched"),
+        } }
+    }
+}
+
+pub(crate) fn treeAdd(
+    mut inBinTree: &metamodelica::Ref<BinTree>,
+    mut inKey: Key,
+    mut inValue: Value,
+) -> Result<metamodelica::Ref<BinTree>> {
+    let mut outBinTree: metamodelica::Ref<BinTree>;
+    outBinTree = 'mc: {
+        let __mc_input = &**inBinTree;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ BinTree { value: None, leftSubTree: None, rightSubTree: None } => {
+                    Ok(metamodelica::Ref::new(BinTree { value: Some(TreeValue { key: inKey, value: inValue }), leftSubTree: None, rightSubTree: None }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ BinTree { value: Some(TreeValue { key: rkey, value: _ }), leftSubTree: left, rightSubTree: right } => {
+                    let 0 = (keyCmp(rkey.clone(), inKey)) else { return Err("pattern mismatch") };
+                    Ok(metamodelica::Ref::new(BinTree { value: Some(TreeValue { key: rkey.clone(), value: inValue }), leftSubTree: left.clone(), rightSubTree: right.clone() }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ BinTree { value: optVal @ Some(TreeValue { key: rkey, value: _ }), leftSubTree: left, rightSubTree: Some(t) } => {
+                    let mut t_1: metamodelica::Ref<BinTree>;
+                    let 1 = (keyCmp(rkey.clone(), inKey)) else { return Err("pattern mismatch") };
+                    t_1 = treeAdd(metamodelica::AsArg::as_arg(&t), inKey, inValue)?;
+                    Ok(metamodelica::Ref::new(BinTree { value: optVal.clone(), leftSubTree: left.clone(), rightSubTree: Some(t_1.clone()) }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ BinTree { value: optVal @ Some(TreeValue { key: rkey, value: _ }), leftSubTree: left, rightSubTree: None } => {
+                    let mut right_1: metamodelica::Ref<BinTree>;
+                    let 1 = (keyCmp(rkey.clone(), inKey)) else { return Err("pattern mismatch") };
+                    right_1 = treeAdd(&(metamodelica::Ref::new(BinTree { value: None, leftSubTree: None, rightSubTree: None })), inKey, inValue)?;
+                    Ok(metamodelica::Ref::new(BinTree { value: optVal.clone(), leftSubTree: left.clone(), rightSubTree: Some(right_1.clone()) }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ BinTree { value: optVal @ Some(TreeValue { key: rkey, value: _ }), leftSubTree: Some(t), rightSubTree: right } => {
+                    let mut t_1: metamodelica::Ref<BinTree>;
+                    let (-1) = (keyCmp(rkey.clone(), inKey)) else { return Err("pattern mismatch") };
+                    t_1 = treeAdd(metamodelica::AsArg::as_arg(&t), inKey, inValue)?;
+                    Ok(metamodelica::Ref::new(BinTree { value: optVal.clone(), leftSubTree: Some(t_1.clone()), rightSubTree: right.clone() }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                Deref @ BinTree { value: optVal @ Some(TreeValue { key: rkey, value: _ }), leftSubTree: None, rightSubTree: right } => {
+                    let mut left_1: metamodelica::Ref<BinTree>;
+                    let (-1) = (keyCmp(rkey.clone(), inKey)) else { return Err("pattern mismatch") };
+                    left_1 = treeAdd(&(metamodelica::Ref::new(BinTree { value: None, leftSubTree: None, rightSubTree: None })), inKey, inValue)?;
+                    Ok(metamodelica::Ref::new(BinTree { value: optVal.clone(), leftSubTree: Some(left_1.clone()), rightSubTree: right.clone() }))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    Error::addMessage(Error::INTERNAL_ERROR.clone(), list![literal!("- BinaryTreeInt.treeAdd failed\n")])?;
+                    Ok(return Err("fail"))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok(outBinTree)
+}
+
+// protected function treeDelete2 "author: PA
+//   This function deletes an entry from the BinTree."
+//   input BinTree inBinTree;
+//   input Integer inKey;
+//   output BinTree outBinTree;
+// algorithm
+//   outBinTree := matchcontinue (inBinTree,inKey)
+//     local
+//       BinTree bt,right,left,t;
+//       Key key,rkey;
+//       TreeValue rightmost;
+//       Option<BinTree> optRight,optLeft,optTree;
+//       Value rval;
+//       Option<TreeValue> optVal;
+//       Integer rhash;
+//
+//     case ((bt as TREENODE(value = NONE(),leftSubTree = NONE(),rightSubTree = NONE())),_)
+//       then bt;
+//
+//     case (TREENODE(value = SOME(TREEVALUE(rkey,rval)),leftSubTree = optLeft,rightSubTree = SOME(right)),_)
+//       equation
+//         0 = keyCmp(rkey, inKey);
+//         (rightmost,right) = treeDeleteRightmostValue(right);
+//         optRight = treePruneEmptyNodes(right);
+//       then
+//         TREENODE(SOME(rightmost),optLeft,optRight);
+//
+//     case (TREENODE(value = SOME(TREEVALUE(rkey,rval)),leftSubTree = SOME(left as TREENODE(value=_)),rightSubTree = NONE()),_)
+//       equation
+//         0 = keyCmp(rkey, inKey);
+//       then
+//         left;
+//
+//     case (TREENODE(value = SOME(TREEVALUE(rkey,rval)),leftSubTree = NONE(),rightSubTree = NONE()),_)
+//       equation
+//         0 = keyCmp(rkey, inKey);
+//       then
+//         TREENODE(NONE(),NONE(),NONE());
+//
+//     case (TREENODE(value = optVal as SOME(TREEVALUE(rkey,rval)),leftSubTree = optLeft,rightSubTree = SOME(t)),_)
+//       equation
+//         1 = keyCmp(rkey, inKey);
+//         t = treeDelete2(t, inKey);
+//         optTree = treePruneEmptyNodes(t);
+//       then
+//         TREENODE(optVal,optLeft,optTree);
+//
+//     case (TREENODE(value = optVal as SOME(TREEVALUE(rkey,rval)),leftSubTree =  SOME(t),rightSubTree = optRight),_)
+//       equation
+//         -1 = keyCmp(rkey, inKey);
+//         t = treeDelete2(t, inKey);
+//         optTree = treePruneEmptyNodes(t);
+//       then
+//         TREENODE(optVal,optTree,optRight);
+//
+//     else
+//       equation
+//         Error.addMessage(Error.INTERNAL_ERROR,{"-BinaryTree.treeDelete failed\n"});
+//       then
+//         fail();
+//   end matchcontinue;
+// end treeDelete2;
+// protected function treeDeleteRightmostValue "author: PA
+//   This function takes a BinTree and deletes the rightmost value of the tree.
+//   Tt returns this value and the updated BinTree. This function is used in
+//   the binary tree deletion function \'tree_delete\'.
+//   inputs:  (BinTree)
+//   outputs: (TreeValue, /* deleted value */
+//               BinTree    /* updated bintree */)
+// "
+//   input BinTree inBinTree;
+//   output TreeValue outTreeValue;
+//   output BinTree outBinTree;
+// algorithm
+//   (outTreeValue,outBinTree) := matchcontinue (inBinTree)
+//     local
+//       TreeValue treeVal,value;
+//       BinTree left,right,bt;
+//       Option<BinTree> optRight, optLeft;
+//       Option<TreeValue> optTreeVal;
+//
+//     case (TREENODE(value = SOME(treeVal),leftSubTree = NONE(),rightSubTree = NONE()))
+//       then (treeVal,TREENODE(NONE(),NONE(),NONE()));
+//
+//     case (TREENODE(value = SOME(treeVal),leftSubTree = SOME(left),rightSubTree = NONE()))
+//       then (treeVal,left);
+//
+//     case (TREENODE(value = optTreeVal,leftSubTree = optLeft,rightSubTree = SOME(right)))
+//       equation
+//         (value,right) = treeDeleteRightmostValue(right);
+//         optRight = treePruneEmptyNodes(right);
+//       then
+//         (value,TREENODE(optTreeVal,optLeft,optRight));
+//
+//     case (TREENODE(value = SOME(treeVal),leftSubTree = NONE(),rightSubTree = SOME(right)))
+//       equation
+//         failure((_,_) = treeDeleteRightmostValue(right));
+//         print("- BinaryTree.treeDeleteRightmostValue: right value was empty, left NONE\n");
+//       then
+//         (treeVal,TREENODE(NONE(),NONE(),NONE()));
+//
+//     else
+//       equation
+//         Error.addMessage(Error.INTERNAL_ERROR,{"- BinaryTree.treeDeleteRightmostValue failed\n"});
+//       then
+//         fail();
+//   end matchcontinue;
+// end treeDeleteRightmostValue;
+// protected function treePruneEmptyNodes "author: PA
+//   This function is a helper function to tree_delete
+//   It is used to delete empty nodes of the BinTree
+//   representation, that might be introduced when deleting nodes."
+//   input BinTree inBinTree;
+//   output Option<BinTree> outBinTreeOption;
+// algorithm
+//   outBinTreeOption := matchcontinue (inBinTree)
+//     local BinTree bt;
+//     case TREENODE(value = NONE(),leftSubTree = NONE(),rightSubTree = NONE()) then NONE();
+//     case bt then SOME(bt);
+//   end matchcontinue;
+// end treePruneEmptyNodes;
+// protected function bintreeDepth "author: PA
+//   This function calculates the depth of the Binary Tree given
+//   as input. It can be used for debugging purposes to investigate
+//   how balanced binary trees are."
+//   input BinTree inBinTree;
+//   output Integer outInteger;
+// algorithm
+//   outInteger := matchcontinue (inBinTree)
+//     local
+//       Value ld,rd,res;
+//       BinTree left,right;
+//
+//     case (TREENODE(leftSubTree = NONE(),rightSubTree = NONE())) then 1;
+//
+//     case (TREENODE(leftSubTree = SOME(left),rightSubTree = SOME(right)))
+//       equation
+//         ld = bintreeDepth(left);
+//         rd = bintreeDepth(right);
+//         res = intMax(ld, rd);
+//       then
+//         res + 1;
+//
+//     case (TREENODE(leftSubTree = SOME(left),rightSubTree = NONE()))
+//       equation
+//         ld = bintreeDepth(left);
+//       then
+//         ld;
+//
+//     case (TREENODE(leftSubTree = NONE(),rightSubTree = SOME(right)))
+//       equation
+//         rd = bintreeDepth(right);
+//       then
+//         rd;
+//   end matchcontinue;
+// end bintreeDepth;
+pub(crate) fn bintreeToList(
+    mut inBinTree: metamodelica::Ref<BinTree>,
+) -> Result<(metamodelica::List<i32>, metamodelica::List<i32>)> {
+    let mut outKeyLst: metamodelica::List<i32>;
+    let mut outValueLst: metamodelica::List<i32>;
+    (outKeyLst, outValueLst) = 'mc: {
+        let __mc_input = inBinTree;
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                bt => {
+                    let mut klst: metamodelica::List<i32>;
+                    let mut vlst: metamodelica::List<i32>;
+                    (klst, vlst) = bintreeToList2(metamodelica::AsArg::as_arg(&bt), metamodelica::nil(), metamodelica::nil())?;
+                    Ok((klst.clone(), vlst.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                _ => {
+                    metamodelica::print(literal!("- BackendDAEUtil.bintreeToList failed\n"));
+                    Ok(return Err("fail"))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok((outKeyLst, outValueLst))
+}
+
+fn bintreeToList2(
+    mut inBinTree: &metamodelica::Ref<BinTree>,
+    mut inKeyLst: metamodelica::List<i32>,
+    mut inValueLst: metamodelica::List<i32>,
+) -> Result<(metamodelica::List<i32>, metamodelica::List<i32>)> {
+    let mut outKeyLst: metamodelica::List<i32>;
+    let mut outValueLst: metamodelica::List<i32>;
+    (outKeyLst, outValueLst) = 'mc: {
+        let __mc_input = (&**inBinTree, inKeyLst, inValueLst);
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ BinTree { value: None, leftSubTree: None, rightSubTree: None }, klst, vlst) => {
+                    Ok((klst.clone(), vlst.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ BinTree { value: Some(TreeValue { key, value }), leftSubTree: left, rightSubTree: right }, klst, vlst) => {
+                    let mut klst = (*klst).clone();
+                    let mut vlst = (*vlst).clone();
+                    (klst, vlst) = bintreeToListOpt(left.clone(), klst.clone(), vlst.clone())?;
+                    (klst, vlst) = bintreeToListOpt(right.clone(), klst.clone(), vlst.clone())?;
+                    Ok((metamodelica::cons(key.clone(), klst.clone()), metamodelica::cons(value.clone(), vlst.clone())))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            ::match_deref::match_deref! { match &__mc_input {
+                (Deref @ BinTree { value: None, leftSubTree: left, .. }, klst, vlst) => {
+                    let mut klst = (*klst).clone();
+                    let mut vlst = (*vlst).clone();
+                    (klst, vlst) = bintreeToListOpt(left.clone(), klst.clone(), vlst.clone())?;
+                    (klst, vlst) = bintreeToListOpt(left.clone(), klst.clone(), vlst.clone())?;
+                    Ok((klst.clone(), vlst.clone()))
+                }
+                _ => return Err("nomatch"),
+            }}
+        })() {
+            break 'mc __v;
+        }
+        return Err("matchcontinue: no arm matched");
+    };
+    Ok((outKeyLst, outValueLst))
+}
+
+fn bintreeToListOpt(
+    mut inBinTreeOption: Option<metamodelica::Ref<BinTree>>,
+    mut inKeyLst: metamodelica::List<i32>,
+    mut inValueLst: metamodelica::List<i32>,
+) -> Result<(metamodelica::List<i32>, metamodelica::List<i32>)> {
+    let mut outKeyLst: metamodelica::List<i32>;
+    let mut outValueLst: metamodelica::List<i32>;
+    (outKeyLst, outValueLst) = (::match_deref::match_deref! { match &(inBinTreeOption) {
+        None => {
+            let mut klst = inKeyLst;
+            let mut vlst = inValueLst;
+            (klst, vlst)
+        },
+        Some(bt) => {
+            let mut klst = inKeyLst;
+            let mut vlst = inValueLst;
+            (klst, vlst) = bintreeToList2(metamodelica::AsArg::as_arg(&bt), klst, vlst)?;
+            (klst, vlst)
+        },
+        _ => unreachable!("match_deref! exhaustiveness placeholder"),
+    } });
+    Ok((outKeyLst, outValueLst))
+}

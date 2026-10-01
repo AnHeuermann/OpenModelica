@@ -1,0 +1,283 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use openmodelica_ast::Absyn;
+use openmodelica_frontend_types::DAE;
+use openmodelica_frontend_types::Values;
+
+/// these are the simulation/buildModel* options
+/// simulation/buildModel* options
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct SimulationOptions {
+    /// start time, default 0.0
+    pub startTime: metamodelica::Ref<DAE::Exp>,
+    /// stop time, default 1.0
+    pub stopTime: metamodelica::Ref<DAE::Exp>,
+    /// number of intervals, default 500
+    pub numberOfIntervals: metamodelica::Ref<DAE::Exp>,
+    /// stepSize, default (stopTime-startTime)/numberOfIntervals
+    pub stepSize: metamodelica::Ref<DAE::Exp>,
+    /// tolerance, default 1e-6
+    pub tolerance: metamodelica::Ref<DAE::Exp>,
+    /// method, default 'dassl'
+    pub method: metamodelica::Ref<DAE::Exp>,
+    /// file name prefix, default ''
+    pub fileNamePrefix: metamodelica::Ref<DAE::Exp>,
+    /// options, default ''
+    pub options: metamodelica::Ref<DAE::Exp>,
+    /// output format, default 'plt'
+    pub outputFormat: metamodelica::Ref<DAE::Exp>,
+    /// variable filter, regex does whole string matching, i.e. it becomes ^.*$ in the runtime
+    pub variableFilter: metamodelica::Ref<DAE::Exp>,
+    /// Compiler flags, in addition to MODELICAUSERCFLAGS
+    pub cflags: metamodelica::Ref<DAE::Exp>,
+    /// Flags sent to the simulation executable (doesn't do anything for buildModel)
+    pub simflags: metamodelica::Ref<DAE::Exp>,
+}
+
+impl metamodelica::gc::MMTrace for SimulationOptions {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.startTime, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.stopTime, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.numberOfIntervals, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.stepSize, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.tolerance, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.method, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.fileNamePrefix, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.options, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.outputFormat, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.variableFilter, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.cflags, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.simflags, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for SimulationOptions {
+    fn default() -> Self {
+        Self {
+            startTime: Default::default(),
+            stopTime: Default::default(),
+            numberOfIntervals: Default::default(),
+            stepSize: Default::default(),
+            tolerance: Default::default(),
+            method: Default::default(),
+            fileNamePrefix: Default::default(),
+            options: Default::default(),
+            outputFormat: Default::default(),
+            variableFilter: Default::default(),
+            cflags: Default::default(),
+            simflags: Default::default(),
+        }
+    }
+}
+
+pub type SIMULATION_OPTIONS = SimulationOptions;
+
+/// - InteractiveTypes.Variable
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct Variable {
+    /// The variable identifier
+    pub varIdent: ArcStr,
+    /// The value
+    pub value: metamodelica::Ref<Values::Value>,
+    /// The type of the expression
+    pub type_: metamodelica::Ref<DAE::Type>,
+}
+
+impl metamodelica::gc::MMTrace for Variable {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.varIdent, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.value, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.type_, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for Variable {
+    fn default() -> Self {
+        Self {
+            varIdent: Default::default(),
+            value: Default::default(),
+            type_: Default::default(),
+        }
+    }
+}
+
+pub type IVAR = Variable;
+
+/// - a component in a class
+///  this is used in extracting all the components in all the classes
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum Component {
+    COMPONENTITEM {
+        /// the class where the component is
+        the1: metamodelica::Ref<Absyn::Path>,
+        /// the type of the component
+        the2: metamodelica::Ref<Absyn::Path>,
+        /// the name of the component
+        the3: metamodelica::Ref<Absyn::ComponentRef>,
+    },
+    EXTENDSITEM {
+        /// the class which is extended
+        the1: metamodelica::Ref<Absyn::Path>,
+        /// the class which is the extension
+        the2: metamodelica::Ref<Absyn::Path>,
+    },
+}
+impl metamodelica::gc::MMTrace for Component {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Component::COMPONENTITEM { the1, the2, the3 } => {
+                metamodelica::gc::MMTrace::mm_accept(the1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(the2, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(the3, __mmv)?;
+                Ok(())
+            }
+            Component::EXTENDSITEM { the1, the2 } => {
+                metamodelica::gc::MMTrace::mm_accept(the1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(the2, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for Component {
+    fn default() -> Self {
+        Self::EXTENDSITEM {
+            the1: Default::default(),
+            the2: Default::default(),
+        }
+    }
+}
+pub use self::Component::{COMPONENTITEM, EXTENDSITEM};
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct Components {
+    pub componentLst: metamodelica::List<Component>,
+    /// the number of components in list. used to optimize the get_dependency_on_class
+    pub the: i32,
+}
+
+impl metamodelica::gc::MMTrace for Components {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.componentLst, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.the, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for Components {
+    fn default() -> Self {
+        Self {
+            componentLst: Default::default(),
+            the: Default::default(),
+        }
+    }
+}
+
+pub type COMPONENTS = Components;
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct ComponentReplacement {
+    /// which class contain the old cref
+    pub which1: metamodelica::Ref<Absyn::Path>,
+    /// the old cref
+    pub the2: metamodelica::Ref<Absyn::ComponentRef>,
+    /// the new cref
+    pub the3: metamodelica::Ref<Absyn::ComponentRef>,
+}
+
+impl metamodelica::gc::MMTrace for ComponentReplacement {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.which1, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.the2, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.the3, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for ComponentReplacement {
+    fn default() -> Self {
+        Self {
+            which1: Default::default(),
+            the2: Default::default(),
+            the3: Default::default(),
+        }
+    }
+}
+
+pub type COMPONENTREPLACEMENT = ComponentReplacement;
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct ComponentReplacementRules {
+    pub componentReplacementLst: metamodelica::List<ComponentReplacement>,
+    /// the number of rules
+    pub the: i32,
+}
+
+impl metamodelica::gc::MMTrace for ComponentReplacementRules {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.componentReplacementLst, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.the, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for ComponentReplacementRules {
+    fn default() -> Self {
+        Self {
+            componentReplacementLst: Default::default(),
+            the: Default::default(),
+        }
+    }
+}
+
+pub type COMPONENTREPLACEMENTRULES = ComponentReplacementRules;

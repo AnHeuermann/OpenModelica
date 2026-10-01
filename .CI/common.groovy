@@ -559,8 +559,7 @@ void buildRustOMC() {
                   'build_cmake/rust-sundials-wasm/**,' +
                   'build_cmake/downloads/wasi_snapshot_preview1.reactor.wasm'
   stash name: 'omc-rust-gui-inputs',
-        includes: 'build_cmake/OMCompiler/Compiler/rust-target/release/libOpenModelicaCompiler.so,' +
-                  'build_cmake/OMCompiler/Compiler/scripting-api-qt/**'
+        includes: 'build_cmake/OMCompiler/Compiler/rust-target/release/libOpenModelicaCompiler.so'
   // The cross-built FMU loaders for the web stage. Not stashed in place: that is
   // the web build's own staging directory, which it empties before reading them.
   sh 'rm -rf fmu-loaders && cp -a build_cmake/OMCompiler/Compiler/fmu-loaders .'
@@ -601,7 +600,6 @@ void configureWeb(String extra) {
       -DRUST_OMC_WASM_MODE=web-release \
       ${rustWasmOptCMakeFlag()} \
       -DRUST_OMC_WASM_RUNTIME=${env.WORKSPACE}/runtime.wasm \
-      -DRUST_OMC_PREBUILT_GENERATED_SRC=ON \
       -DRUST_OMC_TIMINGS=ON \
       -DRUST_OMC_WORK_DIR=${rustWorkDir()} \
       -DRUST_OMC_FMU_NATIVE_TARGETS=${fmuNativeTargets()} \
@@ -692,7 +690,6 @@ void buildRustGUI() {
       -DOM_OMC_ENABLE_RUST=ON \
       -DOM_ENABLE_GUI_CLIENTS=ON \
       -DRUST_OMC_PREBUILT_CDYLIB=${env.WORKSPACE}/build_cmake/OMCompiler/Compiler/rust-target/release/libOpenModelicaCompiler.so \
-      -DRUST_OMC_PREBUILT_SCRIPTING_API_QT_DIR=${env.WORKSPACE}/build_cmake/OMCompiler/Compiler/scripting-api-qt \
       -DRUST_OMC_WORK_DIR=${rustWorkDir()} \
       -DOM_OMC_ENABLE_CPP_RUNTIME=OFF \
       -DOM_USE_CCACHE=OFF \
@@ -833,8 +830,7 @@ Map nightlyTarget(String name) {
 // is where restoreNightlyShared() laid the generated Rust down.
 List nightlyHandoverFlags() {
   String d = "${env.WORKSPACE}/${nightlySharedDir()}"
-  return ['-DRUST_OMC_PREBUILT_GENERATED_SRC=ON',
-          "-DRUST_OMC_WORK_DIR=${rustWorkDir()}",
+  return ["-DRUST_OMC_WORK_DIR=${rustWorkDir()}",
           "-DRUST_OMC_PREBUILT_WASM_DIR=${d}/wasm",
           "-DRUST_OMC_FMU_LOADERS=${d}/fmu-loaders",
           "-DRUST_OMC_FMU_NATIVE_TARGETS=${fmuNativeTargets()}",
@@ -866,7 +862,7 @@ void buildRustNightlyShared() {
       -DRUST_OMC_WASM_ARTIFACTS_OUT=${d}/wasm
   """
   withSccache {
-    // rust_codegen is susan + mmtorust + the Qt scripting API sources;
+    // rust_codegen syncs the sources into the working copy;
     // rust_wasm_runtime and rust_wasm_artifacts are the wasm blobs and the FMU
     // loaders. The compiler itself is deliberately not built here: every byte of
     // it is target-specific, so each target stage builds its own.
@@ -882,7 +878,6 @@ void buildRustNightlyShared() {
   """
   sh """
     cp -a build_cmake/OMCompiler/Compiler/fmu-loaders ${d}/fmu-loaders
-    cp -a build_cmake/OMCompiler/Compiler/scripting-api-qt ${d}/scripting-api-qt
     du -sh ${d}/*
   """
   stash name: 'nightly-shared', includes: "${nightlySharedDir()}/**"
@@ -1033,8 +1028,7 @@ void buildRustNightlyGUI(String name) {
   // stage that builds no wasm at all.
   List flags = nightlyCommonFlags(t) + nightlyHandoverFlags() + t.qt +
                ['-DOM_ENABLE_GUI_CLIENTS=ON',
-                "-DRUST_OMC_PREBUILT_CDYLIB=${env.WORKSPACE}/nightly-cdylib/${t.cdylib}",
-                "-DRUST_OMC_PREBUILT_SCRIPTING_API_QT_DIR=${d}/scripting-api-qt"]
+                "-DRUST_OMC_PREBUILT_CDYLIB=${env.WORKSPACE}/nightly-cdylib/${t.cdylib}"]
   sh "cmake -S . -B build_cmake ${flags.join(' ')}"
   withSccache {
     sh "cmake --build build_cmake --parallel ${numPhysicalCPU()} --target install"

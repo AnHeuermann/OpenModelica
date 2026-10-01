@@ -1,0 +1,1204 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::Error;
+use crate::LexerJSON;
+use crate::LexerJSON::Token;
+use crate::LexerJSON::TokenId;
+use crate::LexerJSON::printToken;
+use crate::LexerJSON::tokenContent;
+use crate::LexerJSON::tokenSourceInfo;
+use crate::Print;
+use crate::System;
+use crate::Testsuite;
+use crate::UnorderedMap;
+use crate::Util;
+use crate::Vector;
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum JSON {
+    OBJECT {
+        values: metamodelica::Ref<UnorderedMap::UnorderedMap<ArcStr, metamodelica::Ref<JSON>>>,
+    },
+    LIST_OBJECT {
+        values: metamodelica::List<(ArcStr, metamodelica::Ref<JSON>)>,
+    },
+    ARRAY {
+        values: metamodelica::Ref<Vector::Vector<metamodelica::Ref<JSON>>>,
+    },
+    LIST {
+        values: metamodelica::List<metamodelica::Ref<JSON>>,
+    },
+    STRING {
+        r#str: ArcStr,
+    },
+    INTEGER {
+        i: i32,
+    },
+    NUMBER {
+        r: metamodelica::Real,
+    },
+    TRUE,
+    FALSE,
+    NULL,
+}
+impl metamodelica::gc::MMTrace for JSON {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            JSON::OBJECT { values } => {
+                metamodelica::gc::MMTrace::mm_accept(values, __mmv)?;
+                Ok(())
+            }
+            JSON::LIST_OBJECT { values } => {
+                metamodelica::gc::MMTrace::mm_accept(values, __mmv)?;
+                Ok(())
+            }
+            JSON::ARRAY { values } => {
+                metamodelica::gc::MMTrace::mm_accept(values, __mmv)?;
+                Ok(())
+            }
+            JSON::LIST { values } => {
+                metamodelica::gc::MMTrace::mm_accept(values, __mmv)?;
+                Ok(())
+            }
+            JSON::STRING { r#str } => {
+                metamodelica::gc::MMTrace::mm_accept(r#str, __mmv)?;
+                Ok(())
+            }
+            JSON::INTEGER { i } => {
+                metamodelica::gc::MMTrace::mm_accept(i, __mmv)?;
+                Ok(())
+            }
+            JSON::NUMBER { r } => {
+                metamodelica::gc::MMTrace::mm_accept(r, __mmv)?;
+                Ok(())
+            }
+            JSON::TRUE => Ok(()),
+            JSON::FALSE => Ok(()),
+            JSON::NULL => Ok(()),
+        }
+    }
+}
+impl JSON {
+    pub fn interned_TRUE() -> metamodelica::Ref<JSON> {
+        thread_local! {
+            static INTERNED: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::TRUE);
+        }
+        INTERNED.with(|i| i.clone())
+    }
+    pub fn interned_FALSE() -> metamodelica::Ref<JSON> {
+        thread_local! {
+            static INTERNED: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::FALSE);
+        }
+        INTERNED.with(|i| i.clone())
+    }
+    pub fn interned_NULL() -> metamodelica::Ref<JSON> {
+        thread_local! {
+            static INTERNED: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::NULL);
+        }
+        INTERNED.with(|i| i.clone())
+    }
+}
+pub fn interned_TRUE() -> metamodelica::Ref<JSON> {
+    JSON::interned_TRUE()
+}
+pub fn interned_FALSE() -> metamodelica::Ref<JSON> {
+    JSON::interned_FALSE()
+}
+pub fn interned_NULL() -> metamodelica::Ref<JSON> {
+    JSON::interned_NULL()
+}
+impl Default for JSON {
+    fn default() -> Self {
+        Self::TRUE
+    }
+}
+pub use self::JSON::{ARRAY, FALSE, INTEGER, LIST, LIST_OBJECT, NULL, NUMBER, OBJECT, STRING, TRUE};
+pub fn emptyObject() -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON>;
+    obj = metamodelica::Ref::new(JSON::OBJECT {
+        values: UnorderedMap::new(
+            (std::sync::Arc::new(fnptr!(stringHashDjb2, ArcStr))
+                as std::sync::Arc<dyn ::std::ops::Fn(ArcStr) -> Result<i32> + 'static>),
+            (std::sync::Arc::new(fnptr!(stringEq, ArcStr, ArcStr))
+                as std::sync::Arc<dyn ::std::ops::Fn(ArcStr, ArcStr) -> Result<bool> + 'static>),
+            1,
+        ),
+    });
+    obj
+}
+
+pub fn emptyListObject() -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::LIST_OBJECT {
+        values: metamodelica::nil(),
+    });
+    obj
+}
+
+pub fn fromPair(mut key: &ArcStr, mut value: &metamodelica::Ref<JSON>) -> Result<metamodelica::Ref<JSON>> {
+    let mut obj: metamodelica::Ref<JSON>;
+    obj = emptyObject();
+    obj = addPair(key, value, obj)?;
+    Ok(obj)
+}
+
+pub(crate) fn listObjectFromPair(mut key: ArcStr, mut value: metamodelica::Ref<JSON>) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::LIST_OBJECT {
+        values: list![(key.clone(), value.clone())],
+    });
+    obj
+}
+
+pub fn emptyArray(mut capacity: i32) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::ARRAY {
+        values: Vector::new(capacity),
+    });
+    obj
+}
+
+pub fn makeArray(mut elements: metamodelica::List<metamodelica::Ref<JSON>>) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::ARRAY {
+        values: Vector::fromList(elements.clone()),
+    });
+    obj
+}
+
+pub fn makeList(mut elements: metamodelica::List<metamodelica::Ref<JSON>>) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::LIST {
+        values: elements.clone(),
+    });
+    obj
+}
+
+pub fn makeString(mut r#str: ArcStr) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::STRING { r#str: r#str.clone() });
+    obj
+}
+
+pub fn makeInteger(mut i: i32) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::INTEGER { i: i });
+    obj
+}
+
+pub fn makeNumber(mut r: metamodelica::Real) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = metamodelica::Ref::new(JSON::NUMBER { r: r });
+    obj
+}
+
+pub fn makeBoolean(mut b: bool) -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = if (b) {
+        crate::JSON::interned_TRUE()
+    } else {
+        crate::JSON::interned_FALSE()
+    };
+    obj
+}
+
+pub fn makeNull() -> metamodelica::Ref<JSON> {
+    let mut obj: metamodelica::Ref<JSON> = crate::JSON::interned_NULL();
+    obj
+}
+
+pub fn isNull(mut obj: &metamodelica::Ref<JSON>) -> bool {
+    let mut res: bool;
+    res = (match &**obj {
+        NULL { .. } => true,
+        _ => false,
+    });
+    res
+}
+
+pub fn addElement<'__b>(
+    mut value: &'__b metamodelica::Ref<JSON>,
+    mut obj: metamodelica::Ref<JSON>,
+) -> Result<metamodelica::Ref<JSON>> {
+    '__tco: loop {
+        match &*obj {
+            ARRAY { values: __obj_values } => {
+                Vector::push(__obj_values.clone(), value.clone());
+                return Ok(obj);
+            }
+            NULL { .. } => {
+                (value, obj) = (value, emptyArray(0));
+                continue '__tco;
+            }
+            _ => return Err("match: no arm matched"),
+        }
+    }
+}
+
+pub fn addElementNotNull(
+    mut value: &metamodelica::Ref<JSON>,
+    mut obj: metamodelica::Ref<JSON>,
+) -> Result<metamodelica::Ref<JSON>> {
+    let mut outObj: metamodelica::Ref<JSON>;
+    outObj = if (isNull(value)) { obj } else { addElement(value, obj)? };
+    Ok(outObj)
+}
+
+pub fn addPair<'__b>(
+    mut key: &'__b ArcStr,
+    mut value: &'__b metamodelica::Ref<JSON>,
+    mut obj: metamodelica::Ref<JSON>,
+) -> Result<metamodelica::Ref<JSON>> {
+    '__tco: loop {
+        match &*obj {
+            OBJECT { values: __obj_values } => {
+                UnorderedMap::add(key.clone(), value.clone(), __obj_values.clone())?;
+                return Ok(obj);
+            }
+            LIST_OBJECT { values: __obj_values } => {
+                return Ok(metamodelica::Ref::new(JSON::LIST_OBJECT {
+                    values: metamodelica::cons((key.clone(), value.clone()), __obj_values.clone()),
+                }));
+            }
+            NULL { .. } => {
+                (key, value, obj) = (key, value, emptyListObject());
+                continue '__tco;
+            }
+            _ => return Err("match: no arm matched"),
+        }
+    }
+}
+
+pub fn addPairNotNull(
+    mut key: &ArcStr,
+    mut value: &metamodelica::Ref<JSON>,
+    mut obj: metamodelica::Ref<JSON>,
+) -> Result<metamodelica::Ref<JSON>> {
+    let mut outObj: metamodelica::Ref<JSON>;
+    outObj = if (isNull(value)) {
+        obj
+    } else {
+        addPair(key, value, obj)?
+    };
+    Ok(outObj)
+}
+
+pub fn toListForm(mut value: &metamodelica::Ref<JSON>) -> Result<metamodelica::Ref<JSON>> {
+    let mut outValue: metamodelica::Ref<JSON>;
+    outValue = (match &**value {
+        OBJECT { values: __value_values } => {
+            let mut pairs: metamodelica::List<(ArcStr, metamodelica::Ref<JSON>)>;
+            pairs = metamodelica::nil();
+            for mut i in 1..=UnorderedMap::size(__value_values.clone()) {
+                pairs = metamodelica::cons(
+                    (
+                        UnorderedMap::keyAt(__value_values.clone(), i)?,
+                        toListForm(&(UnorderedMap::valueAt(__value_values.clone(), i)?))?,
+                    ),
+                    pairs,
+                );
+            }
+            metamodelica::Ref::new(JSON::LIST_OBJECT {
+                values: pairs.reverse(),
+            })
+        }
+        LIST_OBJECT { values: __value_values } => {
+            let mut pairs: metamodelica::List<(ArcStr, metamodelica::Ref<JSON>)>;
+            let mut key: ArcStr;
+            let mut v: metamodelica::Ref<JSON>;
+            pairs = metamodelica::nil();
+            for mut p in &*__value_values.clone() {
+                (key, v) = p.clone();
+                pairs = metamodelica::cons((key, toListForm(&v)?), pairs);
+            }
+            metamodelica::Ref::new(JSON::LIST_OBJECT {
+                values: pairs.reverse(),
+            })
+        }
+        ARRAY { values: __value_values } => {
+            let mut elems: metamodelica::List<metamodelica::Ref<JSON>>;
+            elems = metamodelica::nil();
+            for mut i in ({
+                let __s = Vector::size(__value_values.clone());
+                let __e = 1;
+                (0i32..)
+                    .map(move |__k| __s + __k * (-1))
+                    .take_while(move |&__v| __v >= __e)
+            }) {
+                elems = metamodelica::cons(toListForm(&(Vector::getNoBounds(__value_values.clone(), i)))?, elems);
+            }
+            metamodelica::Ref::new(JSON::LIST { values: elems })
+        }
+        LIST { values: __value_values } => {
+            let mut elems: metamodelica::List<metamodelica::Ref<JSON>>;
+            elems = metamodelica::nil();
+            for mut e in &*__value_values.clone().reverse() {
+                elems = metamodelica::cons(toListForm(metamodelica::AsArg::as_arg(&e))?, elems);
+            }
+            metamodelica::Ref::new(JSON::LIST { values: elems })
+        }
+        _ => value.clone(),
+    });
+    Ok(outValue)
+}
+
+pub fn toString(mut value: &metamodelica::Ref<JSON>, mut prettyPrint: bool) -> Result<ArcStr> {
+    let mut r#str: ArcStr;
+    let mut handle: i32;
+    handle = Print::saveAndClearBuf()?;
+    if prettyPrint {
+        toStringPP_work(value, literal!(""))?;
+    } else {
+        toString_work(value)?;
+    }
+    r#str = Print::getString()?;
+    Print::restoreBuf(handle)?;
+    Ok(r#str)
+}
+
+pub(crate) fn toString_work(mut value: &metamodelica::Ref<JSON>) -> Result<()> {
+    let () = (match &**value {
+        STRING { r#str: __value_str } => {
+            Print::printBuf(literal!("\""))?;
+            Print::printBuf(System::escapedString(__value_str.clone(), true))?;
+            Print::printBuf(literal!("\""))?;
+            ()
+        }
+        TRUE { .. } => {
+            Print::printBuf(literal!("true"))?;
+            ()
+        }
+        FALSE { .. } => {
+            Print::printBuf(literal!("false"))?;
+            ()
+        }
+        NULL { .. } => {
+            Print::printBuf(literal!("null"))?;
+            ()
+        }
+        INTEGER { i: __value_i } => {
+            Print::printBuf(ArcStr::from(::std::format!("{}", __value_i.clone())))?;
+            ()
+        }
+        NUMBER { r: __value_r } => {
+            Print::printBuf(ArcStr::from(::std::format!("{}", __value_r.clone())))?;
+            ()
+        }
+        ARRAY { values: __value_values } => {
+            toString_array(__value_values.clone())?;
+            ()
+        }
+        LIST { values: __value_values } => {
+            toString_list(metamodelica::AsArg::as_arg(&__value_values))?;
+            ()
+        }
+        OBJECT { values: __value_values } => {
+            toString_object(__value_values.clone())?;
+            ()
+        }
+        LIST_OBJECT { values: __value_values } => {
+            toString_listObject(__value_values.clone())?;
+            ()
+        }
+        _ => (),
+    });
+    Ok(())
+}
+
+pub(crate) fn toString_array(mut values: metamodelica::Ref<Vector::Vector<metamodelica::Ref<JSON>>>) -> Result<()> {
+    Print::printBuf(literal!("["))?;
+    for mut i in 1..=Vector::size(values.clone()) {
+        if i != 1 {
+            Print::printBuf(literal!(", "))?;
+        }
+        toString_work(&(Vector::getNoBounds(values.clone(), i)))?;
+    }
+    Print::printBuf(literal!("]"))?;
+    Ok(())
+}
+
+pub(crate) fn toString_list(mut values: &metamodelica::List<metamodelica::Ref<JSON>>) -> Result<()> {
+    let mut first: bool = true;
+    Print::printBuf(literal!("["))?;
+    for mut v in &**values {
+        if first {
+            first = false;
+        } else {
+            Print::printBuf(literal!(", "))?;
+        }
+        toString_work(metamodelica::AsArg::as_arg(&v))?;
+    }
+    Print::printBuf(literal!("]"))?;
+    Ok(())
+}
+
+pub(crate) fn toString_object(
+    mut map: metamodelica::Ref<UnorderedMap::UnorderedMap<ArcStr, metamodelica::Ref<JSON>>>,
+) -> Result<()> {
+    Print::printBuf(literal!("{"))?;
+    for mut i in 1..=UnorderedMap::size(map.clone()) {
+        if i != 1 {
+            Print::printBuf(literal!(", "))?;
+        }
+        Print::printBuf(literal!("\""))?;
+        Print::printBuf(UnorderedMap::keyAt(map.clone(), i)?)?;
+        Print::printBuf(literal!("\":"))?;
+        toString_work(&(UnorderedMap::valueAt(map.clone(), i)?))?;
+    }
+    Print::printBuf(literal!("}"))?;
+    Ok(())
+}
+
+pub(crate) fn toString_listObject(mut object: metamodelica::List<(ArcStr, metamodelica::Ref<JSON>)>) -> Result<()> {
+    let mut first: bool = true;
+    let mut key: ArcStr;
+    let mut value: metamodelica::Ref<JSON>;
+    Print::printBuf(literal!("{"))?;
+    for mut entry in &*object.reverse() {
+        (key, value) = entry.clone();
+        if first {
+            first = false;
+        } else {
+            Print::printBuf(literal!(", "))?;
+        }
+        Print::printBuf(literal!("\""))?;
+        Print::printBuf(key)?;
+        Print::printBuf(literal!("\":"))?;
+        toString_work(&value)?;
+    }
+    Print::printBuf(literal!("}"))?;
+    Ok(())
+}
+
+pub(crate) fn toStringPP_work(mut value: &metamodelica::Ref<JSON>, mut indent: ArcStr) -> Result<()> {
+    let () = (match &**value {
+        STRING { r#str: __value_str } => {
+            Print::printBuf(literal!("\""))?;
+            Print::printBuf(System::escapedString(__value_str.clone(), true))?;
+            Print::printBuf(literal!("\""))?;
+            ()
+        }
+        TRUE { .. } => {
+            Print::printBuf(literal!("true"))?;
+            ()
+        }
+        FALSE { .. } => {
+            Print::printBuf(literal!("false"))?;
+            ()
+        }
+        NULL { .. } => {
+            Print::printBuf(literal!("null"))?;
+            ()
+        }
+        INTEGER { i: __value_i } => {
+            Print::printBuf(ArcStr::from(::std::format!("{}", __value_i.clone())))?;
+            ()
+        }
+        NUMBER { r: __value_r } => {
+            Print::printBuf(ArcStr::from(::std::format!("{}", __value_r.clone())))?;
+            ()
+        }
+        ARRAY { values: __value_values } => {
+            toStringPP_array(__value_values.clone(), indent)?;
+            ()
+        }
+        LIST { values: __value_values } => {
+            toStringPP_list(metamodelica::AsArg::as_arg(&__value_values), indent)?;
+            ()
+        }
+        OBJECT { values: __value_values } => {
+            toStringPP_object(__value_values.clone(), indent)?;
+            ()
+        }
+        LIST_OBJECT { values: __value_values } => {
+            toStringPP_listObject(__value_values.clone(), indent)?;
+            ()
+        }
+        _ => (),
+    });
+    Ok(())
+}
+
+pub(crate) fn toStringPP_array(
+    mut values: metamodelica::Ref<Vector::Vector<metamodelica::Ref<JSON>>>,
+    mut indent: ArcStr,
+) -> Result<()> {
+    let mut next_indent: ArcStr = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*indent);
+        __mm_s.push_str(&*literal!("  "));
+        ArcStr::from(__mm_s)
+    };
+    Print::printBuf(literal!("[\n"))?;
+    for mut i in 1..=Vector::size(values.clone()) {
+        if i != 1 {
+            Print::printBuf(literal!(",\n"))?;
+        }
+        Print::printBuf(next_indent.clone())?;
+        toStringPP_work(&(Vector::getNoBounds(values.clone(), i)), next_indent.clone())?;
+    }
+    Print::printBuf(literal!("\n"))?;
+    Print::printBuf(indent)?;
+    Print::printBuf(literal!("]"))?;
+    Ok(())
+}
+
+pub(crate) fn toStringPP_list(
+    mut values: &metamodelica::List<metamodelica::Ref<JSON>>,
+    mut indent: ArcStr,
+) -> Result<()> {
+    let mut next_indent: ArcStr = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*indent);
+        __mm_s.push_str(&*literal!("  "));
+        ArcStr::from(__mm_s)
+    };
+    let mut first: bool = true;
+    Print::printBuf(literal!("[\n"))?;
+    for mut v in &**values {
+        if first {
+            first = false;
+        } else {
+            Print::printBuf(literal!(",\n"))?;
+        }
+        Print::printBuf(next_indent.clone())?;
+        toStringPP_work(metamodelica::AsArg::as_arg(&v), next_indent.clone())?;
+    }
+    Print::printBuf(literal!("\n"))?;
+    Print::printBuf(indent)?;
+    Print::printBuf(literal!("]"))?;
+    Ok(())
+}
+
+pub(crate) fn toStringPP_object(
+    mut map: metamodelica::Ref<UnorderedMap::UnorderedMap<ArcStr, metamodelica::Ref<JSON>>>,
+    mut indent: ArcStr,
+) -> Result<()> {
+    let mut next_indent: ArcStr = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*indent);
+        __mm_s.push_str(&*literal!("  "));
+        ArcStr::from(__mm_s)
+    };
+    Print::printBuf(literal!("{"))?;
+    for mut i in 1..=UnorderedMap::size(map.clone()) {
+        Print::printBuf(if (i == 1) { literal!("\n") } else { literal!(",\n") })?;
+        Print::printBuf(next_indent.clone())?;
+        Print::printBuf(literal!("\""))?;
+        Print::printBuf(UnorderedMap::keyAt(map.clone(), i)?)?;
+        Print::printBuf(literal!("\": "))?;
+        toStringPP_work(&(UnorderedMap::valueAt(map.clone(), i)?), next_indent.clone())?;
+    }
+    Print::printBuf(literal!("\n"))?;
+    Print::printBuf(indent)?;
+    Print::printBuf(literal!("}"))?;
+    Ok(())
+}
+
+pub(crate) fn toStringPP_listObject(
+    mut object: metamodelica::List<(ArcStr, metamodelica::Ref<JSON>)>,
+    mut indent: ArcStr,
+) -> Result<()> {
+    let mut first: bool = true;
+    let mut key: ArcStr;
+    let mut value: metamodelica::Ref<JSON>;
+    let mut next_indent: ArcStr = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*indent);
+        __mm_s.push_str(&*literal!("  "));
+        ArcStr::from(__mm_s)
+    };
+    Print::printBuf(literal!("{\n"))?;
+    for mut entry in &*object.reverse() {
+        (key, value) = entry.clone();
+        if first {
+            first = false;
+        } else {
+            Print::printBuf(literal!(",\n"))?;
+        }
+        Print::printBuf(next_indent.clone())?;
+        Print::printBuf(literal!("\""))?;
+        Print::printBuf(key)?;
+        Print::printBuf(literal!("\": "))?;
+        toStringPP_work(&value, next_indent.clone())?;
+    }
+    Print::printBuf(literal!("\n"))?;
+    Print::printBuf(indent)?;
+    Print::printBuf(literal!("}"))?;
+    Ok(())
+}
+
+pub type partialParser = std::sync::Arc<
+    dyn ::std::ops::Fn(metamodelica::List<Token>) -> Result<(metamodelica::Ref<JSON>, metamodelica::List<Token>)>
+        + 'static,
+>;
+
+pub fn parseFile(mut fileName: ArcStr) -> Result<metamodelica::Ref<JSON>> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token>;
+    let mut errTokens: metamodelica::List<Token>;
+    (tokens, errTokens) = LexerJSON::scan(fileName)?;
+    reportErrors(&errTokens)?;
+    value = parse_value_check_empty(tokens)?;
+    Ok(value)
+}
+
+pub fn hasKey(mut obj: &metamodelica::Ref<JSON>, mut r#str: ArcStr) -> Result<bool> {
+    let mut b: bool;
+    b = (match &**obj {
+        OBJECT { values: __obj_values } => UnorderedMap::contains(r#str, __obj_values.clone())?,
+        LIST_OBJECT { values: __obj_values } => {
+            b = false;
+            for mut entry in &*__obj_values.clone() {
+                if metamodelica::stringEq(&(Util::tuple21(entry.clone())), &r#str) {
+                    b = true;
+                }
+            }
+            b
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(b)
+}
+
+pub fn get(mut obj: &metamodelica::Ref<JSON>, mut r#str: ArcStr) -> Result<metamodelica::Ref<JSON>> {
+    let mut out: metamodelica::Ref<JSON>;
+    out = (match &**obj {
+        OBJECT { values: __obj_values } => UnorderedMap::getOrFail(r#str, __obj_values.clone())?,
+        LIST_OBJECT { values: __obj_values } => {
+            for mut entry in &*__obj_values.clone() {
+                if metamodelica::stringEq(&(Util::tuple21(entry.clone())), &r#str) {
+                    out = Util::tuple22(entry.clone());
+                    return Ok(out);
+                }
+            }
+            return Err("fail");
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(out)
+}
+
+pub fn getOrDefault(
+    mut obj: &metamodelica::Ref<JSON>,
+    mut r#str: ArcStr,
+    mut default: metamodelica::Ref<JSON>,
+) -> Result<metamodelica::Ref<JSON>> {
+    let mut out: metamodelica::Ref<JSON>;
+    out = (match &**obj {
+        OBJECT { values: __obj_values } => UnorderedMap::getOrDefault(r#str, __obj_values.clone(), default)?,
+        LIST_OBJECT { values: __obj_values } => {
+            for mut entry in &*__obj_values.clone() {
+                if metamodelica::stringEq(&(Util::tuple21(entry.clone())), &r#str) {
+                    out = Util::tuple22(entry.clone());
+                    return Ok(out);
+                }
+            }
+            default
+        }
+        _ => default,
+    });
+    Ok(out)
+}
+
+pub fn at(mut obj: &metamodelica::Ref<JSON>, mut index: i32) -> Result<metamodelica::Ref<JSON>> {
+    let mut out: metamodelica::Ref<JSON>;
+    out = (match &**obj {
+        ARRAY { values: __obj_values } => Vector::get(__obj_values.clone(), index)?,
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(out)
+}
+
+pub fn getString(mut obj: &metamodelica::Ref<JSON>) -> Result<ArcStr> {
+    let mut r#str: ArcStr;
+    let __pa0 = ::match_deref::match_deref! { match &((*obj)) {
+        Deref @ STRING { r#str: __pa0 } => __pa0.clone(),
+        _ => return Err("pattern mismatch"),
+    } };
+    r#str = metamodelica::Own::own(__pa0);
+    Ok(r#str)
+}
+
+pub fn getStringList(mut obj: &metamodelica::Ref<JSON>) -> Result<metamodelica::List<ArcStr>> {
+    let mut strl: metamodelica::List<ArcStr>;
+    strl = (match &**obj {
+        OBJECT { values: __obj_values } => {
+            ({
+                let mut __acc: metamodelica::List<ArcStr> = metamodelica::nil();
+                for mut v in (UnorderedMap::valueList(__obj_values.clone())).into_iter().cloned() {
+                    let __x = getString(&(v.clone()))?;
+                    __acc = cons(__x, __acc);
+                }
+                __acc.reverse()
+            })
+        }
+        LIST_OBJECT { values: __obj_values } => {
+            ({
+                let mut __acc: metamodelica::List<ArcStr> = metamodelica::nil();
+                for mut v in (__obj_values.clone()).into_iter().cloned() {
+                    let __x = getString(&(Util::tuple22(v.clone())))?;
+                    __acc = cons(__x, __acc);
+                }
+                __acc
+            })
+        }
+        ARRAY { values: __obj_values } => Vector::mapToList(
+            __obj_values.clone(),
+            (std::sync::Arc::new(move |__a0: metamodelica::Ref<JSON>| getString(&__a0))
+                as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<JSON>) -> Result<ArcStr> + 'static>),
+        )?,
+        LIST { values: __obj_values } => {
+            ({
+                let mut __acc: metamodelica::List<ArcStr> = metamodelica::nil();
+                for mut v in (__obj_values.clone()).into_iter().cloned() {
+                    let __x = getString(&(v.clone()))?;
+                    __acc = cons(__x, __acc);
+                }
+                __acc.reverse()
+            })
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(strl)
+}
+
+pub fn getKeys(mut obj: &metamodelica::Ref<JSON>) -> Result<metamodelica::List<ArcStr>> {
+    let mut keys: metamodelica::List<ArcStr>;
+    keys = (match &**obj {
+        OBJECT { values: __obj_values } => UnorderedMap::keyList(__obj_values.clone()),
+        LIST_OBJECT { values: __obj_values } => {
+            ({
+                let mut __acc: metamodelica::List<ArcStr> = metamodelica::nil();
+                for mut e in (__obj_values.clone()).into_iter().cloned() {
+                    let __x = Util::tuple21(e.clone());
+                    __acc = cons(__x, __acc);
+                }
+                __acc
+            })
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(keys)
+}
+
+pub fn getBoolean(mut obj: &metamodelica::Ref<JSON>) -> Result<bool> {
+    let mut b: bool;
+    b = (match &**obj {
+        TRUE { .. } => true,
+        FALSE { .. } => false,
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(b)
+}
+
+pub fn size(mut obj: &metamodelica::Ref<JSON>) -> i32 {
+    let mut sz: i32;
+    sz = (match &**obj {
+        OBJECT { values: __obj_values } => UnorderedMap::size(__obj_values.clone()),
+        LIST_OBJECT { values: __obj_values } => ((__obj_values).len() as i32),
+        ARRAY { values: __obj_values } => Vector::size(__obj_values.clone()),
+        LIST { values: __obj_values } => ((__obj_values).len() as i32),
+        _ => 1,
+    });
+    sz
+}
+
+pub(crate) fn parse(mut content: ArcStr, mut fileName: ArcStr) -> Result<metamodelica::Ref<JSON>> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token>;
+    let mut errTokens: metamodelica::List<Token>;
+    (tokens, errTokens) = LexerJSON::scanString(content, fileName)?;
+    reportErrors(&errTokens)?;
+    value = parse_value_check_empty(tokens)?;
+    Ok(value)
+}
+
+pub(crate) fn parse_value_check_empty(mut inTokens: metamodelica::List<Token>) -> Result<metamodelica::Ref<JSON>> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token>;
+    (value, tokens) = parse_value(inTokens)?;
+    check_empty(&tokens)?;
+    Ok(value)
+}
+
+pub(crate) fn parse_value(
+    mut inTokens: metamodelica::List<Token>,
+) -> Result<(metamodelica::Ref<JSON>, metamodelica::List<Token>)> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token> = inTokens.clone();
+    let mut tok: Token;
+    not_eof(tokens.clone())?;
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(tokens) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    tok = metamodelica::Own::own(__pa0);
+    tokens = metamodelica::Own::own(__pa1);
+    (value, tokens) = (match tok.id.clone() {
+        LexerJSON::TokenId::STRING { .. } => {
+            (value, tokens) = parse_string(inTokens)?;
+            (value, tokens)
+        }
+        LexerJSON::TokenId::INTEGER { .. } => {
+            (value, tokens) = parse_integer(inTokens)?;
+            (value, tokens)
+        }
+        LexerJSON::TokenId::NUMBER { .. } => {
+            (value, tokens) = parse_number(inTokens)?;
+            (value, tokens)
+        }
+        LexerJSON::TokenId::OBJECTBEGIN => {
+            (value, tokens) = parse_object(inTokens)?;
+            (value, tokens)
+        }
+        LexerJSON::TokenId::ARRAYBEGIN => {
+            (value, tokens) = parse_array(inTokens)?;
+            (value, tokens)
+        }
+        LexerJSON::TokenId::TRUE => (crate::JSON::interned_TRUE(), tokens),
+        LexerJSON::TokenId::FALSE => (crate::JSON::interned_FALSE(), tokens),
+        LexerJSON::TokenId::NULL => (crate::JSON::interned_NULL(), tokens),
+        _ => {
+            errorExpected(&(literal!("a value")), tok)?;
+            return Err("fail");
+        }
+    });
+    Ok((value, tokens))
+}
+
+pub(crate) fn parse_string(
+    mut inTokens: metamodelica::List<Token>,
+) -> Result<(metamodelica::Ref<JSON>, metamodelica::List<Token>)> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token> = inTokens;
+    let mut tok: Token;
+    let mut content: ArcStr;
+    not_eof(tokens.clone())?;
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(tokens) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    tok = metamodelica::Own::own(__pa0);
+    tokens = metamodelica::Own::own(__pa1);
+    if tok.id.clone() != TokenId::STRING.clone() {
+        errorExpected(&(literal!("a String")), tok.clone())?;
+    }
+    content = tokenContent(tok)?;
+    if ((content).len() as i32) == 2 {
+        content = literal!("");
+    } else {
+        content = System::unescapedString(substring(content.clone(), 2, ((content).len() as i32) - 1)?);
+    }
+    value = metamodelica::Ref::new(JSON::STRING { r#str: content });
+    Ok((value, tokens))
+}
+
+pub(crate) fn parse_integer(
+    mut inTokens: metamodelica::List<Token>,
+) -> Result<(metamodelica::Ref<JSON>, metamodelica::List<Token>)> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token> = inTokens;
+    let mut tok: Token;
+    let mut content: ArcStr;
+    not_eof(tokens.clone())?;
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(tokens) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    tok = metamodelica::Own::own(__pa0);
+    tokens = metamodelica::Own::own(__pa1);
+    if tok.id.clone() != TokenId::INTEGER.clone() {
+        errorExpected(&(literal!("an integer")), tok.clone())?;
+    }
+    content = tokenContent(tok)?;
+    value = metamodelica::Ref::new(JSON::INTEGER { i: stringInt(content)? });
+    Ok((value, tokens))
+}
+
+pub(crate) fn parse_number(
+    mut inTokens: metamodelica::List<Token>,
+) -> Result<(metamodelica::Ref<JSON>, metamodelica::List<Token>)> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token> = inTokens;
+    let mut tok: Token;
+    let mut content: ArcStr;
+    not_eof(tokens.clone())?;
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(tokens) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    tok = metamodelica::Own::own(__pa0);
+    tokens = metamodelica::Own::own(__pa1);
+    if tok.id.clone() != TokenId::NUMBER.clone() {
+        errorExpected(&(literal!("a (real) number")), tok.clone())?;
+    }
+    content = tokenContent(tok)?;
+    value = metamodelica::Ref::new(JSON::NUMBER {
+        r: stringReal(content)?,
+    });
+    Ok((value, tokens))
+}
+
+pub(crate) fn parse_array(
+    mut inTokens: metamodelica::List<Token>,
+) -> Result<(metamodelica::Ref<JSON>, metamodelica::List<Token>)> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token> = inTokens;
+    let mut tok: Token;
+    let mut values: metamodelica::Ref<Vector::Vector<metamodelica::Ref<JSON>>> = Vector::new(0);
+    let mut cont: bool;
+    value = emptyObject();
+    tokens = parse_expected_token(tokens, TokenId::ARRAYBEGIN.clone())?;
+    cont = peek_id(&tokens)? != TokenId::ARRAYEND.clone();
+    while cont {
+        (value, tokens) = parse_value(tokens)?;
+        Vector::push(values.clone(), value);
+        (tokens, cont) = eat_if_next_token_matches(tokens, TokenId::COMMA.clone())?;
+    }
+    tokens = parse_expected_token(tokens, TokenId::ARRAYEND.clone())?;
+    value = metamodelica::Ref::new(JSON::ARRAY { values: values });
+    Ok((value, tokens))
+}
+
+pub(crate) fn parse_object(
+    mut inTokens: metamodelica::List<Token>,
+) -> Result<(metamodelica::Ref<JSON>, metamodelica::List<Token>)> {
+    let mut value: metamodelica::Ref<JSON>;
+    let mut tokens: metamodelica::List<Token> = inTokens;
+    let mut tok: Token;
+    let mut values: metamodelica::Ref<UnorderedMap::UnorderedMap<ArcStr, metamodelica::Ref<JSON>>>;
+    let mut key: ArcStr;
+    let mut cont: bool;
+    values = UnorderedMap::new(
+        (std::sync::Arc::new(fnptr!(stringHashDjb2, ArcStr))
+            as std::sync::Arc<dyn ::std::ops::Fn(ArcStr) -> Result<i32> + 'static>),
+        (std::sync::Arc::new(fnptr!(stringEq, ArcStr, ArcStr))
+            as std::sync::Arc<dyn ::std::ops::Fn(ArcStr, ArcStr) -> Result<bool> + 'static>),
+        1,
+    );
+    tokens = parse_expected_token(tokens, TokenId::OBJECTBEGIN.clone())?;
+    cont = peek_id(&tokens)? != TokenId::ARRAYEND.clone();
+    while cont {
+        let (__pa0, __pa1) = ::match_deref::match_deref! { match &(parse_string(tokens)?) {
+            (Deref @ STRING { r#str: __pa0 }, __pa1) => (__pa0.clone(), __pa1.clone()),
+            _ => return Err("pattern mismatch"),
+        } };
+        key = metamodelica::Own::own(__pa0);
+        tokens = metamodelica::Own::own(__pa1);
+        tokens = parse_expected_token(tokens, TokenId::COLON.clone())?;
+        (value, tokens) = parse_value(tokens)?;
+        UnorderedMap::add(key, value, values.clone())?;
+        (tokens, cont) = eat_if_next_token_matches(tokens, TokenId::COMMA.clone())?;
+    }
+    tokens = parse_expected_token(tokens, TokenId::OBJECTEND.clone())?;
+    value = metamodelica::Ref::new(JSON::OBJECT { values: values });
+    Ok((value, tokens))
+}
+
+fn reportErrors(mut tokens: &metamodelica::List<Token>) -> Result<()> {
+    let mut i: i32 = 0;
+    for mut t in &**tokens {
+        i = i + 1;
+        if i > 10 {
+            Error::addMessage(Error::SCANNER_ERROR_LIMIT.clone(), metamodelica::nil())?;
+        }
+        Error::addSourceMessage(
+            &(Error::SCANNER_ERROR.clone()),
+            list![tokenContent(t.clone())?],
+            &(tokenSourceInfo(t.clone())),
+        )?;
+    }
+    if !((tokens).is_empty()) {
+        return Err("fail");
+    }
+    Ok(())
+}
+
+fn not_eof(mut tokens: metamodelica::List<Token>) -> Result<metamodelica::List<Token>> {
+    let mut tokens: metamodelica::List<Token> = tokens;
+    if (tokens).is_empty() {
+        Error::addCompilerError(literal!("JSON expected value, got <EOF>..."))?;
+        return Err("fail");
+    }
+    Ok(tokens)
+}
+
+fn peek_id(mut tokens: &metamodelica::List<Token>) -> Result<TokenId> {
+    let mut nextToken: TokenId;
+    let mut tok: Token;
+    if (tokens).is_empty() {
+        nextToken = TokenId::_NO_TOKEN.clone();
+    }
+    tok = (tokens).head().cloned()?;
+    nextToken = tok.id.clone();
+    Ok(nextToken)
+}
+
+fn eat_if_next_token_matches(
+    mut tokens: metamodelica::List<Token>,
+    mut expectedToken: TokenId,
+) -> Result<(metamodelica::List<Token>, bool)> {
+    let mut tokens: metamodelica::List<Token> = tokens;
+    let mut matched: bool = false;
+    let mut tok: Token;
+    if (tokens).is_empty() {
+        return Ok((tokens, matched));
+    }
+    tok = (tokens).head().cloned()?;
+    if tok.id.clone() != expectedToken {
+        return Ok((tokens, matched));
+    }
+    matched = true;
+    let __pa0 = ::match_deref::match_deref! { match &(tokens) {
+        Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+        _ => return Err("pattern mismatch"),
+    } };
+    tokens = metamodelica::Own::own(__pa0);
+    Ok((tokens, matched))
+}
+
+fn parse_expected_token(
+    mut tokens: metamodelica::List<Token>,
+    mut expectedToken: TokenId,
+) -> Result<metamodelica::List<Token>> {
+    let mut tokens: metamodelica::List<Token> = tokens;
+    let mut tok: Token;
+    not_eof(tokens.clone())?;
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(tokens) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    tok = metamodelica::Own::own(__pa0);
+    tokens = metamodelica::Own::own(__pa1);
+    if tok.id.clone() != expectedToken {
+        Error::addSourceMessage(
+            &(Error::COMPILER_ERROR.clone()),
+            list![{
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("Expected a "));
+                __mm_s.push_str(&*ArcStr::from(::std::format!("{:?}", expectedToken)));
+                __mm_s.push_str(&*literal!(", got token: "));
+                __mm_s.push_str(&*tokenContent(tok.clone())?);
+                ArcStr::from(__mm_s)
+            }],
+            &(tokenSourceInfo(tok)),
+        )?;
+        return Err("fail");
+    }
+    Ok(tokens)
+}
+
+fn check_empty(mut tokens: &metamodelica::List<Token>) -> Result<()> {
+    let mut tok: Token;
+    if (tokens).is_empty() {
+        return Ok(());
+    }
+    tok = (tokens).head().cloned()?;
+    Error::addSourceMessage(
+        &(Error::COMPILER_ERROR.clone()),
+        list![{
+            let mut __mm_s = String::new();
+            __mm_s.push_str(&*literal!("Expected <EOF>, got more tokens, starting with: "));
+            __mm_s.push_str(&*tokenContent(tok.clone())?);
+            ArcStr::from(__mm_s)
+        }],
+        &(tokenSourceInfo(tok)),
+    )?;
+    return Err("fail");
+    Ok(())
+}
+
+fn errorExpected(mut expected: &ArcStr, mut tok: Token) -> Result<()> {
+    Error::addSourceMessage(
+        &(Error::COMPILER_ERROR.clone()),
+        list![{
+            let mut __mm_s = String::new();
+            __mm_s.push_str(&*literal!("JSON expected "));
+            __mm_s.push_str(&*expected);
+            __mm_s.push_str(&*literal!(", got token "));
+            __mm_s.push_str(&*ArcStr::from(::std::format!("{:?}", tok.id.clone())));
+            __mm_s.push_str(&*literal!(": "));
+            __mm_s.push_str(&*tokenContent(tok.clone())?);
+            ArcStr::from(__mm_s)
+        }],
+        &(tokenSourceInfo(tok)),
+    )?;
+    return Err("fail");
+    Ok(())
+}
+
+pub fn dumpJSONSourceInfo(mut info: &SourceInfo, mut dumpFilename: bool) -> Result<metamodelica::Ref<JSON>> {
+    let mut json: metamodelica::Ref<JSON> = makeNull();
+    if dumpFilename {
+        json = addPair(
+            &(literal!("filename")),
+            &(makeString(Testsuite::friendly(info.fileName.clone())?)),
+            json,
+        )?;
+    }
+    json = addPair(
+        &(literal!("lineStart")),
+        &(makeInteger(info.lineNumberStart.clone())),
+        json,
+    )?;
+    json = addPair(
+        &(literal!("columnStart")),
+        &(makeInteger(info.columnNumberStart.clone())),
+        json,
+    )?;
+    json = addPair(&(literal!("lineEnd")), &(makeInteger(info.lineNumberEnd.clone())), json)?;
+    json = addPair(
+        &(literal!("columnEnd")),
+        &(makeInteger(info.columnNumberEnd.clone())),
+        json,
+    )?;
+    if info.isReadOnly.clone() {
+        json = addPair(&(literal!("readonly")), &(makeBoolean(true)), json)?;
+    }
+    Ok(json)
+}

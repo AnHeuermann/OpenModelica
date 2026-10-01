@@ -1,0 +1,163 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::Autoconf;
+use crate::Flags;
+use crate::System;
+
+pub fn isRunning() -> Result<bool> {
+    let mut runningTestsuite: bool;
+    runningTestsuite = !(stringEq(
+        &(Flags::getConfigString(Flags::RUNNING_TESTSUITE.clone())?),
+        &(literal!("")),
+    ));
+    Ok(runningTestsuite)
+}
+
+pub fn getTempFilesFile() -> Result<ArcStr> {
+    let mut tempFile: ArcStr;
+    tempFile = Flags::getConfigString(Flags::RUNNING_TESTSUITE.clone())?;
+    Ok(tempFile)
+}
+
+pub fn friendly(mut name: ArcStr) -> Result<ArcStr> {
+    let mut friendly: ArcStr;
+    friendly = friendly2(isRunning()?, name)?;
+    Ok(friendly)
+}
+
+fn friendly2(mut cond: bool, mut name: ArcStr) -> Result<ArcStr> {
+    let mut friendly: ArcStr;
+    friendly = (match cond {
+        true => {
+            let mut i: i32;
+            let mut strs: metamodelica::List<ArcStr>;
+            let mut newName: ArcStr;
+            newName = if (metamodelica::stringEq(&arcstr::literal!(Autoconf::os), &(literal!("Windows_NT")))) {
+                System::stringReplace(name, literal!("\\"), literal!("/"))?
+            } else {
+                name
+            };
+            (i, strs) = System::regex(
+                newName,
+                literal!(
+                    "^(.*/Compiler/)?(.*/testsuite/)?(.*/.openmodelica/libraries/)?(.*/lib/omlibrary/)?(.*/build(_cmake)?/(install_cmake/)?)?(.*)$"
+                ),
+                9,
+                true,
+                false,
+            );
+            friendly = (strs).get(i)?;
+            (i, strs) = System::regex(
+                friendly.clone(),
+                literal!("^(.*)(/[_[:alnum:]]*\\.mos?_temp[0-9]*)(.*)$"),
+                4,
+                true,
+                false,
+            );
+            if i == 4 {
+                friendly = {
+                    let mut __mm_s = String::new();
+                    __mm_s.push_str(&*(strs).get(2)?);
+                    __mm_s.push_str(&*(strs).get(4)?);
+                    ArcStr::from(__mm_s)
+                };
+            }
+            friendly
+        }
+        _ => name,
+    });
+    Ok(friendly)
+}
+
+pub fn friendlyPath(mut inPath: ArcStr) -> ArcStr {
+    let mut outPath: ArcStr;
+    outPath = 'mc: {
+        let __mc_input = ();
+        if let Ok(__v) = (|| -> Result<_> {
+            let () = __mc_input.clone() else { return Err("nomatch") };
+            let mut path: ArcStr;
+            let true = (isRunning()?) else {
+                return Err("pattern mismatch");
+            };
+            let false = (System::directoryExists(inPath.clone())) else {
+                return Err("pattern mismatch");
+            };
+            let false = (System::regularFileExists(inPath.clone())) else {
+                return Err("pattern mismatch");
+            };
+            path = {
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*literal!("../"));
+                __mm_s.push_str(&*inPath);
+                ArcStr::from(__mm_s)
+            };
+            let true = (System::directoryExists(path.clone()) || System::regularFileExists(path.clone())) else {
+                return Err("pattern mismatch");
+            };
+            Ok(path.clone())
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let _ = __mc_input.clone() else { return Err("nomatch") };
+            Ok(inPath.clone())
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outPath
+}

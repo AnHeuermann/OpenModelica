@@ -1,0 +1,460 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::IOStreamExt;
+use openmodelica_util_datatypes_basic::List;
+
+/// TODO! change these to X_TYPE
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum IOStreamType {
+    FILE { name: ArcStr },
+    LIST,
+    BUFFER,
+}
+impl metamodelica::gc::MMTrace for IOStreamType {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            IOStreamType::FILE { name } => {
+                metamodelica::gc::MMTrace::mm_accept(name, __mmv)?;
+                Ok(())
+            }
+            IOStreamType::LIST => Ok(()),
+            IOStreamType::BUFFER => Ok(()),
+        }
+    }
+}
+impl Default for IOStreamType {
+    fn default() -> Self {
+        Self::LIST
+    }
+}
+pub use self::IOStreamType::{BUFFER, FILE, LIST};
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub(crate) enum IOStreamData {
+    FILE_DATA { data: i32 },
+    LIST_DATA { data: metamodelica::List<ArcStr> },
+    BUFFER_DATA { data: i32 },
+}
+impl metamodelica::gc::MMTrace for IOStreamData {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            IOStreamData::FILE_DATA { data } => {
+                metamodelica::gc::MMTrace::mm_accept(data, __mmv)?;
+                Ok(())
+            }
+            IOStreamData::LIST_DATA { data } => {
+                metamodelica::gc::MMTrace::mm_accept(data, __mmv)?;
+                Ok(())
+            }
+            IOStreamData::BUFFER_DATA { data } => {
+                metamodelica::gc::MMTrace::mm_accept(data, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for IOStreamData {
+    fn default() -> Self {
+        Self::FILE_DATA {
+            data: Default::default(),
+        }
+    }
+}
+pub(crate) use self::IOStreamData::{BUFFER_DATA, FILE_DATA, LIST_DATA};
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct IOStream {
+    pub name: ArcStr,
+    pub ty: IOStreamType,
+    pub data: IOStreamData,
+}
+
+impl metamodelica::gc::MMTrace for IOStream {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.name, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.ty, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.data, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for IOStream {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            ty: Default::default(),
+            data: Default::default(),
+        }
+    }
+}
+
+pub type IOSTREAM = IOStream;
+
+pub(crate) const stdInput: i32 = 0;
+
+pub const stdOutput: i32 = 1;
+
+pub(crate) const stdError: i32 = 2;
+
+pub static emptyStreamOfTypeList: std::sync::LazyLock<IOStream> = std::sync::LazyLock::new(|| IOStream {
+    name: literal!("emptyStreamOfTypeList"),
+    ty: crate::IOStream::IOStreamType::LIST,
+    data: IOStreamData::LIST_DATA {
+        data: metamodelica::nil(),
+    },
+});
+
+pub fn create(mut streamName: ArcStr, mut streamType: IOStreamType) -> Result<IOStream> {
+    let mut outStream: IOStream;
+    outStream = (match streamType.clone() {
+        IOStreamType::FILE { name: mut fileName } => {
+            let mut fileID: i32;
+            fileID = IOStreamExt::createFile(fileName.clone())?;
+            IOStream {
+                name: streamName,
+                ty: streamType,
+                data: IOStreamData::FILE_DATA { data: fileID },
+            }
+        }
+        IOStreamType::LIST { .. } => IOStream {
+            name: streamName,
+            ty: streamType,
+            data: IOStreamData::LIST_DATA {
+                data: metamodelica::nil(),
+            },
+        },
+        IOStreamType::BUFFER { .. } => {
+            let mut bufferID: i32;
+            bufferID = IOStreamExt::createBuffer()?;
+            IOStream {
+                name: streamName,
+                ty: streamType,
+                data: IOStreamData::BUFFER_DATA { data: bufferID },
+            }
+        }
+    });
+    Ok(outStream)
+}
+
+pub fn append(mut inStream: IOStream, mut inString: ArcStr) -> Result<IOStream> {
+    let mut outStream: IOStream;
+    outStream = (match inStream {
+        ref fStream @ IOStream {
+            data: IOStreamData::FILE_DATA { data: ref fileID },
+            ..
+        } => {
+            IOStreamExt::appendFile(fileID.clone(), inString)?;
+            fStream.clone()
+        }
+        IOStream {
+            name: mut streamName,
+            ty: mut streamType,
+            data: IOStreamData::LIST_DATA { data: ref listData },
+        } => IOStream {
+            name: streamName.clone(),
+            ty: streamType.clone(),
+            data: IOStreamData::LIST_DATA {
+                data: metamodelica::cons(inString, listData.clone()),
+            },
+        },
+        ref bStream @ IOStream {
+            data: IOStreamData::BUFFER_DATA { data: ref bufferID },
+            ..
+        } => {
+            IOStreamExt::appendBuffer(bufferID.clone(), inString)?;
+            bStream.clone()
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outStream)
+}
+
+pub fn appendList(mut inStream: IOStream, mut inStringList: &metamodelica::List<ArcStr>) -> Result<IOStream> {
+    let mut outStream: IOStream;
+    outStream = List::foldr(inStringList, &append, inStream)?;
+    Ok(outStream)
+}
+
+pub(crate) fn appendListReverse(mut s: IOStream, mut data: metamodelica::List<ArcStr>) -> Result<IOStream> {
+    let mut s: IOStream = s;
+    let mut s_data: IOStreamData = s.data.clone();
+    let () = (match s_data.clone() {
+        IOStreamData::FILE_DATA { .. } => {
+            for mut r#str in &*data {
+                IOStreamExt::appendFile(var_field!(s_data.data, IOStreamData::FILE_DATA).clone(), r#str.clone())?;
+            }
+            ()
+        }
+        IOStreamData::LIST_DATA { .. } => {
+            let __owned_variant_data_0 = listAppend(data, var_field!(s_data.data, IOStreamData::LIST_DATA).clone());
+            if let IOStreamData::LIST_DATA { data, .. } = &mut s_data {
+                *data = __owned_variant_data_0;
+            } else {
+                panic!("owned-variant field-assign: value held a different variant than IOStreamData::LIST_DATA");
+            }
+            s.data = s_data;
+            ()
+        }
+        IOStreamData::BUFFER_DATA { .. } => {
+            for mut r#str in &*data {
+                IOStreamExt::appendBuffer(
+                    var_field!(s_data.data, IOStreamData::BUFFER_DATA).clone(),
+                    r#str.clone(),
+                )?;
+            }
+            ()
+        }
+    });
+    Ok(s)
+}
+
+pub fn appendListStream(mut srcStream: IOStream, mut dstStream: IOStream) -> Result<IOStream> {
+    let mut dstStream: IOStream = dstStream;
+    let mut data: metamodelica::List<ArcStr>;
+    let IOSTREAM {
+        data: IOStreamData::LIST_DATA { data: __pa0 },
+        ..
+    } = (srcStream)
+    else {
+        return Err("pattern mismatch");
+    };
+    data = metamodelica::Own::own(__pa0);
+    dstStream = appendListReverse(dstStream, data)?;
+    Ok(dstStream)
+}
+
+pub(crate) fn close(mut inStream: IOStream) -> IOStream {
+    let mut outStream: IOStream;
+    outStream = 'mc: {
+        let __mc_input = inStream.clone();
+        if let Ok(__v) = (|| -> Result<_> {
+            let ref fStream @ IOStream {
+                data: IOStreamData::FILE_DATA { data: ref fileID },
+                ..
+            } = __mc_input.clone()
+            else {
+                return Err("nomatch");
+            };
+            IOStreamExt::closeFile(fileID.clone())?;
+            Ok(fStream.clone())
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let _ = __mc_input.clone() else { return Err("nomatch") };
+            Ok(inStream.clone())
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outStream
+}
+
+pub fn delete(mut inStream: &IOStream) -> Result<()> {
+    let () = (match inStream.clone() {
+        IOStream {
+            data: IOStreamData::FILE_DATA { data: mut fileID },
+            ..
+        } => {
+            IOStreamExt::deleteFile(fileID.clone())?;
+            ()
+        }
+        IOStream {
+            data: IOStreamData::LIST_DATA { .. },
+            ..
+        } => (),
+        IOStream {
+            data: IOStreamData::BUFFER_DATA { data: mut bufferID },
+            ..
+        } => {
+            IOStreamExt::deleteBuffer(bufferID.clone())?;
+            ()
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(())
+}
+
+pub(crate) fn clear(mut inStream: IOStream) -> IOStream {
+    let mut outStream: IOStream;
+    outStream = 'mc: {
+        let __mc_input = inStream;
+        if let Ok(__v) = (|| -> Result<_> {
+            let ref fStream @ IOStream {
+                data: IOStreamData::FILE_DATA { data: ref fileID },
+                ..
+            } = __mc_input.clone()
+            else {
+                return Err("nomatch");
+            };
+            IOStreamExt::clearFile(fileID.clone())?;
+            Ok(fStream.clone())
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let IOStream {
+                name: mut name,
+                ty: mut ty,
+                data: _,
+            } = __mc_input.clone()
+            else {
+                return Err("nomatch");
+            };
+            Ok(IOStream {
+                name: name.clone(),
+                ty: ty.clone(),
+                data: IOStreamData::LIST_DATA {
+                    data: metamodelica::nil(),
+                },
+            })
+        })() {
+            break 'mc __v;
+        }
+        if let Ok(__v) = (|| -> Result<_> {
+            let ref bStream @ IOStream {
+                data: IOStreamData::BUFFER_DATA { data: ref bufferID },
+                ..
+            } = __mc_input.clone()
+            else {
+                return Err("nomatch");
+            };
+            IOStreamExt::clearBuffer(bufferID.clone())?;
+            Ok(bStream.clone())
+        })() {
+            break 'mc __v;
+        }
+        panic!("matchcontinue: no arm matched")
+    };
+    outStream
+}
+
+pub fn empty(mut inStream: &IOStream) -> Result<bool> {
+    let mut res: bool;
+    let mut data: IOStreamData = inStream.data.clone();
+    res = (match data.clone() {
+        IOStreamData::LIST_DATA { .. } => (var_field!(data.data, IOStreamData::LIST_DATA)).is_empty(),
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(res)
+}
+
+pub fn string(mut inStream: &IOStream) -> Result<ArcStr> {
+    let mut string: ArcStr;
+    string = (match inStream.clone() {
+        IOStream {
+            data: IOStreamData::FILE_DATA { data: mut fileID },
+            ..
+        } => {
+            let mut r#str: ArcStr;
+            r#str = IOStreamExt::readFile(fileID.clone())?;
+            r#str
+        }
+        IOStream {
+            data: IOStreamData::LIST_DATA { data: ref listData },
+            ..
+        } => {
+            let mut r#str: ArcStr;
+            r#str = IOStreamExt::appendReversedList(listData.clone());
+            r#str
+        }
+        IOStream {
+            data: IOStreamData::BUFFER_DATA { data: mut bufferID },
+            ..
+        } => {
+            let mut r#str: ArcStr;
+            r#str = IOStreamExt::readBuffer(bufferID.clone())?;
+            r#str
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(string)
+}
+
+pub fn print(mut inStream: &IOStream, mut whereToPrint: i32) -> Result<()> {
+    let () = (match inStream.clone() {
+        IOStream {
+            data: IOStreamData::FILE_DATA { data: mut fileID },
+            ..
+        } => {
+            IOStreamExt::printFile(fileID.clone(), whereToPrint)?;
+            ()
+        }
+        IOStream {
+            data: IOStreamData::BUFFER_DATA { data: mut bufferID },
+            ..
+        } => {
+            IOStreamExt::printBuffer(bufferID.clone(), whereToPrint)?;
+            ()
+        }
+        IOStream {
+            data: IOStreamData::LIST_DATA { data: ref listData },
+            ..
+        } => {
+            IOStreamExt::printReversedList(listData.clone(), whereToPrint)?;
+            ()
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(())
+}
+
+/*
+TODO! Global Streams to be implemented later
+IOStream.remember(IOStream, id);
+IOStream = IOStream.aquire(id);
+IOStream.forget(IOStream, id);
+*/

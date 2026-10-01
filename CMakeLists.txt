@@ -114,7 +114,7 @@ set(host_short ${OM_LIBRARY_ARCH})
 # profile is chosen with RUST_OMC_WASM_MODE.
 omc_option(OM_OMC_WASM "Build only the WebAssembly (browser/Node) omc bundle." OFF)
 if(OM_OMC_WASM)
-  set(OM_OMC_ENABLE_RUST ON CACHE BOOL "Build the Rust (mmtorust) omc port instead of the bootstrapped C omc." FORCE)
+  set(OM_OMC_ENABLE_RUST ON CACHE BOOL "Build the Rust omc instead of the bootstrapped C omc." FORCE)
 endif()
 
 ## On Conda-forge this should be disabled

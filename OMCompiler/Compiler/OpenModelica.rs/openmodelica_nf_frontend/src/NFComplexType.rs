@@ -1,0 +1,163 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::NFInstNode;
+use crate::NFInstNode::InstNode;
+use crate::NFRecord as Record;
+use openmodelica_util::UnorderedMap;
+use openmodelica_util_datatypes_basic::MutableWeak;
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum NFComplexType {
+    CLASS,
+    /// Used for long class declarations extending from a type, e.g.:
+    ///       type SomeType
+    ///         extends Real;
+    ///       end SomeType;
+    EXTENDS_TYPE {
+        /// Weakly: the class tree owns it.
+        baseClass: Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>,
+    },
+    CONNECTOR {
+        /// Weakly: the class tree owns them.
+        potentials: metamodelica::List<Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>>,
+        flows: metamodelica::List<Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>>,
+        streams: metamodelica::List<Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>>,
+    },
+    EXPANDABLE_CONNECTOR {
+        /// Weakly: the class tree owns them.
+        potentiallyPresents:
+            metamodelica::List<Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>>,
+        expandableConnectors:
+            metamodelica::List<Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>>,
+    },
+    RECORD {
+        /// Weakly: the class tree owns it.
+        constructor: Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>,
+        fields: metamodelica::Array<metamodelica::Ref<Record::Field::Field>>,
+        indexMap: metamodelica::Ref<UnorderedMap::UnorderedMap<ArcStr, i32>>,
+    },
+    /// Strong: a structor is stored here instead of in the class tree, so this
+    ///     field is its only owner.
+    EXTERNAL_OBJECT {
+        /// Weakly: the class tree owns them.
+        constructor: Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>,
+        destructor: Option<MutableWeak::MutableWeak<metamodelica::Ref<InstNode::InstNode>>>,
+    },
+}
+impl metamodelica::gc::MMTrace for NFComplexType {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            NFComplexType::CLASS => Ok(()),
+            NFComplexType::EXTENDS_TYPE { baseClass } => {
+                metamodelica::gc::MMTrace::mm_accept(baseClass, __mmv)?;
+                Ok(())
+            }
+            NFComplexType::CONNECTOR {
+                potentials,
+                flows,
+                streams,
+            } => {
+                metamodelica::gc::MMTrace::mm_accept(potentials, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(flows, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(streams, __mmv)?;
+                Ok(())
+            }
+            NFComplexType::EXPANDABLE_CONNECTOR {
+                potentiallyPresents,
+                expandableConnectors,
+            } => {
+                metamodelica::gc::MMTrace::mm_accept(potentiallyPresents, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(expandableConnectors, __mmv)?;
+                Ok(())
+            }
+            NFComplexType::RECORD {
+                constructor,
+                fields,
+                indexMap,
+            } => {
+                metamodelica::gc::MMTrace::mm_accept(constructor, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(fields, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(indexMap, __mmv)?;
+                Ok(())
+            }
+            NFComplexType::EXTERNAL_OBJECT {
+                constructor,
+                destructor,
+            } => {
+                metamodelica::gc::MMTrace::mm_accept(constructor, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(destructor, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl NFComplexType {
+    pub fn interned_CLASS() -> metamodelica::Ref<NFComplexType> {
+        thread_local! {
+            static INTERNED: metamodelica::Ref<NFComplexType> = metamodelica::Ref::new(NFComplexType::CLASS);
+        }
+        INTERNED.with(|i| i.clone())
+    }
+}
+pub fn interned_CLASS() -> metamodelica::Ref<NFComplexType> {
+    NFComplexType::interned_CLASS()
+}
+impl Default for NFComplexType {
+    fn default() -> Self {
+        Self::CLASS
+    }
+}
+pub use self::NFComplexType::{CLASS, CONNECTOR, EXPANDABLE_CONNECTOR, EXTENDS_TYPE, EXTERNAL_OBJECT, RECORD};

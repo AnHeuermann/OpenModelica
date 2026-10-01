@@ -1,0 +1,370 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::GCExt;
+use crate::Mutable;
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct MutableList<T: Clone> {
+    pub length: Mutable::Mutable<i32>,
+    pub front: Mutable::Mutable<metamodelica::List<T>>,
+    pub back: Mutable::Mutable<metamodelica::List<T>>,
+}
+
+impl<T: Clone + metamodelica::gc::MMTrace> metamodelica::gc::MMTrace for MutableList<T> {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.length, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.front, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.back, __mmv)?;
+        Ok(())
+    }
+}
+impl<T: Clone + 'static + metamodelica::gc::MMTrace> Default for MutableList<T> {
+    fn default() -> Self {
+        Self {
+            length: Default::default(),
+            front: Default::default(),
+            back: Default::default(),
+        }
+    }
+}
+
+pub type LIST<T> = MutableList<T>;
+
+pub fn new<T: Clone + 'static + metamodelica::gc::MMTrace>(mut first: T) -> MutableList<T> {
+    let mut delst: MutableList<T>;
+    let mut lst: metamodelica::List<T> = list![first.clone()];
+    delst = MutableList {
+        length: Mutable::create(1),
+        front: Mutable::create(lst.clone()),
+        back: Mutable::create(lst),
+    };
+    delst
+}
+
+pub fn fromList<T: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut lst: &metamodelica::List<T>,
+) -> Result<MutableList<T>> {
+    let mut delst: MutableList<T>;
+    let mut head: metamodelica::List<T>;
+    let mut tail: metamodelica::List<T>;
+    let mut tmp: metamodelica::List<T>;
+    let mut length: i32;
+    let mut t: T;
+    if (lst).is_empty() {
+        delst = MutableList {
+            length: Mutable::create(0),
+            front: Mutable::create(metamodelica::nil()),
+            back: Mutable::create(metamodelica::nil()),
+        };
+        return Ok(delst);
+    }
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &((*lst)) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    t = metamodelica::Own::own(__pa0);
+    tmp = metamodelica::Own::own(__pa1);
+    head = list![t];
+    tail = head.clone();
+    length = 1;
+    for mut l in &*tmp.clone() {
+        tmp = list![l.clone()];
+        Dangerous::listSetRest(tail, tmp.clone())?;
+        tail = tmp.clone();
+        length = length + 1;
+    }
+    delst = MutableList {
+        length: Mutable::create(length),
+        front: Mutable::create(head),
+        back: Mutable::create(tail),
+    };
+    Ok(delst)
+}
+
+pub fn empty<T: Clone + 'static + metamodelica::gc::MMTrace>(mut dummy: T) -> MutableList<T> {
+    let mut delst: MutableList<T>;
+    delst = MutableList {
+        length: Mutable::create(0),
+        front: Mutable::create(metamodelica::nil()),
+        back: Mutable::create(metamodelica::nil()),
+    };
+    delst
+}
+
+pub fn length<T: Clone + 'static + metamodelica::gc::MMTrace>(mut delst: MutableList<T>) -> i32 {
+    let mut length: i32;
+    length = Mutable::access(delst.length.clone());
+    length
+}
+
+pub(crate) fn pop_front<T: Clone + 'static + metamodelica::gc::MMTrace>(mut delst: MutableList<T>) -> Result<T> {
+    let mut elt: T;
+    let mut length: i32 = Mutable::access(delst.length.clone());
+    let mut lst: metamodelica::List<T>;
+    let true = (length > 0) else {
+        return Err("pattern mismatch");
+    };
+    Mutable::update(delst.length.clone(), length - 1);
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &(Mutable::access(delst.front.clone())) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    elt = metamodelica::Own::own(__pa0);
+    lst = metamodelica::Own::own(__pa1);
+    if length == 1 {
+        Mutable::update(delst.front.clone(), metamodelica::nil());
+        Mutable::update(delst.back.clone(), metamodelica::nil());
+        return Ok(elt);
+    }
+    Mutable::update(delst.front.clone(), lst);
+    Ok(elt)
+}
+
+pub fn currentBackCell<T: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut delst: MutableList<T>,
+) -> metamodelica::List<T> {
+    let mut last: metamodelica::List<T>;
+    last = Mutable::access(delst.back.clone());
+    last
+}
+
+pub fn push_front<T: Clone + 'static + metamodelica::gc::MMTrace>(mut delst: MutableList<T>, mut elt: T) -> () {
+    let mut length: i32 = Mutable::access(delst.length.clone());
+    let mut lst: metamodelica::List<T>;
+    Mutable::update(delst.length.clone(), length + 1);
+    if length == 0 {
+        lst = list![elt];
+        Mutable::update(delst.front.clone(), lst.clone());
+        Mutable::update(delst.back.clone(), lst);
+        return ();
+    }
+    lst = Mutable::access(delst.front.clone());
+    Mutable::update(delst.front.clone(), metamodelica::cons(elt, lst));
+    ()
+}
+
+pub fn push_list_front<T: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut delst: MutableList<T>,
+    mut lst: &metamodelica::List<T>,
+) -> Result<()> {
+    let mut length: i32 = Mutable::access(delst.length.clone());
+    let mut lstLength: i32;
+    let mut work: metamodelica::List<T>;
+    let mut oldHead: metamodelica::List<T>;
+    let mut tmp: metamodelica::List<T>;
+    let mut head: metamodelica::List<T>;
+    let mut t: T;
+    lstLength = ((lst).len() as i32);
+    if lstLength == 0 {
+        return Ok(());
+    }
+    Mutable::update(delst.length.clone(), length + lstLength);
+    let (__pa0, __pa1) = ::match_deref::match_deref! { match &((*lst)) {
+        Deref @ metamodelica::ListNode::Cons { head: __pa0, tail: __pa1 } => (__pa0.clone(), __pa1.clone()),
+        _ => return Err("pattern mismatch"),
+    } };
+    t = metamodelica::Own::own(__pa0);
+    tmp = metamodelica::Own::own(__pa1);
+    head = list![t];
+    oldHead = Mutable::access(delst.front.clone());
+    Mutable::update(delst.front.clone(), head.clone());
+    for mut l in &*tmp {
+        work = list![l.clone()];
+        Dangerous::listSetRest(head, work.clone())?;
+        head = work;
+    }
+    if length == 0 {
+        Mutable::update(delst.back.clone(), head);
+    } else {
+        Dangerous::listSetRest(head, oldHead)?;
+    }
+    Ok(())
+}
+
+pub fn push_back<T: Clone + 'static + metamodelica::gc::MMTrace>(mut delst: MutableList<T>, mut elt: T) -> Result<()> {
+    let mut length: i32 = Mutable::access(delst.length.clone());
+    let mut lst: metamodelica::List<T>;
+    Mutable::update(delst.length.clone(), length + 1);
+    if length == 0 {
+        lst = list![elt];
+        Mutable::update(delst.front.clone(), lst.clone());
+        Mutable::update(delst.back.clone(), lst);
+        return Ok(());
+    }
+    lst = list![elt];
+    Dangerous::listSetRest(Mutable::access(delst.back.clone()), lst.clone())?;
+    Mutable::update(delst.back.clone(), lst);
+    Ok(())
+}
+
+pub fn push_list_back<T: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut delst: MutableList<T>,
+    mut lst: &metamodelica::List<T>,
+) -> Result<()> {
+    let mut length: i32 = Mutable::access(delst.length.clone());
+    let mut lstLength: i32;
+    let mut tail: metamodelica::List<T>;
+    let mut tmp: metamodelica::List<T>;
+    let mut t: T;
+    lstLength = ((lst).len() as i32);
+    if lstLength == 0 {
+        return Ok(());
+    }
+    Mutable::update(delst.length.clone(), length + lstLength);
+    t = (lst).get(1)?;
+    tmp = list![t];
+    if length == 0 {
+        Mutable::update(delst.front.clone(), tmp.clone());
+    } else {
+        Dangerous::listSetRest(Mutable::access(delst.back.clone()), tmp.clone())?;
+    }
+    tail = tmp;
+    for mut l in &*(lst).rest()? {
+        tmp = list![l.clone()];
+        Dangerous::listSetRest(tail, tmp.clone())?;
+        tail = tmp;
+    }
+    Mutable::update(delst.back.clone(), tail);
+    Ok(())
+}
+
+pub fn toListAndClear<T: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut delst: MutableList<T>,
+    mut prependToList: metamodelica::List<T>,
+) -> Result<metamodelica::List<T>> {
+    let mut res: metamodelica::List<T>;
+    if Mutable::access(delst.length.clone()) == 0 {
+        res = prependToList;
+        return Ok(res);
+    }
+    res = Mutable::access(delst.front.clone());
+    if !((prependToList).is_empty()) {
+        Dangerous::listSetRest(Mutable::access(delst.back.clone()), prependToList)?;
+    }
+    Mutable::update(delst.back.clone(), metamodelica::nil());
+    Mutable::update(delst.front.clone(), metamodelica::nil());
+    Mutable::update(delst.length.clone(), 0);
+    Ok(res)
+}
+
+pub fn toListNoCopyNoClear<T: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut delst: MutableList<T>,
+) -> metamodelica::List<T> {
+    let mut res: metamodelica::List<T>;
+    res = Mutable::access(delst.front.clone());
+    res
+}
+
+pub(crate) fn clear<T: Clone + 'static + metamodelica::gc::MMTrace>(mut delst: MutableList<T>) -> () {
+    let mut lst: metamodelica::List<T>;
+    lst = Mutable::access(delst.front.clone());
+    Mutable::update(delst.back.clone(), metamodelica::nil());
+    Mutable::update(delst.front.clone(), metamodelica::nil());
+    Mutable::update(delst.length.clone(), 0);
+    for mut l in &*lst {
+        GCExt::free(l.clone());
+    }
+    ()
+}
+
+pub fn mapNoCopy_1<
+    T: Clone + 'static + metamodelica::gc::MMTrace,
+    ArgT1: Clone + 'static + metamodelica::gc::MMTrace,
+>(
+    mut delst: MutableList<T>,
+    mut inMapFunc: &dyn ::std::ops::Fn(T, ArgT1) -> Result<T>,
+    mut inArg1: ArgT1,
+) -> Result<()> {
+    pub type MapFunc<T: Clone + 'static, ArgT1: Clone + 'static> =
+        std::sync::Arc<dyn ::std::ops::Fn(T, ArgT1) -> Result<T> + 'static>;
+
+    let mut lst: metamodelica::List<T> = Mutable::access(delst.front.clone());
+    while !((lst).is_empty()) {
+        Dangerous::listSetFirst(lst.clone(), inMapFunc((lst).get(1)?, inArg1.clone())?)?;
+        let __pa0 = ::match_deref::match_deref! { match &(lst) {
+            Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+            _ => return Err("pattern mismatch"),
+        } };
+        lst = metamodelica::Own::own(__pa0);
+    }
+    Ok(())
+}
+
+pub fn mapFoldNoCopy<
+    T: Clone + 'static + metamodelica::gc::MMTrace,
+    ArgT1: Clone + 'static + metamodelica::gc::MMTrace,
+>(
+    mut delst: MutableList<T>,
+    mut inMapFunc: &dyn ::std::ops::Fn(T, ArgT1) -> Result<(T, ArgT1)>,
+    mut arg: ArgT1,
+) -> Result<ArgT1> {
+    pub type MapFunc<T: Clone + 'static, ArgT1: Clone + 'static> =
+        std::sync::Arc<dyn ::std::ops::Fn(T, ArgT1) -> Result<(T, ArgT1)> + 'static>;
+
+    let mut arg: ArgT1 = arg;
+    let mut element: T;
+    let mut lst: metamodelica::List<T> = Mutable::access(delst.front.clone());
+    while !((lst).is_empty()) {
+        (element, arg) = inMapFunc((lst).get(1)?, arg)?;
+        Dangerous::listSetFirst(lst.clone(), element)?;
+        let __pa0 = ::match_deref::match_deref! { match &(lst) {
+            Deref @ metamodelica::ListNode::Cons { head: _, tail: __pa0 } => __pa0.clone(),
+            _ => return Err("pattern mismatch"),
+        } };
+        lst = metamodelica::Own::own(__pa0);
+    }
+    Ok(arg)
+}

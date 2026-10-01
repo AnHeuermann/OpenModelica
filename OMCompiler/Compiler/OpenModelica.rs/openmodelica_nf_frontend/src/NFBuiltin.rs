@@ -1,0 +1,594 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::NFAttributes as Attributes;
+use crate::NFBinding;
+use crate::NFBuiltinFuncs as BuiltinFuncs;
+use crate::NFClass as Class;
+use crate::NFClassTree::ClassTree;
+use crate::NFComponent as Component;
+use crate::NFComponent::ComponentState;
+use crate::NFComponentRef as ComponentRef;
+use crate::NFComponentRef::Origin;
+use crate::NFDuplicateTree;
+use crate::NFExpression as Expression;
+use crate::NFInstNode;
+use crate::NFInstNode::InstNode;
+use crate::NFInstNode::InstNodeType;
+use crate::NFModifier::Modifier;
+use crate::NFPrefixes::Variability;
+use crate::NFPrefixes::Visibility;
+use crate::NFRestriction as Restriction;
+use crate::NFType as Type;
+use openmodelica_ast::Absyn;
+use openmodelica_frontend_types::SCode;
+use openmodelica_util::NFLookupTree as LookupTree;
+use openmodelica_util_datatypes_basic::Pointer;
+
+pub mod Elements {
+    use super::*;
+    // Default parts of the declarations for builtin elements and types:
+    pub(crate) static ENUMTYPE_SPEC: std::sync::LazyLock<metamodelica::Ref<Absyn::TypeSpec>> =
+        std::sync::LazyLock::new(|| {
+            metamodelica::Ref::new(Absyn::TypeSpec::TPATH {
+                path: metamodelica::Ref::new(Absyn::Path::IDENT {
+                    name: literal!("$EnumType"),
+                }),
+                arrayDim: None,
+            })
+        });
+
+    // StateSelect-specific elements:
+    pub(crate) static REAL: std::sync::LazyLock<metamodelica::Ref<SCode::Element>> = std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(SCode::Element::CLASS {
+            name: literal!("Real"),
+            prefixes: SCode::defaultPrefixes.clone(),
+            encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+            partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+            restriction: openmodelica_frontend_types::SCode::Restriction::R_TYPE,
+            classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+                elementLst: metamodelica::nil(),
+                normalEquationLst: metamodelica::nil(),
+                initialEquationLst: metamodelica::nil(),
+                normalAlgorithmLst: metamodelica::nil(),
+                initialAlgorithmLst: metamodelica::nil(),
+                constraintLst: metamodelica::nil(),
+                clsattrs: metamodelica::nil(),
+                externalDecl: None,
+            }),
+            cmt: SCode::noComment.clone(),
+            info: Absyn::dummyInfo.clone(),
+        })
+    });
+
+    pub(crate) static INTEGER: std::sync::LazyLock<metamodelica::Ref<SCode::Element>> =
+        std::sync::LazyLock::new(|| {
+            metamodelica::Ref::new(SCode::Element::CLASS {
+                name: literal!("Integer"),
+                prefixes: SCode::defaultPrefixes.clone(),
+                encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+                partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+                restriction: openmodelica_frontend_types::SCode::Restriction::R_TYPE,
+                classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+                    elementLst: metamodelica::nil(),
+                    normalEquationLst: metamodelica::nil(),
+                    initialEquationLst: metamodelica::nil(),
+                    normalAlgorithmLst: metamodelica::nil(),
+                    initialAlgorithmLst: metamodelica::nil(),
+                    constraintLst: metamodelica::nil(),
+                    clsattrs: metamodelica::nil(),
+                    externalDecl: None,
+                }),
+                cmt: SCode::noComment.clone(),
+                info: Absyn::dummyInfo.clone(),
+            })
+        });
+
+    pub(crate) static BOOLEAN: std::sync::LazyLock<metamodelica::Ref<SCode::Element>> =
+        std::sync::LazyLock::new(|| {
+            metamodelica::Ref::new(SCode::Element::CLASS {
+                name: literal!("Boolean"),
+                prefixes: SCode::defaultPrefixes.clone(),
+                encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+                partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+                restriction: openmodelica_frontend_types::SCode::Restriction::R_TYPE,
+                classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+                    elementLst: metamodelica::nil(),
+                    normalEquationLst: metamodelica::nil(),
+                    initialEquationLst: metamodelica::nil(),
+                    normalAlgorithmLst: metamodelica::nil(),
+                    initialAlgorithmLst: metamodelica::nil(),
+                    constraintLst: metamodelica::nil(),
+                    clsattrs: metamodelica::nil(),
+                    externalDecl: None,
+                }),
+                cmt: SCode::noComment.clone(),
+                info: Absyn::dummyInfo.clone(),
+            })
+        });
+
+    pub(crate) static STRING: std::sync::LazyLock<metamodelica::Ref<SCode::Element>> = std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(SCode::Element::CLASS {
+            name: literal!("String"),
+            prefixes: SCode::defaultPrefixes.clone(),
+            encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+            partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+            restriction: openmodelica_frontend_types::SCode::Restriction::R_TYPE,
+            classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+                elementLst: metamodelica::nil(),
+                normalEquationLst: metamodelica::nil(),
+                initialEquationLst: metamodelica::nil(),
+                normalAlgorithmLst: metamodelica::nil(),
+                initialAlgorithmLst: metamodelica::nil(),
+                constraintLst: metamodelica::nil(),
+                clsattrs: metamodelica::nil(),
+                externalDecl: None,
+            }),
+            cmt: SCode::noComment.clone(),
+            info: Absyn::dummyInfo.clone(),
+        })
+    });
+
+    pub(crate) static ENUMERATION: std::sync::LazyLock<metamodelica::Ref<SCode::Element>> =
+        std::sync::LazyLock::new(|| {
+            metamodelica::Ref::new(SCode::Element::CLASS {
+                name: literal!("enumeration"),
+                prefixes: SCode::defaultPrefixes.clone(),
+                encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+                partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+                restriction: openmodelica_frontend_types::SCode::Restriction::R_TYPE,
+                classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+                    elementLst: metamodelica::nil(),
+                    normalEquationLst: metamodelica::nil(),
+                    initialEquationLst: metamodelica::nil(),
+                    normalAlgorithmLst: metamodelica::nil(),
+                    initialAlgorithmLst: metamodelica::nil(),
+                    constraintLst: metamodelica::nil(),
+                    clsattrs: metamodelica::nil(),
+                    externalDecl: None,
+                }),
+                cmt: SCode::noComment.clone(),
+                info: Absyn::dummyInfo.clone(),
+            })
+        });
+
+    pub(crate) static ANY: std::sync::LazyLock<metamodelica::Ref<SCode::Element>> = std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(SCode::Element::CLASS {
+            name: literal!("polymorphic"),
+            prefixes: SCode::defaultPrefixes.clone(),
+            encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+            partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+            restriction: openmodelica_frontend_types::SCode::Restriction::R_TYPE,
+            classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+                elementLst: metamodelica::nil(),
+                normalEquationLst: metamodelica::nil(),
+                initialEquationLst: metamodelica::nil(),
+                normalAlgorithmLst: metamodelica::nil(),
+                initialAlgorithmLst: metamodelica::nil(),
+                constraintLst: metamodelica::nil(),
+                clsattrs: metamodelica::nil(),
+                externalDecl: None,
+            }),
+            cmt: SCode::noComment.clone(),
+            info: Absyn::dummyInfo.clone(),
+        })
+    });
+
+    pub(crate) static CLOCK: std::sync::LazyLock<metamodelica::Ref<SCode::Element>> = std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(SCode::Element::CLASS {
+            name: literal!("Clock"),
+            prefixes: SCode::defaultPrefixes.clone(),
+            encapsulatedPrefix: openmodelica_frontend_types::SCode::Encapsulated::NOT_ENCAPSULATED,
+            partialPrefix: openmodelica_frontend_types::SCode::Partial::NOT_PARTIAL,
+            restriction: openmodelica_frontend_types::SCode::Restriction::R_PREDEFINED_CLOCK,
+            classDef: metamodelica::Ref::new(SCode::ClassDef::PARTS {
+                elementLst: metamodelica::nil(),
+                normalEquationLst: metamodelica::nil(),
+                initialEquationLst: metamodelica::nil(),
+                normalAlgorithmLst: metamodelica::nil(),
+                initialAlgorithmLst: metamodelica::nil(),
+                constraintLst: metamodelica::nil(),
+                clsattrs: metamodelica::nil(),
+                externalDecl: None,
+            }),
+            cmt: SCode::noComment.clone(),
+            info: Absyn::dummyInfo.clone(),
+        })
+    });
+}
+
+// An empty InstNode cache for the builtin types. This should really be an empty
+// array to make sure all attempts at using the cache fails, since trying to
+// update the cache of a constant literal would cause a segfault. Creating a
+// completely empty array here doesn't work due to compiler bugs though
+// (generates invalid C code), but this is probably close enough.
+thread_local! { static __EMPTY_NODE_CACHE_TLS: metamodelica::StaticArray<metamodelica::Ref<NFInstNode::CachedData::CachedData>> = metamodelica::StaticArray::new(list![metamodelica::Ref::new(NFInstNode::CachedData::CachedData::FUNCTION { funcs: metamodelica::nil(), typed: true, specialBuiltin: true })].into_iter().cloned().collect()); }
+pub(crate) fn EMPTY_NODE_CACHE() -> metamodelica::StaticArray<metamodelica::Ref<NFInstNode::CachedData::CachedData>> {
+    __EMPTY_NODE_CACHE_TLS.with(|__t| __t.share())
+}
+
+// InstNodes for the builtin types. These have empty class trees to prevent
+// access to the attributes via dot notation (which is not needed for
+// modifiers and illegal in other cases).
+thread_local! { static __POLYMORPHIC_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::CLASS_NODE { name: literal!("polymorphic"), definition: Elements::ANY.clone(), visibility: Visibility::PUBLIC.clone(), cls: Pointer::createImmutable(metamodelica::Ref::new(Class::NFClass::PARTIAL_BUILTIN { ty: metamodelica::Ref::new(Type::NFType::POLYMORPHIC { name: literal!("") }), elements: crate::NFClassTree::ClassTree::interned_EMPTY_TREE(), modifier: crate::NFModifier::Modifier::interned_NOMOD(), prefixes: Class::DEFAULT_PREFIXES.clone(), restriction: crate::NFRestriction::interned_TYPE() })), caches: EMPTY_NODE_CACHE().clone(), owner: None, identity: None, parentScope: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_BUILTIN_CLASS() }); }
+pub(crate) fn POLYMORPHIC_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __POLYMORPHIC_NODE_TLS.with(|__t| __t.clone())
+}
+
+// Lookup tree for Real. Generated by makeBuiltinLookupTree.
+pub(crate) static REAL_LOOKUP_TREE: std::sync::LazyLock<metamodelica::Ref<LookupTree::Tree>> =
+    std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(LookupTree::Tree::NODE {
+            key: literal!("quantity"),
+            value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 1 }),
+            height: 4,
+            left: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                key: literal!("max"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 5 }),
+                height: 3,
+                left: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                    key: literal!("displayUnit"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 3 }),
+                    height: 2,
+                    left: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+                    right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                        key: literal!("fixed"),
+                        value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 7 }),
+                    }),
+                }),
+                right: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                    key: literal!("min"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 4 }),
+                    height: 2,
+                    left: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+                    right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                        key: literal!("nominal"),
+                        value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 8 }),
+                    }),
+                }),
+            }),
+            right: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                key: literal!("unbounded"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 9 }),
+                height: 3,
+                left: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                    key: literal!("start"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 6 }),
+                    height: 2,
+                    left: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+                    right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                        key: literal!("stateSelect"),
+                        value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 10 }),
+                    }),
+                }),
+                right: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                    key: literal!("unit"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 2 }),
+                    height: 2,
+                    left: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                        key: literal!("uncertain"),
+                        value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 11 }),
+                    }),
+                    right: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+                }),
+            }),
+        })
+    });
+
+thread_local! { static __REAL_CLASS_TREE_TLS: metamodelica::Ref<ClassTree::ClassTree> = metamodelica::Ref::new(ClassTree::ClassTree::FLAT_TREE { tree: REAL_LOOKUP_TREE.clone(), classes: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), components: metamodelica::arrayFromVec(list![metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("quantity"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("unit"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("displayUnit"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("min"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_REAL(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("max"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_REAL(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("start"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_REAL(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("fixed"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_BOOLEAN(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("nominal"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_REAL(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("unbounded"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_BOOLEAN(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("stateSelect"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: STATESELECT_TYPE().clone(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("uncertain"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: UNCERTAINTY_TYPE().clone(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() })].into_iter().cloned().collect()), imports: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), duplicates: crate::NFDuplicateTree::Tree::interned_EMPTY() }); }
+pub(crate) fn REAL_CLASS_TREE() -> metamodelica::Ref<ClassTree::ClassTree> {
+    __REAL_CLASS_TREE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __REAL_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::CLASS_NODE { name: literal!("Real"), definition: Elements::REAL.clone(), visibility: Visibility::PUBLIC.clone(), cls: Pointer::createImmutable(metamodelica::Ref::new(Class::NFClass::PARTIAL_BUILTIN { ty: crate::NFType::interned_REAL(), elements: REAL_CLASS_TREE().clone(), modifier: crate::NFModifier::Modifier::interned_NOMOD(), prefixes: Class::DEFAULT_PREFIXES.clone(), restriction: crate::NFRestriction::interned_TYPE() })), caches: EMPTY_NODE_CACHE().clone(), owner: None, identity: None, parentScope: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_BUILTIN_CLASS() }); }
+pub(crate) fn REAL_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __REAL_NODE_TLS.with(|__t| __t.clone())
+}
+
+// Lookup tree for Integer. Generated by makeBuiltinLookupTree.
+pub(crate) static INTEGER_LOOKUP_TREE: std::sync::LazyLock<metamodelica::Ref<LookupTree::Tree>> =
+    std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(LookupTree::Tree::NODE {
+            key: literal!("min"),
+            value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 2 }),
+            height: 3,
+            left: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                key: literal!("max"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 3 }),
+                height: 2,
+                left: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                    key: literal!("fixed"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 5 }),
+                }),
+                right: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+            }),
+            right: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                key: literal!("quantity"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 1 }),
+                height: 2,
+                left: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+                right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                    key: literal!("start"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 4 }),
+                }),
+            }),
+        })
+    });
+
+thread_local! { static __INTEGER_CLASS_TREE_TLS: metamodelica::Ref<ClassTree::ClassTree> = metamodelica::Ref::new(ClassTree::ClassTree::FLAT_TREE { tree: INTEGER_LOOKUP_TREE.clone(), classes: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), components: metamodelica::arrayFromVec(list![metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("quantity"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("min"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_INTEGER(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("max"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_INTEGER(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("start"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_INTEGER(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("fixed"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_BOOLEAN(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() })].into_iter().cloned().collect()), imports: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), duplicates: crate::NFDuplicateTree::Tree::interned_EMPTY() }); }
+pub(crate) fn INTEGER_CLASS_TREE() -> metamodelica::Ref<ClassTree::ClassTree> {
+    __INTEGER_CLASS_TREE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __INTEGER_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::CLASS_NODE { name: literal!("Integer"), definition: Elements::INTEGER.clone(), visibility: Visibility::PUBLIC.clone(), cls: Pointer::createImmutable(metamodelica::Ref::new(Class::NFClass::PARTIAL_BUILTIN { ty: crate::NFType::interned_INTEGER(), elements: INTEGER_CLASS_TREE().clone(), modifier: crate::NFModifier::Modifier::interned_NOMOD(), prefixes: Class::DEFAULT_PREFIXES.clone(), restriction: crate::NFRestriction::interned_TYPE() })), caches: EMPTY_NODE_CACHE().clone(), owner: None, identity: None, parentScope: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_BUILTIN_CLASS() }); }
+pub(crate) fn INTEGER_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __INTEGER_NODE_TLS.with(|__t| __t.clone())
+}
+
+// Lookup tree for Boolean. Generated by makeBuiltinLookupTree.
+pub(crate) static BOOLEAN_LOOKUP_TREE: std::sync::LazyLock<metamodelica::Ref<LookupTree::Tree>> =
+    std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(LookupTree::Tree::NODE {
+            key: literal!("quantity"),
+            value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 1 }),
+            height: 2,
+            left: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                key: literal!("fixed"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 3 }),
+            }),
+            right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                key: literal!("start"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 2 }),
+            }),
+        })
+    });
+
+thread_local! { static __BOOLEAN_CLASS_TREE_TLS: metamodelica::Ref<ClassTree::ClassTree> = metamodelica::Ref::new(ClassTree::ClassTree::FLAT_TREE { tree: BOOLEAN_LOOKUP_TREE.clone(), classes: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), components: metamodelica::arrayFromVec(list![metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("quantity"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("start"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_BOOLEAN(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("fixed"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_BOOLEAN(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() })].into_iter().cloned().collect()), imports: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), duplicates: crate::NFDuplicateTree::Tree::interned_EMPTY() }); }
+pub(crate) fn BOOLEAN_CLASS_TREE() -> metamodelica::Ref<ClassTree::ClassTree> {
+    __BOOLEAN_CLASS_TREE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __BOOLEAN_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::CLASS_NODE { name: literal!("Boolean"), definition: Elements::BOOLEAN.clone(), visibility: Visibility::PUBLIC.clone(), cls: Pointer::createImmutable(metamodelica::Ref::new(Class::NFClass::PARTIAL_BUILTIN { ty: crate::NFType::interned_BOOLEAN(), elements: BOOLEAN_CLASS_TREE().clone(), modifier: crate::NFModifier::Modifier::interned_NOMOD(), prefixes: Class::DEFAULT_PREFIXES.clone(), restriction: crate::NFRestriction::interned_TYPE() })), caches: EMPTY_NODE_CACHE().clone(), owner: None, identity: None, parentScope: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_BUILTIN_CLASS() }); }
+pub(crate) fn BOOLEAN_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __BOOLEAN_NODE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __BOOLEAN_CREF_TLS: metamodelica::Ref<ComponentRef::NFComponentRef> = metamodelica::Ref::new(ComponentRef::NFComponentRef::CREF { node: metamodelica::Ref::new(NFInstNode::NodeHandle::VALUE { node: BOOLEAN_NODE().clone() }), subscripts: metamodelica::nil(), ty: crate::NFType::interned_INTEGER(), origin: Origin::CREF.clone(), restCref: crate::NFComponentRef::interned_EMPTY() }); }
+pub(crate) fn BOOLEAN_CREF() -> metamodelica::Ref<ComponentRef::NFComponentRef> {
+    __BOOLEAN_CREF_TLS.with(|__t| __t.clone())
+}
+
+// Lookup tree for String. Generated by makeBuiltinLookupTree.
+pub(crate) static STRING_LOOKUP_TREE: std::sync::LazyLock<metamodelica::Ref<LookupTree::Tree>> =
+    std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(LookupTree::Tree::NODE {
+            key: literal!("quantity"),
+            value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 1 }),
+            height: 2,
+            left: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                key: literal!("fixed"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 3 }),
+            }),
+            right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                key: literal!("start"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 2 }),
+            }),
+        })
+    });
+
+thread_local! { static __STRING_CLASS_TREE_TLS: metamodelica::Ref<ClassTree::ClassTree> = metamodelica::Ref::new(ClassTree::ClassTree::FLAT_TREE { tree: STRING_LOOKUP_TREE.clone(), classes: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), components: metamodelica::arrayFromVec(list![metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("quantity"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("start"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("fixed"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_BOOLEAN(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() })].into_iter().cloned().collect()), imports: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), duplicates: crate::NFDuplicateTree::Tree::interned_EMPTY() }); }
+pub(crate) fn STRING_CLASS_TREE() -> metamodelica::Ref<ClassTree::ClassTree> {
+    __STRING_CLASS_TREE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __STRING_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::CLASS_NODE { name: literal!("String"), definition: Elements::STRING.clone(), visibility: Visibility::PUBLIC.clone(), cls: Pointer::createImmutable(metamodelica::Ref::new(Class::NFClass::PARTIAL_BUILTIN { ty: crate::NFType::interned_STRING(), elements: STRING_CLASS_TREE().clone(), modifier: crate::NFModifier::Modifier::interned_NOMOD(), prefixes: Class::DEFAULT_PREFIXES.clone(), restriction: crate::NFRestriction::interned_TYPE() })), caches: EMPTY_NODE_CACHE().clone(), owner: None, identity: None, parentScope: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_BUILTIN_CLASS() }); }
+pub(crate) fn STRING_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __STRING_NODE_TLS.with(|__t| __t.clone())
+}
+
+// Lookup tree for enumerations. Generated by makeBuiltinLookupTree.
+// NOTE: The enumeration attributes themselves are created by ClassTree.fromEnumeration,
+//       so any changes to this lookup tree requires fromEnumeration to be updated too.
+pub(crate) static ENUM_LOOKUP_TREE: std::sync::LazyLock<metamodelica::Ref<LookupTree::Tree>> =
+    std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(LookupTree::Tree::NODE {
+            key: literal!("min"),
+            value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 2 }),
+            height: 3,
+            left: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                key: literal!("max"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 3 }),
+                height: 2,
+                left: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                    key: literal!("fixed"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 5 }),
+                }),
+                right: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+            }),
+            right: metamodelica::Ref::new(LookupTree::Tree::NODE {
+                key: literal!("quantity"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 1 }),
+                height: 2,
+                left: openmodelica_util::NFLookupTree::Tree::interned_EMPTY(),
+                right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                    key: literal!("start"),
+                    value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 4 }),
+                }),
+            }),
+        })
+    });
+
+thread_local! { static __ENUM_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::CLASS_NODE { name: literal!("enumeration"), definition: Elements::ENUMERATION.clone(), visibility: Visibility::PUBLIC.clone(), cls: Pointer::createImmutable(metamodelica::Ref::new(Class::NFClass::PARTIAL_BUILTIN { ty: metamodelica::Ref::new(Type::NFType::ENUMERATION { typePath: metamodelica::Ref::new(Absyn::Path::IDENT { name: literal!(":") }), literals: metamodelica::nil() }), elements: crate::NFClassTree::ClassTree::interned_EMPTY_TREE(), modifier: crate::NFModifier::Modifier::interned_NOMOD(), prefixes: Class::DEFAULT_PREFIXES.clone(), restriction: crate::NFRestriction::interned_ENUMERATION() })), caches: EMPTY_NODE_CACHE().clone(), owner: None, identity: None, parentScope: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_BUILTIN_CLASS() }); }
+pub(crate) fn ENUM_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __ENUM_NODE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __STATESELECT_TYPE_TLS: metamodelica::Ref<Type::NFType> = metamodelica::Ref::new(Type::NFType::ENUMERATION { typePath: metamodelica::Ref::new(Absyn::Path::IDENT { name: literal!("StateSelect") }), literals: list![literal!("never"), literal!("avoid"), literal!("default"), literal!("prefer"), literal!("always")] }); }
+pub(crate) fn STATESELECT_TYPE() -> metamodelica::Ref<Type::NFType> {
+    __STATESELECT_TYPE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __ASSERTIONLEVEL_TYPE_TLS: metamodelica::Ref<Type::NFType> = metamodelica::Ref::new(Type::NFType::ENUMERATION { typePath: metamodelica::Ref::new(Absyn::Path::IDENT { name: literal!("AssertionLevel") }), literals: list![literal!("warning"), literal!("error")] }); }
+pub(crate) fn ASSERTIONLEVEL_TYPE() -> metamodelica::Ref<Type::NFType> {
+    __ASSERTIONLEVEL_TYPE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __ASSERTIONLEVEL_WARNING_TLS: metamodelica::Ref<Expression::NFExpression> = metamodelica::Ref::new(Expression::NFExpression::ENUM_LITERAL { ty: ASSERTIONLEVEL_TYPE().clone(), name: literal!("error"), index: 1 }); }
+pub(crate) fn ASSERTIONLEVEL_WARNING() -> metamodelica::Ref<Expression::NFExpression> {
+    __ASSERTIONLEVEL_WARNING_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __ASSERTIONLEVEL_ERROR_TLS: metamodelica::Ref<Expression::NFExpression> = metamodelica::Ref::new(Expression::NFExpression::ENUM_LITERAL { ty: ASSERTIONLEVEL_TYPE().clone(), name: literal!("error"), index: 2 }); }
+pub(crate) fn ASSERTIONLEVEL_ERROR() -> metamodelica::Ref<Expression::NFExpression> {
+    __ASSERTIONLEVEL_ERROR_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __UNCERTAINTY_TYPE_TLS: metamodelica::Ref<Type::NFType> = metamodelica::Ref::new(Type::NFType::ENUMERATION { typePath: metamodelica::Ref::new(Absyn::Path::IDENT { name: literal!("Uncertainty") }), literals: list![literal!("given"), literal!("sought"), literal!("refine"), literal!("propagate")] }); }
+pub(crate) fn UNCERTAINTY_TYPE() -> metamodelica::Ref<Type::NFType> {
+    __UNCERTAINTY_TYPE_TLS.with(|__t| __t.clone())
+}
+
+// Lookup tree for Clock. Generated by makeBuiltinLookupTree.
+pub(crate) static CLOCK_LOOKUP_TREE: std::sync::LazyLock<metamodelica::Ref<LookupTree::Tree>> =
+    std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(LookupTree::Tree::NODE {
+            key: literal!("quantity"),
+            value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 1 }),
+            height: 2,
+            left: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                key: literal!("fixed"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 3 }),
+            }),
+            right: metamodelica::Ref::new(LookupTree::Tree::LEAF {
+                key: literal!("start"),
+                value: metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: 2 }),
+            }),
+        })
+    });
+
+thread_local! { static __CLOCK_CLASS_TREE_TLS: metamodelica::Ref<ClassTree::ClassTree> = metamodelica::Ref::new(ClassTree::ClassTree::FLAT_TREE { tree: CLOCK_LOOKUP_TREE.clone(), classes: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), components: metamodelica::arrayFromVec(list![metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("quantity"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_STRING(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("start"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_CLOCK(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }), metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("fixed"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::TYPE_ATTRIBUTE { ty: crate::NFType::interned_CLOCK(), modifier: crate::NFModifier::Modifier::interned_NOMOD() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() })].into_iter().cloned().collect()), imports: metamodelica::arrayFromVec(metamodelica::nil().into_iter().cloned().collect()), duplicates: crate::NFDuplicateTree::Tree::interned_EMPTY() }); }
+pub(crate) fn CLOCK_CLASS_TREE() -> metamodelica::Ref<ClassTree::ClassTree> {
+    __CLOCK_CLASS_TREE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __CLOCK_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::CLASS_NODE { name: literal!("Clock"), definition: Elements::CLOCK.clone(), visibility: Visibility::PUBLIC.clone(), cls: Pointer::createImmutable(metamodelica::Ref::new(Class::NFClass::PARTIAL_BUILTIN { ty: crate::NFType::interned_CLOCK(), elements: CLOCK_CLASS_TREE().clone(), modifier: crate::NFModifier::Modifier::interned_NOMOD(), prefixes: Class::DEFAULT_PREFIXES.clone(), restriction: crate::NFRestriction::interned_CLOCK() })), caches: metamodelica::arrayFromVec(list![metamodelica::Ref::new(NFInstNode::CachedData::CachedData::FUNCTION { funcs: list![BuiltinFuncs::CLOCK_INFERRED().clone(), BuiltinFuncs::CLOCK_INT().clone(), BuiltinFuncs::CLOCK_REAL().clone(), BuiltinFuncs::CLOCK_BOOL().clone(), BuiltinFuncs::CLOCK_SOLVER().clone()], typed: true, specialBuiltin: true }), crate::NFInstNode::CachedData::interned_NO_CACHE(), crate::NFInstNode::CachedData::interned_NO_CACHE()].into_iter().cloned().collect()), owner: None, identity: None, parentScope: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_BUILTIN_CLASS() }); }
+pub(crate) fn CLOCK_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __CLOCK_NODE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __CLOCK_CREF_TLS: metamodelica::Ref<ComponentRef::NFComponentRef> = metamodelica::Ref::new(ComponentRef::NFComponentRef::CREF { node: metamodelica::Ref::new(NFInstNode::NodeHandle::VALUE { node: CLOCK_NODE().clone() }), subscripts: metamodelica::nil(), ty: crate::NFType::interned_CLOCK(), origin: Origin::CREF.clone(), restCref: crate::NFComponentRef::interned_EMPTY() }); }
+pub(crate) fn CLOCK_CREF() -> metamodelica::Ref<ComponentRef::NFComponentRef> {
+    __CLOCK_CREF_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __TIME_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("time"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::COMPONENT { classInst: REAL_NODE().clone(), ty: crate::NFType::interned_REAL(), binding: NFBinding::EMPTY_BINDING().clone(), condition: NFBinding::EMPTY_BINDING().clone(), attributes: Attributes::INPUT_ATTR().clone(), comment: SCode::noComment.clone(), state: ComponentState::TypeChecked.clone(), info: Absyn::dummyInfo.clone() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }); }
+pub(crate) fn TIME() -> metamodelica::Ref<InstNode::InstNode> {
+    __TIME_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __SUBST_NODE_TLS: metamodelica::Ref<InstNode::InstNode> = metamodelica::Ref::new(InstNode::InstNode::COMPONENT_NODE { name: literal!("$SUBST_CREF"), definition: None, visibility: Visibility::PUBLIC.clone(), component: Pointer::createImmutable(metamodelica::Ref::new(Component::NFComponent::COMPONENT { classInst: REAL_NODE().clone(), ty: crate::NFType::interned_ANY(), binding: NFBinding::EMPTY_BINDING().clone(), condition: NFBinding::EMPTY_BINDING().clone(), attributes: Attributes::DEFAULT_ATTR().clone(), comment: SCode::noComment.clone(), state: ComponentState::TypeChecked.clone(), info: Absyn::dummyInfo.clone() })), owner: None, identity: None, parent: NFInstNode::NO_SCOPE().clone(), nodeType: crate::NFInstNode::InstNodeType::interned_NORMAL_COMP() }); }
+pub(crate) fn SUBST_NODE() -> metamodelica::Ref<InstNode::InstNode> {
+    __SUBST_NODE_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __TIME_CREF_TLS: metamodelica::Ref<ComponentRef::NFComponentRef> = metamodelica::Ref::new(ComponentRef::NFComponentRef::CREF { node: metamodelica::Ref::new(NFInstNode::NodeHandle::VALUE { node: TIME().clone() }), subscripts: metamodelica::nil(), ty: crate::NFType::interned_REAL(), origin: Origin::CREF.clone(), restCref: crate::NFComponentRef::interned_EMPTY() }); }
+pub fn TIME_CREF() -> metamodelica::Ref<ComponentRef::NFComponentRef> {
+    __TIME_CREF_TLS.with(|__t| __t.clone())
+}
+
+thread_local! { static __SUBST_CREF_TLS: metamodelica::Ref<ComponentRef::NFComponentRef> = metamodelica::Ref::new(ComponentRef::NFComponentRef::CREF { node: metamodelica::Ref::new(NFInstNode::NodeHandle::VALUE { node: SUBST_NODE().clone() }), subscripts: metamodelica::nil(), ty: crate::NFType::interned_ANY(), origin: Origin::CREF.clone(), restCref: crate::NFComponentRef::interned_EMPTY() }); }
+pub fn SUBST_CREF() -> metamodelica::Ref<ComponentRef::NFComponentRef> {
+    __SUBST_CREF_TLS.with(|__t| __t.clone())
+}
+
+pub(crate) fn makeBuiltinLookupTree(
+    mut name: &ArcStr,
+    mut components: &metamodelica::List<ArcStr>,
+    mut classes: &metamodelica::List<ArcStr>,
+) -> Result<()> {
+    let mut ltree: metamodelica::Ref<LookupTree::Tree> = LookupTree::new();
+    let mut i: i32;
+    i = 1;
+    for mut comp in &**components {
+        ltree = LookupTree::add(
+            ltree,
+            metamodelica::AsArg::as_arg(&comp),
+            &(metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: i })),
+            &*(std::sync::Arc::new(LookupTree::addConflictDefault)
+                as std::sync::Arc<dyn ::std::ops::Fn(_, _, _) -> Result<_> + 'static>),
+        )?;
+        i = i + 1;
+    }
+    for mut cls in &**classes {
+        ltree = LookupTree::add(
+            ltree,
+            metamodelica::AsArg::as_arg(&cls),
+            &(metamodelica::Ref::new(LookupTree::Entry::Entry::COMPONENT { index: i })),
+            &*(std::sync::Arc::new(LookupTree::addConflictDefault)
+                as std::sync::Arc<dyn ::std::ops::Fn(_, _, _) -> Result<_> + 'static>),
+        )?;
+        i = i + 1;
+    }
+    metamodelica::print({
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*literal!("Lookup tree for "));
+        __mm_s.push_str(&*name);
+        __mm_s.push_str(&*literal!(":\n"));
+        ArcStr::from(__mm_s)
+    });
+    metamodelica::print(anyString(ltree));
+    metamodelica::print(literal!("\n"));
+    Ok(())
+}

@@ -1,0 +1,188 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::NBModule as Module;
+use crate::NBPartition::Partition;
+use crate::NBStrongComponent as StrongComponent;
+use crate::NBackendDAE as BackendDAE;
+use openmodelica_backend_types::BackendDAE as OldBackendDAE;
+use openmodelica_util::Util;
+use openmodelica_util_datatypes_basic::Array;
+
+// Old Backend imports
+pub mod Stages {
+    use super::*;
+    #[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+    pub struct Stages {
+        pub dynamicEval: bool,
+        pub algebraicEval: bool,
+        pub zerocrossEval: bool,
+        pub discreteEval: bool,
+    }
+
+    impl metamodelica::gc::MMTrace for Stages {
+        fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+            metamodelica::gc::MMTrace::mm_accept(&self.dynamicEval, __mmv)?;
+            metamodelica::gc::MMTrace::mm_accept(&self.algebraicEval, __mmv)?;
+            metamodelica::gc::MMTrace::mm_accept(&self.zerocrossEval, __mmv)?;
+            metamodelica::gc::MMTrace::mm_accept(&self.discreteEval, __mmv)?;
+            Ok(())
+        }
+    }
+    impl Default for Stages {
+        fn default() -> Self {
+            Self {
+                dynamicEval: Default::default(),
+                algebraicEval: Default::default(),
+                zerocrossEval: Default::default(),
+                discreteEval: Default::default(),
+            }
+        }
+    }
+
+    pub type STAGES = Stages;
+
+    pub(crate) fn convert(mut stages: &metamodelica::Ref<Stages>) -> OldBackendDAE::EvaluationStages {
+        let mut oldEvalStages: OldBackendDAE::EvaluationStages;
+        oldEvalStages = OldBackendDAE::EvaluationStages {
+            dynamicEval: stages.dynamicEval.clone(),
+            algebraicEval: stages.algebraicEval.clone(),
+            zerocrossEval: stages.zerocrossEval.clone(),
+            discreteEval: stages.discreteEval.clone(),
+        };
+        oldEvalStages
+    }
+}
+
+pub(crate) static DEFAULT_STAGES: std::sync::LazyLock<metamodelica::Ref<Stages::Stages>> =
+    std::sync::LazyLock::new(|| {
+        metamodelica::Ref::new(Stages::Stages {
+            dynamicEval: true,
+            algebraicEval: true,
+            zerocrossEval: false,
+            discreteEval: true,
+        })
+    });
+
+pub(crate) fn removeDummies(
+    mut bdae: metamodelica::Ref<BackendDAE::NBackendDAE>,
+) -> Result<metamodelica::Ref<BackendDAE::NBackendDAE>> {
+    let mut bdae: metamodelica::Ref<BackendDAE::NBackendDAE> = bdae;
+    bdae = (match &*bdae {
+        BackendDAE::MAIN { ode: __bdae_ode, .. } => {
+            assign_variant_field!(bdae => BackendDAE::NBackendDAE::MAIN;
+                        ode = ({
+                let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
+                for mut p in (__bdae_ode.clone()).into_iter().cloned() {
+                    let __x = removeDummyComponents(p.clone())?;
+                    __acc = cons(__x, __acc);
+                }
+                __acc.reverse()
+            }),
+                        algebraic = ({
+                let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
+                for mut p in (var_field!((*bdae).algebraic, BackendDAE::NBackendDAE::MAIN).clone()).into_iter().cloned() {
+                    let __x = removeDummyComponents(p.clone())?;
+                    __acc = cons(__x, __acc);
+                }
+                __acc.reverse()
+            }),
+                        ode_event = ({
+                let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
+                for mut p in (var_field!((*bdae).ode_event, BackendDAE::NBackendDAE::MAIN).clone()).into_iter().cloned() {
+                    let __x = removeDummyComponents(p.clone())?;
+                    __acc = cons(__x, __acc);
+                }
+                __acc.reverse()
+            }),
+                        alg_event = ({
+                let mut __acc: metamodelica::List<metamodelica::Ref<Partition::Partition>> = metamodelica::nil();
+                for mut p in (var_field!((*bdae).alg_event, BackendDAE::NBackendDAE::MAIN).clone()).into_iter().cloned() {
+                    let __x = removeDummyComponents(p.clone())?;
+                    __acc = cons(__x, __acc);
+                }
+                __acc.reverse()
+            })
+                    );
+            bdae
+        }
+        _ => bdae,
+    });
+    Ok(bdae)
+}
+
+pub(crate) fn removeDummyComponents(
+    mut part: metamodelica::Ref<Partition::Partition>,
+) -> Result<metamodelica::Ref<Partition::Partition>> {
+    let mut part: metamodelica::Ref<Partition::Partition> = part;
+    assign_field!(
+        part.strongComponents = Util::applyOption(
+            part.strongComponents.clone(),
+            &({
+                let __pe_b1: Arc<dyn ::std::ops::Fn(_) -> Result<bool> + 'static> = (std::sync::Arc::new(
+                    move |__a0: metamodelica::Ref<StrongComponent::NBStrongComponent>| -> metamodelica::Result<_> {
+                        ::std::result::Result::Ok(StrongComponent::isDummy(&__a0))
+                    },
+                )
+                    as std::sync::Arc<
+                        dyn ::std::ops::Fn(metamodelica::Ref<StrongComponent::NBStrongComponent>) -> Result<bool>
+                            + 'static,
+                    >);
+                move |__pe_a0| Array::filter(__pe_a0, &*__pe_b1)
+            })
+        )?
+    );
+    Ok(part)
+}

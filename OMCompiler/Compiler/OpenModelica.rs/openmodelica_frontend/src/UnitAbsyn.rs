@@ -1,0 +1,484 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use openmodelica_frontend_dump::HashTable;
+use openmodelica_frontend_types::DAE;
+use openmodelica_util::MMath;
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum UnitCheckResult {
+    CONSISTENT,
+    INCONSISTENT { u1: SpecUnit, u2: SpecUnit },
+}
+impl metamodelica::gc::MMTrace for UnitCheckResult {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            UnitCheckResult::CONSISTENT => Ok(()),
+            UnitCheckResult::INCONSISTENT { u1, u2 } => {
+                metamodelica::gc::MMTrace::mm_accept(u1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(u2, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for UnitCheckResult {
+    fn default() -> Self {
+        Self::CONSISTENT
+    }
+}
+pub use self::UnitCheckResult::{CONSISTENT, INCONSISTENT};
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct SpecUnit {
+    /// A type parameter also has an exponent.
+    pub typeParameters: metamodelica::List<(MMath::Rational, TypeParameter)>,
+    /// first seven elements are the SI base units
+    pub units: metamodelica::List<MMath::Rational>,
+}
+
+impl metamodelica::gc::MMTrace for SpecUnit {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.typeParameters, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.units, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for SpecUnit {
+    fn default() -> Self {
+        Self {
+            typeParameters: Default::default(),
+            units: Default::default(),
+        }
+    }
+}
+
+pub type SPECUNIT = SpecUnit;
+
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct TypeParameter {
+    /// a type parameter name has the form identifier followed by a apostrophe, e.g. p'
+    pub name: ArcStr,
+    /// indx in Store
+    pub indx: i32,
+}
+
+impl metamodelica::gc::MMTrace for TypeParameter {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.name, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.indx, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for TypeParameter {
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            indx: Default::default(),
+        }
+    }
+}
+
+pub type TYPEPARAMETER = TypeParameter;
+
+/// A unit is either specified (including type parameters) or unspecified
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum Unit {
+    /// A specified unit
+    SPECIFIED { specified: SpecUnit },
+    /// Unpspecified unit means that the unit is unknown and should be inferred
+    UNSPECIFIED,
+}
+impl metamodelica::gc::MMTrace for Unit {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            Unit::SPECIFIED { specified } => {
+                metamodelica::gc::MMTrace::mm_accept(specified, __mmv)?;
+                Ok(())
+            }
+            Unit::UNSPECIFIED => Ok(()),
+        }
+    }
+}
+impl Default for Unit {
+    fn default() -> Self {
+        Self::UNSPECIFIED
+    }
+}
+pub use self::Unit::{SPECIFIED, UNSPECIFIED};
+
+/// A unit term is either
+/// - a binary operation, e.g. multiplication, addition, etc.
+/// - an equation (equality)
+/// - a location with unique id
+///
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub enum UnitTerm {
+    /// addition ut1+ut2
+    ADD {
+        /// left
+        ut1: metamodelica::Ref<UnitTerm>,
+        /// right
+        ut2: metamodelica::Ref<UnitTerm>,
+        /// for proper error reporting
+        origExp: metamodelica::Ref<DAE::Exp>,
+    },
+    /// subtraction ut1-ut2
+    SUB {
+        /// left
+        ut1: metamodelica::Ref<UnitTerm>,
+        /// right
+        ut2: metamodelica::Ref<UnitTerm>,
+        /// for proper error reporting
+        origExp: metamodelica::Ref<DAE::Exp>,
+    },
+    /// multiplication, ut1*ut2
+    MUL {
+        /// left
+        ut1: metamodelica::Ref<UnitTerm>,
+        /// right
+        ut2: metamodelica::Ref<UnitTerm>,
+        /// for proper error reporting
+        origExp: metamodelica::Ref<DAE::Exp>,
+    },
+    /// division nominator/denominator
+    DIV {
+        /// nominator
+        ut1: metamodelica::Ref<UnitTerm>,
+        /// denominator
+        ut2: metamodelica::Ref<UnitTerm>,
+        /// for proper error reporting
+        origExp: metamodelica::Ref<DAE::Exp>,
+    },
+    /// equation
+    EQN {
+        ut1: metamodelica::Ref<UnitTerm>,
+        ut2: metamodelica::Ref<UnitTerm>,
+        /// for proper error reporting
+        origExp: metamodelica::Ref<DAE::Exp>,
+    },
+    /// location
+    LOC {
+        /// location is an integer(index in vector)
+        loc: i32,
+        /// for proper error reporting
+        origExp: metamodelica::Ref<DAE::Exp>,
+    },
+    /// exponentiation
+    POW {
+        ut1: metamodelica::Ref<UnitTerm>,
+        /// ut^exponent
+        exponent: MMath::Rational,
+        /// for proper error reporting
+        origExp: metamodelica::Ref<DAE::Exp>,
+    },
+}
+impl metamodelica::gc::MMTrace for UnitTerm {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            UnitTerm::ADD { ut1, ut2, origExp } => {
+                metamodelica::gc::MMTrace::mm_accept(ut1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(ut2, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(origExp, __mmv)?;
+                Ok(())
+            }
+            UnitTerm::SUB { ut1, ut2, origExp } => {
+                metamodelica::gc::MMTrace::mm_accept(ut1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(ut2, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(origExp, __mmv)?;
+                Ok(())
+            }
+            UnitTerm::MUL { ut1, ut2, origExp } => {
+                metamodelica::gc::MMTrace::mm_accept(ut1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(ut2, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(origExp, __mmv)?;
+                Ok(())
+            }
+            UnitTerm::DIV { ut1, ut2, origExp } => {
+                metamodelica::gc::MMTrace::mm_accept(ut1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(ut2, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(origExp, __mmv)?;
+                Ok(())
+            }
+            UnitTerm::EQN { ut1, ut2, origExp } => {
+                metamodelica::gc::MMTrace::mm_accept(ut1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(ut2, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(origExp, __mmv)?;
+                Ok(())
+            }
+            UnitTerm::LOC { loc, origExp } => {
+                metamodelica::gc::MMTrace::mm_accept(loc, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(origExp, __mmv)?;
+                Ok(())
+            }
+            UnitTerm::POW { ut1, exponent, origExp } => {
+                metamodelica::gc::MMTrace::mm_accept(ut1, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(exponent, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(origExp, __mmv)?;
+                Ok(())
+            }
+        }
+    }
+}
+impl Default for UnitTerm {
+    fn default() -> Self {
+        Self::LOC {
+            loc: Default::default(),
+            origExp: Default::default(),
+        }
+    }
+}
+pub use self::UnitTerm::{ADD, DIV, EQN, LOC, MUL, POW, SUB};
+
+pub type UnitTerms = metamodelica::List<metamodelica::Ref<UnitTerm>>;
+
+#[derive(Clone, Debug, Eq, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct Store {
+    pub storeVector: metamodelica::Array<Option<Unit>>,
+    /// Number of elements stored in vector
+    pub numElts: i32,
+}
+
+impl metamodelica::gc::MMTrace for Store {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.storeVector, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.numElts, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for Store {
+    fn default() -> Self {
+        Self {
+            storeVector: Default::default(),
+            numElts: Default::default(),
+        }
+    }
+}
+
+pub type STORE = Store;
+
+/// A store used in Inst.mo
+/// requires a mapping from variable names to locations. Unit checking can be turned off using NOSTORE
+#[derive(Clone, metamodelica::MMCtor, metamodelica::ReferenceEq)]
+pub enum InstStore {
+    INSTSTORE {
+        store: Store,
+        ht: (
+            metamodelica::Array<metamodelica::List<(metamodelica::Ref<DAE::ComponentRef>, i32)>>,
+            (
+                i32,
+                i32,
+                metamodelica::Array<Option<(metamodelica::Ref<DAE::ComponentRef>, i32)>>,
+            ),
+            i32,
+            (
+                HashTable::FuncHashCref,
+                HashTable::FuncCrefEqual,
+                HashTable::FuncCrefStr,
+                HashTable::FuncExpStr,
+            ),
+        ),
+        /// when a check is done the result is stored here
+        checkResult: Option<UnitCheckResult>,
+    },
+    /// used to skip unit checking
+    NOSTORE,
+}
+impl metamodelica::gc::MMTrace for InstStore {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        match self {
+            InstStore::INSTSTORE { store, ht, checkResult } => {
+                metamodelica::gc::MMTrace::mm_accept(store, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(ht, __mmv)?;
+                metamodelica::gc::MMTrace::mm_accept(checkResult, __mmv)?;
+                Ok(())
+            }
+            InstStore::NOSTORE => Ok(()),
+        }
+    }
+}
+impl PartialEq for InstStore {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (
+                Self::INSTSTORE {
+                    store: __l_store,
+                    ht: __l_ht,
+                    checkResult: __l_checkResult,
+                },
+                Self::INSTSTORE {
+                    store: __r_store,
+                    ht: __r_ht,
+                    checkResult: __r_checkResult,
+                },
+            ) => {
+                __l_store == __r_store
+                    && (match (__l_ht, __r_ht) {
+                        ((__lt0, __lt1, __lt2, __lt3), (__rt0, __rt1, __rt2, __rt3)) => {
+                            (__lt0 == __rt0)
+                                && (__lt1 == __rt1)
+                                && (__lt2 == __rt2)
+                                && (match (__lt3, __rt3) {
+                                    ((__lt0, __lt1, __lt2, __lt3), (__rt0, __rt1, __rt2, __rt3)) => {
+                                        std::sync::Arc::ptr_eq(__lt0, __rt0)
+                                            && std::sync::Arc::ptr_eq(__lt1, __rt1)
+                                            && std::sync::Arc::ptr_eq(__lt2, __rt2)
+                                            && std::sync::Arc::ptr_eq(__lt3, __rt3)
+                                    }
+                                })
+                        }
+                    })
+                    && __l_checkResult == __r_checkResult
+            }
+            (Self::NOSTORE, Self::NOSTORE) => true,
+            _ => false,
+        }
+    }
+}
+impl Eq for InstStore {}
+impl PartialOrd for InstStore {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for InstStore {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        fn __variant_idx(__v: &InstStore) -> u32 {
+            match __v {
+                InstStore::INSTSTORE { .. } => 0,
+                InstStore::NOSTORE => 1,
+            }
+        }
+        match __variant_idx(self).cmp(&__variant_idx(other)) {
+            std::cmp::Ordering::Equal => {}
+            non_eq => return non_eq,
+        }
+        match (self, other) {
+            (
+                Self::INSTSTORE {
+                    store: __l_store,
+                    ht: __l_ht,
+                    checkResult: __l_checkResult,
+                },
+                Self::INSTSTORE {
+                    store: __r_store,
+                    ht: __r_ht,
+                    checkResult: __r_checkResult,
+                },
+            ) => __l_store
+                .cmp(__r_store)
+                .then_with(|| {
+                    (match (__l_ht, __r_ht) {
+                        ((__lt0, __lt1, __lt2, __lt3), (__rt0, __rt1, __rt2, __rt3)) => __lt0
+                            .cmp(__rt0)
+                            .then_with(|| __lt1.cmp(__rt1))
+                            .then_with(|| __lt2.cmp(__rt2))
+                            .then_with(|| {
+                                (match (__lt3, __rt3) {
+                                    ((__lt0, __lt1, __lt2, __lt3), (__rt0, __rt1, __rt2, __rt3)) => {
+                                        (std::sync::Arc::as_ptr(__lt0) as *const ())
+                                            .cmp(&(std::sync::Arc::as_ptr(__rt0) as *const ()))
+                                            .then_with(|| {
+                                                (std::sync::Arc::as_ptr(__lt1) as *const ())
+                                                    .cmp(&(std::sync::Arc::as_ptr(__rt1) as *const ()))
+                                            })
+                                            .then_with(|| {
+                                                (std::sync::Arc::as_ptr(__lt2) as *const ())
+                                                    .cmp(&(std::sync::Arc::as_ptr(__rt2) as *const ()))
+                                            })
+                                            .then_with(|| {
+                                                (std::sync::Arc::as_ptr(__lt3) as *const ())
+                                                    .cmp(&(std::sync::Arc::as_ptr(__rt3) as *const ()))
+                                            })
+                                    }
+                                })
+                            }),
+                    })
+                })
+                .then_with(|| __l_checkResult.cmp(__r_checkResult)),
+            (Self::NOSTORE, Self::NOSTORE) => std::cmp::Ordering::Equal,
+            _ => unreachable!("variant-index equality already implies same variant"),
+        }
+    }
+}
+impl std::fmt::Debug for InstStore {
+    fn fmt(&self, __f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::INSTSTORE {
+                store: __d_store,
+                ht: __d_ht,
+                checkResult: __d_checkResult,
+            } => {
+                let mut __ds = __f.debug_struct("INSTSTORE");
+                __ds.field("store", __d_store);
+                __ds.field("ht", &format_args!("<dyn-fn-container@{:p}>", __d_ht as *const _));
+                __ds.field("checkResult", __d_checkResult);
+                __ds.finish()
+            }
+            Self::NOSTORE => __f.debug_struct("NOSTORE").finish(),
+        }
+    }
+}
+
+impl Default for InstStore {
+    fn default() -> Self {
+        Self::NOSTORE
+    }
+}
+pub use self::InstStore::{INSTSTORE, NOSTORE};
+
+pub const fn noStore() -> InstStore {
+    crate::UnitAbsyn::InstStore::NOSTORE
+}

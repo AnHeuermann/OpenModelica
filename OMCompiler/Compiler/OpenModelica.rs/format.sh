@@ -9,12 +9,8 @@
 #   format.sh            # rewrite files in place
 #   format.sh --check    # exit 1 and print a diff if anything is unformatted
 #
-# Why not `cargo fmt`: it needs `cargo metadata`, and the compiler workspace
-# does not load on a clean checkout (the lib.rs files mmtorust generates are
-# missing, see README.md). rustfmt runs on the files directly instead, with
-# skip_children so `mod` declarations of generated modules are not followed.
-# Generated sources are not in git and are not touched here; mmtorust and susan
-# format them as they write them (mmtorust/src/rustfmt.rs).
+# rustfmt runs on the files directly rather than through `cargo fmt`, with
+# skip_children so `mod` declarations are not followed (each file is listed).
 #
 # Tools: rustfmt of the toolchain pinned in rust-toolchain.toml, and taplo
 # (`cargo install taplo-cli --locked`, or a release binary from

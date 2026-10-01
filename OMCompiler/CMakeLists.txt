@@ -69,11 +69,11 @@ omc_option(OM_OMC_ENABLE_COMPILER "Build the omc compiler itself, not just the s
 
 omc_option(OM_OMC_USE_LAPACK "Should we use lapack." ON)
 
-# Build the Rust (mmtorust) omc port instead of the bootstrapped C omc. When ON,
-# the compiler is produced by transpiling the MetaModelica sources to Rust and
-# `cargo build`ing them (see Compiler/.cmake/rust_omc.cmake); bomc/omc are never
-# compiled from C. The simulation/function runtime C libraries are still built.
-omc_option(OM_OMC_ENABLE_RUST "Build the Rust (mmtorust) omc port instead of the bootstrapped C omc." OFF)
+# Build the Rust omc instead of the bootstrapped C omc. When ON, the compiler is
+# the Rust source in Compiler/OpenModelica.rs, built with cargo (see
+# Compiler/.cmake/rust_omc.cmake); bomc/omc are never compiled from C. The
+# simulation/function runtime C libraries are still built.
+omc_option(OM_OMC_ENABLE_RUST "Build the Rust omc instead of the bootstrapped C omc." OFF)
 
 # A native omc (C or Rust) that runs Susan and translates the MetaModelica sources
 # in place of bomc, which a cross build of the C omc cannot run.

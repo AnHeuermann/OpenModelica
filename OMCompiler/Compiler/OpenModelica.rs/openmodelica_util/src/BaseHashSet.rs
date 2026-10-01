@@ -1,0 +1,527 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use openmodelica_util_datatypes_basic::Array;
+
+// Below is the instance specific code. For each hashset the user must define:
+// Key      - The key used to uniquely define elements in a hashset
+// hashFunc - A function that maps a key to a positive integer.
+// keyEqual - A comparison function between two keys, returns true if equal.
+// Generic hashset code below
+// adrpo: use a prime here (pick your poison):
+//        3   5   7  11  13  17  19  23  29  31  37  41  43  47  53  59  61  67
+//       71  73  79  83  89  97 101 103 107 109 113 127 131 137 139 149 151 157
+//      163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 257
+//      263 269 271 277 281 283 293 307 311 313 317 331 337 347 349 353 359 367
+//      373 379 383 389 397 401 409 419 421 431 433 439 443 449 457 461 463 467
+//      479 487 491 499 503 509 521 523 541 547 557 563 569 571 577 587 593 599
+//      601 607 613 617 619 631 641 643 647 653 659 661 673 677 683 691 701 709
+//      719 727 733 739 743 751 757 761 769 773 787 797 809 811 821 823 827 829
+//      839 853 857 859 863 877 881 883 887 907 911 919 929 937 941 947 953 967
+//      971 977 983 991 997 1013 2053 3023 4013 4999 5051 5087 24971
+//
+// You can also use Util.nextPrime if you know exactly how large the hash set
+// should be.
+pub(crate) const lowBucketSize: i32 = 257;
+
+pub(crate) const avgBucketSize: i32 = 2053;
+
+pub(crate) const bigBucketSize: i32 = 4013;
+
+pub(crate) const biggerBucketSize: i32 = 25343;
+
+pub(crate) const hugeBucketSize: i32 = 536870879;
+
+pub const defaultBucketSize: i32 = avgBucketSize;
+
+pub type HashSet<Key> = (
+    metamodelica::Array<metamodelica::List<(Key, i32)>>,
+    (i32, i32, metamodelica::Array<Option<Key>>),
+    i32,
+    i32,
+    (FuncHash<Key>, FuncEq<Key>, FuncKeyString<Key>),
+);
+
+pub type HashVector<Key> = metamodelica::Array<metamodelica::List<(Key, i32)>>;
+
+pub type ValueArray<Key> = (i32, i32, metamodelica::Array<Option<Key>>);
+
+pub type FuncsTuple<Key> = (FuncHash<Key>, FuncEq<Key>, FuncKeyString<Key>);
+
+pub type FuncHash<Key: Clone + 'static> = std::sync::Arc<dyn ::std::ops::Fn(Key) -> Result<i32> + 'static>;
+
+pub type FuncEq<Key: Clone + 'static> = std::sync::Arc<dyn ::std::ops::Fn(Key, Key) -> Result<bool> + 'static>;
+
+pub type FuncKeyString<Key: Clone + 'static> = std::sync::Arc<dyn ::std::ops::Fn(Key) -> Result<ArcStr> + 'static>;
+
+pub(crate) fn bucketToValuesSize(mut szBucket: i32) -> i32 {
+    let mut szArr: i32;
+    szArr = (((intReal(szBucket)) * (metamodelica::OrderedFloat(0.6_f64))).0.floor() as i32);
+    szArr
+}
+
+pub fn emptyHashSetWork<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut szBucket: i32,
+    mut fntpl: FuncsTuple<Key>,
+) -> HashSet<Key> {
+    let mut hashSet: HashSet<Key>;
+    let mut arr: metamodelica::Array<metamodelica::List<(Key, i32)>>;
+    let mut emptyarr: metamodelica::Array<Option<Key>>;
+    let mut szArr: i32;
+    arr = arrayCreate(szBucket, metamodelica::nil());
+    szArr = bucketToValuesSize(szBucket);
+    emptyarr = arrayCreate(szArr, None);
+    hashSet = (arr.clone(), (0, szArr, emptyarr.clone()), szBucket, 0, fntpl);
+    hashSet
+}
+
+pub fn add<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut entry: Key,
+    mut hashSet: &HashSet<Key>,
+) -> Result<HashSet<Key>> {
+    let mut outHashSet: HashSet<Key>;
+    outHashSet = (match (entry, hashSet.clone()) {
+        (mut key, (mut hashvec, mut varr, mut bsize, mut n, ref fntpl @ (ref hashFunc, _, _))) => {
+            let mut indx: i32;
+            let mut newpos: i32;
+            let mut indexes: metamodelica::List<(Key, i32)>;
+            let mut fkey: Option<Key>;
+            (fkey, indx) = get1(key.clone(), hashSet)?;
+            if (fkey).is_some() {
+                varr = valueArraySetnth(varr.clone(), indx, key.clone())?;
+            } else {
+                indx = intMod(hashFunc(key.clone())?, bsize.clone());
+                newpos = valueArrayLength(varr.clone());
+                varr = valueArrayAdd(varr.clone(), key.clone())?;
+                indexes = ({
+                    let __elt = (*metamodelica::index_checked(&hashvec.borrow(), indx + 1)?).clone();
+                    __elt
+                });
+                hashvec = metamodelica::arrayUpdate(
+                    hashvec.clone(),
+                    indx + 1,
+                    metamodelica::cons((key.clone(), newpos), indexes),
+                )?;
+                n = valueArrayLength(varr.clone());
+            }
+            (hashvec.clone(), varr.clone(), bsize.clone(), n.clone(), fntpl.clone())
+        }
+        (mut key, (_, _, mut bsize, _, (mut hashFunc, _, mut keystrFunc))) => {
+            let mut hval: i32;
+            let mut s: ArcStr;
+            metamodelica::print(literal!("- BaseHashSet.add failed: "));
+            metamodelica::print(literal!("bsize: "));
+            metamodelica::print(intString(bsize.clone()));
+            metamodelica::print(literal!(" key: "));
+            s = keystrFunc(key.clone())?;
+            metamodelica::print({
+                let mut __mm_s = String::new();
+                __mm_s.push_str(&*s);
+                __mm_s.push_str(&*literal!(" Hash: "));
+                ArcStr::from(__mm_s)
+            });
+            hval = intMod(hashFunc(key)?, bsize.clone());
+            metamodelica::print(intString(hval));
+            metamodelica::print(literal!("\n"));
+            return Err("fail");
+        }
+    });
+    Ok(outHashSet)
+}
+
+pub(crate) fn addNoUpdCheck<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut entry: Key,
+    mut hashSet: &HashSet<Key>,
+) -> Result<HashSet<Key>> {
+    let mut outHashSet: HashSet<Key>;
+    outHashSet = (match (entry, hashSet.clone()) {
+        (mut key, (mut hashvec, mut varr, mut bsize, _, ref fntpl @ (ref hashFunc, _, _))) => {
+            let mut indx: i32;
+            let mut newpos: i32;
+            let mut n_1: i32;
+            let mut varr_1: (i32, i32, metamodelica::Array<Option<Key>>);
+            let mut indexes: metamodelica::List<(Key, i32)>;
+            let mut hashvec_1: metamodelica::Array<metamodelica::List<(Key, i32)>>;
+            indx = intMod(hashFunc(key.clone())?, bsize.clone());
+            newpos = valueArrayLength(varr.clone());
+            varr_1 = valueArrayAdd(varr.clone(), key.clone())?;
+            indexes = ({
+                let __elt = (*metamodelica::index_checked(&hashvec.borrow(), indx + 1)?).clone();
+                __elt
+            });
+            hashvec_1 = metamodelica::arrayUpdate(
+                hashvec.clone(),
+                indx + 1,
+                metamodelica::cons((key.clone(), newpos), indexes),
+            )?;
+            n_1 = valueArrayLength(varr_1.clone());
+            (hashvec_1.clone(), varr_1, bsize.clone(), n_1, fntpl.clone())
+        }
+    });
+    Ok(outHashSet)
+}
+
+pub fn addUnique<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut key: Key,
+    mut hashSet: &HashSet<Key>,
+) -> Result<HashSet<Key>> {
+    let mut outHashSet: HashSet<Key>;
+    outHashSet = (match hashSet.clone() {
+        (mut hashvec, mut varr, mut bsize, _, ref fntpl @ (ref hashFunc, _, _)) if (!(has(key.clone(), hashSet)?)) => {
+            let mut indx: i32;
+            let mut newpos: i32;
+            let mut n_1: i32;
+            let mut varr_1: (i32, i32, metamodelica::Array<Option<Key>>);
+            let mut indexes: metamodelica::List<(Key, i32)>;
+            let mut hashvec_1: metamodelica::Array<metamodelica::List<(Key, i32)>>;
+            indx = intMod(hashFunc(key.clone())?, bsize.clone());
+            newpos = valueArrayLength(varr.clone());
+            varr_1 = valueArrayAdd(varr.clone(), key.clone())?;
+            indexes = ({
+                let __elt = (*metamodelica::index_checked(&hashvec.borrow(), indx + 1)?).clone();
+                __elt
+            });
+            hashvec_1 = metamodelica::arrayUpdate(
+                hashvec.clone(),
+                indx + 1,
+                metamodelica::cons((key.clone(), newpos), indexes),
+            )?;
+            n_1 = valueArrayLength(varr_1.clone());
+            (hashvec_1.clone(), varr_1, bsize.clone(), n_1, fntpl.clone())
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(outHashSet)
+}
+
+pub fn delete<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut key: Key,
+    mut hashSet: &HashSet<Key>,
+) -> Result<HashSet<Key>> {
+    let mut outHashSet: HashSet<Key>;
+    let mut indx: i32;
+    let mut n: i32;
+    let mut bsize: i32;
+    let mut varr_1: (i32, i32, metamodelica::Array<Option<Key>>);
+    let mut varr: (i32, i32, metamodelica::Array<Option<Key>>);
+    let mut hashvec: metamodelica::Array<metamodelica::List<(Key, i32)>>;
+    let mut fntpl: FuncsTuple<Key>;
+    (hashvec, varr, bsize, n, fntpl) = hashSet.clone();
+    let __pa0 = ::match_deref::match_deref! { match &(get1(key, hashSet)?) {
+        (Some(_), __pa0) => __pa0.clone(),
+        _ => return Err("pattern mismatch"),
+    } };
+    indx = metamodelica::Own::own(__pa0);
+    varr_1 = valueArrayClearnth(varr, indx)?;
+    outHashSet = (hashvec.clone(), varr_1, bsize, n, fntpl);
+    Ok(outHashSet)
+}
+
+pub fn has<Key: Clone + 'static + metamodelica::gc::MMTrace>(mut key: Key, mut hashSet: &HashSet<Key>) -> Result<bool> {
+    let mut b: bool;
+    b = (match hashSet.clone() {
+        (_, (0, _, _), _, _, _) => false,
+        _ => {
+            let mut oKey: Option<Key>;
+            (oKey, _) = get1(key, hashSet)?;
+            (oKey).is_some()
+        }
+    });
+    Ok(b)
+}
+
+pub(crate) fn hasAll<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut keys: &metamodelica::List<Key>,
+    mut hashSet: &HashSet<Key>,
+) -> Result<bool> {
+    let mut b: bool = true;
+    for mut key in &**keys {
+        b = has(key.clone(), hashSet)?;
+        if !(b) {
+            return Ok(b);
+        }
+    }
+    Ok(b)
+}
+
+pub(crate) fn get<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut key: Key,
+    mut hashSet: &HashSet<Key>,
+) -> Result<Option<Key>> {
+    let mut okey: Option<Key>;
+    (okey, _) = get1(key, hashSet)?;
+    Ok(okey)
+}
+
+fn get1<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut key: Key,
+    mut hashSet: &HashSet<Key>,
+) -> Result<(Option<Key>, i32)> {
+    let mut okey: Option<Key>;
+    let mut indx: i32;
+    (okey, indx) = (match hashSet.clone() {
+        (mut hashvec, mut varr, mut bsize, _, (mut hashFunc, mut keyEqual, _)) => {
+            let mut hashindx: i32;
+            let mut indexes: metamodelica::List<(Key, i32)>;
+            let mut k: Option<Key>;
+            let mut b: bool;
+            hashindx = intMod(hashFunc(key.clone())?, bsize);
+            indexes = ({
+                let __elt = (*metamodelica::index_checked(&hashvec.borrow(), hashindx + 1)?).clone();
+                __elt
+            });
+            (indx, b) = get2(key, &indexes, &*(keyEqual.clone()))?;
+            k = if (b) { valueArrayNthT(varr, indx)? } else { None };
+            (k, indx)
+        }
+    });
+    Ok((okey, indx))
+}
+
+fn get2<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut key: Key,
+    mut keyIndices: &metamodelica::List<(Key, i32)>,
+    mut keyEqual: &dyn ::std::ops::Fn(Key, Key) -> Result<bool>,
+) -> Result<(i32, bool)> {
+    let mut index: i32 = -1;
+    let mut found: bool = true;
+    let mut key2: Key;
+    for mut t in &**keyIndices {
+        (key2, index) = t.clone();
+        if keyEqual(key.clone(), key2)? {
+            return Ok((index, found));
+        }
+    }
+    found = false;
+    Ok((index, found))
+}
+
+pub fn printHashSet<Key: Clone + 'static + metamodelica::gc::MMTrace>(mut hashSet: &HashSet<Key>) -> Result<()> {
+    let mut printKey: FuncKeyString<Key>;
+    let (_, _, _, _, (_, _, __pa0)) = hashSet;
+    printKey = metamodelica::Own::own(__pa0);
+    metamodelica::print(stringDelimitList(
+        ({
+            let mut __acc: metamodelica::List<ArcStr> = metamodelica::nil();
+            for mut e in (hashSetList(hashSet)?).into_iter().cloned() {
+                let __x = printKey(e.clone())?;
+                __acc = cons(__x, __acc);
+            }
+            __acc.reverse()
+        }),
+        literal!("\n"),
+    ));
+    Ok(())
+}
+
+pub fn dumpHashSet<Key: Clone + 'static + metamodelica::gc::MMTrace>(mut hashSet: &HashSet<Key>) -> Result<()> {
+    metamodelica::print(literal!("HashSet:\n"));
+    printHashSet(hashSet)?;
+    metamodelica::print(literal!("\n"));
+    Ok(())
+}
+
+pub fn hashSetList<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut hashSet: &HashSet<Key>,
+) -> Result<metamodelica::List<Key>> {
+    let mut lst: metamodelica::List<Key>;
+    lst = (match hashSet.clone() {
+        (_, mut varr, _, _, _) => valueArrayList(varr)?,
+    });
+    Ok(lst)
+}
+
+pub(crate) fn valueArrayList<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut inValueArray: ValueArray<Key>,
+) -> Result<metamodelica::List<Key>> {
+    let mut outList: metamodelica::List<Key> = metamodelica::nil();
+    let mut arr: metamodelica::Array<Option<Key>>;
+    let mut size: i32;
+    let mut e: Key;
+    (size, _, arr) = inValueArray;
+    for mut i in 1..=size {
+        if ({
+            let __elt = (*metamodelica::index_checked(&arr.borrow(), i)?).clone();
+            __elt
+        })
+        .is_some()
+        {
+            let __pa0 = ::match_deref::match_deref! { match &(({let __elt = (*metamodelica::index_checked(&arr.borrow(), i)?).clone(); __elt})) {
+                Some(__pa0) => __pa0.clone(),
+                _ => return Err("pattern mismatch"),
+            } };
+            e = metamodelica::Own::own(__pa0);
+            outList = metamodelica::cons(e, outList);
+        }
+    }
+    outList = outList.reverse();
+    Ok(outList)
+}
+
+pub fn currentSize<Key: Clone + 'static + metamodelica::gc::MMTrace>(mut hashSet: &HashSet<Key>) -> i32 {
+    let mut sz: i32;
+    let mut va: ValueArray<Key>;
+    (_, va, _, _, _) = hashSet.clone();
+    sz = valueArrayLength(va);
+    sz
+}
+
+pub(crate) fn valueArrayLength<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut valueArray: ValueArray<Key>,
+) -> i32 {
+    let mut sz: i32;
+    (sz, _, _) = valueArray;
+    sz
+}
+
+pub(crate) fn valueArrayAdd<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut valueArray: ValueArray<Key>,
+    mut entry: Key,
+) -> Result<ValueArray<Key>> {
+    let mut outValueArray: ValueArray<Key>;
+    let mut n: i32;
+    let mut size: i32;
+    let mut expandsize: i32;
+    let mut expandsize_1: i32;
+    let mut arr: metamodelica::Array<Option<Key>>;
+    let mut rsize: metamodelica::Real;
+    let mut rexpandsize: metamodelica::Real;
+    (n, size, arr) = valueArray;
+    if n >= size {
+        rsize = intReal(size);
+        rexpandsize = rsize * metamodelica::OrderedFloat(0.4_f64);
+        expandsize = ((rexpandsize).0.floor() as i32);
+        expandsize_1 = intMax(expandsize, 1);
+        size = expandsize_1 + size;
+        arr = Array::expand(expandsize_1, arr.clone(), None)?;
+    }
+    arr = metamodelica::arrayUpdate(arr.clone(), n + 1, Some(entry))?;
+    outValueArray = (n + 1, size, arr.clone());
+    Ok(outValueArray)
+}
+
+pub(crate) fn valueArraySetnth<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut valueArray: ValueArray<Key>,
+    mut pos: i32,
+    mut entry: Key,
+) -> Result<ValueArray<Key>> {
+    let mut outValueArray: ValueArray<Key>;
+    let mut arr_1: metamodelica::Array<Option<Key>>;
+    let mut arr: metamodelica::Array<Option<Key>>;
+    let mut n: i32;
+    let mut size: i32;
+    (n, size, arr) = valueArray;
+    let true = (pos < size) else {
+        return Err("pattern mismatch");
+    };
+    arr_1 = metamodelica::arrayUpdate(arr.clone(), pos + 1, Some(entry))?;
+    outValueArray = (n, size, arr_1.clone());
+    Ok(outValueArray)
+}
+
+pub(crate) fn valueArrayClearnth<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut valueArray: ValueArray<Key>,
+    mut pos: i32,
+) -> Result<ValueArray<Key>> {
+    let mut outValueArray: ValueArray<Key>;
+    let mut arr_1: metamodelica::Array<Option<Key>>;
+    let mut arr: metamodelica::Array<Option<Key>>;
+    let mut n: i32;
+    let mut size: i32;
+    (n, size, arr) = valueArray;
+    let true = (pos < size) else {
+        return Err("pattern mismatch");
+    };
+    arr_1 = metamodelica::arrayUpdate(arr.clone(), pos + 1, None)?;
+    outValueArray = (n, size, arr_1.clone());
+    Ok(outValueArray)
+}
+
+pub(crate) fn valueArrayNth<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut valueArray: ValueArray<Key>,
+    mut pos: i32,
+) -> Result<Key> {
+    let mut key: Key;
+    key = (match valueArray {
+        (mut n, _, mut arr) if (pos <= n) => {
+            let mut k: Key;
+            let __pa0 = ::match_deref::match_deref! { match &(({let __elt = (*metamodelica::index_checked(&arr.borrow(), pos + 1)?).clone(); __elt})) {
+                Some(__pa0) => __pa0.clone(),
+                _ => return Err("pattern mismatch"),
+            } };
+            k = metamodelica::Own::own(__pa0);
+            k
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(key)
+}
+
+fn valueArrayNthT<Key: Clone + 'static + metamodelica::gc::MMTrace>(
+    mut valueArray: ValueArray<Key>,
+    mut pos: i32,
+) -> Result<Option<Key>> {
+    let mut key: Option<Key>;
+    key = (match valueArray {
+        (mut n, _, mut arr) if (pos <= n) => {
+            ({
+                let __elt = (*metamodelica::index_checked(&arr.borrow(), pos + 1)?).clone();
+                __elt
+            })
+        }
+        _ => return Err("match: no arm matched"),
+    });
+    Ok(key)
+}

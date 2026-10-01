@@ -1,0 +1,200 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::ClockIndexes;
+use crate::Error;
+use crate::Flags;
+use crate::Global;
+use crate::StringUtil;
+use crate::System;
+use openmodelica_util_datatypes_basic::GCExt;
+
+pub(crate) const timeFormat: &'static str = "%.4g";
+
+// Why not "%.9f"?
+pub(crate) const timeMaxLength: i32 = 20;
+
+// Why not 21?
+pub(crate) const memoryMaxSizeInUnit: i32 = 500;
+
+// Why not 512?
+pub(crate) const memorySignificantDigits: i32 = 4;
+
+// Why not 3?
+pub fn execStatReset() -> Result<()> {
+    {
+        let __v = GCExt::getProfStats();
+        crate::Globals::gcProfilingIndex.with(|__root| *__root.borrow_mut() = __v)
+    };
+    System::realtimeClear(ClockIndexes::RT_CLOCK_EXECSTAT.clone())?;
+    System::realtimeTick(ClockIndexes::RT_CLOCK_EXECSTAT.clone())?;
+    Ok(())
+}
+
+pub fn execStat(mut name: &ArcStr) -> Result<()> {
+    fn snprintff(mut val: metamodelica::Real) -> Result<ArcStr> {
+        let mut r#str: ArcStr = System::snprintff(arcstr::literal!(timeFormat), timeMaxLength.clone(), val)?;
+        Ok(r#str)
+    }
+
+    fn bytesToReadableUnit(mut bytes: metamodelica::Real) -> Result<ArcStr> {
+        let mut r#str: ArcStr = StringUtil::bytesToReadableUnit(
+            bytes,
+            memorySignificantDigits.clone(),
+            metamodelica::OrderedFloat((memoryMaxSizeInUnit.clone()) as f64),
+        )?;
+        Ok(r#str)
+    }
+
+    let mut t: metamodelica::Real;
+    let mut total: metamodelica::Real;
+    let mut timeStr: ArcStr;
+    let mut totalTimeStr: ArcStr;
+    let mut gcStr: ArcStr;
+    let mut memory: i32;
+    let mut oldMemory: i32;
+    let mut heapsize_full: i32;
+    let mut free_bytes_full: i32;
+    let mut since: i32;
+    let mut before: i32;
+    let mut stats: GCExt::ProfStats;
+    let mut oldStats: GCExt::ProfStats;
+    if Flags::isSet(Flags::EXEC_STAT.clone())? {
+        for mut i in &*if (Flags::isSet(Flags::EXEC_STAT_EXTRA_GC.clone())?) {
+            list![1, 2]
+        } else {
+            list![1]
+        } {
+            if i.clone() == 2 {
+                GCExt::gcollect();
+            }
+            t = System::realtimeAccumulate(ClockIndexes::RT_CLOCK_EXECSTAT.clone())?;
+            total = System::realtimeAccumulated(ClockIndexes::RT_CLOCK_EXECSTAT.clone())?;
+            let ref __pa4 @ GCExt::PROFSTATS {
+                bytes_allocd_since_gc: ref __pa0,
+                allocd_bytes_before_gc: ref __pa1,
+                heapsize_full: ref __pa2,
+                free_bytes_full: ref __pa3,
+                ..
+            } = GCExt::getProfStats();
+            since = metamodelica::Own::own(__pa0);
+            before = metamodelica::Own::own(__pa1);
+            heapsize_full = metamodelica::Own::own(__pa2);
+            free_bytes_full = metamodelica::Own::own(__pa3);
+            stats = metamodelica::Own::own(__pa4);
+            memory = since + before;
+            oldStats = crate::Globals::gcProfilingIndex.with(|__root| __root.borrow().clone());
+            let GCExt::PROFSTATS {
+                bytes_allocd_since_gc: __pa5,
+                allocd_bytes_before_gc: __pa6,
+                ..
+            } = oldStats;
+            since = metamodelica::Own::own(__pa5);
+            before = metamodelica::Own::own(__pa6);
+            oldMemory = since + before;
+            timeStr = snprintff(t)?;
+            totalTimeStr = snprintff(total)?;
+            if Flags::isSet(Flags::GC_PROF.clone())? {
+                gcStr = GCExt::profStatsStr(stats.clone(), literal!(""), literal!(" / "));
+                Error::addMessage(
+                    Error::EXEC_STAT_GC.clone(),
+                    list![
+                        {
+                            let mut __mm_s = String::new();
+                            __mm_s.push_str(&*name);
+                            __mm_s.push_str(&*if (i.clone() == 2) {
+                                literal!(" GC")
+                            } else {
+                                literal!("")
+                            });
+                            ArcStr::from(__mm_s)
+                        },
+                        timeStr,
+                        totalTimeStr,
+                        gcStr
+                    ],
+                )?;
+            } else {
+                Error::addMessage(
+                    Error::EXEC_STAT.clone(),
+                    list![
+                        {
+                            let mut __mm_s = String::new();
+                            __mm_s.push_str(&*name);
+                            __mm_s.push_str(&*if (i.clone() == 2) {
+                                literal!(" GC")
+                            } else {
+                                literal!("")
+                            });
+                            ArcStr::from(__mm_s)
+                        },
+                        timeStr,
+                        totalTimeStr,
+                        bytesToReadableUnit(metamodelica::OrderedFloat((memory - oldMemory) as f64))?,
+                        bytesToReadableUnit(metamodelica::OrderedFloat((memory) as f64))?,
+                        bytesToReadableUnit(metamodelica::OrderedFloat((free_bytes_full) as f64))?,
+                        bytesToReadableUnit(metamodelica::OrderedFloat((heapsize_full) as f64))?
+                    ],
+                )?;
+            }
+            {
+                let __v = stats;
+                crate::Globals::gcProfilingIndex.with(|__root| *__root.borrow_mut() = __v)
+            };
+            System::realtimeTick(ClockIndexes::RT_CLOCK_EXECSTAT.clone())?;
+        }
+    }
+    Ok(())
+}

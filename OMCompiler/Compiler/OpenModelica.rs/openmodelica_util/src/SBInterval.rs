@@ -1,0 +1,441 @@
+// Auto-generated from MetaModelica source
+/*
+ * This file is part of OpenModelica.
+ *
+ * Copyright (c) 1998-2026, Open Source Modelica Consortium (OSMC),
+ * c/o Linköpings universitet, Department of Computer and Information Science,
+ * SE-58183 Linköping, Sweden.
+ *
+ * All rights reserved.
+ *
+ * THIS PROGRAM IS PROVIDED UNDER THE TERMS OF AGPL VERSION 3 LICENSE OR
+ * THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.8.
+ * ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+ * RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GNU AGPL
+ * VERSION 3, ACCORDING TO RECIPIENTS CHOICE.
+ *
+ * The OpenModelica software and the OSMC (Open Source Modelica Consortium)
+ * Public License (OSMC-PL) are obtained from OSMC, either from the above
+ * address, from the URLs:
+ * http://www.openmodelica.org or
+ * https://github.com/OpenModelica/ or
+ * http://www.ida.liu.se/projects/OpenModelica,
+ * and in the OpenModelica distribution.
+ *
+ * GNU AGPL version 3 is obtained from:
+ * https://www.gnu.org/licenses/licenses.html#GPL
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+ * IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+ *
+ * See the full OSMC Public License conditions for more details.
+ *
+ */
+#![allow(warnings)]
+#![allow(
+    unreachable_patterns,
+    unreachable_code,
+    non_camel_case_types,
+    non_snake_case,
+    dead_code,
+    unused_imports,
+    unused_variables,
+    non_upper_case_globals,
+    unused_mut
+)]
+
+use arcstr::{ArcStr, format, literal};
+use const_str;
+use loop_unwrap::unwrap_break_err;
+use metamodelica::Result;
+use metamodelica::*; // Built-in types and functions
+use std::sync::Arc;
+
+use crate::System;
+use crate::UnorderedSet;
+
+/// Interval type for set based graphs.
+#[derive(Clone, Debug, Eq, Hash, metamodelica::MMCtor, metamodelica::MetaCmp, metamodelica::ReferenceEq)]
+pub struct SBInterval {
+    pub lo: i32,
+    pub step: i32,
+    pub hi: i32,
+}
+
+impl metamodelica::gc::MMTrace for SBInterval {
+    fn mm_accept(&self, __mmv: &mut dyn metamodelica::gc::MMVisitor) -> Result<(), ()> {
+        metamodelica::gc::MMTrace::mm_accept(&self.lo, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.step, __mmv)?;
+        metamodelica::gc::MMTrace::mm_accept(&self.hi, __mmv)?;
+        Ok(())
+    }
+}
+impl Default for SBInterval {
+    fn default() -> Self {
+        Self {
+            lo: Default::default(),
+            step: Default::default(),
+            hi: Default::default(),
+        }
+    }
+}
+
+pub type INTERVAL = SBInterval;
+
+fn euclid(mut a: i32, mut b: i32) -> (i32, i32, i32, i32) {
+    let mut d: i32;
+    let mut m: i32;
+    let mut ua: i32;
+    let mut vb: i32;
+    let mut q: i32;
+    let mut r1: i32 = a;
+    let mut r2: i32 = b;
+    let mut s1: i32 = a;
+    let mut s2: i32 = 0;
+    let mut tmp: i32;
+    while r2 != 0 {
+        q = intDiv(r1, r2);
+        tmp = r2;
+        r2 = r1 - q * r2;
+        r1 = tmp;
+        tmp = s2;
+        s2 = s1 - q * s2;
+        s1 = tmp;
+    }
+    d = r1;
+    m = (s2).abs();
+    ua = s1;
+    vb = r1 - s1;
+    (d, m, ua, vb)
+}
+
+pub fn new(mut lo: i32, mut step: i32, mut hi: i32) -> metamodelica::Ref<SBInterval> {
+    let mut int: metamodelica::Ref<SBInterval>;
+    if lo >= 0 && step > 0 && hi >= 0 {
+        if lo <= hi && hi < System::intMaxLit() {
+            int = metamodelica::Ref::new(SBInterval {
+                lo: lo,
+                step: step,
+                hi: hi - intMod(hi - lo, step),
+            });
+        } else if lo <= hi && hi == System::intMaxLit() {
+            int = metamodelica::Ref::new(SBInterval {
+                lo: lo,
+                step: step,
+                hi: System::intMaxLit(),
+            });
+        } else {
+            int = metamodelica::Ref::new(SBInterval {
+                lo: lo,
+                step: 0,
+                hi: hi,
+            });
+        }
+    } else if lo >= 0 && step == 0 && hi == lo {
+        int = metamodelica::Ref::new(SBInterval {
+            lo: lo,
+            step: 1,
+            hi: hi,
+        });
+    } else {
+        int = newEmpty();
+    }
+    int
+}
+
+pub fn newEmpty() -> metamodelica::Ref<SBInterval> {
+    let mut int: metamodelica::Ref<SBInterval> = metamodelica::Ref::new(SBInterval {
+        lo: -1,
+        step: 0,
+        hi: -1,
+    });
+    int
+}
+
+pub(crate) fn newUnit() -> metamodelica::Ref<SBInterval> {
+    let mut int: metamodelica::Ref<SBInterval> = metamodelica::Ref::new(SBInterval { lo: 1, step: 1, hi: 1 });
+    int
+}
+
+pub(crate) fn newFull() -> metamodelica::Ref<SBInterval> {
+    let mut int: metamodelica::Ref<SBInterval> = metamodelica::Ref::new(SBInterval {
+        lo: 1,
+        step: 1,
+        hi: System::intMaxLit(),
+    });
+    int
+}
+
+pub fn lowerBound(mut int: &metamodelica::Ref<SBInterval>) -> i32 {
+    let mut lo: i32 = int.lo.clone();
+    lo
+}
+
+pub fn stepValue(mut int: &metamodelica::Ref<SBInterval>) -> i32 {
+    let mut step: i32 = int.step.clone();
+    step
+}
+
+pub fn upperBound(mut int: &metamodelica::Ref<SBInterval>) -> i32 {
+    let mut hi: i32 = int.hi.clone();
+    hi
+}
+
+pub(crate) fn crop(mut int: metamodelica::Ref<SBInterval>) -> metamodelica::Ref<SBInterval> {
+    let mut int: metamodelica::Ref<SBInterval> = int;
+    if int.hi.clone() < System::intMaxLit() {
+        assign_field!(int.hi = int.hi.clone() - intMod(int.hi.clone() - int.lo.clone(), int.step.clone()));
+    }
+    int
+}
+
+pub(crate) fn intersection(
+    mut int1: &metamodelica::Ref<SBInterval>,
+    mut int2: &metamodelica::Ref<SBInterval>,
+) -> metamodelica::Ref<SBInterval> {
+    let mut int: metamodelica::Ref<SBInterval>;
+    let mut new_lo: i32;
+    let mut new_step: i32;
+    let mut new_hi: i32;
+    let mut gcd_: i32;
+    let mut ua: i32;
+    let mut vb: i32;
+    let mut x: i32;
+    if int1.hi.clone() < int2.lo.clone() || int2.hi.clone() < int1.lo.clone() {
+        int = newEmpty();
+    } else {
+        (gcd_, new_step, ua, vb) = euclid(int1.step.clone(), int2.step.clone());
+        if 0 != intMod(int1.lo.clone() - int2.lo.clone(), gcd_) {
+            int = newEmpty();
+        } else {
+            x = intDiv(int1.lo.clone(), gcd_) * vb + intDiv(int2.lo.clone(), gcd_) * ua + intMod(int1.lo.clone(), gcd_);
+            new_lo = intMax(int1.lo.clone(), int2.lo.clone());
+            new_hi = intMin(int1.hi.clone(), int2.hi.clone());
+            new_lo = new_lo + intMod(x - new_lo, new_step);
+            if new_hi < System::intMaxLit() {
+                new_hi = new_hi - intMod(new_hi - x, new_step);
+            }
+            if new_hi < new_lo {
+                int = newEmpty();
+            } else {
+                int = new(new_lo, new_step, new_hi);
+            }
+        }
+    }
+    int
+}
+
+pub(crate) fn complement(
+    mut int1: metamodelica::Ref<SBInterval>,
+    mut int2: &metamodelica::Ref<SBInterval>,
+) -> Result<metamodelica::Ref<UnorderedSet::UnorderedSet<metamodelica::Ref<SBInterval>>>> {
+    let mut ints: metamodelica::Ref<UnorderedSet::UnorderedSet<metamodelica::Ref<SBInterval>>>;
+    let mut i2: metamodelica::Ref<SBInterval>;
+    let mut count_r: i32;
+    let mut count_s: i32;
+    ints = UnorderedSet::new(
+        (std::sync::Arc::new(move |__a0: metamodelica::Ref<SBInterval>| -> metamodelica::Result<_> {
+            ::std::result::Result::Ok(hash(&__a0))
+        }) as std::sync::Arc<dyn ::std::ops::Fn(metamodelica::Ref<SBInterval>) -> Result<i32> + 'static>),
+        (std::sync::Arc::new(
+            move |__a0: metamodelica::Ref<SBInterval>,
+                  __a1: metamodelica::Ref<SBInterval>|
+                  -> metamodelica::Result<_> { ::std::result::Result::Ok(isEqual(&__a0, &__a1)) },
+        )
+            as std::sync::Arc<
+                dyn ::std::ops::Fn(metamodelica::Ref<SBInterval>, metamodelica::Ref<SBInterval>) -> Result<bool>
+                    + 'static,
+            >),
+        13,
+    );
+    i2 = intersection(&int1, int2);
+    if isEmpty(&i2) {
+        UnorderedSet::add(int1, ints.clone())?;
+    } else if !(isEqual(&int1, &i2)) {
+        if i2.hi.clone() < int1.hi.clone() {
+            UnorderedSet::add(
+                new(i2.hi.clone() + int1.step.clone(), int1.step.clone(), int1.hi.clone()),
+                ints.clone(),
+            )?;
+        }
+        count_r = intDiv(i2.step.clone(), int1.step.clone()) - 1;
+        count_s = if (i2.hi.clone() < System::intMaxLit()) {
+            intDiv(i2.hi.clone() - i2.lo.clone(), i2.step.clone())
+        } else {
+            System::intMaxLit()
+        };
+        if count_r < count_s {
+            if count_s < System::intMaxLit() {
+                for mut i in ({
+                    let __s = count_r;
+                    let __e = 1;
+                    (0i32..)
+                        .map(move |__k| __s + __k * (-1))
+                        .take_while(move |&__v| __v >= __e)
+                }) {
+                    UnorderedSet::add(
+                        new(
+                            i2.lo.clone() + i * int1.step.clone(),
+                            i2.step.clone(),
+                            i2.hi.clone() - i2.step.clone() + i * int1.step.clone(),
+                        ),
+                        ints.clone(),
+                    )?;
+                }
+            } else {
+                for mut i in ({
+                    let __s = count_r;
+                    let __e = 1;
+                    (0i32..)
+                        .map(move |__k| __s + __k * (-1))
+                        .take_while(move |&__v| __v >= __e)
+                }) {
+                    UnorderedSet::add(
+                        new(
+                            i2.lo.clone() + i * int1.step.clone(),
+                            i2.step.clone(),
+                            System::intMaxLit(),
+                        ),
+                        ints.clone(),
+                    )?;
+                }
+            }
+        } else {
+            for mut i in ({
+                let __s = count_s;
+                let __e = 1;
+                (0i32..)
+                    .map(move |__k| __s + __k * (-1))
+                    .take_while(move |&__v| __v >= __e)
+            }) {
+                UnorderedSet::add(
+                    new(
+                        i2.lo.clone() + int1.step.clone() + (i - 1) * i2.step.clone(),
+                        int1.step.clone(),
+                        i2.lo.clone() - int1.step.clone() + i * i2.step.clone(),
+                    ),
+                    ints.clone(),
+                )?;
+            }
+        }
+        if i2.lo.clone() > int1.lo.clone() {
+            UnorderedSet::add(
+                new(int1.lo.clone(), int1.step.clone(), i2.lo.clone() - int1.step.clone()),
+                ints.clone(),
+            )?;
+        }
+    }
+    Ok(ints)
+}
+
+pub(crate) fn affine(
+    mut int: &metamodelica::Ref<SBInterval>,
+    mut gain: metamodelica::Real,
+    mut offset: i32,
+) -> Result<metamodelica::Ref<SBInterval>> {
+    let mut res: metamodelica::Ref<SBInterval>;
+    let mut lo: metamodelica::Real;
+    let mut step: metamodelica::Real;
+    let mut hi: metamodelica::Real;
+    let mut ilo: i32;
+    let mut istep: i32;
+    let mut ihi: i32;
+    let __arc3 = &(*int);
+    let INTERVAL {
+        lo: __pa0,
+        step: __pa1,
+        hi: __pa2,
+    } = &**__arc3;
+    lo = metamodelica::OrderedFloat((__pa0.clone()) as f64);
+    step = metamodelica::OrderedFloat((__pa1.clone()) as f64);
+    hi = metamodelica::OrderedFloat((__pa2.clone()) as f64);
+    if gain > metamodelica::OrderedFloat((0) as f64) {
+        lo = lo * gain + metamodelica::OrderedFloat((offset) as f64);
+        hi = hi * gain + metamodelica::OrderedFloat((offset) as f64);
+        step = step * gain;
+        if step < metamodelica::OrderedFloat((1) as f64) {
+            step = metamodelica::OrderedFloat(1.0_f64);
+            lo = (lo).ceil();
+            hi = (hi).floor();
+        }
+        if lo < metamodelica::OrderedFloat((0) as f64) {
+            lo = lo
+                + step
+                    * (metamodelica::OrderedFloat((1) as f64)
+                        + (metamodelica::real_div_checked((lo).abs(), step)?).floor());
+        }
+        if hi < lo {
+            res = newEmpty();
+        } else {
+            ilo = ((lo).0.floor() as i32);
+            ihi = ((hi).0.floor() as i32);
+            istep = if (ilo == ihi) { 1 } else { ((step).0.floor() as i32) };
+            res = new(ilo, istep, ihi);
+        }
+    } else {
+        if offset > 0 {
+            res = new(offset, 1, offset);
+        } else {
+            res = newEmpty();
+        }
+    }
+    Ok(res)
+}
+
+pub(crate) fn cardinality(mut int: &metamodelica::Ref<SBInterval>) -> Result<i32> {
+    let mut card: i32 =
+        ((metamodelica::real_div_checked(intReal(int.hi.clone() - int.lo.clone()), intReal(int.step.clone()))?)
+            .0
+            .floor() as i32);
+    Ok(card)
+}
+
+pub(crate) fn contains(mut c: i32, mut int: &metamodelica::Ref<SBInterval>) -> bool {
+    let mut res: bool;
+    res = !(isEmpty(int))
+        && c >= int.lo.clone()
+        && c <= int.hi.clone()
+        && intMod(c - int.lo.clone(), int.step.clone()) == 0;
+    res
+}
+
+pub fn isEmpty(mut int: &metamodelica::Ref<SBInterval>) -> bool {
+    let mut res: bool = int.step.clone() == 0;
+    res
+}
+
+pub fn size(mut int: &metamodelica::Ref<SBInterval>) -> i32 {
+    let mut res: i32 = intDiv(int.hi.clone() - int.lo.clone(), int.step.clone()) + 1;
+    res
+}
+
+pub(crate) fn isEqual(mut int1: &metamodelica::Ref<SBInterval>, mut int2: &metamodelica::Ref<SBInterval>) -> bool {
+    let mut equal: bool;
+    equal = int1.lo.clone() == int2.lo.clone()
+        && int1.step.clone() == int2.step.clone()
+        && int1.hi.clone() == int2.hi.clone();
+    equal
+}
+
+pub(crate) fn hash(mut int: &metamodelica::Ref<SBInterval>) -> i32 {
+    let mut hash: i32 = int.lo.clone();
+    hash
+}
+
+pub(crate) fn toString(mut interval: &metamodelica::Ref<SBInterval>) -> ArcStr {
+    let mut r#str: ArcStr;
+    r#str = {
+        let mut __mm_s = String::new();
+        __mm_s.push_str(&*literal!("["));
+        __mm_s.push_str(&*ArcStr::from(::std::format!("{}", interval.lo.clone())));
+        __mm_s.push_str(&*literal!(":"));
+        __mm_s.push_str(&*ArcStr::from(::std::format!("{}", interval.step.clone())));
+        __mm_s.push_str(&*literal!(":"));
+        __mm_s.push_str(&*ArcStr::from(::std::format!("{}", interval.hi.clone())));
+        __mm_s.push_str(&*literal!("]"));
+        ArcStr::from(__mm_s)
+    };
+    r#str
+}
