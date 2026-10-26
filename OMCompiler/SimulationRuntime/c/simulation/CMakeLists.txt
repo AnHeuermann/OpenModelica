@@ -53,7 +53,7 @@ set(OMC_SIMRT_SIMULATION_SOURCES
   "solver/model_help.c"
   "solver/newton_diagnostics.c"
   "solver/newtonIteration.c"
-  "solver/nonlinearSolverHomotopy.c"
+  "solver/nonlinearSolverHomotopyRust.c"
   "solver/nonlinearSolverHybrd.c"
   "solver/nonlinearSolverNewton.c"
   "solver/nonlinearSystem.c"
@@ -150,6 +150,8 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   FILES_MATCHING
     PATTERN "*.h"
     PATTERN "*.c.inc"
+    # The Rust solver is linked into the runtime, its sources aren't installed
+    PATTERN "nls_solver" EXCLUDE
 )
 
 if(NOT OM_OMC_ENABLE_C_RUNTIME)
@@ -162,6 +164,11 @@ add_library(omc::simrt::simruntime::simulation ALIAS OpenModelicaRuntimeCSimulat
 # The result files (.mat/.arrow/.csv/.plt) are written by libomc_result
 # (results/simulation_result_rust.cpp).
 target_link_libraries(OpenModelicaRuntimeCSimulation PUBLIC omc::result)
+
+# The homotopy solver is the Rust one of solver/nls_solver/homotopy_nls_solver
+# (solver/nonlinearSolverHomotopyRust.c).
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/homotopy_nls_solver.cmake)
+target_link_libraries(OpenModelicaRuntimeCSimulation PUBLIC omc::homotopy_capi)
 
 target_include_directories(OpenModelicaRuntimeCSimulation
   PUBLIC

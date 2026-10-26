@@ -19,3 +19,6 @@
 [submodule "OMEdit/OMEditLIB/Resources/crml-diagram"]
 	path = OMEdit/OMEditLIB/Resources/crml-diagram
 	url = ../CRML-diagram.git
+[submodule "OMCompiler/SimulationRuntime/c/simulation/solver/nls_solver/homotopy_nls_solver"]
+	path = OMCompiler/SimulationRuntime/c/simulation/solver/nls_solver/homotopy_nls_solver
+	url = git@github.com:AnHeuermann/homotopy_nls_solver.git
