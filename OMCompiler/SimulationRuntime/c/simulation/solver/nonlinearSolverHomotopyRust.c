@@ -205,6 +205,43 @@ static int jacobian(void* user, const double* x, const double* f, double* jac)
 }
 
 /**
+ * @brief Solve the system with hybrd from x, the start point of the failed
+ * Newton's method, like solveHomotopy does.
+ *
+ * hybrd starts from nlsx in a discrete call and from the extrapolation
+ * otherwise, so x is written there first. Returns 1 if x holds a solution.
+ */
+static int fallback(void* user, double* x)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+  DATA* data = homotopyData->userData->data;
+  threadData_t* threadData = homotopyData->userData->threadData;
+  NONLINEAR_SYSTEM_DATA* nlsData = homotopyData->userData->nlsData;
+  size_t n = homotopyData->n;
+  volatile NLS_SOLVER_STATUS status = NLS_FAILED;
+
+  memcpy(data->simulationInfo->discreteCall ? nlsData->nlsx : nlsData->nlsxExtrapolation,
+         x, n*sizeof(double));
+  nlsData->solverData = homotopyData->dataHybrid;
+#ifndef OMC_EMCC
+  OMC_TRY_INTERNAL(simulationJumpBuffer)
+#endif
+  status = solveHybrd(data, threadData, nlsData);
+  if (OMC_ERROR_RAISED()) {
+    OMC_ERROR_CLEAR();
+    status = NLS_FAILED;
+  }
+#ifndef OMC_EMCC
+  OMC_CATCH_INTERNAL(simulationJumpBuffer)
+#endif
+  nlsData->solverData = homotopyData;
+  memcpy(x, nlsData->nlsx, n*sizeof(double));
+  homotopyData->lastXValid = FALSE;
+
+  return status == NLS_SOLVED;
+}
+
+/**
  * @brief Write a message of the Rust solver to the stream of its target.
  */
 static void logger(HomLogLevel level, const char* target, const char* message)
@@ -509,6 +546,7 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
   model.residual = residual;
   model.jacobian = homotopyData->trackLastX ? jacobian : NULL;
   model.observer = &homotopyData->observer;
+  model.fallback = fallback;
 
   memcpy(homotopyData->xSolution, homotopyData->xStart, homotopyData->n*sizeof(double));
   homotopyData->lastXValid = FALSE;
