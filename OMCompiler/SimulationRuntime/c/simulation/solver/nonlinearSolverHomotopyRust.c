@@ -54,6 +54,8 @@
 
 #include "homotopy_capi.h"
 
+extern int dgesv_(int *n, int *nrhs, doublereal *a, int *lda, int *ipiv, doublereal *b, int *ldb, int *info);
+
 struct DATA_HOMOTOPY {
   size_t n;                     /* number of residuals and of unknowns without λ */
   NLS_USERDATA* userData;
@@ -85,6 +87,7 @@ struct DATA_HOMOTOPY {
   long numberOfFunctionEvaluations;
   long numberOfIterations;
   DATA_HYBRD* dataHybrid;
+  int* pivots;                  /* pivot indices of dgesv */
 
   /* The homotopy paths of a solve, reported by the Rust solver */
   HomObserver observer;
@@ -204,6 +207,25 @@ static int jacobian(void* user, const double* x, const double* f, double* jac)
     }
   }
   return status;
+}
+
+/**
+ * @brief Solve the linear system of a Newton step after the first with LAPACK,
+ * like linearSolverWrapper with NLS_LS_LAPACK.
+ *
+ * Returns the info of dgesv, nonzero if the matrix is singular.
+ */
+static int solveLinearLapack(void* user, size_t n, double* matrix, double* rhs, double* determinant)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+  int size = (int) n, nrhs = 1, info;
+  size_t k;
+
+  dgesv_(&size, &nrhs, matrix, &size, homotopyData->pivots, rhs, &size, &info);
+  for (*determinant = 1.0, k = 0; k < n; k++) {
+    *determinant *= matrix[k + k*n];
+  }
+  return info;
 }
 
 /**
@@ -495,6 +517,7 @@ DATA_HOMOTOPY* allocateHomotopyData(size_t size, NLS_USERDATA* userData)
   homotopyData->relationsBackup = (modelica_boolean*) calloc(
     data->modelData->nRelations > 0 ? data->modelData->nRelations : 1, sizeof(modelica_boolean));
   homotopyData->dataHybrid = allocateHybrdData(size, userData);
+  homotopyData->pivots = (int*) calloc(size, sizeof(int));
 
   homotopyData->observer.user = homotopyData;
   homotopyData->observer.path_started = pathStarted;
@@ -526,6 +549,7 @@ void freeHomotopyData(DATA_HOMOTOPY* homotopyData)
   free(homotopyData->relationsBackup);
   /* Don't free userData here, it's done in freeHybrdData */
   freeHybrdData(homotopyData->dataHybrid);
+  free(homotopyData->pivots);
   free(homotopyData);
 }
 
@@ -549,6 +573,9 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
   model.jacobian = homotopyData->trackLastX ? jacobian : NULL;
   model.observer = &homotopyData->observer;
   model.fallback = fallback;
+  /* Other linear solvers than LAPACK are total pivoting for the Rust solver */
+  model.linear_solver = homotopyData->userData->data->simulationInfo->nlsLinearSolver == NLS_LS_LAPACK
+                        ? solveLinearLapack : NULL;
 
   memcpy(homotopyData->xSolution, homotopyData->xStart, homotopyData->n*sizeof(double));
   homotopyData->lastXValid = FALSE;
