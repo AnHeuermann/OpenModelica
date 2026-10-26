@@ -37,12 +37,15 @@
  * mixed systems and the flags.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "../options.h"
 #include "../jacobian_util.h"
+#include "../simulation_info_json.h"
 #include "../../util/omc_error.h"
+#include "../../util/omc_file.h"
 #include "../../util/rtclock.h"
 #include "model_help.h"
 #include "nonlinearSystem.h"
@@ -78,7 +81,13 @@ struct DATA_HOMOTOPY {
   modelica_boolean backupRelations;
 
   long numberOfFunctionEvaluations;
+  long numberOfIterations;
   DATA_HYBRD* dataHybrid;
+
+  /* The homotopy paths of a solve, reported by the Rust solver */
+  HomObserver observer;
+  int runHomotopy;
+  FILE* pathFile;               /* the path of OMC_LOG_INIT_HOMOTOPY */
 };
 
 /**
@@ -196,6 +205,191 @@ static int jacobian(void* user, const double* x, const double* f, double* jac)
 }
 
 /**
+ * @brief Write a message of the Rust solver to the stream of its target.
+ */
+static void logger(HomLogLevel level, const char* target, const char* message)
+{
+  int stream = OMC_LOG_NLS_V;
+  if (strcmp(target, "NLS_HOMOTOPY") == 0) {
+    stream = OMC_LOG_NLS_HOMOTOPY;
+  } else if (strcmp(target, "DT") == 0) {
+    stream = OMC_LOG_DT;
+  }
+  if (level <= 2) {
+    warningStreamPrint(stream, 0, "%s", message);
+  } else {
+    infoStreamPrint(stream, 0, "%s", message);
+  }
+}
+
+/**
+ * @brief Open the CSV file of the path, like homotopyAlgorithm with
+ * OMC_LOG_INIT_HOMOTOPY, and write its start point y.
+ */
+static void openPathFile(DATA_HOMOTOPY* homotopyData, int direction, const double* y)
+{
+#if !defined(OMC_NO_FILESYSTEM)
+  DATA* data = homotopyData->userData->data;
+  NONLINEAR_SYSTEM_DATA* nlsData = homotopyData->userData->nlsData;
+  const char* sep = ",";
+  const char* method = data->callback->homotopyMethod == GLOBAL_ADAPTIVE_HOMOTOPY ? "global" : "local";
+  const char* sign = direction > 0 ? "pos" : "neg";
+  char buffer[4096];
+  size_t i;
+
+  if (omc_flag[FLAG_OUTPUT_PATH]) {
+    snprintf(buffer, sizeof(buffer), "%s/%s_nonlinsys%d_adaptive_%s_homotopy_%s.csv",
+             omc_flagValue[FLAG_OUTPUT_PATH], data->modelData->modelFilePrefix,
+             homotopyData->userData->sysNumber, method, sign);
+  } else {
+    snprintf(buffer, sizeof(buffer), "%s_nonlinsys%d_adaptive_%s_homotopy_%s.csv",
+             data->modelData->modelFilePrefix, homotopyData->userData->sysNumber, method, sign);
+  }
+  infoStreamPrint(OMC_LOG_INIT_HOMOTOPY, 0, "The homotopy path will be exported to %s.", buffer);
+  homotopyData->pathFile = omc_fopen(buffer, "wt");
+  if (homotopyData->pathFile == NULL) {
+    return;
+  }
+  fprintf(homotopyData->pathFile, "\"sep=%s\"\n%s", sep, "\"lambda\"");
+  for (i = 0; i < homotopyData->n; i++) {
+    fprintf(homotopyData->pathFile, "%s\"%s\"", sep,
+            modelInfoGetEquation(&data->modelData->modelDataXml, nlsData->equationIndex).vars[i]);
+  }
+  fprintf(homotopyData->pathFile, "\n");
+  fprintf(homotopyData->pathFile, "0.0");
+  for (i = 0; i < homotopyData->n; i++) {
+    fprintf(homotopyData->pathFile, "%s%.16g", sep, y[i]);
+  }
+  fprintf(homotopyData->pathFile, "\n");
+#endif
+}
+
+static void closePathFile(DATA_HOMOTOPY* homotopyData)
+{
+  if (homotopyData->pathFile != NULL) {
+    fclose(homotopyData->pathFile);
+    homotopyData->pathFile = NULL;
+  }
+}
+
+/**
+ * @brief A homotopy path starts, log it like solveHomotopy.
+ */
+static void pathStarted(void* user, int direction, const double* y, size_t size)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+  NONLINEAR_SYSTEM_DATA* nlsData = homotopyData->userData->nlsData;
+  (void) size;
+
+  homotopyData->runHomotopy++;
+  if (nlsData->initHomotopy) {
+    if (homotopyData->runHomotopy == 1) {
+      debugInt(OMC_LOG_INIT_HOMOTOPY, "Homotopy run: ", homotopyData->runHomotopy);
+      debugDouble(OMC_LOG_INIT_HOMOTOPY, "startDirection = ", direction);
+    } else {
+      infoStreamPrint(OMC_LOG_ASSERT, 0, "The homotopy algorithm is started again with opposing start direction.");
+      debugInt(OMC_LOG_INIT_HOMOTOPY, "Homotopy run: ", homotopyData->runHomotopy);
+      debugDouble(OMC_LOG_INIT_HOMOTOPY, "Try again with startDirection = ", direction);
+    }
+    if (OMC_ACTIVE_STREAM(OMC_LOG_INIT_HOMOTOPY)) {
+      openPathFile(homotopyData, direction, y);
+    }
+  } else {
+    debugInt(OMC_LOG_NLS_HOMOTOPY, "Homotopy run: ", homotopyData->runHomotopy);
+    if (homotopyData->runHomotopy <= 2) {
+      debugDouble(OMC_LOG_NLS_HOMOTOPY, "STARTING NEWTON HOMOTOPY METHOD; startDirection = ", direction);
+    } else {
+      debugDouble(OMC_LOG_NLS_HOMOTOPY, "STARTING FIXPOINT HOMOTOPY METHOD = ", direction);
+    }
+  }
+}
+
+/**
+ * @brief A try of a step starts, log λ like homotopyAlgorithm.
+ */
+static void stepStarted(void* user, const double* y, size_t size)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+  int stream = homotopyData->userData->nlsData->initHomotopy ? OMC_LOG_INIT_HOMOTOPY : OMC_LOG_NLS_HOMOTOPY;
+  infoStreamPrint(stream, 0, "homotopy parameter lambda = %g", y[size-1]);
+}
+
+/**
+ * @brief A step was accepted, write it to the CSV file of the path.
+ */
+static void stepAccepted(void* user, const double* y, size_t size)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+  size_t i;
+  if (homotopyData->pathFile != NULL) {
+    fprintf(homotopyData->pathFile, "%.16g", y[size-1]);
+    for (i = 0; i < size-1; i++) {
+      fprintf(homotopyData->pathFile, ",%.16g", y[i]);
+    }
+    fprintf(homotopyData->pathFile, "\n");
+  }
+}
+
+/**
+ * @brief The path reached λ = 1, count its steps like homotopyAlgorithm.
+ */
+static void pathFinished(void* user, const double* y, size_t size, size_t steps)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+  DATA* data = homotopyData->userData->data;
+  modelica_boolean initHomotopy = homotopyData->userData->nlsData->initHomotopy;
+
+  infoStreamPrint(initHomotopy ? OMC_LOG_INIT_HOMOTOPY : OMC_LOG_NLS_HOMOTOPY, 0,
+                  "homotopy parameter lambda = %g", y[size-1]);
+  if (initHomotopy) {
+    data->simulationInfo->homotopySteps += (int) steps;
+    debugInt(OMC_LOG_INIT_HOMOTOPY, "Total number of lambda steps for this homotopy loop:", (int) steps);
+  }
+  closePathFile(homotopyData);
+}
+
+/**
+ * @brief The path failed, warn like homotopyAlgorithm for the homotopy of
+ * the initialization.
+ */
+static void pathFailed(void* user, HomPathFailure failure, double value)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+
+  closePathFile(homotopyData);
+  if (!homotopyData->userData->nlsData->initHomotopy) {
+    debugDouble(OMC_LOG_NLS_HOMOTOPY, "Homotopy algorithm did not converge:", value);
+    return;
+  }
+  switch (failure) {
+  case HOM_PATH_FAILURE_TAU_AT_MINIMUM:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nNo solution for current step size tau found and tau cannot be decreased any further.\nYou can set the minimum step size tau with:\n\t-homTauMin=<value>\nYou can also try to allow more newton steps in the corrector step with:\n\t-homMaxNewtonSteps=<value>\nor change the tolerance for the solution with:\n\t-homHEps=<value>\nYou can also try to use another backtrace stategy in the corrector step with:\n\t-homBacktraceStrategy=<fix|orthogonal>\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.");
+    break;
+  case HOM_PATH_FAILURE_TOO_MANY_TRIES:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nThe maximum number of tries for one lambda is reached (%d).\nYou can change the number of tries with:\n\t-homMaxTries=<value>\nYou can also try to allow more newton steps in the corrector step with:\n\t-homMaxNewtonSteps=<value>\nor change the tolerance for the solution with:\n\t-homHEps=<value>\nYou can also try to use another backtrace stategy in the corrector step with:\n\t-homBacktraceStrategy=<fix|orthogonal>\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.", (int) value);
+    break;
+  case HOM_PATH_FAILURE_LAMBDA_BELOW_MINUS_ONE:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nlambda is smaller than -1: lambda=%g\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.", value);
+    break;
+  case HOM_PATH_FAILURE_TOO_MANY_STEPS:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nThe maximum number of lambda steps is reached (%d).\nYou can change the maximum number of lambda steps with:\n\t-homMaxLambdaSteps=<value>\nYou can also try to influence the step size tau with the following flags:\n\t-homTauDecFac=<value>\n\t-homTauDecFacPredictor=<value>\n\t-homTauIncFac=<value>\n\t-homTauIncThreshold=<value>\n\t-homTauMax=<value>\n\t-homTauMin=<value>\n\t-homTauStart=<value>\nor you can also set the threshold for accepting the current bending with:\n\t-homAdaptBend=<value>\nYou can also try to use another backtrace stategy in the corrector step with:\n\t-homBacktraceStrategy=<fix|orthogonal>\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.", (int) value);
+    break;
+  case HOM_PATH_FAILURE_MODEL_ERROR:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nIt was not possible to calculate the jacobian.\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.");
+    break;
+  case HOM_PATH_FAILURE_SINGULAR:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nThe system is singular and not solvable.\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.");
+    break;
+  case HOM_PATH_FAILURE_PREDICTOR_BACKED_OFF:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nThe step size tau cannot be decreased anymore and current tau=%g already failed.\nYou can influence the calculation of tau with the following flags:\n\t-homTauDecFac=<value>\n\t-homTauDecFacPredictor=<value>\n\t-homTauIncFac=<value>\n\t-homTauIncThreshold=<value>\n\t-homTauMax=<value>\n\t-homTauMin=<value>\n\t-homTauStart=<value>\nYou can also set the threshold for accepting the current bending with:\n\t-homAdaptBend=<value>\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.", value);
+    break;
+  case HOM_PATH_FAILURE_CORRECTOR_STUCK:
+    warningStreamPrint(OMC_LOG_ASSERT, 0, "Homotopy algorithm did not converge.\nThe value specifying the bending of the homotopy curve is smaller than DBL_EPSILON (increment zero).\nYou can use -lv=LOG_INIT_HOMOTOPY,LOG_NLS_HOMOTOPY to get more information.");
+    break;
+  }
+}
+
+/**
  * @brief Allocate the homotopy solver for a system of size unknowns.
  *
  * The settings are the newton* and hom* flags. The hybrd data is allocated
@@ -263,6 +457,17 @@ DATA_HOMOTOPY* allocateHomotopyData(size_t size, NLS_USERDATA* userData)
     data->modelData->nRelations > 0 ? data->modelData->nRelations : 1, sizeof(modelica_boolean));
   homotopyData->dataHybrid = allocateHybrdData(size, userData);
 
+  homotopyData->observer.user = homotopyData;
+  homotopyData->observer.path_started = pathStarted;
+  homotopyData->observer.step_started = stepStarted;
+  homotopyData->observer.step_accepted = stepAccepted;
+  homotopyData->observer.path_finished = pathFinished;
+  homotopyData->observer.path_failed = pathFailed;
+
+  /* Format the trace messages of the solver only if they are logged */
+  hom_set_logger(logger, OMC_ACTIVE_STREAM(OMC_LOG_NLS_V) || OMC_ACTIVE_STREAM(OMC_LOG_NLS_HOMOTOPY) ||
+                         OMC_ACTIVE_STREAM(OMC_LOG_DT) ? 5 : 2);
+
   return homotopyData;
 }
 
@@ -271,6 +476,7 @@ DATA_HOMOTOPY* allocateHomotopyData(size_t size, NLS_USERDATA* userData)
  */
 void freeHomotopyData(DATA_HOMOTOPY* homotopyData)
 {
+  closePathFile(homotopyData);
   hom_solver_free(homotopyData->solver);
   free(homotopyData->x);
   free(homotopyData->lastX);
@@ -291,6 +497,7 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
                            HomSolvedBy* solvedBy)
 {
   HomModel model = {0};
+  HomStatus status;
 
   model.user = homotopyData;
   model.num_residuals = homotopyData->n;
@@ -301,16 +508,21 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
   model.casual_tearing_set = homotopyData->casualTearingSet;
   model.residual = residual;
   model.jacobian = homotopyData->trackLastX ? jacobian : NULL;
+  model.observer = &homotopyData->observer;
 
   memcpy(homotopyData->xSolution, homotopyData->xStart, homotopyData->n*sizeof(double));
   homotopyData->lastXValid = FALSE;
   homotopyData->backupRelations = TRUE;
+  homotopyData->runHomotopy = 0;
 
   if (nlsData->initHomotopy) {
-    return hom_solve_own_homotopy(homotopyData->solver, &model, homotopyData->xSolution,
-                                  omc_flag[FLAG_HOMOTOPY_NEG_START_DIR], solvedBy);
+    status = hom_solve_own_homotopy(homotopyData->solver, &model, homotopyData->xSolution,
+                                    omc_flag[FLAG_HOMOTOPY_NEG_START_DIR], solvedBy);
+  } else {
+    status = hom_solve(homotopyData->solver, &model, homotopyData->xSolution, solvedBy);
   }
-  return hom_solve(homotopyData->solver, &model, homotopyData->xSolution, solvedBy);
+  homotopyData->numberOfIterations += (long) hom_solver_statistics(homotopyData->solver).newton_iterations;
+  return status;
 }
 
 /**
@@ -362,6 +574,7 @@ NLS_SOLVER_STATUS solveHomotopy(DATA *data, threadData_t *threadData, NONLINEAR_
   }
   data->simulationInfo->solveContinuous = 0;
   nlsData->numberOfFEval = homotopyData->numberOfFunctionEvaluations;
+  nlsData->numberOfIterations = homotopyData->numberOfIterations;
 
   return status == HOM_STATUS_SOLVED ? NLS_SOLVED : NLS_FAILED;
 }
