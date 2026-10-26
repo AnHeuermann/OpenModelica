@@ -78,6 +78,8 @@ struct DATA_HOMOTOPY {
   double* xStart;
   double* xSolution;
   modelica_boolean* relationsBackup;
+  /* The next successful residual evaluation is at the start point of a first
+     solve: back up the relations and keep them for the rest of the solve */
   modelica_boolean backupRelations;
 
   long numberOfFunctionEvaluations;
@@ -531,7 +533,7 @@ void freeHomotopyData(DATA_HOMOTOPY* homotopyData)
  * @brief Solve the system once with the Rust solver from xStart.
  */
 static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* nlsData,
-                           HomSolvedBy* solvedBy)
+                           modelica_boolean firstSolve, HomSolvedBy* solvedBy)
 {
   HomModel model = {0};
   HomStatus status;
@@ -550,7 +552,7 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
 
   memcpy(homotopyData->xSolution, homotopyData->xStart, homotopyData->n*sizeof(double));
   homotopyData->lastXValid = FALSE;
-  homotopyData->backupRelations = TRUE;
+  homotopyData->backupRelations = firstSolve;
   homotopyData->runHomotopy = 0;
 
   if (nlsData->initHomotopy) {
@@ -593,7 +595,7 @@ NLS_SOLVER_STATUS solveHomotopy(DATA *data, threadData_t *threadData, NONLINEAR_
   if (data->simulationInfo->discreteCall) {
     data->simulationInfo->solveContinuous = 0;
   }
-  status = solveOnce(homotopyData, nlsData, &solvedBy);
+  status = solveOnce(homotopyData, nlsData, TRUE, &solvedBy);
 
   if (status == HOM_STATUS_SOLVED && nlsData->mixedSystem && data->simulationInfo->discreteCall &&
       !nlsData->initHomotopy) {
@@ -602,8 +604,9 @@ NLS_SOLVER_STATUS solveHomotopy(DATA *data, threadData_t *threadData, NONLINEAR_
       status = HOM_STATUS_NOT_SOLVED;
     } else if (memcmp(data->simulationInfo->relations, homotopyData->relationsBackup,
                       data->modelData->nRelations*sizeof(modelica_boolean)) != 0) {
-      /* The relations changed, solve once more from the start point */
-      status = solveOnce(homotopyData, nlsData, &solvedBy);
+      /* The relations changed, solve once more from the start point. Like
+         solveHomotopy, with solveContinuous = 0, so the relations can switch. */
+      status = solveOnce(homotopyData, nlsData, FALSE, &solvedBy);
     }
   }
 
