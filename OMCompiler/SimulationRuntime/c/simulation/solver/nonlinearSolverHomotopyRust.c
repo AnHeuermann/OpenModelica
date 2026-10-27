@@ -163,7 +163,7 @@ static int residual(void* user, const double* x, double* f)
  * evaluated first unless x is the point of its latest evaluation. The columns
  * of the solver's unknowns are copied from the possibly larger dense Jacobian.
  */
-static int jacobian(void* user, const double* x, const double* f, double* jac)
+static int jacobian(void* user, const double* x, const double* f, double* jac, size_t ld)
 {
   DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
   DATA* data = homotopyData->userData->data;
@@ -202,7 +202,7 @@ static int jacobian(void* user, const double* x, const double* f, double* jac)
   if (status == HOM_EVAL_OK) {
     for (j = 0; j < homotopyData->numUnknowns; j++) {
       for (i = 0; i < n; i++) {
-        jac[j*n + i] = homotopyData->jac[j*homotopyData->jacRows + i];
+        jac[j*ld + i] = homotopyData->jac[j*homotopyData->jacRows + i];
       }
     }
   }
