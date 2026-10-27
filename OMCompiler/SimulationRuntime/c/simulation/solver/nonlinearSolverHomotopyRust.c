@@ -80,8 +80,10 @@ struct DATA_HOMOTOPY {
   double* xStart;
   double* xSolution;
   modelica_boolean* relationsBackup;
+  /* The first solve of a call, not the one after changed relations */
+  modelica_boolean firstSolve;
   /* The next successful residual evaluation is at the start point of a first
-     solve: back up the relations and keep them for the rest of the solve */
+     solve: back up the relations */
   modelica_boolean backupRelations;
 
   long numberOfFunctionEvaluations;
@@ -149,8 +151,6 @@ static int residual(void* user, const double* x, double* f)
       memcpy(homotopyData->relationsBackup, data->simulationInfo->relations,
              data->modelData->nRelations*sizeof(modelica_boolean));
       homotopyData->backupRelations = FALSE;
-      /* Newton's method and the homotopies run with the relations kept */
-      data->simulationInfo->solveContinuous = 1;
     }
   }
   return status;
@@ -207,6 +207,26 @@ static int jacobian(void* user, const double* x, const double* f, double* jac)
     }
   }
   return status;
+}
+
+/**
+ * @brief Freeze the relations once the start point is checked.
+ *
+ * Like solveHomotopy, the relations may switch while the start point and its
+ * Jacobian are evaluated. Their state afterwards is the backup a mixed system
+ * is compared with, and Newton's method and the homotopies run with them
+ * frozen. The solve after changed relations keeps them switching.
+ */
+static void startPointChecked(void* user)
+{
+  DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
+  DATA* data = homotopyData->userData->data;
+
+  if (homotopyData->firstSolve) {
+    memcpy(homotopyData->relationsBackup, data->simulationInfo->relations,
+           data->modelData->nRelations*sizeof(modelica_boolean));
+    data->simulationInfo->solveContinuous = 1;
+  }
 }
 
 /**
@@ -577,9 +597,11 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
   /* Other linear solvers than LAPACK are total pivoting for the Rust solver */
   model.linear_solver = homotopyData->userData->data->simulationInfo->nlsLinearSolver == NLS_LS_LAPACK
                         ? solveLinearLapack : NULL;
+  model.start_point_checked = startPointChecked;
 
   memcpy(homotopyData->xSolution, homotopyData->xStart, homotopyData->n*sizeof(double));
   homotopyData->lastXValid = FALSE;
+  homotopyData->firstSolve = firstSolve;
   homotopyData->backupRelations = firstSolve;
   homotopyData->runHomotopy = 0;
 
@@ -601,8 +623,9 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
  *
  * Like solveHomotopy of nonlinearSolverHomotopy.c: the start point is the
  * current value in a discrete call and the extrapolation otherwise. A
- * solution of a mixed system in a discrete call is checked once against the
- * relations at the start point, and solved again if they changed.
+ * solution of a mixed system in a discrete call, other than the start point,
+ * is checked once against the relations after the start point was checked,
+ * and solved again if they changed.
  */
 NLS_SOLVER_STATUS solveHomotopy(DATA *data, threadData_t *threadData, NONLINEAR_SYSTEM_DATA* nlsData)
 {
@@ -628,8 +651,8 @@ NLS_SOLVER_STATUS solveHomotopy(DATA *data, threadData_t *threadData, NONLINEAR_
   }
   status = solveOnce(homotopyData, nlsData, TRUE, &solvedBy);
 
-  if (status == HOM_STATUS_SOLVED && nlsData->mixedSystem && data->simulationInfo->discreteCall &&
-      !nlsData->initHomotopy) {
+  if (status == HOM_STATUS_SOLVED && solvedBy != HOM_SOLVED_BY_START_POINT && nlsData->mixedSystem &&
+      data->simulationInfo->discreteCall && !nlsData->initHomotopy) {
     data->simulationInfo->solveContinuous = 0;
     if (residual(homotopyData, homotopyData->xSolution, homotopyData->f) != HOM_EVAL_OK) {
       status = HOM_STATUS_NOT_SOLVED;
