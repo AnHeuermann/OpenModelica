@@ -235,15 +235,16 @@ static void startPointChecked(void* user)
  *
  * Returns the info of dgesv, nonzero if the matrix is singular.
  */
-static int solveLinearLapack(void* user, size_t n, double* matrix, double* rhs, double* determinant)
+static int solveLinearLapack(void* user, size_t n, double* matrix, size_t ld, double* rhs,
+                             double* determinant)
 {
   DATA_HOMOTOPY* homotopyData = (DATA_HOMOTOPY*) user;
-  int size = (int) n, nrhs = 1, info;
+  int size = (int) n, lda = (int) ld, nrhs = 1, info;
   size_t k;
 
-  dgesv_(&size, &nrhs, matrix, &size, homotopyData->pivots, rhs, &size, &info);
+  dgesv_(&size, &nrhs, matrix, &lda, homotopyData->pivots, rhs, &size, &info);
   for (*determinant = 1.0, k = 0; k < n; k++) {
-    *determinant *= matrix[k + k*n];
+    *determinant *= matrix[k + k*ld];
   }
   return info;
 }
