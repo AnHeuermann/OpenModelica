@@ -561,6 +561,7 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
 {
   HomModel model = {0};
   HomStatus status;
+  HomStatistics statistics;
 
   model.user = homotopyData;
   model.num_residuals = homotopyData->n;
@@ -588,7 +589,10 @@ static HomStatus solveOnce(DATA_HOMOTOPY* homotopyData, NONLINEAR_SYSTEM_DATA* n
   } else {
     status = hom_solve(homotopyData->solver, &model, homotopyData->xSolution, solvedBy);
   }
-  homotopyData->numberOfIterations += (long) hom_solver_statistics(homotopyData->solver).newton_iterations;
+  statistics = hom_solver_statistics(homotopyData->solver);
+  homotopyData->numberOfIterations += (long) statistics.newton_iterations;
+  nlsData->numberOfJEval += (long) statistics.forward_differences;
+  nlsData->jacobianTime += statistics.forward_differences_time;
   return status;
 }
 
