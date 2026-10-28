@@ -41,6 +41,7 @@ void freeStateSetData(DATA *data);
 
 /* update the state selection */
 int stateSelection(DATA *data, threadData_t *threadData, char reportError, int switchStates);
+int stateSelectionSet(DATA *data, threadData_t *threadData, char reportError, int switchStates, long setIndex, int globalres);
 
 /* do pivoting */
 extern int pivot(double *A, modelica_integer n_rows, modelica_integer n_cols, modelica_integer *rowInd, modelica_integer *colInd);

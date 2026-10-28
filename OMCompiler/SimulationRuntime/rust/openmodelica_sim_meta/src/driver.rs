@@ -314,6 +314,23 @@ impl StateSelection {
         self.run(e, sim_data, model, true, false)
     }
 
+    /// C's `stateSelectionSet` for one set, which `--initialStateSelection` calls
+    /// from the initial system.
+    pub fn select_set(
+        &mut self,
+        e: &mut dyn SimEngine,
+        sim_data: u32,
+        model: &SimMeta,
+        set_index: usize,
+        report_error: bool,
+        switch: bool,
+    ) -> Result<bool> {
+        match (model.state_sets.get(set_index), self.pivots.get_mut(set_index)) {
+            (Some(info), Some(st)) => state_selection_set(e, sim_data, info, st, set_index, report_error, switch),
+            _ => Ok(false),
+        }
+    }
+
     fn run(
         &mut self,
         e: &mut dyn SimEngine,

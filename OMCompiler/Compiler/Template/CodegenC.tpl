@@ -167,6 +167,7 @@ end translateModel;
     #include "simulation/solver/nonlinearSystem.h"
     #include "simulation/solver/mixedSystem.h"
     #include "simulation/solver/spatialDistribution.h"
+    #include "simulation/solver/stateset.h"
     #include "simulation/solver/synchronous.h"
 
     #include <string.h>

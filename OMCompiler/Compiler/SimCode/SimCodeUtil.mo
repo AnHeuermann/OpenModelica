@@ -983,10 +983,16 @@ end collectClockedVars1;
 protected function addTempVars
   input array<list<SimCodeVar.SimVar>> simVars;
   input list<SimCodeVar.SimVar> tempVars;
+  input Mutable<HashSet.HashSet> hs "all processed crefs";
 protected
   Integer ix;
 algorithm
   for e in tempVars loop
+    // --initialStateSelection adds the A of a state set to the initial system as well
+    if BaseHashSet.has(e.name, Mutable.access(hs)) then
+      continue;
+    end if;
+    Mutable.update(hs, BaseHashSet.add(e.name, Mutable.access(hs)));
     ix := match e.type_
     case DAE.T_INTEGER() then Integer(SimVarsIndex.intAlg);
     case DAE.T_ENUMERATION() then Integer(SimVarsIndex.intAlg);
@@ -7524,7 +7530,7 @@ algorithm
     if debug then execStat("createVars: variable list (init lambda0)"); end if;
   end if;
 
-  addTempVars(simVars, tempvars);
+  addTempVars(simVars, tempvars, hs);
   if debug then execStat("createVars: addTempVars"); end if;
   //BaseHashSet.printHashSet(hs);
 
