@@ -5224,7 +5224,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Shows OpenModelica Compiler CLI</source>
-        <translation>Zeigt die CLI des OpenModelica-Compilers</translation>
+        <translation>Zeigt die OpenModelica Compiler CLI</translation>
     </message>
     <message>
         <source>OpenModelica Command Prompt</source>
@@ -5236,11 +5236,11 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>OpenModelica Compiler Diff</source>
-        <translation>OpenModelica-Compiler-Diff</translation>
+        <translation>OpenModelica Compiler Diff</translation>
     </message>
     <message>
         <source>Shows OpenModelica Compiler Diff</source>
-        <translation>Zeigt den OpenModelica-Compiler-Diff</translation>
+        <translation>Zeigt den OpenModelica Compiler Diff</translation>
     </message>
     <message>
         <source>Open Temporary Directory</source>
@@ -5416,7 +5416,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>No active simulation output window. Please select a simulation output window for the re-simulation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein aktives Simulationsausgabefenster. Für die erneute Simulation ein Simulationsausgabefenster auswählen.</translation>
     </message>
     <message>
         <source>&amp;System Libraries</source>
