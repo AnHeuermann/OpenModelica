@@ -2922,7 +2922,7 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>OpenModelica Compiler CLI</source>
-        <translation>OpenModelica-Compiler-CLI</translation>
+        <translation>OpenModelica Compiler CLI</translation>
     </message>
     <message>
         <source>Delete</source>
