@@ -5867,6 +5867,14 @@ Fortfahren?</numerusform>
         <translation>In Klasse einfügen (optional):</translation>
     </message>
     <message>
+        <source>Partial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encapsulated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>State</source>
         <translation>Zustand (State Machine)</translation>
     </message>
