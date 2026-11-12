@@ -5868,11 +5868,11 @@ Fortfahren?</numerusform>
     </message>
     <message>
         <source>Partial</source>
-        <translation type="unfinished"></translation>
+        <translation>partial</translation>
     </message>
     <message>
         <source>Encapsulated</source>
-        <translation type="unfinished"></translation>
+        <translation>encapsulated</translation>
     </message>
     <message>
         <source>State</source>
