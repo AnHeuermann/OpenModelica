@@ -7146,10 +7146,6 @@ Ange värdet 0 om du inte vill ha någon fördröjning.</translation>
         <translation>dryRun = true ersätter inte delmodellen utan visar listan med varningar, och dryRun = false ersätter delmodellen</translation>
     </message>
     <message>
-        <source>ReplaceSubModel</source>
-        <translation>ReplaceSubModel</translation>
-    </message>
-    <message>
         <source>Unable to find the SubModel file.</source>
         <translation>Kunde inte hitta delmodellsfilen.</translation>
     </message>
@@ -7160,6 +7156,10 @@ Ange värdet 0 om du inte vill ha någon fördröjning.</translation>
     <message>
         <source>The submodel was not replaced (dryRun = true). The following changes were detected in the replacing submodel. See the Messages Browser for details.</source>
         <translation>Delmodellen ersattes inte (dryRun = true). Följande ändringar upptäcktes i den ersättande delmodellen. Se fönstret Meddelanden för detaljer.</translation>
+    </message>
+    <message>
+        <source>SubModel file</source>
+        <translation>delmodellsfil</translation>
     </message>
     <message>
         <source>The submodel was replaced (dryRun =false). The following changes were detected and applied. See the Messages Browser for details.</source>
@@ -7292,7 +7292,7 @@ Ange värdet 0 om du inte vill ha någon fördröjning.</translation>
         <translation>Rensa alla</translation>
     </message>
     <message>
-        <source>clears all the result</source>
+        <source>Clears all the results</source>
         <translation>Rensar alla resultat</translation>
     </message>
     <message>

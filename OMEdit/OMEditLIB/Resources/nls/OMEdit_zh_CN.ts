@@ -7080,10 +7080,6 @@ Set the value to 0 if you don&apos;t want any delay.</source>
         <translation>当 dryRun = true 时不替换子模型（可查看警告列表），dryRun = false 时将执行子模型替换</translation>
     </message>
     <message>
-        <source>ReplaceSubModel</source>
-        <translation>替换子模型</translation>
-    </message>
-    <message>
         <source>Unable to find the SubModel file.</source>
         <translation>找不到子模型文件。</translation>
     </message>
@@ -7094,6 +7090,10 @@ Set the value to 0 if you don&apos;t want any delay.</source>
     <message>
         <source>The submodel was not replaced (dryRun = true). The following changes were detected in the replacing submodel. See the Messages Browser for details.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SubModel file</source>
+        <translation>子模型文件</translation>
     </message>
     <message>
         <source>The submodel was replaced (dryRun =false). The following changes were detected and applied. See the Messages Browser for details.</source>
@@ -7226,7 +7226,7 @@ Set the value to 0 if you don&apos;t want any delay.</source>
         <translation>清除全部</translation>
     </message>
     <message>
-        <source>clears all the result</source>
+        <source>Clears all the results</source>
         <translation>清除所有结果</translation>
     </message>
     <message>

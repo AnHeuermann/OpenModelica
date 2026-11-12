@@ -495,7 +495,7 @@ void ReplaceSubModelDialog::browseSubModelPath()
 void ReplaceSubModelDialog::replaceSubModel()
 {
   if (mpPathTextBox->text().isEmpty()) {
-    QMessageBox::critical(this, QString("%1 - %2").arg(Helper::applicationName, Helper::error), GUIMessages::getMessage(GUIMessages::ENTER_VALUE).arg(tr("ReplaceSubModel")), QMessageBox::Ok);
+    QMessageBox::critical(this, QString("%1 - %2").arg(Helper::applicationName, Helper::error), GUIMessages::getMessage(GUIMessages::ENTER_VALUE).arg(tr("SubModel file")), QMessageBox::Ok);
     return;
   }
 

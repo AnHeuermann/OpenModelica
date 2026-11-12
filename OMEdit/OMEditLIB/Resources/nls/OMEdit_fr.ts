@@ -7104,10 +7104,6 @@ Définissez la valeur sur 0 si vous ne souhaitez aucun délai.</translation>
         <translation>dryRun = true ne remplacera pas le sous-modèle, vous pouvez voir la liste des avertissements et dryRun = false remplacera le sous-modèle</translation>
     </message>
     <message>
-        <source>ReplaceSubModel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to find the SubModel file.</source>
         <translation>Impossible de trouver le fichier Sous-Modèle.</translation>
     </message>
@@ -7118,6 +7114,10 @@ Définissez la valeur sur 0 si vous ne souhaitez aucun délai.</translation>
     <message>
         <source>The submodel was not replaced (dryRun = true). The following changes were detected in the replacing submodel. See the Messages Browser for details.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SubModel file</source>
+        <translation>fichier Sous-Modèle</translation>
     </message>
     <message>
         <source>The submodel was replaced (dryRun =false). The following changes were detected and applied. See the Messages Browser for details.</source>
@@ -7252,8 +7252,8 @@ Définissez la valeur sur 0 si vous ne souhaitez aucun délai.</translation>
         <translation>Tout nettoyer</translation>
     </message>
     <message>
-        <source>clears all the result</source>
-        <translation>efface tout le résultat</translation>
+        <source>Clears all the results</source>
+        <translation>Efface tous les résultats</translation>
     </message>
     <message>
         <source>History:</source>

@@ -7146,10 +7146,6 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
         <translation>Mit dryRun = true wird das Submodell nicht ersetzt, sondern nur die Liste der Warnungen angezeigt; mit dryRun = false wird das Submodell ersetzt</translation>
     </message>
     <message>
-        <source>ReplaceSubModel</source>
-        <translation>ReplaceSubModel</translation>
-    </message>
-    <message>
         <source>Unable to find the SubModel file.</source>
         <translation>Die Submodell-Datei wurde nicht gefunden.</translation>
     </message>
@@ -7160,6 +7156,10 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
     <message>
         <source>The submodel was not replaced (dryRun = true). The following changes were detected in the replacing submodel. See the Messages Browser for details.</source>
         <translation>Das Submodell wurde nicht ersetzt (dryRun = true). Im ersetzenden Submodell wurden folgende Änderungen erkannt. Details stehen im Meldungsbrowser.</translation>
+    </message>
+    <message>
+        <source>SubModel file</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The submodel was replaced (dryRun =false). The following changes were detected and applied. See the Messages Browser for details.</source>
@@ -7292,8 +7292,8 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
         <translation>Alle löschen</translation>
     </message>
     <message>
-        <source>clears all the result</source>
-        <translation>Löscht alle Ergebnisse</translation>
+        <source>Clears all the results</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>History:</source>

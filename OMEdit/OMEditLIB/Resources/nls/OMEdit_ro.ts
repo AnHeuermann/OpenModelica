@@ -7064,10 +7064,6 @@ Set the value to 0 if you don&apos;t want any delay.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ReplaceSubModel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to find the SubModel file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7077,6 +7073,10 @@ Set the value to 0 if you don&apos;t want any delay.</source>
     </message>
     <message>
         <source>The submodel was not replaced (dryRun = true). The following changes were detected in the replacing submodel. See the Messages Browser for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SubModel file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7210,7 +7210,7 @@ Set the value to 0 if you don&apos;t want any delay.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>clears all the result</source>
+        <source>Clears all the results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

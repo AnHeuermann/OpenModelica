@@ -7081,10 +7081,6 @@ Set the value to 0 if you don&apos;t want any delay.</source>
         <translation>«dryRun = true» не заменит подмодель, но выдаст список предупреждений, а замена подмодели выполняется с помощью «dryRun = false»</translation>
     </message>
     <message>
-        <source>ReplaceSubModel</source>
-        <translation>Замена подмодели</translation>
-    </message>
-    <message>
         <source>Unable to find the SubModel file.</source>
         <translation>Не удалось найти файл подмодели.</translation>
     </message>
@@ -7095,6 +7091,10 @@ Set the value to 0 if you don&apos;t want any delay.</source>
     <message>
         <source>The submodel was not replaced (dryRun = true). The following changes were detected in the replacing submodel. See the Messages Browser for details.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SubModel file</source>
+        <translation>файл подмодели</translation>
     </message>
     <message>
         <source>The submodel was replaced (dryRun =false). The following changes were detected and applied. See the Messages Browser for details.</source>
@@ -7227,7 +7227,7 @@ Set the value to 0 if you don&apos;t want any delay.</source>
         <translation>Очистить всё</translation>
     </message>
     <message>
-        <source>clears all the result</source>
+        <source>Clears all the results</source>
         <translation>Удаляет все результаты поиска</translation>
     </message>
     <message>

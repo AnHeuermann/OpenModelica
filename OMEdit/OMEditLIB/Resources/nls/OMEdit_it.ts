@@ -7145,10 +7145,6 @@ Impostare il valore a 0 per non avere alcun ritardo.</translation>
         <translation>dryRun = true non sostituisce il sottomodello ma mostra l&apos;elenco degli avvertimenti; dryRun = false sostituisce il sottomodello</translation>
     </message>
     <message>
-        <source>ReplaceSubModel</source>
-        <translation>ReplaceSubModel</translation>
-    </message>
-    <message>
         <source>Unable to find the SubModel file.</source>
         <translation>Impossibile trovare il file del sottomodello.</translation>
     </message>
@@ -7159,6 +7155,10 @@ Impostare il valore a 0 per non avere alcun ritardo.</translation>
     <message>
         <source>The submodel was not replaced (dryRun = true). The following changes were detected in the replacing submodel. See the Messages Browser for details.</source>
         <translation>Il sottomodello non è stato sostituito (dryRun = true). Nel sottomodello sostitutivo sono state rilevate le seguenti modifiche. Consultare la finestra Messaggi per i dettagli.</translation>
+    </message>
+    <message>
+        <source>SubModel file</source>
+        <translation>file del sottomodello</translation>
     </message>
     <message>
         <source>The submodel was replaced (dryRun =false). The following changes were detected and applied. See the Messages Browser for details.</source>
@@ -7291,7 +7291,7 @@ Impostare il valore a 0 per non avere alcun ritardo.</translation>
         <translation>Cancella tutto</translation>
     </message>
     <message>
-        <source>clears all the result</source>
+        <source>Clears all the results</source>
         <translation>Cancella tutti i risultati</translation>
     </message>
     <message>
