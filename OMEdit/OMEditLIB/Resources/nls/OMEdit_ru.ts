@@ -3068,14 +3068,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>Создать экземпляр/Выполнить инициализацию класса Modelica</translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation>Экспортирует модель как Functional Mockup Unit (FMU)</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation>Импортирует модель из Functional Mockup Unit (FMU)</translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation>Экспортирует модель как XML</translation>
     </message>
@@ -3208,10 +3200,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3262,10 +3250,6 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Rotation:</source>
         <translation>Поворот:</translation>
-    </message>
-    <message>
-        <source>Bezier</source>
-        <translation>Безье</translation>
     </message>
     <message>
         <source>Start Arrow:</source>
@@ -3416,10 +3400,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>Зашифрованный пакет</translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation>Экспортирует зашифрованный пакет</translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation>XML</translation>
     </message>
@@ -3554,6 +3534,26 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Reload</source>
         <translation>Перезагрузить</translation>
+    </message>
+    <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation>Экспортирует модель как Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation>Экспортирует зашифрованный пакет</translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation>Импортирует модель из Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bézier</source>
+        <translation>Безье</translation>
     </message>
     <message>
         <source>Index</source>
@@ -5004,10 +5004,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Описание модели FMU</translation>
     </message>
     <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
-        <translation>Импортирует модель из описания интерфейса функциональной модели (FMU)</translation>
-    </message>
-    <message>
         <source>From OMNotebook</source>
         <translation>Из OMNotebook</translation>
     </message>
@@ -5590,6 +5586,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Saves the active class to Google Drive or OneDrive</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
+        <translation>Импортирует модель из описания интерфейса функциональной модели (FMU)</translation>
     </message>
     <message>
         <source>Clears the recent models list</source>

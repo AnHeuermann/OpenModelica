@@ -3061,14 +3061,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>Instantier/Mettre à plat la classe Modelica</translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation>Exporte le modèle sous une Functional Mockup Unit (FMU)</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation>Importe le modèle d&apos;une Functionnal Mockup Interface (FMU)</translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation>Exporte le modèle sous XML</translation>
     </message>
@@ -3201,10 +3193,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3255,10 +3243,6 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Rotation:</source>
         <translation>Rotation:</translation>
-    </message>
-    <message>
-        <source>Bezier</source>
-        <translation>Bezier</translation>
     </message>
     <message>
         <source>Start Arrow:</source>
@@ -3409,10 +3393,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3547,6 +3527,26 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Reload</source>
         <translation>Charger à nouveau</translation>
+    </message>
+    <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation>Exporte le modèle sous une Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation>Importe le modèle d&apos;une Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bézier</source>
+        <translation>Bézier</translation>
     </message>
     <message>
         <source>Index</source>
@@ -4727,6 +4727,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished">Veuillez ouvrir un modèle avant de démarrer le plugin OMSens</translation>
     </message>
     <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
+        <translation>Importe le modèle à partir de la description du modèle Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
         <source>Grid Lines</source>
         <translation>Lignes de Quadrillage</translation>
     </message>
@@ -5125,10 +5129,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>FMU Model Description</source>
         <translation>Description de Modèle FMU</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
-        <translation>Importe le modèle à partir de la description du modèle Functional Mockup Interface (FMU)</translation>
     </message>
     <message>
         <source>From OMNotebook</source>

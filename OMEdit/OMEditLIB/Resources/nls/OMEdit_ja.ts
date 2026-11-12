@@ -3036,14 +3036,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>Modelicaクラスのインスタンス化/フラット化</translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation>モデルをFMUとして書き出し</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation>FMUからモデルを読込み</translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation>XMLとしてモデルを書き出し</translation>
     </message>
@@ -3176,10 +3168,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3230,10 +3218,6 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Rotation:</source>
         <translation>回転:</translation>
-    </message>
-    <message>
-        <source>Bezier</source>
-        <translation>ベジエ</translation>
     </message>
     <message>
         <source>Start Arrow:</source>
@@ -3380,10 +3364,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3518,6 +3498,26 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Reload</source>
         <translation>再ロード</translation>
+    </message>
+    <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation>モデルをFMUとして書き出し</translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation>FMUからモデルを読込み</translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bézier</source>
+        <translation>ベジエ</translation>
     </message>
     <message>
         <source>Index</source>
@@ -4698,6 +4698,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Grid Lines</source>
         <translation>グリッド線</translation>
     </message>
@@ -5096,10 +5100,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     </message>
     <message>
         <source>FMU Model Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

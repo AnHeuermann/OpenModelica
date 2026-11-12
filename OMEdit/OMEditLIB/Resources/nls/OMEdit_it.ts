@@ -3056,14 +3056,6 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
         <translation>Istanzia e appiattisce la classe Modelica</translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation>Esporta il modello come Functional Mockup Unit (FMU)</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation>Importa il modello da Functional Mockup Unit (FMU)</translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation>Esporta il modello come XML</translation>
     </message>
@@ -3196,10 +3188,6 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
         <translation>Traduci come</translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation>Traduce il modello CRML in una nuova classe Modelica</translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation>Esegui</translation>
     </message>
@@ -3250,10 +3238,6 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
     <message>
         <source>Rotation:</source>
         <translation>Rotazione:</translation>
-    </message>
-    <message>
-        <source>Bezier</source>
-        <translation>Bezier</translation>
     </message>
     <message>
         <source>Start Arrow:</source>
@@ -3404,10 +3388,6 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
         <translation>Pacchetto cifrato</translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation>Esporta il pacchetto come pacchetto cifrato</translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation>XML</translation>
     </message>
@@ -3542,6 +3522,26 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
     <message>
         <source>Reload</source>
         <translation>Ricarica</translation>
+    </message>
+    <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation>Esporta il modello come Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation>Esporta il pacchetto come pacchetto cifrato</translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation>Importa il modello da Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation>Traduce il modello CRML in una nuova classe Modelica</translation>
+    </message>
+    <message>
+        <source>Bézier</source>
+        <translation>Bézier</translation>
     </message>
     <message>
         <source>Index</source>
@@ -4750,6 +4750,10 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>Aprire un modello prima di avviare il plugin OMSens.</translation>
     </message>
     <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
+        <translation>Importa il modello da una descrizione del modello FMU</translation>
+    </message>
+    <message>
         <source>Grid Lines</source>
         <translation>Linee di griglia</translation>
     </message>
@@ -5148,10 +5152,6 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
     <message>
         <source>FMU Model Description</source>
         <translation>Descrizione del modello FMU</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
-        <translation>Importa il modello da una descrizione del modello FMU</translation>
     </message>
     <message>
         <source>From OMNotebook</source>

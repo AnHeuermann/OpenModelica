@@ -3049,14 +3049,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>实例化/平坦化Modelica类</translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation>导出为FMU</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation>从FMU接口导入模型</translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation>导出模型为XML</translation>
     </message>
@@ -3189,10 +3181,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>转换另存为</translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation>CRML模型转换另存为Modelica</translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation>运行</translation>
     </message>
@@ -3243,10 +3231,6 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Rotation:</source>
         <translation>旋转：</translation>
-    </message>
-    <message>
-        <source>Bezier</source>
-        <translation>贝塞尔</translation>
     </message>
     <message>
         <source>Start Arrow:</source>
@@ -3393,10 +3377,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>加密包</translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation>导出包为加密包</translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation>XML</translation>
     </message>
@@ -3531,6 +3511,26 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Reload</source>
         <translation>重新加载</translation>
+    </message>
+    <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation>导出为FMU</translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation>导出包为加密包</translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation>从FMU接口导入模型</translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation>CRML模型转换另存为Modelica</translation>
+    </message>
+    <message>
+        <source>Bézier</source>
+        <translation>贝塞尔</translation>
     </message>
     <message>
         <source>Index</source>
@@ -4701,6 +4701,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>打开Modelica文件</translation>
     </message>
     <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
+        <translation>从功能模型接口（FMU）模型描述中导入模型</translation>
+    </message>
+    <message>
         <source>Grid Lines</source>
         <translation>网格线</translation>
     </message>
@@ -5107,10 +5111,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>FMU Model Description</source>
         <translation>FMU模型说明</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
-        <translation>从功能模型接口（FMU）模型描述中导入模型</translation>
     </message>
     <message>
         <source>From OMNotebook</source>

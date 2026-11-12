@@ -3035,14 +3035,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3175,10 +3167,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3228,10 +3216,6 @@ Please check the Messages browser for error messages and possibly undo the lates
     </message>
     <message>
         <source>Rotation:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bezier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3379,10 +3363,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3516,6 +3496,26 @@ Please check the Messages browser for error messages and possibly undo the lates
     </message>
     <message>
         <source>Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bézier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4997,10 +4997,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>From OMNotebook</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5190,6 +5186,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     </message>
     <message>
         <source>Please open a model before starting the OMSens plugin.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -524,14 +524,14 @@ void Helper::initHelperVariables()
   Helper::instantiateModelTip = tr("Instantiate/Flatten the Modelica class");
   Helper::FMU = tr("FMU");
   Helper::exportt = tr("Export");
-  Helper::exportFMUTip = tr("Exports the model as Functional Mockup Unit (FMU)");
+  Helper::exportFMUTip = tr("Exports the model as Functional Mock-up Unit (FMU)");
   Helper::sensitivityOptimization = tr("Sensitivity Optimization");
   Helper::exportReadonlyPackage = tr("Read-only Package");
   Helper::exportRealonlyPackageTip = tr("Exports the package as read-only package");
   Helper::exportEncryptedPackage = tr("Encrypted Package");
-  Helper::exportEncryptedPackageTip = tr("Exports the package as Encrytped package");
+  Helper::exportEncryptedPackageTip = tr("Exports the package as encrypted package");
   Helper::importFMU = tr("Import FMU");
-  Helper::importFMUTip = tr("Imports the model from Functional Mockup Interface (FMU)");
+  Helper::importFMUTip = tr("Imports the model from a Functional Mock-up Unit (FMU)");
   Helper::exportXML = tr("XML");
   Helper::exportXMLTip = tr("Exports the model as XML");
   Helper::exportToOMNotebook = tr("Export to OMNotebook");
@@ -594,7 +594,7 @@ void Helper::initHelperVariables()
   Helper::translateCRML = tr("Translate");
   Helper::translateCRMLTip = tr("Translates the CRML model to Modelica");
   Helper::translateAsCRML = tr("Translate As");
-  Helper::translateAsCRMLTip = tr("Translates As the CRML model to Modelica");
+  Helper::translateAsCRMLTip = tr("Translates the CRML model to Modelica with options");
   Helper::runScript = tr("Run");
   Helper::runScriptTip = tr("Runs the Modelica Script");
   Helper::options = tr("Options");
@@ -612,7 +612,7 @@ void Helper::initHelperVariables()
   Helper::rotation = tr("Rotation:");
   Helper::thickness = tr("Thickness:");
   Helper::smooth = tr("Smooth:");
-  Helper::bezier = tr("Bezier");
+  Helper::bezier = tr("Bézier");
   Helper::startArrow = tr("Start Arrow:");
   Helper::endArrow = tr("End Arrow:");
   Helper::arrowSize = tr("Arrow Size:");

@@ -3089,14 +3089,6 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
         <translation>Instansiera/platta ut Modelicaklassen</translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation>Exporterar modellen som en Functional Mockup Unit (FMU)</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation>Importerar modellen från en Functional Mockup Interface (FMU)</translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation>Exporterar modellen som XML</translation>
     </message>
@@ -3221,10 +3213,6 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
         <translation>Översätt som</translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation>Översätter CRML-modellen till en ny Modelicaklass</translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation>Kör</translation>
     </message>
@@ -3275,10 +3263,6 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
     <message>
         <source>Rotation:</source>
         <translation>Rotation:</translation>
-    </message>
-    <message>
-        <source>Bezier</source>
-        <translation>Bezier</translation>
     </message>
     <message>
         <source>Start Arrow:</source>
@@ -3429,10 +3413,6 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
         <translation>Krypterat paket</translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation>Exporterar paketet som ett krypterat paket</translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation>XML</translation>
     </message>
@@ -3567,6 +3547,26 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
     <message>
         <source>Reload</source>
         <translation>Ladda om</translation>
+    </message>
+    <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation>Exporterar modellen som en Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation>Exporterar paketet som ett krypterat paket</translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation>Importerar modellen från en Functional Mock-up Unit (FMU)</translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation>Översätter CRML-modellen till en ny Modelicaklass</translation>
+    </message>
+    <message>
+        <source>Bézier</source>
+        <translation>Bézier</translation>
     </message>
     <message>
         <source>Index</source>
@@ -5075,10 +5075,6 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>FMU-modellbeskrivning</translation>
     </message>
     <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
-        <translation>Importerar modellen från en FMU-modellbeskrivning</translation>
-    </message>
-    <message>
         <source>From OMNotebook</source>
         <translation>Från OMNotebook</translation>
     </message>
@@ -5633,6 +5629,10 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
     <message>
         <source>Saves the active class to Google Drive or OneDrive</source>
         <translation>Sparar den aktiva klassen i Google Drive eller OneDrive</translation>
+    </message>
+    <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
+        <translation>Importerar modellen från en FMU-modellbeskrivning</translation>
     </message>
     <message>
         <source>Clears the recent models list</source>

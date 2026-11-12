@@ -2921,6 +2921,18 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Modell instanziieren</translation>
     </message>
     <message>
+        <source>Exports the model as Functional Mock-up Unit (FMU)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exports the package as encrypted package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>OpenModelica Compiler CLI</source>
         <translation>OpenModelica Compiler CLI</translation>
     </message>
@@ -3089,14 +3101,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Instanziiert/flacht die Modelica-Klasse ab</translation>
     </message>
     <message>
-        <source>Exports the model as Functional Mockup Unit (FMU)</source>
-        <translation>Exportiert das Modell als Functional Mock-up Unit (FMU)</translation>
-    </message>
-    <message>
-        <source>Imports the model from Functional Mockup Interface (FMU)</source>
-        <translation>Importiert das Modell aus einer Functional Mock-up Unit (FMU)</translation>
-    </message>
-    <message>
         <source>Exports the model as XML</source>
         <translation>Exportiert das Modell als XML</translation>
     </message>
@@ -3213,10 +3217,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Übersetzen als</translation>
     </message>
     <message>
-        <source>Translates As the CRML model to Modelica</source>
-        <translation>Übersetzt das CRML-Modell nach Modelica mit Optionen</translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation>Ausführen</translation>
     </message>
@@ -3235,10 +3235,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     <message>
         <source>Rotation:</source>
         <translation>Drehung:</translation>
-    </message>
-    <message>
-        <source>Bezier</source>
-        <translation>Bézier</translation>
     </message>
     <message>
         <source>Start Arrow:</source>
@@ -3377,10 +3373,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Verschlüsseltes Paket</translation>
     </message>
     <message>
-        <source>Exports the package as Encrytped package</source>
-        <translation>Exportiert das Paket als verschlüsseltes Paket</translation>
-    </message>
-    <message>
         <source>XML</source>
         <translation>XML</translation>
     </message>
@@ -3515,6 +3507,14 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     <message>
         <source>Reload</source>
         <translation>Neu laden</translation>
+    </message>
+    <message>
+        <source>Translates the CRML model to Modelica with options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bézier</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Index</source>
@@ -5123,10 +5123,6 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>FMU-Modellbeschreibung</translation>
     </message>
     <message>
-        <source>Imports the model from Functional Mockup Interface (FMU) model description</source>
-        <translation>Importiert das Modell aus der Modellbeschreibung einer Functional Mock-up Unit (FMU)</translation>
-    </message>
-    <message>
         <source>From OMNotebook</source>
         <translation>Aus OMNotebook</translation>
     </message>
@@ -5633,6 +5629,10 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     <message>
         <source>Saves the active class to Google Drive or OneDrive</source>
         <translation>Speichert die aktive Klasse in Google Drive oder OneDrive</translation>
+    </message>
+    <message>
+        <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clears the recent models list</source>

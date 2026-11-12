@@ -4817,7 +4817,7 @@ void MainWindow::createActions()
   connect(mpImportFMUAction, SIGNAL(triggered()), SLOT(importModelFMU()));
   // import FMU model description action
   mpImportFMUModelDescriptionAction = new QAction(tr("FMU Model Description"), this);
-  mpImportFMUModelDescriptionAction->setStatusTip(tr("Imports the model from Functional Mockup Interface (FMU) model description"));
+  mpImportFMUModelDescriptionAction->setStatusTip(tr("Imports the model from the model description of a Functional Mock-up Unit (FMU)"));
   connect(mpImportFMUModelDescriptionAction, SIGNAL(triggered()), SLOT(importFMUModelDescription()));
   // import from OMNotebook action
   mpImportFromOMNotebookAction = new QAction(QIcon(":/Resources/icons/import-omnotebook.svg"), tr("From OMNotebook"), this);
