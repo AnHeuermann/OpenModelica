@@ -114,11 +114,7 @@ QString Helper::utf8 = "UTF-8";
 const char * const Helper::fmuPlatformNamePropertyId = "fmu-platform-name";
 QFontInfo Helper::systemFontInfo = QFontInfo(QFont());
 QFontInfo Helper::monospacedFontInfo = QFontInfo(QFont());
-#ifdef Q_OS_MAC
-QString Helper::toolsOptionsPath = tr("OMEdit->Preferences");
-#else
-QString Helper::toolsOptionsPath = tr("Tools->Options");
-#endif
+QString Helper::toolsOptionsPath;
 QString Helper::speedOptions = "10,5,2,1,0.5,0.2,0.1";
 QStringList Helper::timeDisplayUnits = QStringList() << "min" << "h" << "d";
 /* Meta Modelica Types */
@@ -457,6 +453,11 @@ QString Helper::switchModel;
 void Helper::initHelperVariables()
 {
   /* Global translated variables */
+#ifdef Q_OS_MAC
+  Helper::toolsOptionsPath = tr("OMEdit->Preferences");
+#else
+  Helper::toolsOptionsPath = tr("Tools->Options");
+#endif
   Helper::newModelicaClass = tr("Modelica Class");
   Helper::newModelicaClassTip = tr("Create New Modelica Class");
   Helper::newModelicaClassLibraryBrowser = tr("New Modelica Class");
