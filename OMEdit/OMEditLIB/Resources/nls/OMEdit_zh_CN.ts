@@ -4615,12 +4615,12 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>选择提交</translation>
     </message>
     <message>
-        <source>Sha1</source>
-        <translation>sha1</translation>
-    </message>
-    <message>
         <source>Subject</source>
         <translation>科目</translation>
+    </message>
+    <message>
+        <source>SHA-1</source>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -4913,10 +4913,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>无法执行终端命令 &lt;b&gt;%1&lt;/b&gt;（参数：&lt;b&gt;%2&lt;/b&gt;）。进程执行失败，错误：&lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>OMSens is not supported on MacOS</source>
-        <translation>OMSens 不支持 macOS 系统</translation>
-    </message>
-    <message>
         <source>Opens and converts the Modelica file(s) with encoding</source>
         <translation>用指定编码打开并且转Modelica文件</translation>
     </message>
@@ -4963,10 +4959,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Instantiate Model</source>
         <translation>实例化模型</translation>
-    </message>
-    <message>
-        <source>Instantiates the modelica model</source>
-        <translation>实例化modleica模型</translation>
     </message>
     <message>
         <source>New Parametric Plot Window</source>
@@ -5053,10 +5045,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>文档</translation>
     </message>
     <message>
-        <source>FMU_EXPORT Failed</source>
-        <translation>FMU_EXPORT 失败</translation>
-    </message>
-    <message>
         <source>Translating model %1 as FMU</source>
         <translation>正在将模型 %1 转换为 FMU</translation>
     </message>
@@ -5071,6 +5059,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Modelica Packages (*.mo *.zip)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OMSens is not supported on macOS</source>
+        <translation>OMSens 不支持 macOS 系统</translation>
     </message>
     <message>
         <source>CRML Testsuite</source>
@@ -5195,6 +5187,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Toggle between tab or sub-window view mode</source>
         <translation>在选项卡和子窗口间切换显示模式</translation>
+    </message>
+    <message>
+        <source>Instantiates the Modelica model</source>
+        <translation>实例化Modelica模型</translation>
     </message>
     <message>
         <source>Shows the list of archived simulations</source>

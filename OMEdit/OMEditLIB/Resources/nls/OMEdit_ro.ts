@@ -4600,11 +4600,11 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sha1</source>
+        <source>Subject</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Subject</source>
+        <source>SHA-1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4706,10 +4706,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FMU_EXPORT Failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Translating model %1 as FMU</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4739,10 +4735,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     </message>
     <message>
         <source>Unable to run terminal command &lt;b&gt;%1&lt;/b&gt; with arguments &lt;b&gt;%2&lt;/b&gt;. Process failed with error &lt;b&gt;%3&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OMSens is not supported on MacOS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5122,10 +5114,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Instanțiere Model</translation>
     </message>
     <message>
-        <source>Instantiates the modelica model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Transition Mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5174,6 +5162,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>OMSens is not supported on macOS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Failed to load OMSens plugin. %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5211,6 +5203,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     </message>
     <message>
         <source>Toggle between tab or sub-window view mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instantiates the Modelica model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

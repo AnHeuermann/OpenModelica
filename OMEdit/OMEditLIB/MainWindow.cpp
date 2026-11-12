@@ -1685,7 +1685,7 @@ void MainWindow::exportModelFMU(LibraryTreeItem *pLibraryTreeItem)
   const bool wasmTarget = targetLanguage.compare("wasm") == 0 || targetLanguage.compare("wasm-jit") == 0;
   if (!wasmTarget && targetLanguage.compare("C") != 0 && targetLanguage.compare("Cpp") != 0) {
     MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, tr("Target Language <b>%1</b> is not supported for FMU Export. Only <b>C</b>, <b>Cpp</b>, <b>wasm</b> and <b>wasm-jit</b> are supported").arg(targetLanguage),
-                                                                  tr("FMU_EXPORT Failed"), Helper::errorLevel));
+                                                                  Helper::scriptingKind, Helper::errorLevel));
     return;
   }
 
@@ -3938,7 +3938,7 @@ void MainWindow::runOMSensPlugin()
   if (!mpOMSensPlugin) {
     // load OMSens plugin
 #ifdef Q_OS_MAC
-    MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, tr("OMSens is not supported on MacOS"), Helper::scriptingKind, Helper::errorLevel));
+    MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, tr("OMSens is not supported on macOS"), Helper::scriptingKind, Helper::errorLevel));
     return;
   }
 #else
@@ -4993,7 +4993,7 @@ void MainWindow::createActions()
   connect(mpCheckAllModelsAction, SIGNAL(triggered()), SLOT(checkAllModels()));
   // instantiate model action
   mpInstantiateModelAction = new QAction(QIcon(":/Resources/icons/flatmodel.svg"), tr("Instantiate Model"), this);
-  mpInstantiateModelAction->setStatusTip(tr("Instantiates the modelica model"));
+  mpInstantiateModelAction->setStatusTip(tr("Instantiates the Modelica model"));
   mpInstantiateModelAction->setEnabled(false);
   connect(mpInstantiateModelAction, SIGNAL(triggered()), SLOT(instantiateModel()));
   // simulation setup action

@@ -4657,12 +4657,12 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>Commit auswählen</translation>
     </message>
     <message>
-        <source>Sha1</source>
-        <translation>SHA1</translation>
-    </message>
-    <message>
         <source>Subject</source>
         <translation>Betreff</translation>
+    </message>
+    <message>
+        <source>SHA-1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Ok</source>
@@ -4919,10 +4919,6 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>Der Terminalbefehl &lt;b&gt;%1&lt;/b&gt; mit den Argumenten &lt;b&gt;%2&lt;/b&gt; kann nicht ausgeführt werden. Der Prozess ist mit dem Fehler &lt;b&gt;%3&lt;/b&gt; fehlgeschlagen</translation>
     </message>
     <message>
-        <source>OMSens is not supported on MacOS</source>
-        <translation>OMSens wird unter macOS nicht unterstützt</translation>
-    </message>
-    <message>
         <source>Opens and converts the Modelica file(s) with encoding</source>
         <translation>Öffnet und konvertiert die Modelica-Datei(en) mit Zeichenkodierung</translation>
     </message>
@@ -4961,10 +4957,6 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     <message>
         <source>Instantiate Model</source>
         <translation>Modell instanziieren</translation>
-    </message>
-    <message>
-        <source>Instantiates the modelica model</source>
-        <translation>Instanziiert das Modelica-Modell</translation>
     </message>
     <message>
         <source>Opens the Modelica file(s)</source>
@@ -5043,10 +5035,6 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>Dokumentation</translation>
     </message>
     <message>
-        <source>FMU_EXPORT Failed</source>
-        <translation>FMU_EXPORT fehlgeschlagen</translation>
-    </message>
-    <message>
         <source>Translating model %1 as FMU</source>
         <translation>Modell %1 wird als FMU übersetzt</translation>
     </message>
@@ -5065,6 +5053,10 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     <message>
         <source>Importing ngspice netlist and converting to Modelica code</source>
         <translation>ngspice-Netzliste wird importiert und in Modelica-Code konvertiert</translation>
+    </message>
+    <message>
+        <source>OMSens is not supported on macOS</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to load OMSens plugin. %1</source>
@@ -5205,6 +5197,10 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     <message>
         <source>Toggle between tab or sub-window view mode</source>
         <translation>Schaltet zwischen Tab- und Unterfensteransicht um</translation>
+    </message>
+    <message>
+        <source>Instantiates the Modelica model</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Shows the list of archived simulations</source>

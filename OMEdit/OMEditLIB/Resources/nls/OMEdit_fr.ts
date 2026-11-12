@@ -4633,12 +4633,12 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished">Selectionner Commit</translation>
     </message>
     <message>
-        <source>Sha1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Subject</source>
         <translation type="unfinished">Sujet</translation>
+    </message>
+    <message>
+        <source>SHA-1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Ok</source>
@@ -4939,10 +4939,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Impossible d&apos;exécuter la commande de terminal &lt;b&gt;%1&lt;/b&gt; avec les arguments &lt;b&gt;%2&lt;/b&gt;. Le processus a échoué avec l&apos;erreur &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>OMSens is not supported on MacOS</source>
-        <translation>OMSens n&apos;est pas pris en charge sur MacOS</translation>
-    </message>
-    <message>
         <source>Opens the Modelica file(s)</source>
         <translation>Ouvre le(s) fichier(s) Modelica</translation>
     </message>
@@ -4981,10 +4977,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Instantiate Model</source>
         <translation>Instancier le Modèle</translation>
-    </message>
-    <message>
-        <source>Instantiates the modelica model</source>
-        <translation>Instancie le modèle modelica</translation>
     </message>
     <message>
         <source>New Parametric Plot Window</source>
@@ -5071,10 +5063,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FMU_EXPORT Failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Translating model %1 as FMU</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5089,6 +5077,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Modelica Packages (*.mo *.zip)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OMSens is not supported on macOS</source>
+        <translation>OMSens n&apos;est pas pris en charge sur macOS</translation>
     </message>
     <message>
         <source>CRML Testsuite</source>
@@ -5213,6 +5205,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Toggle between tab or sub-window view mode</source>
         <translation>Basculer entre le mode d&apos;affichage par onglet ou par sous-fenêtre</translation>
+    </message>
+    <message>
+        <source>Instantiates the Modelica model</source>
+        <translation>Instancie le modèle Modelica</translation>
     </message>
     <message>
         <source>Shows the list of archived simulations</source>

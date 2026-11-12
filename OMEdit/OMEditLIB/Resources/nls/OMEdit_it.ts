@@ -4656,12 +4656,12 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>Seleziona commit</translation>
     </message>
     <message>
-        <source>Sha1</source>
-        <translation>Sha1</translation>
-    </message>
-    <message>
         <source>Subject</source>
         <translation>Oggetto</translation>
+    </message>
+    <message>
+        <source>SHA-1</source>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -4962,10 +4962,6 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>Impossibile eseguire il comando del terminale &lt;b&gt;%1&lt;/b&gt; con gli argomenti &lt;b&gt;%2&lt;/b&gt;. Il processo non è riuscito con errore &lt;b&gt;%3&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>OMSens is not supported on MacOS</source>
-        <translation>OMSens non è supportato su macOS</translation>
-    </message>
-    <message>
         <source>Opens the Modelica file(s)</source>
         <translation>Apre i file Modelica</translation>
     </message>
@@ -5004,10 +5000,6 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
     <message>
         <source>Instantiate Model</source>
         <translation>Istanzia modello</translation>
-    </message>
-    <message>
-        <source>Instantiates the modelica model</source>
-        <translation>Istanzia il modello Modelica</translation>
     </message>
     <message>
         <source>New Parametric Plot Window</source>
@@ -5094,10 +5086,6 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>Documentazione</translation>
     </message>
     <message>
-        <source>FMU_EXPORT Failed</source>
-        <translation>Esportazione FMU non riuscita</translation>
-    </message>
-    <message>
         <source>Translating model %1 as FMU</source>
         <translation>Traduzione del modello %1 come FMU</translation>
     </message>
@@ -5112,6 +5100,10 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
     <message>
         <source>Modelica Packages (*.mo *.zip)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OMSens is not supported on macOS</source>
+        <translation>OMSens non è supportato su macOS</translation>
     </message>
     <message>
         <source>CRML Testsuite</source>
@@ -5236,6 +5228,10 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
     <message>
         <source>Toggle between tab or sub-window view mode</source>
         <translation>Alterna tra la modalità di visualizzazione a schede e a finestre</translation>
+    </message>
+    <message>
+        <source>Instantiates the Modelica model</source>
+        <translation>Istanzia il modello Modelica</translation>
     </message>
     <message>
         <source>Shows the list of archived simulations</source>

@@ -4657,12 +4657,12 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>Välj commit</translation>
     </message>
     <message>
-        <source>Sha1</source>
-        <translation>Sha1</translation>
-    </message>
-    <message>
         <source>Subject</source>
         <translation>Ämne</translation>
+    </message>
+    <message>
+        <source>SHA-1</source>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -4939,10 +4939,6 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>Dokumentation</translation>
     </message>
     <message>
-        <source>FMU_EXPORT Failed</source>
-        <translation>FMU-exporten misslyckades</translation>
-    </message>
-    <message>
         <source>Translating model %1 as FMU</source>
         <translation>Översätter modellen %1 som FMU</translation>
     </message>
@@ -4993,10 +4989,6 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
     <message>
         <source>Unable to run terminal command &lt;b&gt;%1&lt;/b&gt; with arguments &lt;b&gt;%2&lt;/b&gt;. Process failed with error &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>Kunde inte köra terminalkommandot &lt;b&gt;%1&lt;/b&gt; med argumenten &lt;b&gt;%2&lt;/b&gt;. Processen misslyckades med felet &lt;b&gt;%3&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>OMSens is not supported on MacOS</source>
-        <translation>OMSens stöds inte i macOS</translation>
     </message>
     <message>
         <source>Failed to load OMSens plugin. %1</source>
@@ -5201,10 +5193,6 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
     <message>
         <source>Instantiate Model</source>
         <translation>Instansiera modell</translation>
-    </message>
-    <message>
-        <source>Instantiates the modelica model</source>
-        <translation>Instansierar Modelicamodellen</translation>
     </message>
     <message>
         <source>Shows the list of archived simulations</source>
@@ -5603,6 +5591,10 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>Är du säker på att du vill rensa listan över senaste modeller?</translation>
     </message>
     <message>
+        <source>OMSens is not supported on macOS</source>
+        <translation>OMSens stöds inte i macOS</translation>
+    </message>
+    <message>
         <source>Loads the compiled model</source>
         <translation>Laddar in den kompilerade modellen</translation>
     </message>
@@ -5629,6 +5621,10 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
     <message>
         <source>Clears the recent models list</source>
         <translation>Rensar listan över senaste modeller</translation>
+    </message>
+    <message>
+        <source>Instantiates the Modelica model</source>
+        <translation>Instansierar Modelicamodellen</translation>
     </message>
     <message>
         <source>Recent &amp;Models</source>

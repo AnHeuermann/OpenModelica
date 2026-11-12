@@ -4614,12 +4614,12 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Выбор коммита</translation>
     </message>
     <message>
-        <source>Sha1</source>
-        <translation>Sha1</translation>
-    </message>
-    <message>
         <source>Subject</source>
         <translation>Тема</translation>
+    </message>
+    <message>
+        <source>SHA-1</source>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -4682,10 +4682,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Unable to run terminal command &lt;b&gt;%1&lt;/b&gt; with arguments &lt;b&gt;%2&lt;/b&gt;. Process failed with error &lt;b&gt;%3&lt;/b&gt;</source>
         <translation>Не удалось запустить команду терминала &lt;b&gt;%1&lt;/b&gt; с параметрами &lt;b&gt;%2&lt;/b&gt;. Процесс завершился с ошибкой &lt;b&gt;%3&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>OMSens is not supported on MacOS</source>
-        <translation>OMSens не поддерживается на MacOS</translation>
     </message>
     <message>
         <source>Opens and converts the Modelica file(s) with encoding</source>
@@ -4892,10 +4888,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FMU_EXPORT Failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Translating model %1 as FMU</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4934,6 +4926,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>exporting to Image</source>
         <translation>экспорта в изображение</translation>
+    </message>
+    <message>
+        <source>OMSens is not supported on macOS</source>
+        <translation>OMSens не поддерживается на macOS</translation>
     </message>
     <message>
         <source>Failed to load OMSens plugin. %1</source>
@@ -5130,10 +5126,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Instantiate Model</source>
         <translation>Создать экземпляр модели</translation>
-    </message>
-    <message>
-        <source>Instantiates the modelica model</source>
-        <translation>Создать экземпляр модели modelica</translation>
     </message>
     <message>
         <source>Shows the list of archived simulations</source>
@@ -5586,6 +5578,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Clears the recent models list</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instantiates the Modelica model</source>
+        <translation>Создать экземпляр модели Modelica</translation>
     </message>
     <message>
         <source>Recent &amp;Models</source>
