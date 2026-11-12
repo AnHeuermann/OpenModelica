@@ -2110,10 +2110,6 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>&lt;b&gt;%1&lt;b&gt; &lt;i&gt;%2&lt;/i&gt;已存在于&lt;b&gt;%3&lt;/b&gt;中。</translation>
     </message>
     <message>
-        <source>The file &lt;b&gt;%1&lt;/b&gt; not found.</source>
-        <translation>未找到文件&lt;b&gt;%1&lt;/b&gt;。</translation>
-    </message>
-    <message>
         <source>Error opening the file &lt;b&gt;%1&lt;/b&gt;. %2</source>
         <translation>&lt;b&gt;%1&lt;/b&gt; %2文件打开错误</translation>
     </message>
@@ -2164,10 +2160,6 @@ You can choose between waiting longer or abort debugging.</source>
     <message>
         <source>A component with the name &lt;b&gt;%1&lt;/b&gt; already exists. The name is changed from &lt;b&gt;%1&lt;/b&gt; to &lt;b&gt;%2&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;This is probably wrong because the component is declared as &lt;b&gt;inner&lt;/b&gt;.</source>
         <translation>名为&lt;b&gt;%1&lt;/b&gt;的组件已存在，名称由&lt;b&gt;%1&lt;/b&gt;改为&lt;b&gt;%2&lt;/b&gt;。通常这种错误是因为组件被声明为&lt;b&gt;inner&lt;/b&gt;。</translation>
-    </message>
-    <message>
-        <source>The FIGARO is generated.</source>
-        <translation>FIGARO已生成。</translation>
     </message>
     <message>
         <source>The encrypted package is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
@@ -2274,6 +2266,10 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>不能打开文件 &lt;b&gt;%1&lt;/b&gt; 。</translation>
     </message>
     <message>
+        <source>The file &lt;b&gt;%1&lt;/b&gt; was not found.</source>
+        <translation>未找到文件&lt;b&gt;%1&lt;/b&gt;。</translation>
+    </message>
+    <message>
         <source>Delete the existing class(es) before loading the file/library &lt;b&gt;%1&lt;/b&gt;.</source>
         <translation>加载文件/库&lt;b&gt;%1&lt;/b&gt;前删除现存类。</translation>
     </message>
@@ -2308,6 +2304,10 @@ You can choose between waiting longer or abort debugging.</source>
     <message>
         <source>The XML is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
         <translation>XML 生成于 &lt;b&gt;%1&lt;/b&gt;。</translation>
+    </message>
+    <message>
+        <source>The Figaro file is generated.</source>
+        <translation>FIGARO已生成。</translation>
     </message>
     <message>
         <source>The read-only package is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
@@ -2570,7 +2570,7 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>默认视图</translation>
     </message>
     <message>
-        <source>This settings will be used when no preferredView annotation is defined.</source>
+        <source>This setting is used when no preferredView annotation is defined.</source>
         <translation>当没有首先注释视图定义是使用此设置。</translation>
     </message>
     <message>

@@ -2112,10 +2112,6 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
         <translation>&lt;b&gt;%1&lt;/b&gt; &lt;i&gt;%2&lt;/i&gt; existerar redan i &lt;b&gt;%3&lt;/b&gt;.</translation>
     </message>
     <message>
-        <source>The file &lt;b&gt;%1&lt;/b&gt; not found.</source>
-        <translation>Filen &lt;b&gt;%1&lt;/b&gt; kunde inte hittas.</translation>
-    </message>
-    <message>
         <source>Cannot move FMU to &lt;b&gt;%1&lt;/b&gt;.</source>
         <translation>Kan inte flytta FMU:n till &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
@@ -2164,6 +2160,10 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
         <translation>Kunde inte öppna filen &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
     <message>
+        <source>The file &lt;b&gt;%1&lt;/b&gt; was not found.</source>
+        <translation>Filen &lt;b&gt;%1&lt;/b&gt; kunde inte hittas.</translation>
+    </message>
+    <message>
         <source>Error opening the file &lt;b&gt;%1&lt;/b&gt;. %2</source>
         <translation>Fel vid öppning av filen &lt;b&gt;%1&lt;/b&gt;. %2</translation>
     </message>
@@ -2190,6 +2190,10 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
     <message>
         <source>A component with the name &lt;b&gt;%1&lt;/b&gt; already exists. The name is changed from &lt;b&gt;%1&lt;/b&gt; to &lt;b&gt;%2&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;This is probably wrong because the component is declared as &lt;b&gt;inner&lt;/b&gt;.</source>
         <translation>En komponent med namn &lt;b&gt;%1&lt;/b&gt; existerar redan. Namnet är ändrat från &lt;b&gt;%1&lt;/b&gt; till &lt;b&gt;%2&lt;/b&gt;. &lt;br /&gt;&lt;br /&gt;Detta är förmodligen fel eftersom komponenten är deklarerad som &lt;b&gt;inner&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>The Figaro file is generated.</source>
+        <translation>Figaro-filen har genererats.</translation>
     </message>
     <message>
         <source>The encrypted package is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
@@ -2230,10 +2234,6 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
     <message>
         <source>Library index file &lt;b&gt;%1&lt;/b&gt; doesn&apos;t exist.</source>
         <translation>Biblioteksindexfilen &lt;b&gt;%1&lt;/b&gt; finns inte.</translation>
-    </message>
-    <message>
-        <source>The FIGARO is generated.</source>
-        <translation>FIGARO har genererats.</translation>
     </message>
     <message>
         <source>Are you sure you want to unload &lt;b&gt;%1&lt;/b&gt;? Everything contained inside this class will also be unloaded.</source>
@@ -2581,7 +2581,7 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
         <translation>Standardvy</translation>
     </message>
     <message>
-        <source>This settings will be used when no preferredView annotation is defined.</source>
+        <source>This setting is used when no preferredView annotation is defined.</source>
         <translation>Den här inställningen används när det inte finns någon preferredView-annotering.</translation>
     </message>
     <message>

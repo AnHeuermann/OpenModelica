@@ -2087,10 +2087,6 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>&lt;b&gt;%3&lt;/b&gt;.の中にすでに&lt;b&gt;%1&lt;/b&gt; &lt;i&gt;%2&lt;/i&gt;があります.</translation>
     </message>
     <message>
-        <source>The file &lt;b&gt;%1&lt;/b&gt; not found.</source>
-        <translation>ファイル &lt;b&gt;%1&lt;/b&gt;が見つかりません.</translation>
-    </message>
-    <message>
         <source>Error has occurred while loading the file/library &lt;b&gt;%1&lt;/b&gt;. Unable to load the file/library.</source>
         <translation>ライブラリy &lt;b&gt;%1&lt;/b&gt;のローディング中にエラーが発生しました.&#x3000;ライブラリをロードできません.</translation>
     </message>
@@ -2128,6 +2124,10 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>ファイル &lt;b&gt; %1 &lt;/b&gt;を開くことができません.</translation>
     </message>
     <message>
+        <source>The file &lt;b&gt;%1&lt;/b&gt; was not found.</source>
+        <translation>ファイル &lt;b&gt;%1&lt;/b&gt;が見つかりません.</translation>
+    </message>
+    <message>
         <source>Error opening the file &lt;b&gt;%1&lt;/b&gt;. %2</source>
         <translation>ファイル&lt;b&gt;%1&lt;/b&gt; の読込みでエラーが起きました. %2</translation>
     </message>
@@ -2154,6 +2154,10 @@ You can choose between waiting longer or abort debugging.</source>
     <message>
         <source>A component with the name &lt;b&gt;%1&lt;/b&gt; already exists. The name is changed from &lt;b&gt;%1&lt;/b&gt; to &lt;b&gt;%2&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;This is probably wrong because the component is declared as &lt;b&gt;inner&lt;/b&gt;.</source>
         <translation>&lt;b&gt;%1&lt;/b&gt;の名前のコンポーネントが存在しています. 名前は &lt;b&gt;%1&lt;/b&gt; から &lt;b&gt;%2&lt;/b&gt;へ変更されます. .&lt;br /&gt;&lt;br /&gt; コンポーネントは &lt;b&gt;inner&lt;/b&gt;として宣言されているため誤っていると思われます.</translation>
+    </message>
+    <message>
+        <source>The Figaro file is generated.</source>
+        <translation>FIGAROが生成されます.</translation>
     </message>
     <message>
         <source>The encrypted package is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
@@ -2194,10 +2198,6 @@ You can choose between waiting longer or abort debugging.</source>
     <message>
         <source>Library index file &lt;b&gt;%1&lt;/b&gt; doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The FIGARO is generated.</source>
-        <translation>FIGAROが生成されます.</translation>
     </message>
     <message>
         <source>A component with the name &lt;b&gt;%1&lt;/b&gt; already exists or is a Modelica keyword. Please choose another name.</source>
@@ -2560,7 +2560,7 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>デフォルトビュー</translation>
     </message>
     <message>
-        <source>This settings will be used when no preferredView annotation is defined.</source>
+        <source>This setting is used when no preferredView annotation is defined.</source>
         <translation>preferredViewの注記が無い場合この設定が使用されます.</translation>
     </message>
     <message>

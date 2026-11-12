@@ -5261,7 +5261,7 @@ GraphicalViewsPage::GraphicalViewsPage(OptionsDialog *pOptionsDialog)
   pModelingViewModeGroupBox->setLayout(modelingViewModeLayout);
   // Default View
   QGroupBox *pDefaultViewGroupBox = new QGroupBox(tr("Default View"));
-  pDefaultViewGroupBox->setToolTip(tr("This settings will be used when no preferredView annotation is defined."));
+  pDefaultViewGroupBox->setToolTip(tr("This setting is used when no preferredView annotation is defined."));
   mpIconViewRadioButton = new QRadioButton(Helper::iconView);
   mpDiagramViewRadioButton = new QRadioButton(Helper::diagramView);
   mpDiagramViewRadioButton->setChecked(true);

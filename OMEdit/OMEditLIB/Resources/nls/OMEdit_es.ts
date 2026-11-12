@@ -2113,10 +2113,6 @@ You can choose between waiting longer or abort debugging.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The file &lt;b&gt;%1&lt;/b&gt; not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error opening the file &lt;b&gt;%1&lt;/b&gt;. %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2146,10 +2142,6 @@ You can choose between waiting longer or abort debugging.</source>
     </message>
     <message>
         <source>A source-only FMU will be generated because an empty list of platforms is selected. If this is not intended, check settings in &lt;b&gt;%1-&gt;FMI-&gt;Platforms&lt;/b&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The FIGARO is generated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2233,6 +2225,10 @@ You can choose between waiting longer or abort debugging.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>The file &lt;b&gt;%1&lt;/b&gt; was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Enter a value for &lt;b&gt;%1&lt;/b&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2246,6 +2242,10 @@ You can choose between waiting longer or abort debugging.</source>
     </message>
     <message>
         <source>The XML is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Figaro file is generated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2557,7 +2557,7 @@ You can choose between waiting longer or abort debugging.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This settings will be used when no preferredView annotation is defined.</source>
+        <source>This setting is used when no preferredView annotation is defined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

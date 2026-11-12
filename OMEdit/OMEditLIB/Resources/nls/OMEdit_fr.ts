@@ -2112,10 +2112,6 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
         <translation>&lt;b&gt;%1&lt;/b&gt; &lt;i&gt;%2&lt;/i&gt; existe déjà dans &lt;b&gt;%3&lt;/b&gt;.</translation>
     </message>
     <message>
-        <source>The file &lt;b&gt;%1&lt;/b&gt; not found.</source>
-        <translation>Le fichier &lt;b&gt;%1&lt;/b&gt; n&apos;a pas été trouvé.</translation>
-    </message>
-    <message>
         <source>Cannot move FMU to &lt;b&gt;%1&lt;/b&gt;.</source>
         <translation>Impossible de déplacer FMU vers &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
@@ -2164,6 +2160,10 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
         <translation>Impossible d&apos;ouvrir le fichier &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
     <message>
+        <source>The file &lt;b&gt;%1&lt;/b&gt; was not found.</source>
+        <translation>Le fichier &lt;b&gt;%1&lt;/b&gt; n&apos;a pas été trouvé.</translation>
+    </message>
+    <message>
         <source>Error opening the file &lt;b&gt;%1&lt;/b&gt;. %2</source>
         <translation>Erreur lors de l&apos;ouverture du fichier &lt;b&gt;%1&lt;/b&gt;. %2</translation>
     </message>
@@ -2190,6 +2190,10 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
     <message>
         <source>A component with the name &lt;b&gt;%1&lt;/b&gt; already exists. The name is changed from &lt;b&gt;%1&lt;/b&gt; to &lt;b&gt;%2&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;This is probably wrong because the component is declared as &lt;b&gt;inner&lt;/b&gt;.</source>
         <translation>Un composant avec le nom &lt;b&gt;%1&lt;/b&gt; existe déjà. Le nom &lt;b&gt;%1&lt;/b&gt; a été changé en &lt;b&gt;%2&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;C&apos;est probablement faux car le composant est déclaré comme &lt;b&gt;intérieur&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>The Figaro file is generated.</source>
+        <translation>Le fichier Figaro a été généré.</translation>
     </message>
     <message>
         <source>The encrypted package is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
@@ -2231,10 +2235,6 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
     <message>
         <source>Library index file &lt;b&gt;%1&lt;/b&gt; doesn&apos;t exist.</source>
         <translation>Le fichier d&apos;index de bibliothèque &lt;b&gt;%1&lt;/b&gt; n&apos;existe pas.</translation>
-    </message>
-    <message>
-        <source>The FIGARO is generated.</source>
-        <translation>Le FIGARO est généré.</translation>
     </message>
     <message>
         <source>Are you sure you want to unload &lt;b&gt;%1&lt;/b&gt;? Everything contained inside this class will also be unloaded.</source>
@@ -2583,7 +2583,7 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
         <translation>Vue par Défaut</translation>
     </message>
     <message>
-        <source>This settings will be used when no preferredView annotation is defined.</source>
+        <source>This setting is used when no preferredView annotation is defined.</source>
         <translation>Ces réglages seront utilisés lorsque le paramètre pas de vue préférée est défini.</translation>
     </message>
     <message>

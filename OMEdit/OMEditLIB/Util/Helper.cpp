@@ -814,7 +814,7 @@ QString GUIMessages::getMessage(int type)
     case UNABLE_TO_DELETE_FILE:
       return tr("Unable to delete <b>%1</b>.");
     case FILE_NOT_FOUND:
-      return tr("The file <b>%1</b> not found.");
+      return tr("The file <b>%1</b> was not found.");
     case ERROR_OPENING_FILE:
       return tr("Error opening the file <b>%1</b>. %2");
     case UNABLE_TO_LOAD_MODEL:
@@ -852,7 +852,7 @@ QString GUIMessages::getMessage(int type)
     case XML_GENERATED:
       return tr("The XML is generated at <b>%1</b>.");
     case FIGARO_GENERATED:
-      return tr("The FIGARO is generated.");
+      return tr("The Figaro file is generated.");
     case ENCRYPTED_PACKAGE_GENERATED:
       return tr("The encrypted package is generated at <b>%1</b>.");
     case READONLY_PACKAGE_GENERATED:
