@@ -1429,6 +1429,10 @@ Select the models for which you want to discard the local translation flag and a
         <translation>Цвет фона</translation>
     </message>
     <message>
+        <source>Change the background color of your text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Align Left</source>
         <translation>По левому краю</translation>
     </message>
@@ -1538,6 +1542,10 @@ Select the models for which you want to discard the local translation flag and a
     </message>
     <message>
         <source>The model instance for %1 is not available; the documentation changes were not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

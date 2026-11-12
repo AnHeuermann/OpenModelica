@@ -1434,6 +1434,10 @@ Selezionare i modelli per cui scartare i flag di traduzione locali e applicare i
         <translation>Colore di sfondo</translation>
     </message>
     <message>
+        <source>Change the background color of your text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Align Left</source>
         <translation>Allinea a sinistra</translation>
     </message>
@@ -1544,6 +1548,10 @@ Selezionare i modelli per cui scartare i flag di traduzione locali e applicare i
     <message>
         <source>The model instance for %1 is not available; the documentation changes were not saved.</source>
         <translation>L&apos;istanza del modello per %1 non è disponibile; le modifiche alla documentazione non sono state salvate.</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

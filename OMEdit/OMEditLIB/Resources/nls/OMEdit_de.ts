@@ -1434,6 +1434,10 @@ Für die ausgewählten Modelle werden die lokalen Übersetzungsflags verworfen u
         <translation>Hintergrundfarbe</translation>
     </message>
     <message>
+        <source>Change the background color of your text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Align Left</source>
         <translation>Linksbündig</translation>
     </message>
@@ -1544,6 +1548,10 @@ Für die ausgewählten Modelle werden die lokalen Übersetzungsflags verworfen u
     <message>
         <source>The model instance for %1 is not available; the documentation changes were not saved.</source>
         <translation>Die Modellinstanz für %1 ist nicht verfügbar; die Änderungen an der Dokumentation wurden nicht gespeichert.</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

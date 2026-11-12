@@ -1432,6 +1432,10 @@ Sélectionnez les modèles pour lesquels vous souhaitez supprimer l&apos;indicat
         <translation>Couleur Arrière plan</translation>
     </message>
     <message>
+        <source>Change the background color of your text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Align Left</source>
         <translation>Aligner Gauche</translation>
     </message>
@@ -1543,6 +1547,10 @@ Sélectionnez les modèles pour lesquels vous souhaitez supprimer l&apos;indicat
     </message>
     <message>
         <source>The model instance for %1 is not available; the documentation changes were not saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
