@@ -687,7 +687,7 @@ void Helper::initHelperVariables()
   Helper::unstageCurrentFileFromCommit = tr("Unstage Current File");
   Helper::unstageCurrentFileFromCommitTip = tr("Unstaging current file from next commit");
   Helper::commitFiles = tr("Commit");
-  Helper::commitFilesTip = tr("Commiting modified files to the repository");
+  Helper::commitFilesTip = tr("Committing modified files to the repository");
   Helper::resume = tr("Resume");
   Helper::interrupt = tr("Interrupt");
   Helper::exit = tr("Exit");
@@ -719,9 +719,9 @@ void Helper::initHelperVariables()
   Helper::newOMSimulatorModel = tr("SSP Model");
   Helper::newOMSimulatorModelTip = tr("Creates a new SSP Model");
   Helper::addSystem = tr("Add System");
-  Helper::addSystemTip = tr("Adds the System i.e., FMI or TLM");
+  Helper::addSystemTip = tr("Adds the system, e.g. FMI or TLM");
   Helper::addSubModel = tr("Add SubModel");
-  Helper::addSubModelTip = tr("Adds the SubModel i.e., FMU or Table");
+  Helper::addSubModelTip = tr("Adds the submodel, e.g. FMU or table");
   Helper::addConnector = tr("Add Connector");
   Helper::addConnectorTip = tr("Adds the connector");
   Helper::running = tr("Running");

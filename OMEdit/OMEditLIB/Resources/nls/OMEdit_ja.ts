@@ -3248,6 +3248,10 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Committing modified files to the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Report Issue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3257,6 +3261,14 @@ Please check the Messages browser for error messages and possibly undo the lates
     </message>
     <message>
         <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adds the system, e.g. FMI or TLM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adds the submodel, e.g. FMU or table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3600,10 +3612,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Commiting modified files to the repository</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Resume</source>
         <translation>再開</translation>
     </message>
@@ -3716,15 +3724,7 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adds the System i.e., FMI or TLM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Add SubModel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adds the SubModel i.e., FMU or Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

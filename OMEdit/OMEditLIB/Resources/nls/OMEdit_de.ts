@@ -3265,6 +3265,10 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Elemente filtern</translation>
     </message>
     <message>
+        <source>Committing modified files to the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Report Issue</source>
         <translation>Problem melden</translation>
     </message>
@@ -3275,6 +3279,14 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     <message>
         <source>Version:</source>
         <translation>Version:</translation>
+    </message>
+    <message>
+        <source>Adds the system, e.g. FMI or TLM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adds the submodel, e.g. FMU or table</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Replace SubModel</source>
@@ -3597,10 +3609,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Commit</translation>
     </message>
     <message>
-        <source>Commiting modified files to the repository</source>
-        <translation>Committet die geänderten Dateien in das Repository</translation>
-    </message>
-    <message>
         <source>Resume</source>
         <translation>Fortsetzen</translation>
     </message>
@@ -3729,16 +3737,8 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>SSP-Modell</translation>
     </message>
     <message>
-        <source>Adds the System i.e., FMI or TLM</source>
-        <translation>Fügt das System hinzu, z. B. FMI oder TLM</translation>
-    </message>
-    <message>
         <source>Add SubModel</source>
         <translation>Submodell hinzufügen</translation>
-    </message>
-    <message>
-        <source>Adds the SubModel i.e., FMU or Table</source>
-        <translation>Fügt das Submodell hinzu, z. B. FMU oder Tabelle</translation>
     </message>
     <message>
         <source>Add Connector</source>

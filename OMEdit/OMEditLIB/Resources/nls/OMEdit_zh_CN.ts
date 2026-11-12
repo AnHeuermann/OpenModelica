@@ -3257,6 +3257,10 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>过滤元件</translation>
     </message>
     <message>
+        <source>Committing modified files to the repository</source>
+        <translation>正在向存储库提交当前修改文件</translation>
+    </message>
+    <message>
         <source>Report Issue</source>
         <translation>报告问题</translation>
     </message>
@@ -3267,6 +3271,14 @@ Please check the Messages browser for error messages and possibly undo the lates
     <message>
         <source>Version:</source>
         <translation>版本：</translation>
+    </message>
+    <message>
+        <source>Adds the system, e.g. FMI or TLM</source>
+        <translation>添加系统，例如 FMI 或者 TLM</translation>
+    </message>
+    <message>
+        <source>Adds the submodel, e.g. FMU or table</source>
+        <translation>添加子模型，例如 FMU 或 Table</translation>
     </message>
     <message>
         <source>Replace SubModel</source>
@@ -3613,10 +3625,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>提交</translation>
     </message>
     <message>
-        <source>Commiting modified files to the repository</source>
-        <translation>正在向存储库提交当前修改文件</translation>
-    </message>
-    <message>
         <source>Resume</source>
         <translation>继续</translation>
     </message>
@@ -3729,16 +3737,8 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>SSP模型</translation>
     </message>
     <message>
-        <source>Adds the System i.e., FMI or TLM</source>
-        <translation>添加系统，例如 FMI 或者 TLM</translation>
-    </message>
-    <message>
         <source>Add SubModel</source>
         <translation>添加子模型</translation>
-    </message>
-    <message>
-        <source>Adds the SubModel i.e., FMU or Table</source>
-        <translation>添加子模型，例如 FMU 或 Table</translation>
     </message>
     <message>
         <source>Add Connector</source>

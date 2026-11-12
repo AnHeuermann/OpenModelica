@@ -3268,6 +3268,10 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
         <translation>Filtra elementi</translation>
     </message>
     <message>
+        <source>Committing modified files to the repository</source>
+        <translation>Esegue il commit dei file modificati nel repository</translation>
+    </message>
+    <message>
         <source>Report Issue</source>
         <translation>Segnala un problema</translation>
     </message>
@@ -3278,6 +3282,14 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
     <message>
         <source>Version:</source>
         <translation>Versione:</translation>
+    </message>
+    <message>
+        <source>Adds the system, e.g. FMI or TLM</source>
+        <translation>Aggiunge un sistema, ad esempio FMI o TLM</translation>
+    </message>
+    <message>
+        <source>Adds the submodel, e.g. FMU or table</source>
+        <translation>Aggiunge un sottomodello, ad esempio FMU o tabella</translation>
     </message>
     <message>
         <source>Replace SubModel</source>
@@ -3624,10 +3636,6 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
         <translation>Esegui commit</translation>
     </message>
     <message>
-        <source>Commiting modified files to the repository</source>
-        <translation>Esegue il commit dei file modificati nel repository</translation>
-    </message>
-    <message>
         <source>Resume</source>
         <translation>Riprendi</translation>
     </message>
@@ -3740,16 +3748,8 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
         <translation>Modello SSP</translation>
     </message>
     <message>
-        <source>Adds the System i.e., FMI or TLM</source>
-        <translation>Aggiunge un sistema, ovvero FMI o TLM</translation>
-    </message>
-    <message>
         <source>Add SubModel</source>
         <translation>Aggiungi sottomodello</translation>
-    </message>
-    <message>
-        <source>Adds the SubModel i.e., FMU or Table</source>
-        <translation>Aggiunge un sottomodello, ovvero FMU o tabella</translation>
     </message>
     <message>
         <source>Add Connector</source>

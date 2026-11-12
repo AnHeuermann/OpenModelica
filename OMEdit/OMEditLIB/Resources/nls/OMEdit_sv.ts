@@ -3293,6 +3293,10 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
         <translation>Filtrera element</translation>
     </message>
     <message>
+        <source>Committing modified files to the repository</source>
+        <translation>Committar ändrade filer till repositoryt</translation>
+    </message>
+    <message>
         <source>Report Issue</source>
         <translation>Rapportera problem</translation>
     </message>
@@ -3303,6 +3307,14 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
     <message>
         <source>Version:</source>
         <translation>Version:</translation>
+    </message>
+    <message>
+        <source>Adds the system, e.g. FMI or TLM</source>
+        <translation>Lägger till ett system, t.ex. FMI eller TLM</translation>
+    </message>
+    <message>
+        <source>Adds the submodel, e.g. FMU or table</source>
+        <translation>Lägger till en delmodell, t.ex. FMU eller tabell</translation>
     </message>
     <message>
         <source>Replace SubModel</source>
@@ -3649,10 +3661,6 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
         <translation>Committa</translation>
     </message>
     <message>
-        <source>Commiting modified files to the repository</source>
-        <translation>Committar ändrade filer till repositoryt</translation>
-    </message>
-    <message>
         <source>Resume</source>
         <translation>Återuppta</translation>
     </message>
@@ -3765,16 +3773,8 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
         <translation>SSP-modell</translation>
     </message>
     <message>
-        <source>Adds the System i.e., FMI or TLM</source>
-        <translation>Lägger till ett system, dvs. FMI eller TLM</translation>
-    </message>
-    <message>
         <source>Add SubModel</source>
         <translation>Lägg till delmodell</translation>
-    </message>
-    <message>
-        <source>Adds the SubModel i.e., FMU or Table</source>
-        <translation>Lägger till en delmodell, dvs. FMU eller tabell</translation>
     </message>
     <message>
         <source>Add Connector</source>
