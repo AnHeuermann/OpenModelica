@@ -6683,10 +6683,6 @@ Ange vilken Python-tolk som har omuq installerat i Verktyg &gt; Alternativ &gt; 
 <context>
     <name>PlotWindowContainer</name>
     <message>
-        <source>Interactive Plot : %1</source>
-        <translation>Interaktivt diagram: %1</translation>
-    </message>
-    <message>
         <source>Name Plot Tab</source>
         <translation>Namnge diagramflik</translation>
     </message>
@@ -6729,6 +6725,10 @@ Ange vilken Python-tolk som har omuq installerat i Verktyg &gt; Alternativ &gt; 
     <message>
         <source>Select a plot window before saving a figure in a model.</source>
         <translation>Välj ett diagramfönster innan du sparar en figur i en modell.</translation>
+    </message>
+    <message>
+        <source>Interactive Plot: %1</source>
+        <translation>Interaktivt diagram: %1</translation>
     </message>
     <message>
         <source>There are no curves to save in the model annotation.</source>

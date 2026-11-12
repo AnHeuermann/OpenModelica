@@ -6618,10 +6618,6 @@ Set the Python executable that has omuq installed in Tools &gt; Options &gt; OMS
 <context>
     <name>PlotWindowContainer</name>
     <message>
-        <source>Interactive Plot : %1</source>
-        <translation>Интерактивный график: %1</translation>
-    </message>
-    <message>
         <source>Name Plot Tab</source>
         <translation>Имя вкладки графика</translation>
     </message>
@@ -6664,6 +6660,10 @@ Set the Python executable that has omuq installed in Tools &gt; Options &gt; OMS
     <message>
         <source>Select a plot window before saving a figure in a model.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interactive Plot: %1</source>
+        <translation>Интерактивный график: %1</translation>
     </message>
     <message>
         <source>There are no curves to save in the model annotation.</source>

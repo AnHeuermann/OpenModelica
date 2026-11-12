@@ -6682,10 +6682,6 @@ Impostare l&apos;eseguibile Python in cui è installato omuq in Strumenti &gt; O
 <context>
     <name>PlotWindowContainer</name>
     <message>
-        <source>Interactive Plot : %1</source>
-        <translation>Grafico interattivo: %1</translation>
-    </message>
-    <message>
         <source>Name Plot Tab</source>
         <translation>Assegna nome alla scheda del grafico</translation>
     </message>
@@ -6728,6 +6724,10 @@ Impostare l&apos;eseguibile Python in cui è installato omuq in Strumenti &gt; O
     <message>
         <source>Select a plot window before saving a figure in a model.</source>
         <translation>Selezionare una finestra del grafico prima di salvare una figura in un modello.</translation>
+    </message>
+    <message>
+        <source>Interactive Plot: %1</source>
+        <translation>Grafico interattivo: %1</translation>
     </message>
     <message>
         <source>There are no curves to save in the model annotation.</source>

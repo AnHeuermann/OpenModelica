@@ -6683,10 +6683,6 @@ Das Python-Programm, in dem omuq installiert ist, unter Werkzeuge &gt; Optionen 
 <context>
     <name>PlotWindowContainer</name>
     <message>
-        <source>Interactive Plot : %1</source>
-        <translation>Interaktiver Plot: %1</translation>
-    </message>
-    <message>
         <source>Name Plot Tab</source>
         <translation>Plot-Tab benennen</translation>
     </message>
@@ -6729,6 +6725,10 @@ Das Python-Programm, in dem omuq installiert ist, unter Werkzeuge &gt; Optionen 
     <message>
         <source>Select a plot window before saving a figure in a model.</source>
         <translation>Vor dem Speichern einer Abbildung in einem Modell ein Plotfenster auswählen.</translation>
+    </message>
+    <message>
+        <source>Interactive Plot: %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>There are no curves to save in the model annotation.</source>
