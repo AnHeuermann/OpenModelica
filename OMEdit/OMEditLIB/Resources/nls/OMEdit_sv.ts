@@ -3813,14 +3813,6 @@ Se fönstret Meddelanden för felmeddelanden och ångra eventuellt de senaste ä
         <translation>Villkor:</translation>
     </message>
     <message>
-        <source>Immediate</source>
-        <translation>Immediate</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation>Synchronize</translation>
-    </message>
-    <message>
         <source>Priority:</source>
         <translation>Priority:</translation>
     </message>

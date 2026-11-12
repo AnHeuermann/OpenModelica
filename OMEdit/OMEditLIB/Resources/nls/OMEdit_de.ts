@@ -3777,14 +3777,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Bedingung:</translation>
     </message>
     <message>
-        <source>Immediate</source>
-        <translation>Sofort</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation>Synchronisieren</translation>
-    </message>
-    <message>
         <source>Priority:</source>
         <translation>Priorität:</translation>
     </message>

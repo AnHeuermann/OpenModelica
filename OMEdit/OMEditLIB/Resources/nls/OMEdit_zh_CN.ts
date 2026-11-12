@@ -3777,14 +3777,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>情况：</translation>
     </message>
     <message>
-        <source>Immediate</source>
-        <translation>即时</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation>同步</translation>
-    </message>
-    <message>
         <source>Priority:</source>
         <translation>优先：</translation>
     </message>

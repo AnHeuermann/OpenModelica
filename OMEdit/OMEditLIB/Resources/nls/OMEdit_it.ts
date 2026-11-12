@@ -3788,14 +3788,6 @@ Controllare i messaggi di errore nella finestra Messaggi ed eventualmente annull
         <translation>Condizione:</translation>
     </message>
     <message>
-        <source>Immediate</source>
-        <translation>Immediate</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation>Synchronize</translation>
-    </message>
-    <message>
         <source>Priority:</source>
         <translation>Priority:</translation>
     </message>

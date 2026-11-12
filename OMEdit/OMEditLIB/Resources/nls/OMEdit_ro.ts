@@ -3764,14 +3764,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Immediate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Priority:</source>
         <translation type="unfinished"></translation>
     </message>

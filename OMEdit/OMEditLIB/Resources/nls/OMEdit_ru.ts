@@ -3800,14 +3800,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>Условие:</translation>
     </message>
     <message>
-        <source>Immediate</source>
-        <translation>Немедленно</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation>Синхронизировать</translation>
-    </message>
-    <message>
         <source>Priority:</source>
         <translation>Приоритет:</translation>
     </message>

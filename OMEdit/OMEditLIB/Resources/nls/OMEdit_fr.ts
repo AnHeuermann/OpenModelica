@@ -3793,14 +3793,6 @@ Please check the Messages browser for error messages and possibly undo the lates
         <translation>Condition:</translation>
     </message>
     <message>
-        <source>Immediate</source>
-        <translation>Immédiat</translation>
-    </message>
-    <message>
-        <source>Synchronize</source>
-        <translation>Synchroniser</translation>
-    </message>
-    <message>
         <source>Priority:</source>
         <translation>Priorité:</translation>
     </message>
