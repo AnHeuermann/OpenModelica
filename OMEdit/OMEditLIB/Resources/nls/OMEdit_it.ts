@@ -2000,7 +2000,7 @@ Se non è selezionata alcuna piattaforma, la FMU viene esportata come FMI 3.0 (f
         <translation>Generazione dei file target cmake di %1. Attendere.</translation>
     </message>
     <message>
-        <source>Generated cmake target files failed. Exited with code %1.</source>
+        <source>Generating the cmake target files failed. Exited with code %1.</source>
         <translation>La generazione dei file target cmake non è riuscita. Terminata con codice %1.</translation>
     </message>
     <message>

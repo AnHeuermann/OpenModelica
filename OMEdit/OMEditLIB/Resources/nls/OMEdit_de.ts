@@ -2000,8 +2000,8 @@ Ist keine Plattform ausgewählt, wird die FMU als FMI 3.0 (fmi-ls-wasm) exportie
         <translation>Erzeuge CMake-Zieldateien von %1. Einen Moment bitte.</translation>
     </message>
     <message>
-        <source>Generated cmake target files failed. Exited with code %1.</source>
-        <translation>Das Erzeugen der CMake-Zieldateien ist fehlgeschlagen. Beendet mit Code %1.</translation>
+        <source>Generating the cmake target files failed. Exited with code %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Generated cmake target files successfully.

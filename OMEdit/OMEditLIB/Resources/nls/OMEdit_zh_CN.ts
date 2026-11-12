@@ -1992,7 +1992,7 @@ With no platform selected, the FMU is exported as FMI 3.0 (fmi-ls-wasm).</source
         <translation>正在生成 %1 的cmake目标文件，请稍候。</translation>
     </message>
     <message>
-        <source>Generated cmake target files failed. Exited with code %1.</source>
+        <source>Generating the cmake target files failed. Exited with code %1.</source>
         <translation>生成cmake目标文件失败，退出代码：%1。</translation>
     </message>
     <message>

@@ -2000,7 +2000,7 @@ Om ingen plattform är vald exporteras FMU:n som FMI 3.0 (fmi-ls-wasm).</transla
         <translation>Genererar cmake-målfiler för %1. Vänta en stund.</translation>
     </message>
     <message>
-        <source>Generated cmake target files failed. Exited with code %1.</source>
+        <source>Generating the cmake target files failed. Exited with code %1.</source>
         <translation>Genereringen av cmake-målfiler misslyckades. Avslutades med koden %1.</translation>
     </message>
     <message>
