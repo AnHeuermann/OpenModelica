@@ -7701,6 +7701,10 @@ Can cause high overhead but values will not be missed.</source>
         <translation>仿真失败，退出码 %1 。</translation>
     </message>
     <message>
+        <source>URL is &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>URL 是 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
         <source>Simulation of %1 finished.</source>
         <translation>%1仿真完成。</translation>
     </message>
@@ -7741,10 +7745,6 @@ Can cause high overhead but values will not be missed.</source>
 </source>
         <translation>编译过程成功完成。
 </translation>
-    </message>
-    <message>
-        <source>Url is &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>URL 是 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Running simulation of %1.</source>
@@ -7818,7 +7818,7 @@ Can cause high overhead but values will not be missed.</source>
         <translation>仿真前保存模型</translation>
     </message>
     <message>
-        <source>Disabling this will effect the debugger functionality.</source>
+        <source>Disabling this will affect the debugger functionality.</source>
         <translation>禁用此项会影响调试器功能。</translation>
     </message>
     <message>
@@ -7861,7 +7861,7 @@ Can cause high overhead but values will not be missed.</source>
 <context>
     <name>SolverSettingsDialog</name>
     <message>
-        <source>SolverSettings - %1 (%2)</source>
+        <source>Solver Settings - %1 (%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

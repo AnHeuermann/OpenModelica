@@ -5451,7 +5451,7 @@ SimulationPage::SimulationPage(OptionsDialog *pOptionsDialog)
   mpIgnoreSimulationFlagsAnnotationCheckBox = new QCheckBox(tr("Ignore __OpenModelica_simulationFlags annotation"));
   /* save class before simulation checkbox */
   mpSaveClassBeforeSimulationCheckBox = new QCheckBox(tr("Save class before simulation"));
-  mpSaveClassBeforeSimulationCheckBox->setToolTip(tr("Disabling this will effect the debugger functionality."));
+  mpSaveClassBeforeSimulationCheckBox->setToolTip(tr("Disabling this will affect the debugger functionality."));
   mpSaveClassBeforeSimulationCheckBox->setChecked(OptionsDefaults::Simulation::saveClassBeforeSimulation);
   /* switch to plotting perspective after simulation checkbox */
   mpSwitchToPlottingPerspectiveCheckBox = new QCheckBox(tr("Switch to plotting perspective after simulation"));

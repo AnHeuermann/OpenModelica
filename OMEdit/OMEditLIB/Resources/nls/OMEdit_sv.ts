@@ -7768,6 +7768,10 @@ Kan ge stor extra belastning men inga värden går förlorade.</translation>
         <translation>Simuleringsprocessen misslyckades. Avslutades med koden %1.</translation>
     </message>
     <message>
+        <source>URL is &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>URL: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
         <source>Simulation of %1 finished.</source>
         <translation>Simuleringen av %1 är klar.</translation>
     </message>
@@ -7808,10 +7812,6 @@ Kan ge stor extra belastning men inga värden går förlorade.</translation>
 </source>
         <translation>Kompileringen avslutades utan fel.
 </translation>
-    </message>
-    <message>
-        <source>Url is &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>URL: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Running simulation of %1.</source>
@@ -7885,7 +7885,7 @@ Kan ge stor extra belastning men inga värden går förlorade.</translation>
         <translation>Spara klass före simulering</translation>
     </message>
     <message>
-        <source>Disabling this will effect the debugger functionality.</source>
+        <source>Disabling this will affect the debugger functionality.</source>
         <translation>Om du inaktiverar detta påverkas debuggerns funktion.</translation>
     </message>
     <message>
@@ -7928,7 +7928,7 @@ Kan ge stor extra belastning men inga värden går förlorade.</translation>
 <context>
     <name>SolverSettingsDialog</name>
     <message>
-        <source>SolverSettings - %1 (%2)</source>
+        <source>Solver Settings - %1 (%2)</source>
         <translation>Lösarinställningar - %1 (%2)</translation>
     </message>
     <message>

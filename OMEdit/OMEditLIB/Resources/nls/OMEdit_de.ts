@@ -7768,6 +7768,10 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
         <translation>Der Simulationsprozess ist fehlgeschlagen. Beendet mit Code %1.</translation>
     </message>
     <message>
+        <source>URL is &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Simulation of %1 finished.</source>
         <translation>Die Simulation von %1 ist beendet.</translation>
     </message>
@@ -7808,10 +7812,6 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
 </source>
         <translation>Der Kompilierungsprozess wurde erfolgreich beendet.
 </translation>
-    </message>
-    <message>
-        <source>Url is &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Die URL ist &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Running simulation of %1.</source>
@@ -7885,8 +7885,8 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
         <translation>Klasse vor der Simulation speichern</translation>
     </message>
     <message>
-        <source>Disabling this will effect the debugger functionality.</source>
-        <translation>Ohne diese Option funktioniert der Debugger nur eingeschränkt.</translation>
+        <source>Disabling this will affect the debugger functionality.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Switch to plotting perspective after simulation</source>
@@ -7928,8 +7928,8 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
 <context>
     <name>SolverSettingsDialog</name>
     <message>
-        <source>SolverSettings - %1 (%2)</source>
-        <translation>Löser-Einstellungen - %1 (%2)</translation>
+        <source>Solver Settings - %1 (%2)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Fixed Step Size:</source>

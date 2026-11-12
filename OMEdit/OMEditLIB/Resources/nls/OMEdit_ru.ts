@@ -7702,6 +7702,10 @@ Can cause high overhead but values will not be missed.</source>
         <translation>Ошибка: Процесс модулирования завершился с кодом %1.</translation>
     </message>
     <message>
+        <source>URL is &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>URL-адрес &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
         <source>Simulation of %1 finished.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7742,10 +7746,6 @@ Can cause high overhead but values will not be missed.</source>
 </source>
         <translation>Процесс компиляции завершён успешно.
 </translation>
-    </message>
-    <message>
-        <source>Url is &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Url-адрес &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Running simulation of %1.</source>
@@ -7819,7 +7819,7 @@ Can cause high overhead but values will not be missed.</source>
         <translation>Сохранять класс перед моделированием</translation>
     </message>
     <message>
-        <source>Disabling this will effect the debugger functionality.</source>
+        <source>Disabling this will affect the debugger functionality.</source>
         <translation>Отключение этого параметра влияет на функциональность отладчика.</translation>
     </message>
     <message>
@@ -7862,7 +7862,7 @@ Can cause high overhead but values will not be missed.</source>
 <context>
     <name>SolverSettingsDialog</name>
     <message>
-        <source>SolverSettings - %1 (%2)</source>
+        <source>Solver Settings - %1 (%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -7767,6 +7767,10 @@ Può causare un elevato overhead, ma nessun valore viene perso.</translation>
         <translation>Il processo di simulazione non è riuscito. Terminato con codice %1.</translation>
     </message>
     <message>
+        <source>URL is &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>URL: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
         <source>Simulation of %1 finished.</source>
         <translation>Simulazione di %1 completata.</translation>
     </message>
@@ -7807,10 +7811,6 @@ Può causare un elevato overhead, ma nessun valore viene perso.</translation>
 </source>
         <translation>Processo di compilazione completato correttamente.
 </translation>
-    </message>
-    <message>
-        <source>Url is &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>URL: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Running simulation of %1.</source>
@@ -7884,7 +7884,7 @@ Può causare un elevato overhead, ma nessun valore viene perso.</translation>
         <translation>Salva la classe prima della simulazione</translation>
     </message>
     <message>
-        <source>Disabling this will effect the debugger functionality.</source>
+        <source>Disabling this will affect the debugger functionality.</source>
         <translation>Disattivando questa opzione si influisce sul funzionamento del debugger.</translation>
     </message>
     <message>
@@ -7927,7 +7927,7 @@ Può causare un elevato overhead, ma nessun valore viene perso.</translation>
 <context>
     <name>SolverSettingsDialog</name>
     <message>
-        <source>SolverSettings - %1 (%2)</source>
+        <source>Solver Settings - %1 (%2)</source>
         <translation>Impostazioni del solutore - %1 (%2)</translation>
     </message>
     <message>

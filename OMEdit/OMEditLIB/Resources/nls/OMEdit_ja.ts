@@ -7689,6 +7689,10 @@ Can cause high overhead but values will not be missed.</source>
         <translation>シミュレーションプロセスが失敗. コード %1で終了.</translation>
     </message>
     <message>
+        <source>URL is &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Simulation of %1 finished.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7727,10 +7731,6 @@ Can cause high overhead but values will not be missed.</source>
     <message>
         <source>Compilation process finished successfully.
 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Url is &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7805,7 +7805,7 @@ Can cause high overhead but values will not be missed.</source>
         <translation>シミュレーション前にクラスを保存</translation>
     </message>
     <message>
-        <source>Disabling this will effect the debugger functionality.</source>
+        <source>Disabling this will affect the debugger functionality.</source>
         <translation>このスイッチをオフにするとデバグ機能に影響が出ます.</translation>
     </message>
     <message>
@@ -7848,7 +7848,7 @@ Can cause high overhead but values will not be missed.</source>
 <context>
     <name>SolverSettingsDialog</name>
     <message>
-        <source>SolverSettings - %1 (%2)</source>
+        <source>Solver Settings - %1 (%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
