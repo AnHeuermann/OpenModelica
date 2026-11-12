@@ -3266,7 +3266,7 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>Committing modified files to the repository</source>
-        <translation type="unfinished"></translation>
+        <translation>Committet die geänderten Dateien in das Repository</translation>
     </message>
     <message>
         <source>Report Issue</source>
@@ -3282,11 +3282,11 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>Adds the system, e.g. FMI or TLM</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt das System hinzu, z. B. FMI oder TLM</translation>
     </message>
     <message>
         <source>Adds the submodel, e.g. FMU or table</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt das Submodell hinzu, z. B. FMU oder Tabelle</translation>
     </message>
     <message>
         <source>Replace SubModel</source>
@@ -3622,15 +3622,15 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>Step Over</source>
-        <translation>Überspringen</translation>
+        <translation>Prozedurschritt</translation>
     </message>
     <message>
         <source>Step Into</source>
-        <translation>Hineinspringen</translation>
+        <translation>Einzelschritt</translation>
     </message>
     <message>
         <source>Step Return</source>
-        <translation>Zurückspringen</translation>
+        <translation>Ausführen bis Rücksprung</translation>
     </message>
     <message>
         <source>Attach to Running Process</source>
