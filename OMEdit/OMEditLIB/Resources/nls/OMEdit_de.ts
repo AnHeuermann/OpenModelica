@@ -702,15 +702,15 @@
     </message>
     <message>
         <source>Keep Mine For All</source>
-        <translation>Für alle meine behalten</translation>
+        <translation>Überall meine Version</translation>
     </message>
     <message>
         <source>Take Cloud For All</source>
-        <translation>Für alle Cloud übernehmen</translation>
+        <translation>Überall Cloud-Version</translation>
     </message>
     <message>
         <source>Keep Both For All</source>
-        <translation>Für alle beide behalten</translation>
+        <translation>Überall beide Versionen</translation>
     </message>
     <message>
         <source>Synchronise</source>
@@ -940,7 +940,7 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
     </message>
     <message>
         <source>Commit description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Commit-Beschreibung:</translation>
     </message>
 </context>
 <context>
@@ -1001,7 +1001,7 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
     </message>
     <message>
         <source>Your email (if we may contact you with questions about this issue):</source>
-        <translation type="unfinished"></translation>
+        <translation>E-Mail-Adresse (falls wir bei Fragen zu diesem Problem Kontakt aufnehmen dürfen):</translation>
     </message>
     <message>
         <source>Describe the issue in few words:</source>
@@ -1071,7 +1071,7 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
     </message>
     <message>
         <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf oberster Ebene existiert bereits eine Klasse &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
 </context>
 <context>
@@ -2165,7 +2165,7 @@ Sie können länger warten oder das Debuggen abbrechen.</numerusform>
     </message>
     <message>
         <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine Debug-Konfiguration mit dem Namen &lt;b&gt;%1&lt;/b&gt; existiert bereits. Fehler beim Speichern der Debug-Konfiguration &lt;b&gt;%2&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Unable to find component %1 while parsing transition(%2).</source>
