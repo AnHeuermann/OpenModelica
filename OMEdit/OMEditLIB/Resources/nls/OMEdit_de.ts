@@ -6372,7 +6372,7 @@ Endpunkt: %2</translation>
     </message>
     <message>
         <source>%1 activity %2</source>
-        <translation>%1 Aktivität %2</translation>
+        <translation>%1-Aktivität %2</translation>
     </message>
     <message>
         <source>none</source>
@@ -6728,7 +6728,7 @@ Das Python-Programm, in dem omuq installiert ist, unter Werkzeuge &gt; Optionen 
     </message>
     <message>
         <source>Interactive Plot: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Interaktiver Plot: %1</translation>
     </message>
     <message>
         <source>There are no curves to save in the model annotation.</source>
