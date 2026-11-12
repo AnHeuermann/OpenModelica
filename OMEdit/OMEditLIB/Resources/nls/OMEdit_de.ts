@@ -8213,7 +8213,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>Traceability Daemon IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>IP-Adresse des Traceability-Daemons:</translation>
     </message>
     <message>
         <source>Traceability Daemon Port:</source>
@@ -8599,7 +8599,7 @@ Variabilität: %4</translation>
     </message>
     <message>
         <source>No news without an internet connection.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohne Internetverbindung können keine Nachrichten angezeigt werden.</translation>
     </message>
     <message>
         <source>Recent Models</source>
