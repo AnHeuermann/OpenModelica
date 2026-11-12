@@ -8212,8 +8212,8 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
         <translation>Git-Repository:</translation>
     </message>
     <message>
-        <source>Traceability Daemon IP Adress:</source>
-        <translation>IP-Adresse des Traceability-Daemons:</translation>
+        <source>Traceability Daemon IP Address:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Traceability Daemon Port:</source>
@@ -8598,8 +8598,8 @@ Variabilität: %4</translation>
         <translation>Systembibliotheken</translation>
     </message>
     <message>
-        <source>Sorry, no internet no news items.</source>
-        <translation>Ohne Internetverbindung können keine Nachrichten angezeigt werden.</translation>
+        <source>No news without an internet connection.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Recent Models</source>

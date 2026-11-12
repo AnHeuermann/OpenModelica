@@ -8212,7 +8212,7 @@ Kan ge stor extra belastning men inga värden går förlorade.</translation>
         <translation>Git-repository:</translation>
     </message>
     <message>
-        <source>Traceability Daemon IP Adress:</source>
+        <source>Traceability Daemon IP Address:</source>
         <translation>IP-adress för spårbarhetsdemonen:</translation>
     </message>
     <message>
@@ -8598,7 +8598,7 @@ Variabilitet: %4</translation>
         <translation>Systembibliotek</translation>
     </message>
     <message>
-        <source>Sorry, no internet no news items.</source>
+        <source>No news without an internet connection.</source>
         <translation>Ingen internetanslutning, så inga nyheter kan visas.</translation>
     </message>
     <message>

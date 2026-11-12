@@ -6948,7 +6948,7 @@ TraceabilityPage::TraceabilityPage(OptionsDialog *pOptionsDialog)
   mpBrowseGitRepositoryButton->setAutoDefault(false);
   connect(mpBrowseGitRepositoryButton, SIGNAL(clicked()), SLOT(browseGitRepository()));
   // Traceability Daemon Ip Adress
-  mpTraceabilityDaemonIpAdressLabel = new Label(tr("Traceability Daemon IP Adress:"));
+  mpTraceabilityDaemonIpAdressLabel = new Label(tr("Traceability Daemon IP Address:"));
   mpTraceabilityDaemonIpAdressTextBox = new QLineEdit;
   // Traceability Daemon Port
   mpTraceabilityDaemonPortLabel = new Label(tr("Traceability Daemon Port:"));

@@ -8211,7 +8211,7 @@ Può causare un elevato overhead, ma nessun valore viene perso.</translation>
         <translation>Repository Git:</translation>
     </message>
     <message>
-        <source>Traceability Daemon IP Adress:</source>
+        <source>Traceability Daemon IP Address:</source>
         <translation>Indirizzo IP del demone di tracciabilità:</translation>
     </message>
     <message>
@@ -8597,7 +8597,7 @@ Variabilità: %4</translation>
         <translation>Librerie di sistema</translation>
     </message>
     <message>
-        <source>Sorry, no internet no news items.</source>
+        <source>No news without an internet connection.</source>
         <translation>Nessuna connessione a Internet, quindi non è possibile mostrare notizie.</translation>
     </message>
     <message>

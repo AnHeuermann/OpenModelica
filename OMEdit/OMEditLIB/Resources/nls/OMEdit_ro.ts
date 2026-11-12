@@ -8126,7 +8126,7 @@ Can cause high overhead but values will not be missed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Traceability Daemon IP Adress:</source>
+        <source>Traceability Daemon IP Address:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8507,7 +8507,7 @@ Variability: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sorry, no internet no news items.</source>
+        <source>No news without an internet connection.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -8145,7 +8145,7 @@ Can cause high overhead but values will not be missed.</source>
         <translation>Git 存储库：</translation>
     </message>
     <message>
-        <source>Traceability Daemon IP Adress:</source>
+        <source>Traceability Daemon IP Address:</source>
         <translation>可追踪守护进程IP地址：</translation>
     </message>
     <message>
@@ -8530,7 +8530,7 @@ Variability: %4</source>
         <translation>系统库</translation>
     </message>
     <message>
-        <source>Sorry, no internet no news items.</source>
+        <source>No news without an internet connection.</source>
         <translation>抱歉，没有网络，没有新闻项。</translation>
     </message>
     <message>
