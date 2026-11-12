@@ -936,6 +936,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <source>Commit Message </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commit description:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComponentNameDialog</name>
@@ -994,8 +998,8 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <translation>Envoyer Rapport</translation>
     </message>
     <message>
-        <source>Your Email (in case you want us to contact you regarding this issue):</source>
-        <translation>Votre e-mail (au cas où vous souhaiteriez que nous vous contactions à ce sujet)&#xa0;:</translation>
+        <source>Your email (if we may contact you with questions about this issue):</source>
+        <translation>Votre e-mail (si nous pouvons vous contacter pour des questions sur ce problème) :</translation>
     </message>
     <message>
         <source>Describe the issue in few words:</source>
@@ -1062,6 +1066,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
     <message>
         <source>System</source>
         <translation>Système</translation>
+    </message>
+    <message>
+        <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2180,6 +2188,10 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
         <translation>Le package chiffré est généré à &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
     <message>
+        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Une configuration de débuggage avec le nom &lt;b&gt;%1&lt;/b&gt; existe déjà. Une erreur s&apos;est produite pendant la sauvegarde de la configuration de débuggage &lt;b&gt;%2&lt;/b&gt;.</translation>
+    </message>
+    <message>
         <source>Unable to find component %1 while parsing %2 in %3.</source>
         <translation>Impossible de trouver le composant %1 lors de l&apos;analyse de %2 dans %3.</translation>
     </message>
@@ -2239,10 +2251,6 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
     <message>
         <source>Terminal command is not set. You can define a new terminal command in &lt;b&gt;%1-&gt;General-&gt;Terminal Command&lt;/b&gt;.</source>
         <translation>La commande du terminal n&apos;est pas définie. Vous pouvez définir une nouvelle commande de terminal dans &lt;b&gt;%1-&gt;Général-&gt;Commande de terminal&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;b&gt;.</source>
-        <translation>Une configuration de débuggage avec le nom &lt;b&gt;%1&lt;/b&gt; existe déjà. Une erreur s&apos;est produite pendant la sauvegarde de la configuration de débuggage &lt;b&gt;%2&lt;b&gt;.</translation>
     </message>
     <message>
         <source>The FMU is generated at &lt;b&gt;%1&lt;/b&gt;.</source>

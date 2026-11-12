@@ -933,6 +933,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <source>Commit Message </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commit description:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComponentNameDialog</name>
@@ -991,7 +995,7 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Your Email (in case you want us to contact you regarding this issue):</source>
+        <source>Your email (if we may contact you with questions about this issue):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1056,6 +1060,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
     </message>
     <message>
         <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2202,10 +2210,6 @@ You can choose between waiting longer or abort debugging.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;b&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please check the message browser for more error specific details.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2255,6 +2259,10 @@ You can choose between waiting longer or abort debugging.</source>
     </message>
     <message>
         <source>Are you sure you want to delete &lt;b&gt;%1&lt;/b&gt;?&lt;br /&gt;&lt;br /&gt;This will also delete from file system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -938,6 +938,10 @@ Den lokala kopian och dess synkroniseringsstatus tas bort. Ingenting i molnet p�
         <source>Commit Message </source>
         <translation>Commit-meddelande </translation>
     </message>
+    <message>
+        <source>Commit description:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComponentNameDialog</name>
@@ -996,8 +1000,8 @@ Den lokala kopian och dess synkroniseringsstatus tas bort. Ingenting i molnet p�
         <translation>Skicka rapport</translation>
     </message>
     <message>
-        <source>Your Email (in case you want us to contact you regarding this issue):</source>
-        <translation>Din e-post (om du vill att vi ska kontakta dig angående detta problem):</translation>
+        <source>Your email (if we may contact you with questions about this issue):</source>
+        <translation>Din e-post (om vi får kontakta dig med frågor om detta problem):</translation>
     </message>
     <message>
         <source>Describe the issue in few words:</source>
@@ -1064,6 +1068,10 @@ Den lokala kopian och dess synkroniseringsstatus tas bort. Ingenting i molnet p�
     <message>
         <source>System</source>
         <translation>System</translation>
+    </message>
+    <message>
+        <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2180,6 +2188,10 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
         <translation>Det krypterade paketet har genererats i &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
     <message>
+        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>En debug-konfiguration med namnet &lt;b&gt;%1&lt;/b&gt; existerar redan. Ett fel inträffade när debug-konfigurationen &lt;b&gt;%2&lt;/b&gt; sparades.</translation>
+    </message>
+    <message>
         <source>Unable to find component %1 while parsing %2 in %3.</source>
         <translation>Kunde inte hitta komponenten %1 vid tolkning av %2 i %3.</translation>
     </message>
@@ -2238,10 +2250,6 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
     <message>
         <source>Terminal command is not set. You can define a new terminal command in &lt;b&gt;%1-&gt;General-&gt;Terminal Command&lt;/b&gt;.</source>
         <translation>Inget terminalkommando är angivet. Du kan ange ett terminalkommando i &lt;b&gt;%1-&gt;Allmänt-&gt;Terminalkommando&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;b&gt;.</source>
-        <translation>En debug-konfiguration med namnet &lt;b&gt;%1&lt;/b&gt; existerar redan. Ett fel inträffade när debug-konfigurationen &lt;b&gt;%2&lt;/b&gt; sparades.</translation>
     </message>
     <message>
         <source>The FMU is generated at &lt;b&gt;%1&lt;/b&gt;.</source>

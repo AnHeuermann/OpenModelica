@@ -933,6 +933,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <source>Commit Message </source>
         <translation>Сообщение коммита </translation>
     </message>
+    <message>
+        <source>Commit description:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComponentNameDialog</name>
@@ -991,7 +995,7 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <translation>Отправить отчет</translation>
     </message>
     <message>
-        <source>Your Email (in case you want us to contact you regarding this issue):</source>
+        <source>Your email (if we may contact you with questions about this issue):</source>
         <translation>Адрес электронной почты (для обратной связи по этому вопросу):</translation>
     </message>
     <message>
@@ -1059,6 +1063,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
     <message>
         <source>System</source>
         <translation>Система</translation>
+    </message>
+    <message>
+        <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2185,10 +2193,6 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>Команда терминала не задана. Новую команду терминала можно задать в &lt;b&gt;%1-&gt;Общие-&gt;Команда терминала&lt;/b&gt;.</translation>
     </message>
     <message>
-        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;b&gt;.</source>
-        <translation>Конфигурация отладки с именем &lt;b&gt;%1&lt;/b&gt; уже существует. Ошибка произошла при сохранении конфигурации отладки &lt;b&gt;%2&lt;b&gt;.</translation>
-    </message>
-    <message>
         <source>A component with the name &lt;b&gt;%1&lt;/b&gt; already exists or is a Modelica keyword. Please choose another name.</source>
         <translation>Компонент с именем &lt;b&gt;%1&lt;/b&gt; уже существует или является ключевым словом Modelica. Выберите другое имя.</translation>
     </message>
@@ -2255,6 +2259,10 @@ You can choose between waiting longer or abort debugging.</source>
     <message>
         <source>Are you sure you want to delete &lt;b&gt;%1&lt;/b&gt;?&lt;br /&gt;&lt;br /&gt;This will also delete from file system.</source>
         <translation>Удалить &lt;b&gt;%1&lt;/b&gt;?&lt;br /&gt;&lt;br /&gt;Удаление будет выполнено и в файловой системе.</translation>
+    </message>
+    <message>
+        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Конфигурация отладки с именем &lt;b&gt;%1&lt;/b&gt; уже существует. Ошибка произошла при сохранении конфигурации отладки &lt;b&gt;%2&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Maximum &lt;b&gt;%1&lt;/b&gt; debug configurations are allowed.</source>

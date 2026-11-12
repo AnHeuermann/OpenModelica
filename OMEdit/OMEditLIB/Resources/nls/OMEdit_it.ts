@@ -938,6 +938,10 @@ La copia locale e il suo stato di sincronizzazione vengono rimossi. Nel cloud no
         <source>Commit Message </source>
         <translation>Messaggio di commit </translation>
     </message>
+    <message>
+        <source>Commit description:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComponentNameDialog</name>
@@ -996,8 +1000,8 @@ La copia locale e il suo stato di sincronizzazione vengono rimossi. Nel cloud no
         <translation>Invia rapporto</translation>
     </message>
     <message>
-        <source>Your Email (in case you want us to contact you regarding this issue):</source>
-        <translation>La tua email (se vuoi che ti contattiamo riguardo a questo problema):</translation>
+        <source>Your email (if we may contact you with questions about this issue):</source>
+        <translation>La tua email (se possiamo contattarti per domande su questo problema):</translation>
     </message>
     <message>
         <source>Describe the issue in few words:</source>
@@ -1064,6 +1068,10 @@ La copia locale e il suo stato di sincronizzazione vengono rimossi. Nel cloud no
     <message>
         <source>System</source>
         <translation>Sistema</translation>
+    </message>
+    <message>
+        <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2200,10 +2208,6 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>Il comando del terminale non è impostato. È possibile definire un nuovo comando del terminale in &lt;b&gt;%1-&gt;Generale-&gt;Comando del terminale&lt;/b&gt;.</translation>
     </message>
     <message>
-        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;b&gt;.</source>
-        <translation>Esiste già una configurazione di debug con il nome &lt;b&gt;%1&lt;/b&gt;. Si è verificato un errore durante il salvataggio della configurazione di debug &lt;b&gt;%2&lt;b&gt;.</translation>
-    </message>
-    <message>
         <source>Please check the message browser for more error specific details.</source>
         <translation>Consultare la finestra Messaggi per maggiori dettagli sull&apos;errore.</translation>
     </message>
@@ -2278,6 +2282,10 @@ You can choose between waiting longer or abort debugging.</source>
     <message>
         <source>Are you sure you want to delete &lt;b&gt;%1&lt;/b&gt;?&lt;br /&gt;&lt;br /&gt;This will also delete from file system.</source>
         <translation>Sei sicuro di voler eliminare &lt;b&gt;%1&lt;/b&gt;?&lt;br /&gt;&lt;br /&gt;Verrà eliminato anche dal file system.</translation>
+    </message>
+    <message>
+        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Esiste già una configurazione di debug con il nome &lt;b&gt;%1&lt;/b&gt;. Si è verificato un errore durante il salvataggio della configurazione di debug &lt;b&gt;%2&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Maximum &lt;b&gt;%1&lt;/b&gt; debug configurations are allowed.</source>

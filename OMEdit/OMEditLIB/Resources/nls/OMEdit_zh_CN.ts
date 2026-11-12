@@ -933,6 +933,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <source>Commit Message </source>
         <translation>提交信息 </translation>
     </message>
+    <message>
+        <source>Commit description:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComponentNameDialog</name>
@@ -991,7 +995,7 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <translation>发送报告</translation>
     </message>
     <message>
-        <source>Your Email (in case you want us to contact you regarding this issue):</source>
+        <source>Your email (if we may contact you with questions about this issue):</source>
         <translation>您的电子邮件（如果您希望我们就此问题与您联系）：</translation>
     </message>
     <message>
@@ -1059,6 +1063,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
     <message>
         <source>System</source>
         <translation>系统</translation>
+    </message>
+    <message>
+        <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2178,10 +2186,6 @@ You can choose between waiting longer or abort debugging.</source>
         <translation>格式 &lt;b&gt;%1&lt;b&gt; 修改无效。正确格式为  &lt;b&gt;phi(start=1)&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;b&gt;.</source>
-        <translation>名为 &lt;b&gt;%1&lt;b&gt;的调试配置已存在。保持调试配置 &lt;b&gt;%2&lt;b&gt; 时出错。</translation>
-    </message>
-    <message>
         <source>Maximum &lt;b&gt;%1&lt;/b&gt; debug configurations are allowed.</source>
         <translation>调试配置最大运行 &lt;b&gt;%1&lt;b&gt; 。</translation>
     </message>
@@ -2300,6 +2304,10 @@ You can choose between waiting longer or abort debugging.</source>
     <message>
         <source>The read-only package is generated at &lt;b&gt;%1&lt;/b&gt;.</source>
         <translation>只读包在&lt;b&gt;%1&lt;/b&gt;处生成。</translation>
+    </message>
+    <message>
+        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>名为 &lt;b&gt;%1&lt;/b&gt;的调试配置已存在。保存调试配置 &lt;b&gt;%2&lt;/b&gt; 时出错。</translation>
     </message>
     <message>
         <source>Automatically-adjusted vector length scales zoomed out the scene too much. Home position will be reset as if adjustable-length vectors were not drawn.</source>

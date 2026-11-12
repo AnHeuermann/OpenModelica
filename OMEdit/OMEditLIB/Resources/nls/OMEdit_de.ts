@@ -938,6 +938,10 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
         <source>Commit Message </source>
         <translation>Commit-Nachricht </translation>
     </message>
+    <message>
+        <source>Commit description:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ComponentNameDialog</name>
@@ -996,8 +1000,8 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
         <translation>Bericht senden</translation>
     </message>
     <message>
-        <source>Your Email (in case you want us to contact you regarding this issue):</source>
-        <translation>E-Mail-Adresse (falls wir zu diesem Problem nachfragen dürfen):</translation>
+        <source>Your email (if we may contact you with questions about this issue):</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Describe the issue in few words:</source>
@@ -1064,6 +1068,10 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
     <message>
         <source>System</source>
         <translation>System</translation>
+    </message>
+    <message>
+        <source>A top-level class named &lt;b&gt;%1&lt;/b&gt; already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2156,6 +2164,10 @@ Sie können länger warten oder das Debuggen abbrechen.</numerusform>
         <translation>&lt;b&gt;%1&lt;/b&gt; wirklich entladen?</translation>
     </message>
     <message>
+        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Unable to find component %1 while parsing transition(%2).</source>
         <translation>Die Komponente %1 wurde beim Parsen von transition(%2) nicht gefunden.</translation>
     </message>
@@ -2226,10 +2238,6 @@ Sie können länger warten oder das Debuggen abbrechen.</numerusform>
     <message>
         <source>Terminal command is not set. You can define a new terminal command in &lt;b&gt;%1-&gt;General-&gt;Terminal Command&lt;/b&gt;.</source>
         <translation>Der Terminalbefehl ist nicht festgelegt. Er kann in &lt;b&gt;%1-&gt;Allgemein-&gt;Terminalbefehl&lt;/b&gt; festgelegt werden.</translation>
-    </message>
-    <message>
-        <source>A debug configuration with name &lt;b&gt;%1&lt;/b&gt; already exists. Error occurred while saving the debug configuration &lt;b&gt;%2&lt;b&gt;.</source>
-        <translation>Eine Debug-Konfiguration mit dem Namen &lt;b&gt;%1&lt;/b&gt; existiert bereits. Fehler beim Speichern der Debug-Konfiguration &lt;b&gt;%2&lt;b&gt;.</translation>
     </message>
     <message>
         <source>Following error has occurred.&lt;br /&gt;%1</source>

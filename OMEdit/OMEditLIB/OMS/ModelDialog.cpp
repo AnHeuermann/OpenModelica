@@ -144,8 +144,7 @@ void CreateModelDialog::createNewModel()
     LibraryTreeItem *pChildLibraryTreeItem = pParentLibraryTreeItem->child(i);
     if (pChildLibraryTreeItem && pChildLibraryTreeItem->getName().compare(mpNameTextBox->text()) == 0) {
         QMessageBox::critical(this, QString("%1 - %2").arg(Helper::applicationName, Helper::error),
-                              GUIMessages::getMessage(GUIMessages::MODEL_ALREADY_EXISTS)
-                                  .arg(tr("Model"), mpNameTextBox->text(), "in scope"), QMessageBox::Ok);
+                              tr("A top-level class named <b>%1</b> already exists.").arg(mpNameTextBox->text()), QMessageBox::Ok);
         return;
     }
   }
