@@ -4515,27 +4515,27 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Updates the bindings</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisiert die Bindungen</translation>
     </message>
     <message>
         <source>Version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Version: %1</translation>
     </message>
     <message>
         <source>Version Date: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Versionsdatum: %1</translation>
     </message>
     <message>
         <source>Version Build: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Versions-Build: %1</translation>
     </message>
     <message>
         <source>Date Modified: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Änderungsdatum: %1</translation>
     </message>
     <message>
         <source>Revision ID: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisions-ID: %1</translation>
     </message>
     <message>
         <source>Generate Verification Scenarios</source>
@@ -4582,7 +4582,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
-        <translation type="unfinished"></translation>
+        <translation>„Speichern unter“ ist für ein Modelica-Paket, das als Verzeichnishierarchie gespeichert ist, nicht möglich.</translation>
     </message>
     <message>
         <source>Failed to find the class &lt;b&gt;%1&lt;/b&gt;.</source>
