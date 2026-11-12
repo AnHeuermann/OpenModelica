@@ -4662,7 +4662,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>SHA-1</source>
-        <translation type="unfinished"></translation>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -5056,7 +5056,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>OMSens is not supported on macOS</source>
-        <translation type="unfinished"></translation>
+        <translation>OMSens wird unter macOS nicht unterstützt</translation>
     </message>
     <message>
         <source>Failed to load OMSens plugin. %1</source>
@@ -5200,7 +5200,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Instantiates the Modelica model</source>
-        <translation type="unfinished"></translation>
+        <translation>Instanziiert das Modelica-Modell</translation>
     </message>
     <message>
         <source>Shows the list of archived simulations</source>
