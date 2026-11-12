@@ -5868,7 +5868,7 @@ Fortfahren?</numerusform>
     </message>
     <message>
         <source>State</source>
-        <translation>State</translation>
+        <translation>Zustand (State Machine)</translation>
     </message>
     <message>
         <source>Select Extends Class</source>
@@ -7159,7 +7159,7 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
     </message>
     <message>
         <source>SubModel file</source>
-        <translation type="unfinished"></translation>
+        <translation>Submodell-Datei</translation>
     </message>
     <message>
         <source>The submodel was replaced (dryRun =false). The following changes were detected and applied. See the Messages Browser for details.</source>
@@ -7293,7 +7293,7 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
     </message>
     <message>
         <source>Clears all the results</source>
-        <translation type="unfinished"></translation>
+        <translation>Löscht alle Ergebnisse</translation>
     </message>
     <message>
         <source>History:</source>
@@ -7346,7 +7346,7 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
     </message>
     <message>
         <source>Closure:</source>
-        <translation>Schließung:</translation>
+        <translation>Abschluss:</translation>
     </message>
     <message>
         <source>Text</source>
@@ -7569,7 +7569,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>Clock (Optional):</source>
-        <translation>Uhr (optional):</translation>
+        <translation>Zeitmessung (optional):</translation>
     </message>
     <message>
         <source>Linear Solver (Optional):</source>
