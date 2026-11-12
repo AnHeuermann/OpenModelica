@@ -5673,16 +5673,16 @@ Continue?</source>
         <translation>清理标签</translation>
     </message>
     <message>
-        <source>clears the messages from this tab</source>
+        <source>Clears the messages from this tab</source>
         <translation>清理当前标签信息</translation>
+    </message>
+    <message>
+        <source>Clears the messages from all tabs</source>
+        <translation>清理所有标签的信息</translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
         <translation>清理所有标签</translation>
-    </message>
-    <message>
-        <source>clears the messages from all tabs</source>
-        <translation>清理所有标签的信息</translation>
     </message>
 </context>
 <context>
@@ -5814,14 +5814,6 @@ Continue?</source>
     <message>
         <source>Insert in class (optional):</source>
         <translation>插入到类（可选）：</translation>
-    </message>
-    <message>
-        <source>Partial</source>
-        <translation>部分</translation>
-    </message>
-    <message>
-        <source>Encapsulated</source>
-        <translation>封装</translation>
     </message>
     <message>
         <source>State</source>

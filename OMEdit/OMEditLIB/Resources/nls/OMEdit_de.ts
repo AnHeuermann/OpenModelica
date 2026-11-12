@@ -5724,16 +5724,16 @@ Fortfahren?</numerusform>
         <translation>Diesen Tab leeren</translation>
     </message>
     <message>
-        <source>clears the messages from this tab</source>
-        <translation>Entfernt die Meldungen aus diesem Tab</translation>
+        <source>Clears the messages from this tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clears the messages from all tabs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
         <translation>Alle Tabs leeren</translation>
-    </message>
-    <message>
-        <source>clears the messages from all tabs</source>
-        <translation>Entfernt die Meldungen aus allen Tabs</translation>
     </message>
 </context>
 <context>
@@ -5865,14 +5865,6 @@ Fortfahren?</numerusform>
     <message>
         <source>Insert in class (optional):</source>
         <translation>In Klasse einfügen (optional):</translation>
-    </message>
-    <message>
-        <source>Partial</source>
-        <translation>Partial</translation>
-    </message>
-    <message>
-        <source>Encapsulated</source>
-        <translation>Encapsulated</translation>
     </message>
     <message>
         <source>State</source>

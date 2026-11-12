@@ -5724,16 +5724,16 @@ Vill du fortsätta?</numerusform>
         <translation>Töm den här fliken</translation>
     </message>
     <message>
-        <source>clears the messages from this tab</source>
+        <source>Clears the messages from this tab</source>
         <translation>Tömmer meddelandena i den här fliken</translation>
+    </message>
+    <message>
+        <source>Clears the messages from all tabs</source>
+        <translation>Tömmer meddelandena i alla flikar</translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
         <translation>Töm alla flikar</translation>
-    </message>
-    <message>
-        <source>clears the messages from all tabs</source>
-        <translation>Tömmer meddelandena i alla flikar</translation>
     </message>
 </context>
 <context>
@@ -5865,14 +5865,6 @@ Vill du fortsätta?</numerusform>
     <message>
         <source>Insert in class (optional):</source>
         <translation>Infoga i klass (frivillig):</translation>
-    </message>
-    <message>
-        <source>Partial</source>
-        <translation>Partial</translation>
-    </message>
-    <message>
-        <source>Encapsulated</source>
-        <translation>Encapsulated</translation>
     </message>
     <message>
         <source>State</source>

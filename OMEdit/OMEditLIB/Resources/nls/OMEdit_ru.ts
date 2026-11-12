@@ -5674,16 +5674,16 @@ Continue?</source>
         <translation>Очистить данную вкладку</translation>
     </message>
     <message>
-        <source>clears the messages from this tab</source>
+        <source>Clears the messages from this tab</source>
         <translation>удаляет сообщения из этой вкладки</translation>
+    </message>
+    <message>
+        <source>Clears the messages from all tabs</source>
+        <translation>удаляет сообщения из всех вкладок</translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
         <translation>Очистить все вкладки</translation>
-    </message>
-    <message>
-        <source>clears the messages from all tabs</source>
-        <translation>удаляет сообщения из всех вкладок</translation>
     </message>
 </context>
 <context>
@@ -5815,14 +5815,6 @@ Continue?</source>
     <message>
         <source>Insert in class (optional):</source>
         <translation>Вставить в класс (необязательно):</translation>
-    </message>
-    <message>
-        <source>Partial</source>
-        <translation>Partial</translation>
-    </message>
-    <message>
-        <source>Encapsulated</source>
-        <translation>Encapsulated</translation>
     </message>
     <message>
         <source>State</source>

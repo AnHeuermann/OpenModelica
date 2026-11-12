@@ -5664,15 +5664,15 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>clears the messages from this tab</source>
+        <source>Clears the messages from this tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clears the messages from all tabs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>clears the messages from all tabs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5805,14 +5805,6 @@ Continue?</source>
     <message>
         <source>Insert in class (optional):</source>
         <translation>挿入するクラス（オプション）:</translation>
-    </message>
-    <message>
-        <source>Partial</source>
-        <translation>Partial</translation>
-    </message>
-    <message>
-        <source>Encapsulated</source>
-        <translation>Encapsulated</translation>
     </message>
     <message>
         <source>State</source>

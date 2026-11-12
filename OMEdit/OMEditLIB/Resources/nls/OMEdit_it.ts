@@ -5723,16 +5723,16 @@ Continuare?</numerusform>
         <translation>Cancella questa scheda</translation>
     </message>
     <message>
-        <source>clears the messages from this tab</source>
+        <source>Clears the messages from this tab</source>
         <translation>Cancella i messaggi di questa scheda</translation>
+    </message>
+    <message>
+        <source>Clears the messages from all tabs</source>
+        <translation>Cancella i messaggi di tutte le schede</translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
         <translation>Cancella tutte le schede</translation>
-    </message>
-    <message>
-        <source>clears the messages from all tabs</source>
-        <translation>Cancella i messaggi di tutte le schede</translation>
     </message>
 </context>
 <context>
@@ -5864,14 +5864,6 @@ Continuare?</numerusform>
     <message>
         <source>Insert in class (optional):</source>
         <translation>Inserisci nella classe (opzionale):</translation>
-    </message>
-    <message>
-        <source>Partial</source>
-        <translation>Partial</translation>
-    </message>
-    <message>
-        <source>Encapsulated</source>
-        <translation>Encapsulated</translation>
     </message>
     <message>
         <source>State</source>

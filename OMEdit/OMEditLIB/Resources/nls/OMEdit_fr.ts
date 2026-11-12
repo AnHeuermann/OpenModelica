@@ -5692,16 +5692,16 @@ Continue?</source>
         <translation>Effacer Cet Onglet</translation>
     </message>
     <message>
-        <source>clears the messages from this tab</source>
+        <source>Clears the messages from this tab</source>
         <translation>efface les messages de cet onglet</translation>
+    </message>
+    <message>
+        <source>Clears the messages from all tabs</source>
+        <translation>efface les messages de tous les onglets</translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
         <translation>Effacer Tous les Onglets</translation>
-    </message>
-    <message>
-        <source>clears the messages from all tabs</source>
-        <translation>efface les messages de tous les onglets</translation>
     </message>
 </context>
 <context>
@@ -5833,14 +5833,6 @@ Continue?</source>
     <message>
         <source>Insert in class (optional):</source>
         <translation>Insérer dans la classe (optionnel):</translation>
-    </message>
-    <message>
-        <source>Partial</source>
-        <translation>Partial</translation>
-    </message>
-    <message>
-        <source>Encapsulated</source>
-        <translation>Encapsulé</translation>
     </message>
     <message>
         <source>State</source>
