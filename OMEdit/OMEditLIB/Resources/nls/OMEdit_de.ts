@@ -5725,11 +5725,11 @@ Fortfahren?</numerusform>
     </message>
     <message>
         <source>Clears the messages from this tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Entfernt die Meldungen aus diesem Tab</translation>
     </message>
     <message>
         <source>Clears the messages from all tabs</source>
-        <translation type="unfinished"></translation>
+        <translation>Entfernt die Meldungen aus allen Tabs</translation>
     </message>
     <message>
         <source>Clear All Tabs</source>
