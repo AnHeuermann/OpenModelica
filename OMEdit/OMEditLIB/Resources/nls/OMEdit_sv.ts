@@ -5439,12 +5439,12 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>SSP</translation>
     </message>
     <message>
-        <source>&amp;Git</source>
-        <translation>&amp;Git</translation>
+        <source>No active simulation output window. Please select a simulation output window for the re-simulation.</source>
+        <translation>Inget fönster för simuleringsutmatning är aktivt. Välj ett fönster för simuleringsutmatning för omsimulering.</translation>
     </message>
     <message>
-        <source>TraceabilityMenu</source>
-        <translation type="unfinished"></translation>
+        <source>&amp;Git</source>
+        <translation>&amp;Git</translation>
     </message>
     <message>
         <source>Traceability</source>
@@ -5629,10 +5629,6 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
     <message>
         <source>Recent &amp;Models</source>
         <translation>Senaste &amp;modeller</translation>
-    </message>
-    <message>
-        <source>No active simulation output window. Please select a simulation output window for re-simulate.</source>
-        <translation>Inget fönster för simuleringsutmatning är aktivt. Välj ett fönster för simuleringsutmatning för omsimulering.</translation>
     </message>
     <message>
         <source>Open a Modelica class first; it is the active class that gets saved.</source>

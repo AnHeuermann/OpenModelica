@@ -5442,6 +5442,10 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>&amp;Debug</translation>
     </message>
     <message>
+        <source>No active simulation output window. Please select a simulation output window for the re-simulation.</source>
+        <translation>Nessuna finestra di output della simulazione attiva. Selezionare una finestra di output della simulazione per la nuova simulazione.</translation>
+    </message>
+    <message>
         <source>&amp;SSP</source>
         <translation>&amp;SSP</translation>
     </message>
@@ -5452,10 +5456,6 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
     <message>
         <source>&amp;Git</source>
         <translation>&amp;Git</translation>
-    </message>
-    <message>
-        <source>TraceabilityMenu</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Traceability</source>
@@ -5628,10 +5628,6 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
     <message>
         <source>Recent &amp;Models</source>
         <translation>&amp;Modelli recenti</translation>
-    </message>
-    <message>
-        <source>No active simulation output window. Please select a simulation output window for re-simulate.</source>
-        <translation>Nessuna finestra di output della simulazione attiva. Selezionare una finestra di output della simulazione per la nuova simulazione.</translation>
     </message>
     <message>
         <source>Open a Modelica class first; it is the active class that gets saved.</source>

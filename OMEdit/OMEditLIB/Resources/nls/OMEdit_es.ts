@@ -5157,6 +5157,10 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>No active simulation output window. Please select a simulation output window for the re-simulation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5421,10 +5425,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>TraceabilityMenu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Traceability</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5570,10 +5570,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     </message>
     <message>
         <source>Recent &amp;Models</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No active simulation output window. Please select a simulation output window for re-simulate.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

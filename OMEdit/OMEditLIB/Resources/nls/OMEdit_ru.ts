@@ -5368,16 +5368,16 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>&amp;Отладка</translation>
     </message>
     <message>
+        <source>No active simulation output window. Please select a simulation output window for the re-simulation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;SSP</source>
         <translation>&amp;SSP</translation>
     </message>
     <message>
         <source>&amp;Git</source>
         <translation>&amp;Git</translation>
-    </message>
-    <message>
-        <source>TraceabilityMenu</source>
-        <translation>Меню отслеживания</translation>
     </message>
     <message>
         <source>Traceability</source>
@@ -5585,10 +5585,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     </message>
     <message>
         <source>Recent &amp;Models</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No active simulation output window. Please select a simulation output window for re-simulate.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

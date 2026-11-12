@@ -5415,6 +5415,10 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>SSP-Werkzeugleiste</translation>
     </message>
     <message>
+        <source>No active simulation output window. Please select a simulation output window for the re-simulation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;System Libraries</source>
         <translation>&amp;Systembibliotheken</translation>
     </message>
@@ -5449,10 +5453,6 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     <message>
         <source>&amp;Git</source>
         <translation>&amp;Git</translation>
-    </message>
-    <message>
-        <source>TraceabilityMenu</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Traceability</source>
@@ -5629,10 +5629,6 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     <message>
         <source>Recent &amp;Models</source>
         <translation>Zuletzt verwendete &amp;Modelle</translation>
-    </message>
-    <message>
-        <source>No active simulation output window. Please select a simulation output window for re-simulate.</source>
-        <translation>Kein aktives Simulationsausgabefenster. Für die erneute Simulation ein Simulationsausgabefenster auswählen.</translation>
     </message>
     <message>
         <source>Open a Modelica class first; it is the active class that gets saved.</source>

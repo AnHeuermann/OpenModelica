@@ -5498,7 +5498,7 @@ void MainWindow::createMenus()
   pGitMenu->setTitle(tr("&Git"));
   // Traceability actions
   QMenu *pTraceabilityMenu = new QMenu(menuBar());
-  pTraceabilityMenu->setObjectName(tr("TraceabilityMenu"));
+  pTraceabilityMenu->setObjectName("TraceabilityMenu");
   pTraceabilityMenu->setTitle(tr("Traceability"));
   // add actions to Git menu
   pGitMenu->addAction(mpCreateGitRepositoryAction);
@@ -6142,7 +6142,7 @@ void MainWindow::reSimulate(bool showSetup)
     pSimulationOutputWidget->reSimulate(showSetup);
   } else {
     QMessageBox::critical(MainWindow::instance(), QString("%1 - %2").arg(Helper::applicationName, Helper::error),
-                          tr("No active simulation output window. Please select a simulation output window for re-simulate."), QMessageBox::Ok);
+                          tr("No active simulation output window. Please select a simulation output window for the re-simulation."), QMessageBox::Ok);
   }
 }
 
