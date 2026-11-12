@@ -2922,15 +2922,15 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>Exports the model as Functional Mock-up Unit (FMU)</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportiert das Modell als Functional Mock-up Unit (FMU)</translation>
     </message>
     <message>
         <source>Exports the package as encrypted package</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportiert das Paket als verschlüsseltes Paket</translation>
     </message>
     <message>
         <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
-        <translation type="unfinished"></translation>
+        <translation>Importiert das Modell aus einer Functional Mock-up Unit (FMU)</translation>
     </message>
     <message>
         <source>OpenModelica Compiler CLI</source>
@@ -3098,7 +3098,7 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>Instantiate/Flatten the Modelica class</source>
-        <translation>Instanziiert/flacht die Modelica-Klasse ab</translation>
+        <translation>Instanziiert die Modelica-Klasse (flaches Modell)</translation>
     </message>
     <message>
         <source>Exports the model as XML</source>
@@ -3510,11 +3510,11 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>Translates the CRML model to Modelica with options</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersetzt das CRML-Modell nach Modelica mit Optionen</translation>
     </message>
     <message>
         <source>Bézier</source>
-        <translation type="unfinished"></translation>
+        <translation>Bézier</translation>
     </message>
     <message>
         <source>Index</source>
@@ -5632,7 +5632,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Imports the model from the model description of a Functional Mock-up Unit (FMU)</source>
-        <translation type="unfinished"></translation>
+        <translation>Importiert das Modell aus der Modellbeschreibung einer Functional Mock-up Unit (FMU)</translation>
     </message>
     <message>
         <source>Clears the recent models list</source>
