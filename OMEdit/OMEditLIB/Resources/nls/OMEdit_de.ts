@@ -457,7 +457,7 @@
     <message>
         <source>Translating %1 with crml.js
 </source>
-        <translation>Übersetze %1 mit crml.js
+        <translation>%1 wird mit crml.js übersetzt
 </translation>
     </message>
     <message>
@@ -607,7 +607,7 @@
     </message>
     <message>
         <source>Opening %1...</source>
-        <translation>Öffne %1...</translation>
+        <translation>%1 wird geöffnet...</translation>
     </message>
     <message>
         <source>Could not open the cloud folder: %1</source>
@@ -615,7 +615,7 @@
     </message>
     <message>
         <source>Listing %1...</source>
-        <translation>Liste %1 auf...</translation>
+        <translation>%1 wird aufgelistet...</translation>
     </message>
     <message>
         <source>Could not list the folder: %1</source>
@@ -635,7 +635,7 @@
     </message>
     <message>
         <source>Creating %1...</source>
-        <translation>Erstelle %1...</translation>
+        <translation>%1 wird erstellt...</translation>
     </message>
     <message>
         <source>Could not create the folder: %1</source>
@@ -842,7 +842,7 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
     <name>CloudSyncEngine</name>
     <message>
         <source>Looking at %1...</source>
-        <translation>Prüfe %1...</translation>
+        <translation>%1 wird geprüft...</translation>
     </message>
     <message>
         <source>%1: the folder holds more than one entry with this name</source>
@@ -1641,11 +1641,11 @@ Für die ausgewählten Modelle werden die lokalen Übersetzungsflags verworfen u
     </message>
     <message>
         <source>Opening %1 %2 parameters window</source>
-        <translation>Öffne Parameterfenster von %1 %2</translation>
+        <translation>Parameterfenster von %1 %2 wird geöffnet</translation>
     </message>
     <message>
         <source>Opening %1 %2 attributes window</source>
-        <translation>Öffne Attributfenster von %1 %2</translation>
+        <translation>Attributfenster von %1 %2 wird geöffnet</translation>
     </message>
 </context>
 <context>
@@ -1741,7 +1741,7 @@ Für die ausgewählten Modelle werden die lokalen Übersetzungsflags verworfen u
     <name>ElementTreeView</name>
     <message>
         <source>Opening %1 %2 parameters window</source>
-        <translation>Öffne Parameterfenster von %1 %2</translation>
+        <translation>Parameterfenster von %1 %2 wird geöffnet</translation>
     </message>
 </context>
 <context>
@@ -1759,7 +1759,7 @@ Für die ausgewählten Modelle werden die lokalen Übersetzungsflags verworfen u
     </message>
     <message>
         <source>Exporting model as Figaro</source>
-        <translation>Exportiere Modell als Figaro</translation>
+        <translation>Modell wird als Figaro exportiert</translation>
     </message>
 </context>
 <context>
@@ -1997,11 +1997,11 @@ Ist keine Plattform ausgewählt, wird die FMU als FMI 3.0 (fmi-ls-wasm) exportie
     </message>
     <message>
         <source>Generating cmake target files of %1. Please wait for a while.</source>
-        <translation>Erzeuge CMake-Zieldateien von %1. Einen Moment bitte.</translation>
+        <translation>CMake-Zieldateien von %1 werden erzeugt. Einen Moment bitte.</translation>
     </message>
     <message>
         <source>Generating the cmake target files failed. Exited with code %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Erzeugen der CMake-Zieldateien ist fehlgeschlagen. Beendet mit Code %1.</translation>
     </message>
     <message>
         <source>Generated cmake target files successfully.
@@ -2019,7 +2019,7 @@ Ist keine Plattform ausgewählt, wird die FMU als FMI 3.0 (fmi-ls-wasm) exportie
     </message>
     <message>
         <source>Building %1</source>
-        <translation>Erstelle %1</translation>
+        <translation>%1 wird erstellt</translation>
     </message>
     <message>
         <source>Post compilation process failed. Exited with code %1.</source>
@@ -2041,7 +2041,7 @@ Ist keine Plattform ausgewählt, wird die FMU als FMI 3.0 (fmi-ls-wasm) exportie
     </message>
     <message>
         <source>Zipping of %1</source>
-        <translation>Packe %1 als ZIP</translation>
+        <translation>%1 wird als ZIP gepackt</translation>
     </message>
     <message>
         <source>The FMU is generated at: %1</source>
@@ -2067,9 +2067,9 @@ Ist keine Plattform ausgewählt, wird die FMU als FMI 3.0 (fmi-ls-wasm) exportie
 You can choose between waiting longer or abort debugging.</source>
         <translation>
             <numerusform>Der GDB-Prozess hat innerhalb von %n Sekunde nicht auf einen Befehl reagiert. Möglicherweise hängt er in einer Endlosschleife oder braucht für den Vorgang länger als erwartet.
-Sie können länger warten oder das Debuggen abbrechen.</numerusform>
+Weiter warten oder das Debuggen abbrechen?</numerusform>
             <numerusform>Der GDB-Prozess hat innerhalb von %n Sekunden nicht auf einen Befehl reagiert. Möglicherweise hängt er in einer Endlosschleife oder braucht für den Vorgang länger als erwartet.
-Sie können länger warten oder das Debuggen abbrechen.</numerusform>
+Weiter warten oder das Debuggen abbrechen?</numerusform>
         </translation>
     </message>
     <message>
@@ -2665,7 +2665,7 @@ Sie können länger warten oder das Debuggen abbrechen.</numerusform>
     </message>
     <message>
         <source>Opening %1 parameters window</source>
-        <translation>Öffne Parameterfenster von %1</translation>
+        <translation>Parameterfenster von %1 wird geöffnet</translation>
     </message>
     <message>
         <source>The Modelica code of this model is invalid, so the graphics cannot be displayed.
@@ -2938,7 +2938,7 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     </message>
     <message>
         <source>Loading</source>
-        <translation>Lade</translation>
+        <translation>Wird geladen</translation>
     </message>
     <message>
         <source>Question</source>
@@ -4274,7 +4274,7 @@ Das Server-Programm oben und den Meldungsbrowser auf Details prüfen.</translati
     </message>
     <message>
         <source>Checking the release contents...</source>
-        <translation>Prüfe den Inhalt des Release...</translation>
+        <translation>Inhalt des Release wird geprüft...</translation>
     </message>
     <message>
         <source>Failed to read release %1 of the Modelica language server:
@@ -4292,7 +4292,7 @@ Die veröffentlichten Prüfsummen konnten nicht abgerufen werden, daher wurde ni
     </message>
     <message>
         <source>Downloading %1 (%2 MB)...</source>
-        <translation>Lade %1 herunter (%2 MB)...</translation>
+        <translation>%1 wird heruntergeladen (%2 MB)...</translation>
     </message>
     <message>
         <source>Release %1 does not provide %2.
@@ -4358,7 +4358,7 @@ Einen Server selbst erstellen und als Server-Programm angeben.</translation>
     </message>
     <message>
         <source>Downloading the Modelica language server...</source>
-        <translation>Lade den Modelica Language Server herunter...</translation>
+        <translation>Modelica Language Server wird heruntergeladen...</translation>
     </message>
     <message>
         <source>Release %1 publishes no checksum for:
@@ -4440,7 +4440,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Loading system libraries</source>
-        <translation>Lade Systembibliotheken</translation>
+        <translation>Systembibliotheken werden geladen</translation>
     </message>
 </context>
 <context>
@@ -4582,7 +4582,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Saving %1</source>
-        <translation>Speichere %1</translation>
+        <translation>%1 wird gespeichert</translation>
     </message>
     <message>
         <source>Unable to save the file, unknown library type.</source>
@@ -4820,11 +4820,11 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Reading Settings</source>
-        <translation>Lese Einstellungen</translation>
+        <translation>Einstellungen werden gelesen</translation>
     </message>
     <message>
         <source>Loading Widgets</source>
-        <translation>Lade Widgets</translation>
+        <translation>Widgets werden geladen</translation>
     </message>
     <message>
         <source>Bitmap</source>
@@ -4864,7 +4864,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Creating Widgets</source>
-        <translation>Erzeuge Widgets</translation>
+        <translation>Widgets werden erzeugt</translation>
     </message>
     <message>
         <source>Welcome</source>
@@ -4872,7 +4872,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Exporting model as XML</source>
-        <translation>Exportiere Modell als XML</translation>
+        <translation>Modell wird als XML exportiert</translation>
     </message>
     <message>
         <source>instantiating</source>
@@ -4908,7 +4908,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Updating library index</source>
-        <translation>Aktualisiere Bibliotheksindex</translation>
+        <translation>Bibliotheksindex wird aktualisiert</translation>
     </message>
     <message>
         <source>Failed to update the library index. This could be because of bad internet connection.</source>
@@ -4916,7 +4916,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Importing model(s) from OMNotebook</source>
-        <translation>Importiere Modell(e) aus OMNotebook</translation>
+        <translation>Modell(e) werden aus OMNotebook importiert</translation>
     </message>
     <message>
         <source>exporting to Image</source>
@@ -4980,7 +4980,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Initializing</source>
-        <translation>Initialisiere</translation>
+        <translation>Wird initialisiert</translation>
     </message>
     <message>
         <source>Changes to welcome perspective (%1)</source>
@@ -5008,11 +5008,11 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Exporting the package as encrypted package</source>
-        <translation>Exportiere das Paket als verschlüsseltes Paket</translation>
+        <translation>Paket wird als verschlüsseltes Paket exportiert</translation>
     </message>
     <message>
         <source>Exporting the package as read-only package</source>
-        <translation>Exportiere das Paket als schreibgeschütztes Paket</translation>
+        <translation>Paket wird als schreibgeschütztes Paket exportiert</translation>
     </message>
     <message>
         <source>Unable to find the file &lt;b&gt;%1&lt;/b&gt; with line number &lt;b&gt;%2&lt;/b&gt;</source>
@@ -5056,7 +5056,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Translating model %1 as FMU</source>
-        <translation>Übersetze Modell %1 als FMU</translation>
+        <translation>Modell %1 wird als FMU übersetzt</translation>
     </message>
     <message>
         <source>making read-only package</source>
@@ -5072,7 +5072,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Importing ngspice netlist and converting to Modelica code</source>
-        <translation>Importiere ngspice-Netzliste und konvertiere sie in Modelica-Code</translation>
+        <translation>ngspice-Netzliste wird importiert und in Modelica-Code konvertiert</translation>
     </message>
     <message>
         <source>Failed to load OMSens plugin. %1</source>
@@ -5524,11 +5524,11 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Exporting model to OMNotebook</source>
-        <translation>Exportiere Modell nach OMNotebook</translation>
+        <translation>Modell wird nach OMNotebook exportiert</translation>
     </message>
     <message>
         <source>Exporting model as an Image</source>
-        <translation>Exportiere Modell als Bild</translation>
+        <translation>Modell wird als Bild exportiert</translation>
     </message>
     <message>
         <source>Import</source>
@@ -5568,7 +5568,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Creating widgets</source>
-        <translation>Erzeuge Widgets</translation>
+        <translation>Widgets werden erzeugt</translation>
     </message>
     <message>
         <source>All files must be in the same directory.</source>
@@ -5580,7 +5580,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Exporting model %1 as FMU</source>
-        <translation>Exportiere Modell %1 als FMU</translation>
+        <translation>Modell %1 wird als FMU exportiert</translation>
     </message>
     <message>
         <source>Exported &lt;b&gt;%1&lt;/b&gt;.</source>
@@ -5604,7 +5604,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Fetching %1...</source>
-        <translation>Hole %1...</translation>
+        <translation>%1 wird abgerufen...</translation>
     </message>
     <message>
         <source>%1 is no longer in the cloud folder.</source>
@@ -5660,7 +5660,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Uploading %1...</source>
-        <translation>Lade %1 hoch...</translation>
+        <translation>%1 wird hochgeladen...</translation>
     </message>
     <message>
         <source>%1 holds no Modelica classes.</source>
@@ -5668,7 +5668,7 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     </message>
     <message>
         <source>Saving %1 to the cloud...</source>
-        <translation>Speichere %1 in der Cloud...</translation>
+        <translation>%1 wird in der Cloud gespeichert...</translation>
     </message>
     <message>
         <source>Confirm Deletions</source>
@@ -5838,7 +5838,7 @@ Fortfahren?</numerusform>
     </message>
     <message>
         <source>Showing element &lt;b&gt;%1&lt;/b&gt; in &lt;b&gt;%2&lt;/b&gt;</source>
-        <translation>Zeige Element &lt;b&gt;%1&lt;/b&gt; in &lt;b&gt;%2&lt;/b&gt;</translation>
+        <translation>Element &lt;b&gt;%1&lt;/b&gt; in &lt;b&gt;%2&lt;/b&gt; wird angezeigt</translation>
     </message>
     <message>
         <source>Cannot Set Permissions</source>
@@ -5857,7 +5857,7 @@ Fortfahren?</numerusform>
     </message>
     <message>
         <source>Adapting extent to diagram</source>
-        <translation>Passe Ausdehnung an das Diagramm an</translation>
+        <translation>Ausdehnung wird an das Diagramm angepasst</translation>
     </message>
     <message>
         <source>adapting extent to diagram</source>
@@ -6007,7 +6007,7 @@ Fortfahren?</numerusform>
     </message>
     <message>
         <source>Waiting for you to sign in with the browser...</source>
-        <translation>Warte auf die Anmeldung im Browser...</translation>
+        <translation>Warten auf die Anmeldung im Browser...</translation>
     </message>
     <message>
         <source>The sign-in response did not match the request.</source>
@@ -6015,7 +6015,7 @@ Fortfahren?</numerusform>
     </message>
     <message>
         <source>Exchanging the authorization code...</source>
-        <translation>Tausche den Autorisierungscode aus...</translation>
+        <translation>Autorisierungscode wird ausgetauscht...</translation>
     </message>
     <message>
         <source>The saved sign-in is no longer valid. Sign in again.</source>
@@ -6431,7 +6431,7 @@ Endpunkt: %2</translation>
     <name>OMUQOutputWidget</name>
     <message>
         <source>Starting omuq for %1.</source>
-        <translation>Starte omuq für %1.</translation>
+        <translation>omuq wird für %1 gestartet.</translation>
     </message>
     <message>
         <source>Live view: %1
@@ -6467,7 +6467,7 @@ Endpunkt: %2</translation>
     </message>
     <message>
         <source>Running %1 of %2.</source>
-        <translation>Führe %1 von %2 aus.</translation>
+        <translation>%1 von %2 läuft.</translation>
     </message>
     <message>
         <source>t = %1: left the domain %2 (%3) at (%4)
@@ -6568,7 +6568,7 @@ Das Python-Programm, in dem omuq installiert ist, unter Werkzeuge &gt; Optionen 
     </message>
     <message>
         <source>Converting files to UTF-8</source>
-        <translation>Konvertiere Dateien nach UTF-8</translation>
+        <translation>Dateien werden nach UTF-8 konvertiert</translation>
     </message>
 </context>
 <context>
@@ -7282,7 +7282,7 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
     <name>SearchResultWidget</name>
     <message>
         <source>Searching &lt;b&gt;%1&lt;/b&gt; of &lt;b&gt;%2&lt;/b&gt; files. Please wait for a while.</source>
-        <translation>Durchsuche &lt;b&gt;%1&lt;/b&gt; von &lt;b&gt;%2&lt;/b&gt; Dateien. Einen Moment bitte.</translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; von &lt;b&gt;%2&lt;/b&gt; Dateien werden durchsucht. Einen Moment bitte.</translation>
     </message>
     <message>
         <source>Searched &lt;b&gt;%1&lt;/b&gt; of &lt;b&gt;%2&lt;/b&gt; files. Search Cancelled.</source>
@@ -7657,7 +7657,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>Translating %1.</source>
-        <translation>Übersetze %1.</translation>
+        <translation>%1 wird übersetzt.</translation>
     </message>
     <message>
         <source>Generated code for the target language &lt;b&gt;%1&lt;/b&gt; at %2.</source>
@@ -7805,7 +7805,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>Compiling %1. Please wait for a while.</source>
-        <translation>Kompiliere %1. Einen Moment bitte.</translation>
+        <translation>%1 wird kompiliert. Einen Moment bitte.</translation>
     </message>
     <message>
         <source>Running interactive simulation of %1.</source>
@@ -7863,7 +7863,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>Cancelling simulation of %1…</source>
-        <translation>Breche die Simulation von %1 ab…</translation>
+        <translation>Simulation von %1 wird abgebrochen…</translation>
     </message>
 </context>
 <context>
@@ -8513,7 +8513,7 @@ Variabilität: %4</translation>
     </message>
     <message>
         <source>Loading simulation result variables</source>
-        <translation>Lade Variablen des Simulationsergebnisses</translation>
+        <translation>Variablen des Simulationsergebnisses werden geladen</translation>
     </message>
     <message>
         <source>You cannot re-simulate this class.&lt;br /&gt;This is just a result file loaded via menu &lt;b&gt;File-&gt;Open Result File(s)&lt;/b&gt;.</source>
