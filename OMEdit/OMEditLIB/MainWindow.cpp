@@ -6198,33 +6198,34 @@ AboutOMEditDialog::AboutOMEditDialog(MainWindow *pMainWindow)
   setAttribute(Qt::WA_DeleteOnClose);
 
   const QString omsVersionLine = OMSProxy::isCreated()
-      ? QString("<b>Connected to %1</b><br />").arg(OMSProxy::instance()->getVersion())
+      ? QString("<b>%1</b><br />").arg(tr("Connected to %1").arg(OMSProxy::instance()->getVersion()))
       : QString();
+#ifdef OM_ENABLE_ENCRYPTION
+  const QString omcVersionLine = tr("Connected to %1 with encryption support").arg(Helper::OpenModelicaVersion);
+#else
+  const QString omcVersionLine = tr("Connected to %1 without encryption support").arg(Helper::OpenModelicaVersion);
+#endif
+#if defined(WITHOUT_ANIMATION)
+  const QString animationLine = QString("<br /><em>%1</em>.").arg(tr("Compiled without 3D animation support"));
+#else
+  const QString animationLine;
+#endif
   const QString aboutText = tr(
      "<h2>%1 - %2</h2>"
-     "<b>Connected to %3 %4 encryption support</b><br />"
-     "%5"
+     "<b>%3</b><br />"
+     "%4"
      "<br />"
-     "Compiled with <b>Qt %7</b>, running with <b>Qt %8</b>.<br /><br />"
-     "Installation path <b>%6</b><br /><br />"
+     "Compiled with <b>Qt %5</b>, running with <b>Qt %6</b>.<br /><br />"
+     "Installation path <b>%7</b><br /><br />"
      "Copyright <b>Open Source Modelica Consortium (OSMC)</b>.<br />"
-     "Distributed under OSMC-PL and AGPL3, see <u><a href=\"http://www.openmodelica.org\">www.openmodelica.org</a></u>."
-#if defined(WITHOUT_ANIMATION)
-     "<br /><em>Compiled without 3D animation support</em>."
-#endif
-     "")
+     "Distributed under OSMC-PL and AGPL3, see <u><a href=\"http://www.openmodelica.org\">www.openmodelica.org</a></u>.")
      .arg(Helper::applicationName,
           Helper::applicationIntroText,
-          Helper::OpenModelicaVersion,
-#ifdef OM_ENABLE_ENCRYPTION
-          "with",
-#else
-          "without",
-#endif
+          omcVersionLine,
           omsVersionLine,
-          Helper::OpenModelicaHome,
           QStringLiteral(QT_VERSION_STR),
-          QString::fromLatin1(qVersion()));
+          QString::fromLatin1(qVersion()),
+          Helper::OpenModelicaHome) + animationLine;
   // about text label
   Label *pAboutTextLabel = new Label(aboutText);
   pAboutTextLabel->setWordWrap(true);

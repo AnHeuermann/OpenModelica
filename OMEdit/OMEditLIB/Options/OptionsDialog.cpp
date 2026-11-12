@@ -7158,13 +7158,13 @@ CRMLPage::CRMLPage(OptionsDialog *pOptionsDialog)
   mpCompilerCommandLineOptionsLabel = new Label(tr("Compiler Arguments:"));
   mpCompilerCommandLineOptionsTextBox = new QLineEdit;
   // CRML Process
-  mpCompilerProcessLabel = new Label(tr("Processor:"));
+  mpCompilerProcessLabel = new Label(tr("Java Executable:"));
   mpCompilerProcessTextBox = new QLineEdit(OptionsDefaults::CRML::process);
   mpBrowseCompilerProcessButton = new QPushButton(Helper::browse);
   mpBrowseCompilerProcessButton->setAutoDefault(false);
   connect(mpBrowseCompilerProcessButton, SIGNAL(clicked()), SLOT(browseCompilerProcessFile()));
   mpResetCompilerProcessButton = new QPushButton(Helper::reset);
-  mpResetCompilerProcessButton->setToolTip(tr("Resets to default Processor path"));
+  mpResetCompilerProcessButton->setToolTip(tr("Resets to the default Java executable"));
   mpResetCompilerProcessButton->setAutoDefault(false);
   connect(mpResetCompilerProcessButton, SIGNAL(clicked()), SLOT(resetCompilerProcessPath()));
   mpModelicaLibraries = new DirectoryOrFileSelector(false, tr("Modelica Library Paths:"), pOptionsDialog);

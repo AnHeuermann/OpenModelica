@@ -8,7 +8,23 @@
         <translation>Om %1</translation>
     </message>
     <message>
-        <source>&lt;h2&gt;%1 - %2&lt;/h2&gt;&lt;b&gt;Connected to %3 %4 encryption support&lt;/b&gt;&lt;br /&gt;%5&lt;br /&gt;Compiled with &lt;b&gt;Qt %7&lt;/b&gt;, running with &lt;b&gt;Qt %8&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;Installation path &lt;b&gt;%6&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Copyright &lt;b&gt;Open Source Modelica Consortium (OSMC)&lt;/b&gt;.&lt;br /&gt;Distributed under OSMC-PL and AGPL3, see &lt;u&gt;&lt;a href=&quot;http://www.openmodelica.org&quot;&gt;www.openmodelica.org&lt;/a&gt;&lt;/u&gt;.&lt;br /&gt;&lt;em&gt;Compiled without 3D animation support&lt;/em&gt;.</source>
+        <source>Connected to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected to %1 with encryption support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected to %1 without encryption support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compiled without 3D animation support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;h2&gt;%1 - %2&lt;/h2&gt;&lt;b&gt;%3&lt;/b&gt;&lt;br /&gt;%4&lt;br /&gt;Compiled with &lt;b&gt;Qt %5&lt;/b&gt;, running with &lt;b&gt;Qt %6&lt;/b&gt;.&lt;br /&gt;&lt;br /&gt;Installation path &lt;b&gt;%7&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Copyright &lt;b&gt;Open Source Modelica Consortium (OSMC)&lt;/b&gt;.&lt;br /&gt;Distributed under OSMC-PL and AGPL3, see &lt;u&gt;&lt;a href=&quot;http://www.openmodelica.org&quot;&gt;www.openmodelica.org&lt;/a&gt;&lt;/u&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -102,8 +118,8 @@
         <translation>System</translation>
     </message>
     <message>
-        <source>A model already have a system. Only one system is allowed inside a model.</source>
-        <translation>Modellen har redan ett system. Endast ett system är tillåtet i en modell.</translation>
+        <source>The model already has a root system. An SSP model can have only one root system.</source>
+        <translation>Modellen har redan ett rotsystem. En SSP-modell kan bara ha ett rotsystem.</translation>
     </message>
 </context>
 <context>
@@ -255,8 +271,12 @@
 <context>
     <name>BreakpointDialog</name>
     <message>
-        <source>%1 Breakpoint</source>
-        <translation>%1 brytpunkt</translation>
+        <source>Edit Breakpoint</source>
+        <translation>Redigera brytpunkt</translation>
+    </message>
+    <message>
+        <source>Add Breakpoint</source>
+        <translation>Lägg till brytpunkt</translation>
     </message>
     <message>
         <source>File Name:</source>
@@ -283,8 +303,8 @@
         <translation>Ignorera antal:</translation>
     </message>
     <message>
-        <source>* Use &quot;%1&quot; to set condition on simulation time.</source>
-        <translation>* Använd &quot;%1&quot; för att ange villkor på simuleringstiden.</translation>
+        <source>* In a condition, &quot;%1&quot; is the simulation time.</source>
+        <translation>* I ett villkor är &quot;%1&quot; simuleringstiden.</translation>
     </message>
     <message>
         <source>Select Class</source>
@@ -333,12 +353,12 @@
         <translation>Kompilatorargument:</translation>
     </message>
     <message>
-        <source>Processor:</source>
-        <translation>Processor:</translation>
+        <source>Java Executable:</source>
+        <translation>Java-program:</translation>
     </message>
     <message>
-        <source>Resets to default Processor path</source>
-        <translation>Återställer till standardsökvägen för processorn</translation>
+        <source>Resets to the default Java executable</source>
+        <translation>Återställer till standardprogrammet för Java</translation>
     </message>
     <message>
         <source>Modelica Library Paths:</source>

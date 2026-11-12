@@ -229,7 +229,7 @@ void AddSystemDialog::addSystem()
   // Check if Model already have the system
   if (pParentLibraryTreeItem->isTopLevel() && pParentLibraryTreeItem->childrenSize() > 0) {
     QMessageBox::critical(this, QString("%1 - %2").arg(Helper::applicationName, Helper::error),
-                          tr("A model already have a system. Only one system is allowed inside a model."), QMessageBox::Ok);
+                          tr("The model already has a root system. An SSP model can have only one root system."), QMessageBox::Ok);
     return;
   }
   // Check if system already exists
