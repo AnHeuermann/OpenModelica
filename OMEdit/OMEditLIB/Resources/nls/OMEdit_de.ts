@@ -2000,8 +2000,8 @@ Ist keine Plattform ausgewählt, wird die FMU als FMI 3.0 (fmi-ls-wasm) exportie
         <translation>CMake-Zieldateien von %1 werden erzeugt. Einen Moment bitte.</translation>
     </message>
     <message>
-        <source>Generating the cmake target files failed. Exited with code %1.</source>
-        <translation>Das Erzeugen der CMake-Zieldateien ist fehlgeschlagen. Beendet mit Code %1.</translation>
+        <source>Generating the cmake target files failed with exit code %1.</source>
+        <translation>Das Erzeugen der CMake-Zieldateien ist mit Exit-Code %1 fehlgeschlagen.</translation>
     </message>
     <message>
         <source>Generated cmake target files successfully.
@@ -2925,10 +2925,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
         <translation>Exportiert das Modell als Functional Mock-up Unit (FMU)</translation>
     </message>
     <message>
-        <source>Exports the package as encrypted package</source>
-        <translation>Exportiert das Paket als verschlüsseltes Paket</translation>
-    </message>
-    <message>
         <source>Imports the model from a Functional Mock-up Unit (FMU)</source>
         <translation>Importiert das Modell aus einer Functional Mock-up Unit (FMU)</translation>
     </message>
@@ -3099,6 +3095,14 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     <message>
         <source>Instantiate/Flatten the Modelica class</source>
         <translation>Instanziiert die Modelica-Klasse (flaches Modell)</translation>
+    </message>
+    <message>
+        <source>Exports the package as a read-only package</source>
+        <translation>Exportiert das Paket als schreibgeschütztes Paket</translation>
+    </message>
+    <message>
+        <source>Exports the package as an encrypted package</source>
+        <translation>Exportiert das Paket als verschlüsseltes Paket</translation>
     </message>
     <message>
         <source>Exports the model as XML</source>
@@ -3375,10 +3379,6 @@ Fehlermeldungen stehen im Meldungsbrowser; eventuell die letzten Änderungen mit
     <message>
         <source>Read-only Package</source>
         <translation>Schreibgeschütztes Paket</translation>
-    </message>
-    <message>
-        <source>Exports the package as read-only package</source>
-        <translation>Exportiert das Paket als schreibgeschütztes Paket</translation>
     </message>
     <message>
         <source>Encrypted Package</source>
