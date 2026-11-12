@@ -1037,7 +1037,7 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
     </message>
     <message>
         <source>We can&apos;t contact you with a possible solution if you don&apos;t provide a valid e-mail address.</source>
-        <translation>Ohne gültige E-Mail-Adresse können wir keine mögliche Lösung zurückschicken.</translation>
+        <translation>Ohne gültige E-Mail-Adresse können wir keine Rückfragen zum Problem stellen.</translation>
     </message>
     <message>
         <source>Send without e-mail</source>
@@ -1435,7 +1435,7 @@ Für die ausgewählten Modelle werden die lokalen Übersetzungsflags verworfen u
     </message>
     <message>
         <source>Change the background color of your text</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändert die Hintergrundfarbe des Texts</translation>
     </message>
     <message>
         <source>Align Left</source>
@@ -1551,7 +1551,7 @@ Für die ausgewählten Modelle werden die lokalen Übersetzungsflags verworfen u
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
 </context>
 <context>
