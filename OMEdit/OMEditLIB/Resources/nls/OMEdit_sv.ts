@@ -4514,8 +4514,28 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>Uppdatera bindningar</translation>
     </message>
     <message>
-        <source>updates the bindings</source>
+        <source>Updates the bindings</source>
         <translation>Uppdaterar bindningarna</translation>
+    </message>
+    <message>
+        <source>Version: %1</source>
+        <translation>Version: %1</translation>
+    </message>
+    <message>
+        <source>Version Date: %1</source>
+        <translation>Versionsdatum: %1</translation>
+    </message>
+    <message>
+        <source>Version Build: %1</source>
+        <translation>Versionsbygge: %1</translation>
+    </message>
+    <message>
+        <source>Date Modified: %1</source>
+        <translation>Senast ändrad: %1</translation>
+    </message>
+    <message>
+        <source>Revision ID: %1</source>
+        <translation>RevisionId: %1</translation>
     </message>
     <message>
         <source>Generate Verification Scenarios</source>
@@ -4536,26 +4556,6 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
     <message>
         <source>Deletes the Modelica class</source>
         <translation>Tar bort Modelicaklassen</translation>
-    </message>
-    <message>
-        <source>Version : %1</source>
-        <translation>Version: %1</translation>
-    </message>
-    <message>
-        <source>Version Date : %1</source>
-        <translation>Versionsdatum: %1</translation>
-    </message>
-    <message>
-        <source>Version Build : %1</source>
-        <translation>Versionsbygge: %1</translation>
-    </message>
-    <message>
-        <source>Date Modified : %1</source>
-        <translation>Senast ändrad: %1</translation>
-    </message>
-    <message>
-        <source>RevisionId : %1</source>
-        <translation>RevisionId: %1</translation>
     </message>
     <message>
         <source>Calibrate...</source>
@@ -4581,7 +4581,7 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>Kunde inte spara filen, okänd bibliotekstyp.</translation>
     </message>
     <message>
-        <source>It is not possible to save as a Modelica package saved in a directory hierarchy Mapping.</source>
+        <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
         <translation>Det går inte att använda Spara som för ett Modelicapaket som är sparat i en kataloghierarki.</translation>
     </message>
     <message>

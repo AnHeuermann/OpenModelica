@@ -4513,8 +4513,28 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>Aggiorna i binding</translation>
     </message>
     <message>
-        <source>updates the bindings</source>
+        <source>Updates the bindings</source>
         <translation>Aggiorna i binding</translation>
+    </message>
+    <message>
+        <source>Version: %1</source>
+        <translation>Versione: %1</translation>
+    </message>
+    <message>
+        <source>Version Date: %1</source>
+        <translation>Data della versione: %1</translation>
+    </message>
+    <message>
+        <source>Version Build: %1</source>
+        <translation>Build della versione: %1</translation>
+    </message>
+    <message>
+        <source>Date Modified: %1</source>
+        <translation>Data di modifica: %1</translation>
+    </message>
+    <message>
+        <source>Revision ID: %1</source>
+        <translation>RevisionId: %1</translation>
     </message>
     <message>
         <source>Generate Verification Scenarios</source>
@@ -4535,26 +4555,6 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
     <message>
         <source>Deletes the Modelica class</source>
         <translation>Elimina la classe Modelica</translation>
-    </message>
-    <message>
-        <source>Version : %1</source>
-        <translation>Versione: %1</translation>
-    </message>
-    <message>
-        <source>Version Date : %1</source>
-        <translation>Data della versione: %1</translation>
-    </message>
-    <message>
-        <source>Version Build : %1</source>
-        <translation>Build della versione: %1</translation>
-    </message>
-    <message>
-        <source>Date Modified : %1</source>
-        <translation>Data di modifica: %1</translation>
-    </message>
-    <message>
-        <source>RevisionId : %1</source>
-        <translation>RevisionId: %1</translation>
     </message>
     <message>
         <source>Calibrate...</source>
@@ -4580,7 +4580,7 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>Impossibile salvare il file, tipo di libreria sconosciuto.</translation>
     </message>
     <message>
-        <source>It is not possible to save as a Modelica package saved in a directory hierarchy Mapping.</source>
+        <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
         <translation>Non è possibile usare Salva come per un pacchetto Modelica salvato in una gerarchia di directory.</translation>
     </message>
     <message>

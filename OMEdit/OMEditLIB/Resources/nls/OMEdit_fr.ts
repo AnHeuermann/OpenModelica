@@ -4490,8 +4490,28 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Mettre à jour Liaisons</translation>
     </message>
     <message>
-        <source>updates the bindings</source>
+        <source>Updates the bindings</source>
         <translation>met à jour les liaisons</translation>
+    </message>
+    <message>
+        <source>Version: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Date: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Build: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date Modified: %1</source>
+        <translation>Date de Modification : %1</translation>
+    </message>
+    <message>
+        <source>Revision ID: %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Generate Verification Scenarios</source>
@@ -4512,26 +4532,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Deletes the Modelica class</source>
         <translation>Supprime la classe Modelica</translation>
-    </message>
-    <message>
-        <source>Version : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version Date : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version Build : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Date Modified : %1</source>
-        <translation>Date de Modification : %1</translation>
-    </message>
-    <message>
-        <source>RevisionId : %1</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Calibrate...</source>
@@ -4557,7 +4557,7 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Impossible de sauvegarder le fichier, type de librairie inconnu.</translation>
     </message>
     <message>
-        <source>It is not possible to save as a Modelica package saved in a directory hierarchy Mapping.</source>
+        <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
         <translation>Il n&apos;est pas possible d&apos;enregistrer en tant que package Modelica enregistré dans un mappage de hiérarchie de répertoires.</translation>
     </message>
     <message>

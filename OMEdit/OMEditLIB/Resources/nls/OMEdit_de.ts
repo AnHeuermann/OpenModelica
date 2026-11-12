@@ -4514,8 +4514,28 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>Bindungen aktualisieren</translation>
     </message>
     <message>
-        <source>updates the bindings</source>
-        <translation>Aktualisiert die Bindungen</translation>
+        <source>Updates the bindings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Date: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Build: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date Modified: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Revision ID: %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Generate Verification Scenarios</source>
@@ -4536,26 +4556,6 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
     <message>
         <source>Deletes the Modelica class</source>
         <translation>Löscht die Modelica-Klasse</translation>
-    </message>
-    <message>
-        <source>Version : %1</source>
-        <translation>Version: %1</translation>
-    </message>
-    <message>
-        <source>Version Date : %1</source>
-        <translation>Versionsdatum: %1</translation>
-    </message>
-    <message>
-        <source>Version Build : %1</source>
-        <translation>Versions-Build: %1</translation>
-    </message>
-    <message>
-        <source>Date Modified : %1</source>
-        <translation>Änderungsdatum: %1</translation>
-    </message>
-    <message>
-        <source>RevisionId : %1</source>
-        <translation>Revisions-ID: %1</translation>
     </message>
     <message>
         <source>Calibrate...</source>
@@ -4581,8 +4581,8 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>Die Datei kann nicht gespeichert werden, unbekannter Bibliothekstyp.</translation>
     </message>
     <message>
-        <source>It is not possible to save as a Modelica package saved in a directory hierarchy Mapping.</source>
-        <translation>Ein Modelica-Paket, das in einer Verzeichnishierarchie gespeichert ist, kann nicht mit „Speichern unter“ gespeichert werden.</translation>
+        <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to find the class &lt;b&gt;%1&lt;/b&gt;.</source>

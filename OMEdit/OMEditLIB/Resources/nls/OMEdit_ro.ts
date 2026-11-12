@@ -4457,7 +4457,27 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>updates the bindings</source>
+        <source>Updates the bindings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Date: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version Build: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date Modified: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Revision ID: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4478,26 +4498,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     </message>
     <message>
         <source>Deletes the Modelica class</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version Date : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version Build : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Date Modified : %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>RevisionId : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4524,7 +4524,7 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>It is not possible to save as a Modelica package saved in a directory hierarchy Mapping.</source>
+        <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

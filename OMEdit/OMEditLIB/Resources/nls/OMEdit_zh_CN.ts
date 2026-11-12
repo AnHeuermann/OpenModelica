@@ -4472,8 +4472,28 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>更新绑定</translation>
     </message>
     <message>
-        <source>updates the bindings</source>
+        <source>Updates the bindings</source>
         <translation>更新绑定信息</translation>
+    </message>
+    <message>
+        <source>Version: %1</source>
+        <translation>版本：%1</translation>
+    </message>
+    <message>
+        <source>Version Date: %1</source>
+        <translation>版本日期：%1</translation>
+    </message>
+    <message>
+        <source>Version Build: %1</source>
+        <translation>版本生成 : %1</translation>
+    </message>
+    <message>
+        <source>Date Modified: %1</source>
+        <translation>修改日期：%1</translation>
+    </message>
+    <message>
+        <source>Revision ID: %1</source>
+        <translation>修订ID：%1</translation>
     </message>
     <message>
         <source>Generate Verification Scenarios</source>
@@ -4494,26 +4514,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Deletes the Modelica class</source>
         <translation>删除 Modelica 类</translation>
-    </message>
-    <message>
-        <source>Version : %1</source>
-        <translation>版本：%1</translation>
-    </message>
-    <message>
-        <source>Version Date : %1</source>
-        <translation>版本日期：%1</translation>
-    </message>
-    <message>
-        <source>Version Build : %1</source>
-        <translation>版本生成 : %1</translation>
-    </message>
-    <message>
-        <source>Date Modified : %1</source>
-        <translation>修改日期：%1</translation>
-    </message>
-    <message>
-        <source>RevisionId : %1</source>
-        <translation>修订ID：%1</translation>
     </message>
     <message>
         <source>Calibrate...</source>
@@ -4539,7 +4539,7 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>无法保持稳健，库类型未知。</translation>
     </message>
     <message>
-        <source>It is not possible to save as a Modelica package saved in a directory hierarchy Mapping.</source>
+        <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
         <translation>无法另存为目录层级映射中的Modelica包。</translation>
     </message>
     <message>

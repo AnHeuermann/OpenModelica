@@ -4471,8 +4471,28 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Обновить привязки</translation>
     </message>
     <message>
-        <source>updates the bindings</source>
+        <source>Updates the bindings</source>
         <translation>Обновляет привязки</translation>
+    </message>
+    <message>
+        <source>Version: %1</source>
+        <translation>Версия: %1</translation>
+    </message>
+    <message>
+        <source>Version Date: %1</source>
+        <translation>Дата версии: %1</translation>
+    </message>
+    <message>
+        <source>Version Build: %1</source>
+        <translation>Сборка версии: %1</translation>
+    </message>
+    <message>
+        <source>Date Modified: %1</source>
+        <translation>Дата изменения: %1</translation>
+    </message>
+    <message>
+        <source>Revision ID: %1</source>
+        <translation>ID ревизии: %1</translation>
     </message>
     <message>
         <source>Generate Verification Scenarios</source>
@@ -4493,26 +4513,6 @@ Use Download... to fetch one, or point Server Executable at a server you already
     <message>
         <source>Deletes the Modelica class</source>
         <translation>Удаляет класс Modelica</translation>
-    </message>
-    <message>
-        <source>Version : %1</source>
-        <translation>Версия: %1</translation>
-    </message>
-    <message>
-        <source>Version Date : %1</source>
-        <translation>Дата версии: %1</translation>
-    </message>
-    <message>
-        <source>Version Build : %1</source>
-        <translation>Сборка версии: %1</translation>
-    </message>
-    <message>
-        <source>Date Modified : %1</source>
-        <translation>Дата изменения: %1</translation>
-    </message>
-    <message>
-        <source>RevisionId : %1</source>
-        <translation>ID ревизии: %1</translation>
     </message>
     <message>
         <source>Calibrate...</source>
@@ -4538,7 +4538,7 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation>Не удалось сохранить файл, неизвестный тип библиотеки.</translation>
     </message>
     <message>
-        <source>It is not possible to save as a Modelica package saved in a directory hierarchy Mapping.</source>
+        <source>Save As is not possible for a Modelica package that is saved as a directory hierarchy.</source>
         <translation>Не удалось сохранить в качестве пакета Modelica, сохраняемого в составе иерархии каталога.</translation>
     </message>
     <message>
