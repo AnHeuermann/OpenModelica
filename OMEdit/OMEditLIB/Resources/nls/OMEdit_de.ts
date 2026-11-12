@@ -7735,7 +7735,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>Post compiling %1.</source>
-        <translation>Nachbearbeitung von %1.</translation>
+        <translation>%1 wird nachbearbeitet.</translation>
     </message>
     <message>
         <source>Post compilation process failed. Exited with code %1.</source>
@@ -7769,7 +7769,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>URL is &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Die URL ist &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Simulation of %1 finished.</source>
@@ -7886,7 +7886,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     </message>
     <message>
         <source>Disabling this will affect the debugger functionality.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohne diese Option funktioniert der Debugger nur eingeschränkt.</translation>
     </message>
     <message>
         <source>Switch to plotting perspective after simulation</source>
@@ -7929,7 +7929,7 @@ Kann hohen Mehraufwand verursachen, aber es gehen keine Werte verloren.</transla
     <name>SolverSettingsDialog</name>
     <message>
         <source>Solver Settings - %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Löser-Einstellungen - %1 (%2)</translation>
     </message>
     <message>
         <source>Fixed Step Size:</source>
