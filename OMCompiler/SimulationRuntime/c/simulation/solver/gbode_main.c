@@ -36,6 +36,7 @@
 #include <time.h>
 
 #include "gbode_main.h"
+#include "spatialDistribution.h"
 #include "gbode_util.h"
 
 #include "gbode_conf.h"
@@ -1524,6 +1525,9 @@ int gbode_main(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo)
     */
     gbData->stepSize = fmin(gbData->stepSize, data->simulationInfo->nextSampleEvent - gbData->time);
     gbData->stepSize = fmin(gbData->stepSize, stopTime - gbData->time);
+    /* The history grows only at the target, so the driver must be able to shorten the step. */
+    if (data->modelData->nSpatialDistributions)
+      gbData->stepSize = fmin(gbData->stepSize, targetTime - gbData->time);
     // TODO maybe easier to use targetTime
     //gbData->stepSize = fmin(gbData->stepSize, targetTime - gbData->time);
 
@@ -1610,6 +1614,11 @@ int gbode_main(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo)
       if (gb_step_info != 0) {
         gbData->stats.nConvergenceTestFailures++;
         if (OMC_ACTIVE_STREAM(OMC_LOG_SOLVER)) infoStreamPrint(OMC_LOG_SOLVER, 0, "gbode_main: Failed to calculate step at time = %5g with step size h = %5g.", gbData->time, gbData->stepSize);
+        /* A shorter internal step cannot add missing history; the driver shortens the step. */
+        if (spatialDistributionNeedsHistory(data, FALSE)) {
+          messageClose(OMC_LOG_SOLVER);
+          return -1;
+        }
         if (gbData->ctrl_method == GB_CTRL_CNST) {
           errorStreamPrint(OMC_LOG_STDOUT, 0, "Simulation aborted since gbode is running with fixed step size and step calculation has failed at time = %5g with step size h = %5g.", gbData->time, gbData->stepSize);
           messageClose(OMC_LOG_SOLVER);
@@ -1759,7 +1768,13 @@ int gbode_main(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo)
       if (!gbData->tableau->isKRightAvailable) {
         sData->timeValue = gbData->timeRight;
         memcpy(sData->realVars, gbData->y, data->modelData->nStates * sizeof(double));
-        gbode_fODE(data, threadData, &(gbData->stats.nCallsODE), NULL);
+        if (gbode_fODE(data, threadData, &(gbData->stats.nCallsODE), NULL)) {
+          gbData->stepSize *= 0.5;
+          if (gbData->time + gbData->stepSize <= gbData->time) return -1;
+          gbData->stats.nConvergenceTestFailures++;
+          err = INFINITY;
+          continue;
+        }
         memcpy(gbData->kRight, fODE, nStates * sizeof(double));
       }
       else
@@ -2072,7 +2087,7 @@ int gbode_main(DATA *data, threadData_t *threadData, SOLVER_INFO *solverInfo)
     if (gbData->noRestart) {
       gbData->timeRight = gbData->time;
       memcpy(gbData->yRight, gbData->yOld, nStates * sizeof(double));
-      gbode_fODE(data, threadData, &(gbData->stats.nCallsODE), NULL);
+      if (gbode_fODE(data, threadData, &(gbData->stats.nCallsODE), NULL)) return -1;
       memcpy(gbData->kRight, fODE, nStates * sizeof(double));
     }
 
