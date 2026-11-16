@@ -37,7 +37,7 @@
 #include "CleanDialog.h"
 #include "MainWindow.h"
 #include "Modeling/ModelWidgetContainer.h"
-#include "Git/GitCommands.h"
+#include "Git/GitRepository.h"
 #include "Util/Helper.h"
 #include "QFrame"
 #include "QDialogButtonBox"
@@ -102,8 +102,15 @@ CleanDialog::CleanDialog(QWidget *pParent)
 void CleanDialog::getUntrackedFiles()
 {
   QString fileName = MainWindow::instance()->getModelWidgetContainer()->getCurrentModelWidget()->getLibraryTreeItem()->getFileName();
-  QString workingDirectory = GitCommands::instance()->getRepositoryName(fileName);
-  QStringList untrackedFiles = GitCommands::instance()->getUntrackedFiles(fileName);
+  GitRepository repository = GitRepository::open(fileName);
+  QString workingDirectory = repository.workingDirectory();
+  QStringList untrackedFiles;
+  const QMap<QString, GitRepository::Status> changedFiles = repository.changedFiles();
+  for (auto it = changedFiles.constBegin(); it != changedFiles.constEnd(); ++it) {
+    if (it.value() == GitRepository::WorkTreeNew) {
+      untrackedFiles.append(QDir(workingDirectory).relativeFilePath(it.key()));
+    }
+  }
 
   if (const int oldRowCount = mpCleanFilesModel->rowCount())
       mpCleanFilesModel->removeRows(0, oldRowCount);

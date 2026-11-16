@@ -44,21 +44,23 @@
 #include "QCheckBox"
 #include "QDialogButtonBox"
 
+#include "Git/GitRepository.h"
+
 class Label;
 class CommitChangesDialog : public QDialog
 {
   Q_OBJECT
 public:
   CommitChangesDialog(QWidget *pParent = 0);
-  void generateTraceabilityURI(QString activity, QString modelFileName, QString nameStructure, QString fmuFileName);
-  void commitAndGenerateTraceabilityURI(QString fileName);
+  static void generateTraceabilityURI(QString activity, QString modelFileName, QString nameStructure, QString fmuFileName);
+  static void commitAndGenerateTraceabilityURI(QString fileName);
 private:
   QStandardItemModel *mpCommitChangedFilesModel;
   QTreeView * mpCommitChangedFilesTreeView;
   void getChangedFiles();
   void addFile(QString fileStatus, QString fileName, bool checked);
-  QString getFileStatus(QString status);
-  QStringList mpModifiedFiles;
+  static QString getFileStatus(GitRepository::Status status);
+  GitRepository mRepository;
   Label *mpRepositoryLabel;
   QLineEdit *mpRepositoryNameTextBox;
   Label *mpBranchLabel;

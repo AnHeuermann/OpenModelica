@@ -39,6 +39,7 @@
 
 #include "Modeling/ModelWidgetContainer.h"
 #include "MainWindow.h"
+#include "Git/GitRepository.h"
 #include "LibraryTreeWidget.h"
 #include "ElementTreeWidget.h"
 #include "ItemDelegate.h"
@@ -8402,12 +8403,9 @@ void ModelWidgetContainer::currentModelWidgetChanged(QMdiSubWindow *pSubWindow)
     iconGraphicsView = pModelWidget->getIconViewToolButton()->isChecked();
     diagramGraphicsView = pModelWidget->getDiagramViewToolButton()->isChecked();
     textView = pModelWidget->getTextViewToolButton()->isChecked();
-    // check for git working directory
-    /* ticket:5646 Crash when importing SSP files with TLM systems
-     * Disable the Git features until we have them implemented properly.
-     * GitCommands::getGitStdout causes crash in Linux.
-     */
-    //gitWorkingDirectory = !pLibraryTreeItem->getFileName().isEmpty() && GitCommands::instance()->isSavedUnderGitRepository(pLibraryTreeItem->getFileName());
+#if !defined(__EMSCRIPTEN__)
+    gitWorkingDirectory = !pLibraryTreeItem->getFileName().isEmpty() && GitRepository::open(pLibraryTreeItem->getFileName()).isValid();
+#endif
     if (pLibraryTreeItem->isModelica()) {
       modelica = true;
     } else if (pLibraryTreeItem->isSSP()) {

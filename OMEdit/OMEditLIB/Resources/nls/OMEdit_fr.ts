@@ -933,6 +933,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Could not commit to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Commit Message </source>
         <translation type="unfinished"></translation>
     </message>
@@ -4347,13 +4351,6 @@ Vous pouvez choisir entre attendre plus longtemps ou annuler le débuggage.</num
     </message>
 </context>
 <context>
-    <name>GitCommands</name>
-    <message>
-        <source>Repository Creation Failed</source>
-        <translation>Échec de la création du repository</translation>
-    </message>
-</context>
-<context>
     <name>GoogleDriveProvider</name>
     <message>
         <source>The file changed in Google Drive since it was last synchronised.</source>
@@ -6902,6 +6899,26 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Repository Creation Failed</source>
+        <translation type="unfinished">Échec de la création du repository</translation>
+    </message>
+    <message>
+        <source>A version control repository could not be created in %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialized Git repository in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not stage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not unstage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Load Encrypted Library</source>
         <translation>Charger la Bibliothèque Chiffrée</translation>
     </message>
@@ -8851,6 +8868,10 @@ Définissez la valeur sur 0 si vous ne souhaitez aucun délai.</translation>
         <source>Simulating…</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Could not commit %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Quick3DViewerWidget</name>
@@ -8976,6 +8997,10 @@ Définissez la valeur sur 0 si vous ne souhaitez aucun délai.</translation>
     </message>
     <message>
         <source>Revert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not revert %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -43,7 +43,7 @@
 #include "QDialogButtonBox"
 #include <QDialog>
 
-#include<QProcess>
+#include "Git/GitRepository.h"
 
 class Label;
 class RevertCommitsDialog : public QDialog
@@ -64,7 +64,7 @@ private:
   QPushButton *mpRevertButton;
   QPushButton *mpCancelButton;
   QDialogButtonBox *mpButtonBox;
-  QProcess *mpProcess;
+  GitRepository mRepository;
 private slots:
   void revertCommit();
   void browseCommitLog();
@@ -90,7 +90,6 @@ private:
   QPushButton *mpOkButton;
   QPushButton *mpCancelButton;
   QDialogButtonBox *mpButtonBox;
-  QProcess *mpProcess;
 private slots:
   void ok();
 

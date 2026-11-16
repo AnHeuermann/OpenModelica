@@ -84,7 +84,7 @@
 #include "Git/CommitChangesDialog.h"
 #include "Git/RevertCommitsDialog.h"
 #include "Git/CleanDialog.h"
-#include "Git/GitCommands.h"
+#include "Git/GitRepository.h"
 #include "Traceability/TraceabilityInformationURI.h"
 #include "Plotting/DiagramWindow.h"
 #include "Interfaces/InformationInterface.h"
@@ -620,11 +620,6 @@ void MainWindow::setUpMainWindow(threadData_t *threadData)
   updateRecentModelActionsAndList();
   // OMSens plugin
   mpOMSensPlugin = 0;
-  // create the Git commands instance
-  //mpGitCommands = new GitCommands(this);
-#if !defined(__EMSCRIPTEN__)
-  GitCommands::create();
-#endif
   // Create a centralwidget for the main window
   mpCentralStackedWidget = new QStackedWidget;
   mpCentralStackedWidget->addWidget(mpWelcomePageWidget);
@@ -1218,10 +1213,6 @@ void MainWindow::beforeClosingMainWindow()
   // delete the GDBAdapter object
 #if !defined(__EMSCRIPTEN__)
   GDBAdapter::destroy();
-#endif
-  // delete the GitCommands object
-#if !defined(__EMSCRIPTEN__)
-  GitCommands::destroy();
 #endif
   // delete the searchwidget object to call the destructor, to cancel the search operation running on seperate thread
   delete mpSearchWidget;
@@ -4625,7 +4616,18 @@ void MainWindow::createGitRepository()
   QString gitRepositoryPath = StringHandler::getExistingDirectory(this, QString("%1 - %2").arg(Helper::applicationName).arg(Helper::chooseDirectory), NULL);
   if (gitRepositoryPath.isEmpty())
     return;
-  GitCommands::instance()->createGitRepository(gitRepositoryPath);
+  GitRepository repository = GitRepository::init(gitRepositoryPath);
+  if (!repository.isValid()) {
+    QMessageBox::warning(this, QString(Helper::applicationName).append(" - ").append(tr("Repository Creation Failed")),
+                         tr("A version control repository could not be created in %1: %2").arg(gitRepositoryPath, repository.errorString()), QMessageBox::Ok);
+    return;
+  }
+  MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, tr("Initialized Git repository in %1").arg(repository.workingDirectory()),
+                                                        Helper::scriptingKind, Helper::notificationLevel));
+  QDir repositoryDirectory(repository.workingDirectory());
+  for (const QString &directory : {"Models", "SimulationResults", "FMUs", "ModelDescriptions"}) {
+    repositoryDirectory.mkdir(directory);
+  }
 #endif
 }
 
@@ -4639,7 +4641,10 @@ void MainWindow::logCurrentFile()
 #if !defined(__EMSCRIPTEN__)
   ModelWidget *pModelWidget = mpModelWidgetContainer->getCurrentModelWidget();
   if (pModelWidget) {
-     GitCommands::instance()->logCurrentFile(pModelWidget->getLibraryTreeItem()->getFileName());
+    const QString fileName = pModelWidget->getLibraryTreeItem()->getFileName();
+    foreach (const GitRepository::Commit &commit, GitRepository::open(fileName).log(-1, fileName)) {
+      qDebug() << commit.shortId << commit.time.toString(Qt::ISODate) << commit.authorName << commit.summary;
+    }
   }
 #endif
 }
@@ -4654,7 +4659,12 @@ void MainWindow::stageCurrentFileForCommit()
 #if !defined(__EMSCRIPTEN__)
   ModelWidget *pModelWidget = mpModelWidgetContainer->getCurrentModelWidget();
   if (pModelWidget) {
-     GitCommands::instance()->stageCurrentFileForCommit(pModelWidget->getLibraryTreeItem()->getFileName());
+    const QString fileName = pModelWidget->getLibraryTreeItem()->getFileName();
+    GitRepository repository = GitRepository::open(fileName);
+    if (!repository.stage(fileName)) {
+      MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, tr("Could not stage %1: %2").arg(fileName, repository.errorString()),
+                                                            Helper::scriptingKind, Helper::errorLevel));
+    }
   }
 #endif
 }
@@ -4669,7 +4679,12 @@ void MainWindow::unstageCurrentFileFromCommit()
 #if !defined(__EMSCRIPTEN__)
   ModelWidget *pModelWidget = mpModelWidgetContainer->getCurrentModelWidget();
   if (pModelWidget) {
-     GitCommands::instance()->unstageCurrentFileFromCommit(pModelWidget->getLibraryTreeItem()->getFileName());
+    const QString fileName = pModelWidget->getLibraryTreeItem()->getFileName();
+    GitRepository repository = GitRepository::open(fileName);
+    if (!repository.unstage(fileName)) {
+      MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, tr("Could not unstage %1: %2").arg(fileName, repository.errorString()),
+                                                            Helper::scriptingKind, Helper::errorLevel));
+    }
   }
 #endif
 }
@@ -4710,10 +4725,6 @@ void MainWindow::cleanWorkingDirectory()
   CleanDialog *pCleanDialog = new CleanDialog(this);
   pCleanDialog->exec();
 #endif
-//  ModelWidget *pModelWidget = mpModelWidgetContainer->getCurrentModelWidget();
-//  if (pModelWidget) {
-//     mpGitCommands->cleanWorkingDirectory();
-//  }
 }
 
 /*!

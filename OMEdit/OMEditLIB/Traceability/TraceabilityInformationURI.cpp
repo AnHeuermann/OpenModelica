@@ -39,7 +39,6 @@
 #include "Modeling/MessagesWidget.h"
 #include "Options/OptionsDialog.h"
 #include "Modeling/ModelWidgetContainer.h"
-#include "Git/GitCommands.h"
 #include "Util/NetworkAccessManager.h"
 
 /*!

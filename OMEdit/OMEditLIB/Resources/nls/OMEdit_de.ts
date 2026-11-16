@@ -935,6 +935,10 @@ Die lokale Kopie und ihr Synchronisierungsstatus werden entfernt. In der Cloud w
         <translation>Commit</translation>
     </message>
     <message>
+        <source>Could not commit to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Commit Message </source>
         <translation>Commit-Nachricht </translation>
     </message>
@@ -4345,13 +4349,6 @@ Weiter warten oder das Debuggen abbrechen?</numerusform>
     </message>
 </context>
 <context>
-    <name>GitCommands</name>
-    <message>
-        <source>Repository Creation Failed</source>
-        <translation>Erstellen des Repositorys fehlgeschlagen</translation>
-    </message>
-</context>
-<context>
     <name>GoogleDriveProvider</name>
     <message>
         <source>The file changed in Google Drive since it was last synchronised.</source>
@@ -6886,6 +6883,26 @@ Mit „Herunterladen...“ einen holen oder als Server-Programm einen vorhandene
         <translation>CRML-Testsuite</translation>
     </message>
     <message>
+        <source>Repository Creation Failed</source>
+        <translation type="unfinished">Erstellen des Repositorys fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>A version control repository could not be created in %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialized Git repository in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not stage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not unstage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Load Encrypted Library</source>
         <translation>Verschlüsselte Bibliothek laden</translation>
     </message>
@@ -8893,6 +8910,10 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
         <source>Simulating…</source>
         <translation>Wird simuliert…</translation>
     </message>
+    <message>
+        <source>Could not commit %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Quick3DViewerWidget</name>
@@ -9018,6 +9039,10 @@ Der Wert 0 bedeutet keine Verzögerung.</translation>
     <message>
         <source>Revert</source>
         <translation>Rückgängig machen</translation>
+    </message>
+    <message>
+        <source>Could not revert %1: %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

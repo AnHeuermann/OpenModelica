@@ -935,6 +935,10 @@ Den lokala kopian och dess synkroniseringsstatus tas bort. Ingenting i molnet p�
         <translation>Committa</translation>
     </message>
     <message>
+        <source>Could not commit to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Commit Message </source>
         <translation>Commit-meddelande </translation>
     </message>
@@ -4345,13 +4349,6 @@ Du kan välja mellan att vänta längre och att avbryta debuggningen.</numerusfo
     </message>
 </context>
 <context>
-    <name>GitCommands</name>
-    <message>
-        <source>Repository Creation Failed</source>
-        <translation>Det gick inte att skapa repository</translation>
-    </message>
-</context>
-<context>
     <name>GoogleDriveProvider</name>
     <message>
         <source>The file changed in Google Drive since it was last synchronised.</source>
@@ -6818,6 +6815,26 @@ Använd Hämta... för att hämta en, eller låt Serverprogram peka på en serve
         <translation>CRML-testsvit</translation>
     </message>
     <message>
+        <source>Repository Creation Failed</source>
+        <translation type="unfinished">Det gick inte att skapa repository</translation>
+    </message>
+    <message>
+        <source>A version control repository could not be created in %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialized Git repository in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not stage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not unstage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Opens the Modelica file(s)</source>
         <translation>Öppnar Modelicafil(er)</translation>
     </message>
@@ -8893,6 +8910,10 @@ Ange värdet 0 om du inte vill ha någon fördröjning.</translation>
         <source>Simulating…</source>
         <translation>Simulerar…</translation>
     </message>
+    <message>
+        <source>Could not commit %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Quick3DViewerWidget</name>
@@ -9018,6 +9039,10 @@ Ange värdet 0 om du inte vill ha någon fördröjning.</translation>
     <message>
         <source>Revert</source>
         <translation>Reverta</translation>
+    </message>
+    <message>
+        <source>Could not revert %1: %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

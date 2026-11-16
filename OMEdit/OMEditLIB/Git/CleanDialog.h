@@ -44,7 +44,6 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QStandardItemModel>
-#include<QProcess>
 
 
 class CleanDialog : public QDialog
@@ -63,7 +62,6 @@ private:
   QPushButton *mpCleanRepositoryButton;
   QPushButton *mpCancelButton;
   QDialogButtonBox *mpButtonBox;
-  QProcess *mpProcess;
 //private slots:
 //  void revertCommit();
 //  void browseCommitLog();

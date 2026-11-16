@@ -101,8 +101,6 @@ class AboutOMEditDialog;
 class Label;
 class FileDataNotifier;
 class LibraryTreeItem;
-class GitCommands;
-class CommitChangesDialog;
 class TraceabilityInformationURI;
 class StatusBar;
 class TraceabilityGraphViewWidget;
@@ -171,8 +169,6 @@ public:
   OMSSimulationDialog* getOMSSimulationDialog() {return mpOMSSimulationDialog;}
   ModelWidgetContainer* getModelWidgetContainer() {return mpModelWidgetContainer;}
   WelcomePageWidget* getWelcomePageWidget() {return mpWelcomePageWidget;}
-  GitCommands* getGitCommands() {return mpGitCommands;}
-  CommitChangesDialog* getCommitChangesDialog() {return mpCommitChangesDialog;}
   TraceabilityInformationURI* getTraceabilityInformationURI() {return mpTraceabilityInformationURI;}
   QTabWidget* getMessagesTabWidget() {return mpMessagesTabWidget;}
   StatusBar* getStatusBar() {return mpStatusBar;}
@@ -350,8 +346,6 @@ private:
   ModelWidgetContainer *mpModelWidgetContainer;
   WelcomePageWidget *mpWelcomePageWidget;
   QObject *mpOMSensPlugin;
-  GitCommands *mpGitCommands;
-  CommitChangesDialog *mpCommitChangesDialog;
   TraceabilityInformationURI *mpTraceabilityInformationURI;
   QStackedWidget *mpCentralStackedWidget;
   QTabWidget *mpMessagesTabWidget;

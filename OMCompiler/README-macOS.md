@@ -31,7 +31,7 @@ OpenModelica:
 ```sh
 sudo port install curl libiconv gettext flex cmake ccache libomp openjdk11
 # Qt6 for the graphical clients, needs macOS 14 or newer for QtWebEngine
-sudo port install qt6-qtbase qt6-qtwebengine qt6-qt5compat qt6-qtsvg qt6-qtquick3d
+sudo port install qt6-qtbase qt6-qtwebengine qt6-qt5compat qt6-qtsvg qt6-qtquick3d libgit2
 ```
 
 MacPorts does not install `libomp` where CMake looks for it, so the configure command in
@@ -43,7 +43,7 @@ Install `homebrew` by following the instructions on <https://brew.sh/>, then ins
 dependencies for OpenModelica:
 
 ```sh
-brew install openjdk pkg-config cmake make ccache qtwebengine qt5compat qtsvg qthttpserver qtquick3d
+brew install openjdk pkg-config cmake make ccache qtwebengine qt5compat qtsvg qthttpserver qtquick3d libgit2
 echo "export PATH=\"$(brew --prefix openjdk)/bin:\$PATH\"" >> ~/.zshrc
 ```
 

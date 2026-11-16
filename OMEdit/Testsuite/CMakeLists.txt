@@ -133,6 +133,9 @@ set(OMEDIT_TEST_RECENTMODELS_SOURCES RecentModels/RecentModelsTest.cpp
                                      RecentModels/RecentModelsTest.h)
 add_omedit_test(RecentModels "${OMEDIT_TEST_RECENTMODELS_SOURCES}")
 
+set(OMEDIT_TEST_GITREPOSITORY_SOURCES Git/GitRepositoryTest.cpp)
+add_omedit_test(GitRepository "${OMEDIT_TEST_GITREPOSITORY_SOURCES}")
+
 set(OMEDIT_TEST_REPLACEABLECONSTRAINEDBY_SOURCES ReplaceableConstrainedBy/ReplaceableConstrainedByTest.cpp
                                                   ReplaceableConstrainedBy/ReplaceableConstrainedByTest.h)
 add_omedit_test(ReplaceableConstrainedBy "${OMEDIT_TEST_REPLACEABLECONSTRAINEDBY_SOURCES}")

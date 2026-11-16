@@ -137,7 +137,7 @@ void ImportFMUModelDescriptionDialog::importFMUModelDescription()
     // Get the name of the file without the extension
     QString base_name = file.baseName();
     //Push traceability information automaticaly to Daemon
-    MainWindow::instance()->getCommitChangesDialog()->generateTraceabilityURI("modelDescriptionImport", fmuFileName, base_name, mpFmuModelDescriptionTextBox->text());
+    CommitChangesDialog::generateTraceabilityURI("modelDescriptionImport", fmuFileName, base_name, mpFmuModelDescriptionTextBox->text());
   }
   accept();
 }

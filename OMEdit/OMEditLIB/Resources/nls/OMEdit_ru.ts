@@ -930,6 +930,10 @@ The local copy and its synchronisation state are removed. Nothing in the cloud i
         <translation>коммит</translation>
     </message>
     <message>
+        <source>Could not commit to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Commit Message </source>
         <translation>Сообщение коммита </translation>
     </message>
@@ -4333,13 +4337,6 @@ You can choose between waiting longer or abort debugging.</source>
     </message>
 </context>
 <context>
-    <name>GitCommands</name>
-    <message>
-        <source>Repository Creation Failed</source>
-        <translation>Ошибка создания репозитория</translation>
-    </message>
-</context>
-<context>
     <name>GoogleDriveProvider</name>
     <message>
         <source>The file changed in Google Drive since it was last synchronised.</source>
@@ -6759,6 +6756,26 @@ Use Download... to fetch one, or point Server Executable at a server you already
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Repository Creation Failed</source>
+        <translation type="unfinished">Ошибка создания репозитория</translation>
+    </message>
+    <message>
+        <source>A version control repository could not be created in %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialized Git repository in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not stage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not unstage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Opens the Modelica file(s)</source>
         <translation>Открывает файл(ы) Modelica</translation>
     </message>
@@ -8828,6 +8845,10 @@ Set the value to 0 if you don&apos;t want any delay.</source>
         <source>Simulating…</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Could not commit %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Quick3DViewerWidget</name>
@@ -8953,6 +8974,10 @@ Set the value to 0 if you don&apos;t want any delay.</source>
     <message>
         <source>Revert</source>
         <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>Could not revert %1: %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

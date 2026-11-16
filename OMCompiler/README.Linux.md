@@ -86,6 +86,7 @@ Install the following dependencies with your package manager:
 - libhdf5 (optional, MAT v7.3 result files, see `OM_ENABLE_HDF5`)
 - ncurses, readline (optional, used by OMShell-terminal)
 - Qt6 with QtWebEngine, Qt5Compat, QtQuick3D (optional, used by OMEdit) and QtSvg (optional, used by the graphical clients)
+- libgit2 >= 1.1 (libgit2-dev, optional, Git support in OMEdit)
 - rustc and cargo (see [1.3 Rust toolchain](#13-rust-toolchain))
 
 ### 1.3 Rust toolchain

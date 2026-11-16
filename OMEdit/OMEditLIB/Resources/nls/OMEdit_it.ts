@@ -935,6 +935,10 @@ La copia locale e il suo stato di sincronizzazione vengono rimossi. Nel cloud no
         <translation>Esegui commit</translation>
     </message>
     <message>
+        <source>Could not commit to %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Commit Message </source>
         <translation>Messaggio di commit </translation>
     </message>
@@ -4345,13 +4349,6 @@ You can choose between waiting longer or abort debugging.</source>
     </message>
 </context>
 <context>
-    <name>GitCommands</name>
-    <message>
-        <source>Repository Creation Failed</source>
-        <translation>Creazione del repository non riuscita</translation>
-    </message>
-</context>
-<context>
     <name>GoogleDriveProvider</name>
     <message>
         <source>The file changed in Google Drive since it was last synchronised.</source>
@@ -6925,6 +6922,26 @@ Usare Scarica... per ottenerne uno, oppure impostare Eseguibile del server su un
         <translation>Testsuite CRML</translation>
     </message>
     <message>
+        <source>Repository Creation Failed</source>
+        <translation type="unfinished">Creazione del repository non riuscita</translation>
+    </message>
+    <message>
+        <source>A version control repository could not be created in %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialized Git repository in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not stage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not unstage %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Load Encrypted Library</source>
         <translation>Carica libreria cifrata</translation>
     </message>
@@ -8892,6 +8909,10 @@ Impostare il valore a 0 per non avere alcun ritardo.</translation>
         <source>Simulating…</source>
         <translation>Simulazione in corso…</translation>
     </message>
+    <message>
+        <source>Could not commit %1: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Quick3DViewerWidget</name>
@@ -9017,6 +9038,10 @@ Impostare il valore a 0 per non avere alcun ritardo.</translation>
     <message>
         <source>Revert</source>
         <translation>Esegui revert</translation>
+    </message>
+    <message>
+        <source>Could not revert %1: %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

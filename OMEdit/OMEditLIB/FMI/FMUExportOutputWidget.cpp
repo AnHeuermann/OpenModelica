@@ -556,7 +556,7 @@ void FmuExportOutputWidget::zipFMU()
     //trace export FMU
     if (OptionsDialog::instance()->getTraceabilityPage()->getTraceabilityGroupBox()->isChecked()) {
       //Push traceability information automaticaly to Daemon
-      MainWindow::instance()->getCommitChangesDialog()->generateTraceabilityURI("fmuExport", mpLibraryTreeItem->getFileName(), mpLibraryTreeItem->getNameStructure(), mFmuLocationPath);
+      CommitChangesDialog::generateTraceabilityURI("fmuExport", mpLibraryTreeItem->getFileName(), mpLibraryTreeItem->getNameStructure(), mFmuLocationPath);
     }
     mpProgressBar->setValue(1);
     mpProgressLabel->setText(tr("Export of FMU %1 finished.").arg(mpLibraryTreeItem->getName()));

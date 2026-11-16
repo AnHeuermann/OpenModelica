@@ -56,7 +56,6 @@
 #include "OMS/OMSCalibrationDialog.h"
 #endif
 #include "OMUQ/OMUQDialog.h"
-#include "Git/GitCommands.h"
 #include "Git/CommitChangesDialog.h"
 #include "Util/ResourceCache.h"
 #include "Search/FindUsageWidget.h"
@@ -4900,8 +4899,8 @@ bool LibraryWidget::saveModelicaLibraryTreeItemOneFile(LibraryTreeItem *pLibrary
 #endif
       /* Save the traceabiliy information and send to Daemon. */
 #if !defined(__EMSCRIPTEN__)
-      if(GitCommands::instance()->isSavedUnderGitRepository(pLibraryTreeItem->getFileName()) && OptionsDialog::instance()->getTraceabilityPage()->getTraceabilityGroupBox()->isChecked() ){
-        MainWindow::instance()->getCommitChangesDialog()->commitAndGenerateTraceabilityURI(pLibraryTreeItem->getFileName());
+      if (OptionsDialog::instance()->getTraceabilityPage()->getTraceabilityGroupBox()->isChecked() && GitRepository::open(pLibraryTreeItem->getFileName()).isValid()) {
+        CommitChangesDialog::commitAndGenerateTraceabilityURI(pLibraryTreeItem->getFileName());
       }
 #endif
     } else {

@@ -137,10 +137,10 @@ set(OMEDITLIB_SOURCES LSP/LSPClient.cpp
                       CRML/CRMLTranslatorOutputWidget.cpp
                       OMUQ/OMUQDialog.cpp
                       OMUQ/OMUQOutputWidget.cpp
-                      Git/GitCommands.cpp
                       Git/CommitChangesDialog.cpp
                       Git/RevertCommitsDialog.cpp
                       Git/CleanDialog.cpp
+                      Git/GitRepository.cpp
                       OMEditApplication.cpp
                       Traceability/TraceabilityGraphViewWidget.cpp
                       Traceability/TraceabilityInformationURI.cpp
@@ -304,10 +304,10 @@ set(OMEDITLIB_HEADERS LSP/LSPClient.h
                       CRML/CRMLTranslatorOutputWidget.h
                       OMUQ/OMUQDialog.h
                       OMUQ/OMUQOutputWidget.h
-                      Git/GitCommands.h
                       Git/CommitChangesDialog.h
                       Git/RevertCommitsDialog.h
                       Git/CleanDialog.h
+                      Git/GitRepository.h
                       OMEditApplication.h
                       Traceability/TraceabilityGraphViewWidget.h
                       Traceability/TraceabilityInformationURI.h
@@ -465,6 +465,19 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     endif ()
   endif ()
 endif ()
+
+# Git access (Git/GitRepository.cpp). Without libgit2 OMEdit finds no repositories.
+find_package(PkgConfig QUIET)
+if(PKG_CONFIG_FOUND)
+  pkg_check_modules(LIBGIT2 QUIET IMPORTED_TARGET libgit2>=1.1)
+endif()
+if(LIBGIT2_FOUND)
+  message(STATUS "OMEdit: Git support with libgit2 ${LIBGIT2_VERSION}.")
+  target_compile_definitions(OMEditLib PRIVATE OM_OMEDIT_HAVE_LIBGIT2)
+  target_link_libraries(OMEditLib PUBLIC PkgConfig::LIBGIT2)
+else()
+  message(STATUS "OMEdit: libgit2 >= 1.1 not found. Building without Git support.")
+endif()
 
 # StringHandler formats reals with om_format.h.
 target_link_libraries(OMEditLib PUBLIC omc::3rd::ryu)

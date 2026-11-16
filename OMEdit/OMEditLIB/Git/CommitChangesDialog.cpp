@@ -37,7 +37,6 @@
 #include "MainWindow.h"
 #include "Modeling/ModelWidgetContainer.h"
 #include "Modeling/MessagesWidget.h"
-#include "Git/GitCommands.h"
 #include "Options/OptionsDialog.h"
 #include "Traceability/TraceabilityInformationURI.h"
 #include "Util/Helper.h"
@@ -67,17 +66,17 @@ CommitChangesDialog::CommitChangesDialog(QWidget *pParent)
   setWindowTitle(QString(Helper::applicationName).append(" - ").append(tr("Commit")));
   setAttribute(Qt::WA_DeleteOnClose);
   resize(850, 600);
-  QString repository = MainWindow::instance()->getModelWidgetContainer()->getCurrentModelWidget()->getLibraryTreeItem()->getFileName();
+  mRepository = GitRepository::open(MainWindow::instance()->getModelWidgetContainer()->getCurrentModelWidget()->getLibraryTreeItem()->getFileName());
   // repository information
   mpRepositoryLabel = new Label(tr("Repository:"));
   mpRepositoryNameTextBox = new QLineEdit;
   mpRepositoryNameTextBox->setEnabled(false);
-  mpRepositoryNameTextBox->setText(GitCommands::instance()->getRepositoryName(repository));
+  mpRepositoryNameTextBox->setText(mRepository.workingDirectory());
   //Branch
   mpBranchLabel = new Label(tr("Branch:"));
   mpBranchNameTextBox = new QLineEdit;
   mpBranchNameTextBox->setEnabled(false);
-  mpBranchNameTextBox->setText(GitCommands::instance()->getBranchName(repository));
+  mpBranchNameTextBox->setText(mRepository.branchName());
   QGroupBox *pRepositoryInformationGroupBox = new QGroupBox(tr("Repository Information:"));
   QGridLayout *pRepositoryInformationGridLayout = new QGridLayout;
   pRepositoryInformationGridLayout->addWidget(mpRepositoryLabel, 0, 0);
@@ -89,10 +88,10 @@ CommitChangesDialog::CommitChangesDialog(QWidget *pParent)
   QGroupBox *pCommitInformationGroupBox = new QGroupBox(tr("Commit Information:"));
   mpAuthorLabel = new Label(tr("Author:"));
   mpAuthorTextBox = new QLineEdit;
-  mpAuthorTextBox->setText(GitCommands::instance()->getAuthorName());
+  mpAuthorTextBox->setText(mRepository.configValue("user.name"));
   mpEmailLabel = new Label(tr("Email:"));
   mpEmailTextBox = new QLineEdit;
-  mpEmailTextBox->setText(GitCommands::instance()->getEmailName());
+  mpEmailTextBox->setText(mRepository.configValue("user.email"));
   QGridLayout *pCommitInformationGridLayout = new QGridLayout;
   pCommitInformationGridLayout->addWidget(mpAuthorLabel, 0, 0);
   pCommitInformationGridLayout->addWidget(mpAuthorTextBox, 0, 1);
@@ -153,16 +152,13 @@ void CommitChangesDialog::getChangedFiles()
 {
   QString fileName = MainWindow::instance()->getModelWidgetContainer()->getCurrentModelWidget()->getLibraryTreeItem()->getFileName();
 
-  mpModifiedFiles = GitCommands::instance()->getChangedFiles(fileName);
+  std::optional<GitRepository::Status> status = mRepository.fileStatus(fileName);
 
   if (const int oldRowCount = mpCommitChangedFilesModel->rowCount())
       mpCommitChangedFilesModel->removeRows(0, oldRowCount);
-  foreach (const QString &fileName, mpModifiedFiles)
-     if(!fileName.isEmpty()) {
-       QString status = getFileStatus(fileName.mid(0, 2));
-       QString file = fileName.mid(3);
-       addFile(status, file, true);
-     }
+  if (status && *status != GitRepository::Current && !status->testFlag(GitRepository::Ignored)) {
+    addFile(getFileStatus(*status), QDir(mRepository.workingDirectory()).relativeFilePath(fileName), true);
+  }
   for (int c = 0; c < mpCommitChangedFilesModel->columnCount(); c++)
       mpCommitChangedFilesTreeView->resizeColumnToContents(c);
    mpSelectAllCheckBox->setChecked(true);
@@ -203,26 +199,44 @@ void CommitChangesDialog::addFile(QString fileStatus, QString fileName, bool che
    mpCommitChangedFilesModel->appendRow(row);
 }
 
-QString CommitChangesDialog::getFileStatus(QString status)
+QString CommitChangesDialog::getFileStatus(GitRepository::Status status)
 {
- if (status.trimmed().compare("M")== 0)
-    return "modelModification";
-  else if (status.trimmed().compare("A")== 0)
+  if (status & (GitRepository::IndexNew | GitRepository::WorkTreeNew))
     return "modelCreation";
-  else if (status.trimmed().compare("D")== 0)
+  else if (status & (GitRepository::IndexDeleted | GitRepository::WorkTreeDeleted))
     return "Deleted";
-  else if (status.trimmed().compare("R")== 0)
+  else if (status & (GitRepository::IndexRenamed | GitRepository::WorkTreeRenamed))
     return "Renamed";
-  else if (status.trimmed().compare("C")== 0)
-    return "Copied";
-  else if (status.trimmed().compare("??")== 0)
-    return "modelCreation";
- else if (status.trimmed().compare("AM")== 0)
-   return "modelCreation";
+  else if (status & (GitRepository::IndexModified | GitRepository::WorkTreeModified | GitRepository::IndexTypeChange | GitRepository::WorkTreeTypeChange))
+    return "modelModification";
   else
-    // should never be reached
     return "UnknownFileStatus";
 }
+
+namespace {
+
+void reportGitError(const QString &message)
+{
+  MessagesWidget::instance()->addGUIMessage(MessageItem(MessageItem::Modelica, message, Helper::scriptingKind, Helper::errorLevel));
+}
+
+QString fileHash(const QString &fileName)
+{
+  GitRepository repository = GitRepository::open(fileName);
+  std::optional<QString> hash = repository.isValid() ? repository.fileHash(fileName) : GitRepository::hashFile(fileName);
+  return hash.value_or(QString());
+}
+
+QString commitAndGetFileHash(const QString &fileName, const QString &message)
+{
+  GitRepository repository = GitRepository::open(fileName);
+  if (!repository.isValid() || !repository.commitFile(fileName, message)) {
+    reportGitError(QObject::tr("Could not commit %1: %2").arg(fileName, repository.errorString()));
+  }
+  return fileHash(fileName);
+}
+
+} // namespace
 
 /*!
   Slot activated when mpCommitDescriptionTextBox textChanged signal is raised.\n
@@ -237,17 +251,9 @@ void CommitChangesDialog::commitDescriptionTextChanged()
 
 void CommitChangesDialog::commitFiles()
 {
-  QString filePath = MainWindow::instance()->getModelWidgetContainer()->getCurrentModelWidget()->getLibraryTreeItem()->getFileName();
-  QString nameStructure = MainWindow::instance()->getModelWidgetContainer()->getCurrentModelWidget()->getLibraryTreeItem()->getNameStructure();
-  QFileInfo info(filePath);
-  GitCommands::instance()->commitFiles(filePath, mpCommitDescriptionTextBox->toPlainText());
-  foreach (const QString &fileName, mpModifiedFiles) {
-    if(!fileName.isEmpty()) {
-//      QString activity = getFileStatus(fileName.mid(0, 2));
-//      QString fileURI = fileName.mid(3);
-//      generateTraceabilityURI(nameStructure, info.absolutePath(), filePath, activity, fileURI );
-      }
-   }
+  if (!mRepository.commit(mpCommitDescriptionTextBox->toPlainText(), mpAuthorTextBox->text(), mpEmailTextBox->text())) {
+    reportGitError(tr("Could not commit to %1: %2").arg(mRepository.workingDirectory(), mRepository.errorString()));
+  }
   accept();
 }
 
@@ -260,21 +266,21 @@ void CommitChangesDialog::generateTraceabilityURI(QString activity, QString mode
   if(activity.compare("modelDescriptionImport")== 0) {
     entityType = "modelDescriptionFile";
     path = dir.relativeFilePath(modelFileName);
-    gitHash = GitCommands::instance()->commitAndGetFileHash(modelFileName, activity);
+    gitHash = commitAndGetFileHash(modelFileName, activity);
     fmuFileNameURI = "Entity.modelFile:" + path + "#" + gitHash ;
-    sourceModelFileNameURI = "Entity.modelDescriptionFile:" + dir.relativeFilePath(fmuFileName) + "#" + GitCommands::instance()->getGitHash(fmuFileName);
+    sourceModelFileNameURI = "Entity.modelDescriptionFile:" + dir.relativeFilePath(fmuFileName) + "#" + fileHash(fmuFileName);
   }else if(activity.compare("fmuImport")== 0) {
     entityType = "fmu";
     path = dir.relativeFilePath(modelFileName);
-    gitHash = GitCommands::instance()->commitAndGetFileHash(modelFileName, activity);
+    gitHash = commitAndGetFileHash(modelFileName, activity);
     fmuFileNameURI = "Entity.modelFile:" + path + "#" + gitHash ;
-    sourceModelFileNameURI = "Entity.fmu:" + dir.relativeFilePath(fmuFileName) + "#" + GitCommands::instance()->getGitHash(fmuFileName);
+    sourceModelFileNameURI = "Entity.fmu:" + dir.relativeFilePath(fmuFileName) + "#" + fileHash(fmuFileName);
   }else {
     entityType = "fmu";
     path = dir.relativeFilePath(fmuFileName);
-    gitHash = GitCommands::instance()->commitAndGetFileHash(fmuFileName, activity);
+    gitHash = commitAndGetFileHash(fmuFileName, activity);
     fmuFileNameURI = "Entity.fmu:" + path + "#" + gitHash;
-    sourceModelFileNameURI = "Entity.modelFile:" + dir.relativeFilePath(modelFileName) + "#" + GitCommands::instance()->getGitHash(modelFileName);
+    sourceModelFileNameURI = "Entity.modelFile:" + dir.relativeFilePath(modelFileName) + "#" + fileHash(modelFileName);
   }
   toolURI = "Entity.softwareTool:OpenModelica: " + MainWindow::instance()->getOMCProxy()->getVersion();
   agentURI = "Agent:" + OptionsDialog::instance()->getTraceabilityPage()->getEmail()->text();
@@ -284,8 +290,8 @@ void CommitChangesDialog::generateTraceabilityURI(QString activity, QString mode
 
 void CommitChangesDialog::commitAndGenerateTraceabilityURI(QString fileName)
 {
-  QString status = GitCommands::instance()->getSingleFileStatus(fileName);
-  QString activity = getFileStatus(status.mid(0, 2));
+  std::optional<GitRepository::Status> status = GitRepository::open(fileName).fileStatus(fileName);
+  QString activity = getFileStatus(status.value_or(GitRepository::Status(GitRepository::Current)));
   QString commitMessage = "OpenModelica Modeling";
   commitMessage = QInputDialog::getMultiLineText(MainWindow::instance(), tr("Commit Message "), tr("Commit description:"));
   QString toolURI, activityURI, agentURI, sourceModelFileNameURI, fmuFileNameURI, gitHash, path;
@@ -296,13 +302,13 @@ void CommitChangesDialog::commitAndGenerateTraceabilityURI(QString fileName)
   activityURI = "Activity."+ activity +":" + time.toTimeZone(QTimeZone::utc()).toString(Qt::ISODate)+ "#" + QUuid::createUuid().toString().mid(1, 36);
   path = dir.relativeFilePath(fileName);
   if(activity.compare("modelModification")== 0) {
-    gitHash = GitCommands::instance()->getGitHash(fileName);
+    gitHash = fileHash(fileName);
     sourceModelFileNameURI = "Entity.modelFile:" + path + "#" + gitHash;
-    fmuFileNameURI = "Entity.modelFile:" + path + "#" + GitCommands::instance()->commitAndGetFileHash(fileName, commitMessage);
+    fmuFileNameURI = "Entity.modelFile:" + path + "#" + commitAndGetFileHash(fileName, commitMessage);
     MainWindow::instance()->getTraceabilityInformationURI()->translateURIToJsonMessageFormat(activity,  toolURI,  activityURI,  agentURI,  sourceModelFileNameURI,  fmuFileNameURI, "modelFile", path, gitHash);
   }
   else if(activity.compare("modelCreation")== 0) {
-    gitHash = GitCommands::instance()->commitAndGetFileHash(fileName, commitMessage);
+    gitHash = commitAndGetFileHash(fileName, commitMessage);
     sourceModelFileNameURI = "Entity.modelFile:" + path + "#" + gitHash;
     MainWindow::instance()->getTraceabilityInformationURI()->translateModelCreationURIToJsonMessageFormat(activity,  toolURI,  activityURI,  agentURI,  sourceModelFileNameURI, "modelFile", path, gitHash);
   }
