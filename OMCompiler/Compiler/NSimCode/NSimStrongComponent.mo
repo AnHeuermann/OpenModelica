@@ -1067,6 +1067,18 @@ public
                   scalar_simvar.arrayCref := NONE();
                   scalar_simvar.numArrayElement := {};
                   osimvar := SOME(scalar_simvar);
+                elseif isNone(osimvar) and not Flags.getConfigBool(Flags.SIM_CODE_SCALARIZE)
+                       and not List.any(Type.arrayDims(var.ty), hasRuntimeSize) then
+                  // the element of the array simvar, it keeps the index of the array
+                  osimvar := UnorderedMap.get(ComponentRef.stripSubscriptsAll(scal_var.name), simcode_map);
+                  if isSome(osimvar) then
+                    SOME(scalar_simvar) := osimvar;
+                    scalar_simvar.name := scal_var.name;
+                    scalar_simvar.type_ := scal_var.ty;
+                    scalar_simvar.arrayCref := NONE();
+                    scalar_simvar.numArrayElement := {};
+                    osimvar := SOME(scalar_simvar);
+                  end if;
                 end if;
                 if isSome(osimvar) then
                   linVars := Util.getOption(osimvar) :: linVars;

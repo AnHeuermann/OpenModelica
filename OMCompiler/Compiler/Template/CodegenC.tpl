@@ -3353,8 +3353,11 @@ end functionNonLinearResiduals;
 template linearSystemSetIterVars(list<SimVar> vars, Text &sub)
   "the iteration variables from xloc, runs of consecutive real variables at once"
 ::=
-  (simVarIndexRuns(vars) |> (pos, idx, len, kind) =>
-    if intEq(kind, 1) then if intGt(len, 1) then
+  (simVarIndexRuns(vars) |> (pos, idx, len, kind, off) =>
+    if intEq(kind, 4) then
+      (match listGet(vars, intAdd(pos, 1)) case var as SIMVAR() then
+        'memcpy(&data->localData[0]->realVars[data->simulationInfo->realVarsIndex[<%idx%>] + <%off%>], xloc + <%pos%>, <%len%> * sizeof(double)); /* <%crefCComment(var, crefStrNoUnderscore(var.name))%> ... */')
+    else if intEq(kind, 1) then if intGt(len, 1) then
       (match listGet(vars, intAdd(pos, 1)) case var as SIMVAR() then
         'memcpy(&data->localData[0]->realVars[<%idx%>], xloc + <%pos%>, <%len%> * sizeof(double)); /* <%crefCComment(var, crefStrNoUnderscore(var.name))%> ... */')
     else
@@ -8265,6 +8268,29 @@ case alg as SES_INVERSE_ALGORITHM(__) then
   >>
 end equationAlgorithm;
 
+template linearSystemCopyVars(list<SimVar> vars, Context context, Text &auxFunction, Boolean toAux)
+  "copies the iteration variables to aux_x (the old values) or back from aux_x,
+   runs of consecutive real variables at once (see simVarIndexRuns)"
+::=
+  match context
+  case SIMULATION_CONTEXT(__) then
+    (simVarIndexRuns(vars) |> (pos, idx, len, kind, off) =>
+      if boolAnd(intGt(len, 1), boolOr(intEq(kind, 1), intEq(kind, 4))) then
+        let first = if intEq(kind, 4) then 'data->simulationInfo->realVarsIndex[<%idx%>] + <%off%>' else idx
+        if toAux then 'memcpy(aux_x + <%pos%>, &data->localData[1]->realVars[<%first%>], <%len%> * sizeof(double));'
+        else 'memcpy(&data->localData[0]->realVars[<%first%>], aux_x + <%pos%>, <%len%> * sizeof(double));'
+      else
+        (match listGet(vars, intAdd(pos, 1)) case SIMVAR(__) then
+          if toAux then 'aux_x[<%pos%>] = <%contextCrefOld(name, context, &auxFunction, 1)%>;'
+          else '<%contextCrefNoPrevExp(name, context, &auxFunction)%> = aux_x[<%pos%>];')
+    ;separator="\n")
+  else
+    (vars |> SIMVAR(__) hasindex i0 =>
+      if toAux then 'aux_x[<%i0%>] = <%contextCrefOld(name, context, &auxFunction, 1)%>;'
+      else '<%contextCrefNoPrevExp(name, context, &auxFunction)%> = aux_x[<%i0%>];'
+    ;separator="\n")
+end linearSystemCopyVars;
+
 template equationLinear(SimEqSystem eq, Context context, Text &varDecls, Text &varFrees)
  "Generates a linear equation system."
 ::=
@@ -8276,7 +8302,8 @@ case e as SES_LINEAR(lSystem=ls as LINEARSYSTEM(__), alternativeTearing = at) th
   <<
   /* Linear equation system */
   int retValue;
-  double aux_x[<%listLength(ls.vars)%>] = { <%ls.vars |> SIMVAR(__) hasindex i0 => '<%contextCrefOld(name, context, auxFunctions, 1)%>' ;separator=","%> };
+  double aux_x[<%listLength(ls.vars)%>];
+  <%linearSystemCopyVars(ls.vars, context, auxFunctions, true)%>
   infoStreamPrint(OMC_LOG_DT, 0, "Solving linear system <%ls.index%> (STRICT TEARING SET if tearing enabled) at time = %18.10e", data->localData[0]->timeValue);
   <% if profileSome() then 'SIM_PROF_TICK_EQ(modelInfoGetEquation(&data->modelData->modelDataXml,<%ls.index%>).profileBlockIndex);' %>
   <% if ls.partOfJac then
@@ -8293,7 +8320,7 @@ case e as SES_LINEAR(lSystem=ls as LINEARSYSTEM(__), alternativeTearing = at) th
     <%returnval2%>
   }
   /* write solution */
-  <%ls.vars |> SIMVAR(__) hasindex i0 => '<%contextCrefNoPrevExp(name, context, auxFunctions)%> = aux_x[<%i0%>];' ;separator="\n"%>
+  <%linearSystemCopyVars(ls.vars, context, auxFunctions, false)%>
   <% if profileSome() then 'SIM_PROF_ACC_EQ(modelInfoGetEquation(&data->modelData->modelDataXml,<%ls.index%>).profileBlockIndex);' %>
 
   <%returnval%>

@@ -9191,9 +9191,12 @@ template initializeStaticLSVars(list<SimVar> vars, Integer index)
  one of the parameters."
 ::=
   let len = listLength(simVarIndexRuns(vars))
-  let rows = (simVarIndexRuns(vars) |> (pos, idx, n, kind) =>
+  let rows = (simVarIndexRuns(vars) |> (pos, idx, n, kind, off) =>
     match listGet(vars, intAdd(pos, 1)) case var as SIMVAR() then
-      '{<%pos%>, <%idx%>, <%n%>, <%kind%>} /* <%crefCComment(var, crefStrNoUnderscore(var.name))%> */'
+      if intEq(kind, 4) then
+        '{<%pos%>, (int) data->simulationInfo->realVarsIndex[<%idx%>] + <%off%>, <%n%>, 1} /* <%crefCComment(var, crefStrNoUnderscore(var.name))%> */'
+      else
+        '{<%pos%>, <%idx%>, <%n%>, <%kind%>} /* <%crefCComment(var, crefStrNoUnderscore(var.name))%> */'
     ;separator=",\n")
   <<
   void initializeStaticLSData<%index%>(DATA* data, threadData_t* threadData, LINEAR_SYSTEM_DATA* linearSystemData, modelica_boolean initSparsePattern)

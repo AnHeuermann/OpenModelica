@@ -25,6 +25,7 @@ recordActualStream.mos \
 arrayZeroDivisionInitial.mos \
 arrayPreValues.mos \
 jacobianElementSeed.mos \
+linearArrayLoop.mos \
 jacobianArrayIndices.mos \
 jacobianLiterals.mos \
 blockLiterals.mos \
