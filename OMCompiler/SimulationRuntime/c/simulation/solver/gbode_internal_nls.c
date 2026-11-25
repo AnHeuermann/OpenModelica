@@ -192,10 +192,10 @@ static void gbInternal_evalJacobianMR(DATA* data,
   fullJac->evalSelectionCol = NULL;
 }
 
-static void gbInternal_evalNumericalJacobian(DATA *data,
-                                             threadData_t *threadData,
-                                             DATA_GBODE *gbData,
-                                             GB_INTERNAL_NLS_DATA *nls)
+static int gbInternal_evalNumericalJacobian(DATA *data,
+                                            threadData_t *threadData,
+                                            DATA_GBODE *gbData,
+                                            GB_INTERNAL_NLS_DATA *nls)
 {
   const double delta_h = numericalDifferentiationDeltaXsolver;
 
@@ -279,10 +279,10 @@ static void gbInternal_evalNumericalJacobian(DATA *data,
       }
     }
     if (rhsFailed) {
-      omc_error_raise(threadData);
-      return;
+      return rhsFailed;
     }
   }
+  return 0;
 }
 
 /**
@@ -300,6 +300,7 @@ static void gbInternal_evalNumericalJacobian(DATA *data,
 static int gbInternal_evalJacobian(DATA *data, threadData_t *threadData, DATA_GBODE *gbData, GB_INTERNAL_NLS_DATA *nls)
 {
   int ret = -1;
+  int numericFailed = 0;
 
   /* try */
   OMC_TRY_INTERNAL(simulationJumpBuffer)
@@ -323,10 +324,10 @@ static int gbInternal_evalJacobian(DATA *data, threadData_t *threadData, DATA_GB
   }
   else
   {
-    gbInternal_evalNumericalJacobian(data, threadData, gbData, nls);
+    numericFailed = gbInternal_evalNumericalJacobian(data, threadData, gbData, nls);
   }
 
-  if (OMC_ERROR_RAISED()) { OMC_ERROR_CLEAR(); } else { ret = 0; }
+  if (OMC_ERROR_RAISED()) { OMC_ERROR_CLEAR(); } else if (!numericFailed) { ret = 0; }
 
     OMC_CATCH_INTERNAL(simulationJumpBuffer)
 
