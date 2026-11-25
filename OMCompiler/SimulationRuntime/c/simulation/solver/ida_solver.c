@@ -952,18 +952,12 @@ int ida_solver_step(DATA* data, threadData_t *threadData, SOLVER_INFO* solverInf
       memcpy(sData->realVars + data->modelData->nStates, idaData->statesDer, sizeof(double)*data->modelData->nStates);
     }
 
-    modelica_boolean historyFailed;
-    if (storeSolverSteps) {
-      const modelica_boolean intermediateStep = flag == IDA_SUCCESS && solverInfo->currentTime < tout;
+    const modelica_boolean intermediateStep = flag == IDA_SUCCESS && solverInfo->currentTime < tout;
 #ifdef OMC_FMI_RUNTIME
-      if (intermediateStep && idaData->daeMode)
-        data->simulationInfo->daeModeData->evaluateDAEResiduals(data, threadData, EVAL_ALGEBRAIC);
+    if (storeSolverSteps && intermediateStep && idaData->daeMode)
+      data->simulationInfo->daeModeData->evaluateDAEResiduals(data, threadData, EVAL_ALGEBRAIC);
 #endif
-      historyFailed = intermediateStep && storeSpatialDistributionStep(data, threadData);
-    } else {
-      historyFailed = spatialDistributionNeedsHistory(data, FALSE);
-    }
-    if (historyFailed) {
+    if (spatialDistributionAfterSolverCall(data, threadData, storeSolverSteps, intermediateStep) != SPATIAL_DISTRIBUTION_STEP_OK) {
       retVal = IDA_RES_FAIL;
       messageClose(OMC_LOG_SOLVER);
       break;

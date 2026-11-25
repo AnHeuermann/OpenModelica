@@ -1175,14 +1175,8 @@ int cvode_solver_step(DATA *data, threadData_t *threadData, SOLVER_INFO *solverI
     /* Set time to current time */
     simulationData->timeValue = solverInfo->currentTime;
 
-    modelica_boolean historyFailed;
-    if (storeSolverSteps) {
-      const modelica_boolean intermediateStep = flag == CV_SUCCESS && solverInfo->currentTime < tout;
-      historyFailed = intermediateStep && storeSpatialDistributionStep(data, threadData);
-    } else {
-      historyFailed = spatialDistributionNeedsHistory(data, FALSE);
-    }
-    if (historyFailed) {
+    const modelica_boolean intermediateStep = flag == CV_SUCCESS && solverInfo->currentTime < tout;
+    if (spatialDistributionAfterSolverCall(data, threadData, storeSolverSteps, intermediateStep) != SPATIAL_DISTRIBUTION_STEP_OK) {
       retVal = CV_RHSFUNC_FAIL;
       break;
     }

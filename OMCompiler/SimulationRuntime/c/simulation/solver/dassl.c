@@ -613,14 +613,8 @@ int dassl_step(DATA* data, threadData_t *threadData, SOLVER_INFO* solverInfo)
       /* set ringbuffer time to current time */
       sData->timeValue = solverInfo->currentTime;
 
-      modelica_boolean historyFailed;
-      if (storeSolverSteps) {
-        const modelica_boolean intermediateStep = dasslData->idid == 1 && solverInfo->currentTime < tout;
-        historyFailed = intermediateStep && storeSpatialDistributionStep(data, threadData);
-      } else {
-        historyFailed = spatialDistributionNeedsHistory(data, FALSE);
-      }
-      if (historyFailed)
+      const modelica_boolean intermediateStep = dasslData->idid == 1 && solverInfo->currentTime < tout;
+      if (spatialDistributionAfterSolverCall(data, threadData, storeSolverSteps, intermediateStep) != SPATIAL_DISTRIBUTION_STEP_OK)
       {
         retVal = -1;
         break;
